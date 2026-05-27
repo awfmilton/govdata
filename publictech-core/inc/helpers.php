@@ -29,6 +29,9 @@ function stream_json_rows( \PDOStatement $stmt ): void {
 	if ( ! headers_sent() ) {
 		header( 'Content-Type: application/json; charset=utf-8' );
 		header( 'X-Accel-Buffering: no' );
+		// Per-user tier-restricted data must never end up in a shared cache.
+		header( 'Cache-Control: private, no-store' );
+		header( 'Vary: Authorization, Cookie' );
 	}
 	echo '[';
 	$first = true;

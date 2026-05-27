@@ -30,6 +30,13 @@ add_action( 'wp_enqueue_scripts', static function () {
 		PUBLICTECH_TERMINAL_VERSION
 	);
 
+	wp_enqueue_style(
+		'publictech-terminal-overrides',
+		PUBLICTECH_TERMINAL_URL . 'assets/css/overrides.css',
+		[ 'publictech-terminal' ],
+		PUBLICTECH_TERMINAL_VERSION
+	);
+
 	wp_enqueue_script(
 		'publictech-terminal-app',
 		PUBLICTECH_TERMINAL_URL . 'assets/js/app.js',

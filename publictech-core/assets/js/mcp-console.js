@@ -73,7 +73,11 @@
 				render(active.view);
 			})
 			.catch(function (e) {
-				host && (host.innerHTML = '<div class="pt-error">' + e.message + '</div>');
+				if (!host) return;
+				const div = document.createElement('div');
+				div.className = 'pt-error';
+				div.textContent = e && e.message ? String(e.message) : 'Query failed.';
+				host.replaceChildren(div);
 			});
 	}
 

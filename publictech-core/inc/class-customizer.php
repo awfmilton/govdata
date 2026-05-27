@@ -29,7 +29,10 @@ final class Chart_Customizer {
 
 	private function __construct() {
 		add_action( 'customize_register', [ $this, 'register' ] );
-		add_action( 'wp_head',            [ $this, 'emit_css_vars' ], 5 );
+		// Priority 100 so we land AFTER the main stylesheets, allowing our
+		// :root override to win the cascade. (Pre-priority-20 ran before
+		// terminal.css and was being overwritten.)
+		add_action( 'wp_head',            [ $this, 'emit_css_vars' ], 100 );
 	}
 
 	public function register( \WP_Customize_Manager $wp ): void {
@@ -71,10 +74,12 @@ final class Chart_Customizer {
 	}
 
 	public function emit_css_vars(): void {
-		$accent = get_theme_mod( 'pt_accent', '#00a0d2' );
-		$font   = get_theme_mod( 'pt_font',   'Montserrat' );
-		$rgb    = sscanf( ltrim( $accent, '#' ), '%2x%2x%2x' );
-		if ( ! $rgb || count( $rgb ) !== 3 ) {
+		$accent = (string) get_theme_mod( 'pt_accent', '#00a0d2' );
+		$font   = (string) get_theme_mod( 'pt_font',   'Montserrat' );
+		// sscanf returns null (not false) for unparseable input on PHP 8.1+ and
+		// count(null) is a fatal — guard explicitly.
+		$rgb = sscanf( ltrim( $accent, '#' ), '%2x%2x%2x' );
+		if ( ! is_array( $rgb ) || 3 !== count( $rgb ) ) {
 			$rgb = [ 0, 160, 210 ];
 		}
 		printf(

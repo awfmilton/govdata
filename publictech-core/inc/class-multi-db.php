@@ -58,9 +58,19 @@ final class Multi_DB {
 	/**
 	 * Lightweight per-alias health check used by the status rail.
 	 *
+	 * Cached for 30 s in the object cache to avoid running 4+ round-trip
+	 * SELECTs on every page render. The cache is keyed by the alias list
+	 * hash so re-configuring connections invalidates it immediately.
+	 *
 	 * @return array<string,array{ok:bool,latency_ms:?float,error:?string}>
 	 */
 	public function health(): array {
+		$cache_key = 'pt_health_' . substr( md5( implode( '|', $this->aliases() ) ), 0, 12 );
+		$cached    = wp_cache_get( $cache_key, 'publictech' );
+		if ( is_array( $cached ) ) {
+			return $cached;
+		}
+
 		$out = [];
 		foreach ( $this->aliases() as $alias ) {
 			$t0 = microtime( true );
@@ -68,9 +78,11 @@ final class Multi_DB {
 				$this->connection( $alias )->pdo()->query( 'SELECT 1' )->fetchColumn();
 				$out[ $alias ] = [ 'ok' => true, 'latency_ms' => round( ( microtime( true ) - $t0 ) * 1000, 1 ), 'error' => null ];
 			} catch ( \Throwable $e ) {
-				$out[ $alias ] = [ 'ok' => false, 'latency_ms' => null, 'error' => $e->getMessage() ];
+				// Don't leak DB error messages or DSN fragments to callers.
+				$out[ $alias ] = [ 'ok' => false, 'latency_ms' => null, 'error' => 'connection_failed' ];
 			}
 		}
+		wp_cache_set( $cache_key, $out, 'publictech', 30 );
 		return $out;
 	}
 }

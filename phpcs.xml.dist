@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+<ruleset name="PublicTech">
+	<description>Coding standards for the PublicTech audit-terminal suite.</description>
+
+	<file>publictech-core</file>
+	<file>publictech-terminal</file>
+	<file>publictech-mcp</file>
+
+	<exclude-pattern>*/vendor/*</exclude-pattern>
+	<exclude-pattern>*/node_modules/*</exclude-pattern>
+	<exclude-pattern>*/assets/css/*</exclude-pattern>
+	<exclude-pattern>*/assets/js/*</exclude-pattern>
+	<exclude-pattern>*/build/*</exclude-pattern>
+
+	<arg name="extensions" value="php"/>
+	<arg name="basepath" value="."/>
+	<arg name="parallel"  value="4"/>
+	<arg name="colors"/>
+	<arg value="ps"/>
+
+	<rule ref="WordPress-Core"/>
+	<rule ref="WordPress-Docs"/>
+	<rule ref="WordPress-Extra">
+		<!-- We use namespaces and short array syntax intentionally. -->
+		<exclude name="Universal.Files.SeparateFunctionsFromOO"/>
+		<exclude name="Squiz.Commenting.FileComment.Missing"/>
+		<!-- We do not yoda-condition because PHP 8 typed properties make it noise. -->
+		<exclude name="WordPress.PHP.YodaConditions.NotYoda"/>
+	</rule>
+
+	<rule ref="WordPress.WP.I18n">
+		<properties>
+			<property name="text_domain" type="array">
+				<element value="publictech-core"/>
+				<element value="publictech-terminal"/>
+				<element value="publictech-mcp"/>
+			</property>
+		</properties>
+	</rule>
+
+	<rule ref="WordPress.NamingConventions.PrefixAllGlobals">
+		<properties>
+			<property name="prefixes" type="array">
+				<element value="publictech"/>
+				<element value="PUBLICTECH"/>
+				<element value="pt"/>
+				<element value="PT"/>
+			</property>
+		</properties>
+	</rule>
+
+	<rule ref="PHPCompatibilityWP">
+		<config name="testVersion" value="8.1-"/>
+	</rule>
+
+	<!-- Three-space mixed indent comes from a few inherited prototype lines; allow tabs. -->
+	<rule ref="Generic.WhiteSpace.DisallowSpaceIndent"/>
+</ruleset>

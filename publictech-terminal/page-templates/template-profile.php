@@ -31,7 +31,8 @@ $pt_user    = wp_get_current_user();
 $pt_tiers   = \PublicTech\Core\Access_Tiers::instance();
 $pt_tier    = $pt_tiers->user_tier( $pt_user->ID );
 $pt_quota   = $pt_tiers->quota( $pt_user->ID );
-$pt_saved   = (array) get_user_meta( $pt_user->ID, 'pt_saved_queries', true );
+$pt_saved_raw = get_user_meta( $pt_user->ID, 'pt_saved_queries', true );
+$pt_saved     = is_array( $pt_saved_raw ) ? array_filter( $pt_saved_raw, 'is_array' ) : [];
 $pt_initial = strtoupper( substr( $pt_user->display_name, 0, 2 ) );
 
 get_header(); ?>
