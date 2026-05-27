@@ -5,6 +5,8 @@
  *  - member-parliament : one row per MP, indexed by FacetWP.
  *  - audit-flag        : community-filed flags on transactions.
  *  - forum-thread      : forum threads (acts as bbPress fallback if no forum plugin).
+ *  - pt_workspace      : saved analysis workspaces.
+ *  - user-chart        : user-authored Billboard.js chart definitions.
  *
  * @package PublicTech\Core
  */
@@ -75,6 +77,45 @@ final class CPT {
 			'capability_type'     => 'post',
 		] );
 
+		register_post_type( 'user-chart', [
+			'labels' => [
+				'name'          => __( 'User Charts',  'publictech-core' ),
+				'singular_name' => __( 'Chart',         'publictech-core' ),
+				'add_new_item'  => __( 'New Chart',     'publictech-core' ),
+			],
+			'public'              => true,
+			'publicly_queryable'  => true,
+			'show_in_rest'        => true,
+			'menu_icon'           => 'dashicons-chart-pie',
+			'supports'            => [ 'title', 'editor', 'author', 'excerpt', 'custom-fields' ],
+			'has_archive'         => 'charts',
+			'rewrite'             => [ 'slug' => 'chart', 'with_front' => false ],
+			'capability_type'     => 'post',
+			'taxonomies'          => [ 'chart_kind' ],
+			'show_in_graphql'     => false,
+		] );
+
+		// Chart spec/source/counters exposed via REST so the builder UI can
+		// hydrate without ad-hoc endpoints. Author-scoped auth is enforced
+		// per-post by the auth_callback below.
+		$owner_only = static function ( $allowed, $meta_key, $post_id ) {
+			return current_user_can( 'edit_post', $post_id );
+		};
+		$reader_ok = '__return_true';
+		foreach ( [
+			'pt_spec'   => [ 'type' => 'string',  'auth' => $owner_only, 'show_in_rest' => true ],
+			'pt_source' => [ 'type' => 'string',  'auth' => $owner_only, 'show_in_rest' => true ],
+			'pt_views'  => [ 'type' => 'integer', 'auth' => $reader_ok,  'show_in_rest' => true ],
+			'pt_forks'  => [ 'type' => 'integer', 'auth' => $reader_ok,  'show_in_rest' => true ],
+		] as $key => $args ) {
+			register_post_meta( 'user-chart', $key, [
+				'single'        => true,
+				'type'          => $args['type'],
+				'show_in_rest'  => $args['show_in_rest'],
+				'auth_callback' => $args['auth'],
+			] );
+		}
+
 		// Structured workspace meta — saved query IDs, pinned chart IDs,
 		// collaborator user IDs. Exposed via REST so the builder UI can
 		// read/write without ad-hoc endpoints. Auth check is post-level.
@@ -97,6 +138,7 @@ final class CPT {
 		register_taxonomy( 'mp_committee',   'member-parliament', $this->tax_args( __( 'Committee', 'publictech-core' ), 'committee' ) );
 		register_taxonomy( 'forum_category', 'forum-thread',      $this->tax_args( __( 'Category',  'publictech-core' ), 'forum-cat', true ) );
 		register_taxonomy( 'forum_tag',      'forum-thread',      $this->tax_args( __( 'Tag',       'publictech-core' ), 'forum-tag', false ) );
+		register_taxonomy( 'chart_kind',     'user-chart',        $this->tax_args( __( 'Chart Kind','publictech-core' ), 'chart-kind', false ) );
 	}
 
 	private function tax_args( string $label, string $slug, bool $hierarchical = false ): array {
