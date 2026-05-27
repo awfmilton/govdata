@@ -119,7 +119,7 @@ final class Access_Tiers {
 	/**
 	 * Store/rotate a token reverse-index entry, removing the prior one if any.
 	 */
-	private function index_token( int $user_id, string $plain ): void {
+	public function index_token( int $user_id, string $plain ): void {
 		$old = (string) get_user_meta( $user_id, self::META_TOKEN, true );
 		if ( $old ) {
 			delete_option( 'pt_tok_' . substr( $old, 0, 16 ) );
