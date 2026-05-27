@@ -85,6 +85,25 @@ final class Asset_Pipeline {
 			[ 'strategy' => 'defer' ]
 		);
 
+		// topojson-client (needed for the choropleth renderer to convert
+		// TopoJSON to GeoJSON FeatureCollections). Tiny — ~7kb gzipped.
+		wp_enqueue_script(
+			'topojson-client',
+			esc_url_raw( apply_filters( 'publictech_topojson_url', 'https://cdn.jsdelivr.net/npm/topojson-client@3.1.0/dist/topojson-client.min.js' ) ),
+			[],
+			'3.1.0',
+			[ 'strategy' => 'defer' ]
+		);
+
+		// d3-sankey (Phase 2 — needed by the sankey renderer). Also small.
+		wp_enqueue_script(
+			'd3-sankey',
+			esc_url_raw( apply_filters( 'publictech_d3_sankey_url', 'https://cdn.jsdelivr.net/npm/d3-sankey@0.12.3/dist/d3-sankey.min.js' ) ),
+			[ 'd3' ],
+			'0.12.3',
+			[ 'strategy' => 'defer' ]
+		);
+
 		wp_register_script(
 			'publictech-chart-theme',
 			PUBLICTECH_CORE_URL . 'assets/js/chart-theme.js',
