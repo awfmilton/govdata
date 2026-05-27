@@ -106,6 +106,44 @@ get_header(); ?>
 						<?php endif; ?>
 					</div>
 				</div>
+
+				<?php
+				// Corporate-affiliations panel. Source data is intentionally
+				// pluggable: a site that has wired up a vendor↔asset link
+				// table hooks `publictech_mp_affiliations` and returns rows
+				// matching [ ['vendor' => …, 'role' => …, 'amount' => …,
+				// 'source_url' => …] ]. The panel renders nothing if no
+				// matches are returned.
+				$pt_affiliations = (array) apply_filters( 'publictech_mp_affiliations', [], $mp_id );
+				if ( $pt_affiliations ) :
+					?>
+					<div class="panel">
+						<div class="hd"><h3>◇ <?php esc_html_e( 'Corporate Affiliations', 'publictech-terminal' ); ?></h3><span class="meta"><?php echo esc_html( number_format_i18n( count( $pt_affiliations ) ) ); ?></span></div>
+						<div class="kvs">
+							<?php foreach ( $pt_affiliations as $pt_aff ) :
+								if ( ! is_array( $pt_aff ) || empty( $pt_aff['vendor'] ) ) { continue; }
+								$pt_url = isset( $pt_aff['source_url'] ) ? (string) $pt_aff['source_url'] : '';
+								?>
+								<div class="kv">
+									<span class="k">
+										<?php echo esc_html( $pt_aff['vendor'] ); ?>
+										<?php if ( ! empty( $pt_aff['role'] ) ) : ?>
+											<span class="dim" style="margin-left:6px"><?php echo esc_html( $pt_aff['role'] ); ?></span>
+										<?php endif; ?>
+									</span>
+									<span class="v">
+										<?php if ( isset( $pt_aff['amount'] ) ) : ?>
+											$<?php echo esc_html( number_format_i18n( (int) $pt_aff['amount'] ) ); ?>
+										<?php endif; ?>
+										<?php if ( $pt_url ) : ?>
+											<a href="<?php echo esc_url( $pt_url ); ?>" rel="noopener noreferrer" target="_blank" title="<?php esc_attr_e( 'Source document', 'publictech-terminal' ); ?>" style="margin-left:6px;color:var(--accent)">⎘</a>
+										<?php endif; ?>
+									</span>
+								</div>
+							<?php endforeach; ?>
+						</div>
+					</div>
+				<?php endif; ?>
 			</aside>
 
 			<div class="prof-main">

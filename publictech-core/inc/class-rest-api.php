@@ -74,6 +74,31 @@ final class REST_API {
 			'permission_callback' => static fn() => is_user_logged_in(),
 			'callback'            => [ $this, 'customizer_save' ],
 		] );
+
+		register_rest_route( PUBLICTECH_CORE_REST_NS, '/queries', [
+			[
+				'methods'             => \WP_REST_Server::READABLE,
+				'permission_callback' => static fn() => is_user_logged_in(),
+				'callback'            => [ $this, 'queries_list' ],
+			],
+			[
+				'methods'             => \WP_REST_Server::CREATABLE,
+				'permission_callback' => static fn() => is_user_logged_in(),
+				'callback'            => [ $this, 'queries_save' ],
+			],
+		] );
+
+		register_rest_route( PUBLICTECH_CORE_REST_NS, '/queries/(?P<id>[A-Za-z0-9_-]+)', [
+			'methods'             => \WP_REST_Server::DELETABLE,
+			'permission_callback' => static fn() => is_user_logged_in(),
+			'callback'            => [ $this, 'queries_delete' ],
+		] );
+
+		register_rest_route( PUBLICTECH_CORE_REST_NS, '/export/(?P<id>[A-Za-z0-9_-]+)', [
+			'methods'             => \WP_REST_Server::READABLE,
+			'permission_callback' => $auth,
+			'callback'            => [ $this, 'export_query_csv' ],
+		] );
 	}
 
 	/* ---------- handlers ---------- */
@@ -257,6 +282,131 @@ final class REST_API {
 
 		update_user_meta( $uid, 'pt_chart_theme', wp_json_encode( $clean ) );
 		return rest_ensure_response( [ 'ok' => true, 'theme' => $clean ] );
+	}
+
+	/* ---------- saved queries + CSV export ---------- */
+
+	/**
+	 * Saved-query store. Each query lives under the calling user's user_meta
+	 * pt_saved_queries: { id => { id, title, schema, table, filters, order, created } }.
+	 * Per-user isolation is enforced by the user_meta scope itself; the export
+	 * handler additionally re-checks ownership before running.
+	 */
+	public function queries_list( \WP_REST_Request $req ): \WP_REST_Response {
+		$uid     = get_current_user_id();
+		$queries = get_user_meta( $uid, 'pt_saved_queries', true );
+		return rest_ensure_response( is_array( $queries ) ? array_values( $queries ) : [] );
+	}
+
+	public function queries_save( \WP_REST_Request $req ): \WP_REST_Response|\WP_Error {
+		$uid   = get_current_user_id();
+		$body  = (array) $req->get_json_params();
+		$title = sanitize_text_field( (string) ( $body['title']  ?? '' ) );
+		$schema= sanitize_key(         (string) ( $body['schema'] ?? '' ) );
+		$table = sanitize_key(         (string) ( $body['table']  ?? '' ) );
+		if ( '' === $title || '' === $schema || '' === $table ) {
+			return new \WP_Error( 'pt_bad_request', 'title, schema, and table are required.', [ 'status' => 400 ] );
+		}
+		$columns = apply_filters( "publictech_columns_{$schema}_{$table}", [], $schema, $table );
+		if ( ! $columns ) {
+			return new \WP_Error( 'pt_unknown_table', 'Unknown schema/table.', [ 'status' => 404 ] );
+		}
+		$tier = Access_Tiers::instance()->quota( $uid );
+		if ( '*' !== $tier['schemas'] && ! in_array( $schema, (array) $tier['schemas'], true ) ) {
+			return new \WP_Error( 'pt_tier_locked', 'Schema not included in your tier.', [ 'status' => 403 ] );
+		}
+
+		$query = [
+			'id'      => substr( bin2hex( random_bytes( 8 ) ), 0, 16 ),
+			'title'   => $title,
+			'schema'  => $schema,
+			'table'   => $table,
+			'filters' => is_array( $body['filters'] ?? null ) ? $body['filters'] : [],
+			'order'   => sanitize_text_field( (string) ( $body['order'] ?? '' ) ),
+			'created' => gmdate( 'c' ),
+			'runs'    => 0,
+		];
+
+		$store = get_user_meta( $uid, 'pt_saved_queries', true );
+		$store = is_array( $store ) ? $store : [];
+		// Cap stored queries so user_meta can't be DoS'd. Oldest wins on overflow.
+		if ( count( $store ) >= 200 ) {
+			array_shift( $store );
+		}
+		$store[ $query['id'] ] = $query;
+		update_user_meta( $uid, 'pt_saved_queries', $store );
+		return rest_ensure_response( $query );
+	}
+
+	public function queries_delete( \WP_REST_Request $req ): \WP_REST_Response {
+		$uid   = get_current_user_id();
+		$qid   = sanitize_text_field( (string) $req['id'] );
+		$store = get_user_meta( $uid, 'pt_saved_queries', true );
+		if ( is_array( $store ) && isset( $store[ $qid ] ) ) {
+			unset( $store[ $qid ] );
+			update_user_meta( $uid, 'pt_saved_queries', $store );
+		}
+		return rest_ensure_response( [ 'ok' => true ] );
+	}
+
+	/**
+	 * Stream a saved query's result set as CSV. The query is resolved against
+	 * the calling user's saved-query store (ownership-enforced by scope), the
+	 * schema/table is whitelisted via the same publictech_columns_* filter the
+	 * stream endpoint uses, and tier max_rows clamps the result count.
+	 */
+	public function export_query_csv( \WP_REST_Request $req ): void {
+		if ( ( $gate = Throttle::instance()->enforce_rest( $req ) ) instanceof \WP_Error ) {
+			wp_send_json( $gate->get_error_data() + [ 'message' => $gate->get_error_message() ], 429 );
+			return;
+		}
+
+		$uid   = get_current_user_id();
+		if ( ! $uid ) {
+			wp_send_json( [ 'message' => 'Authentication required.' ], 401 );
+			return;
+		}
+		$qid   = sanitize_text_field( (string) $req['id'] );
+		$store = get_user_meta( $uid, 'pt_saved_queries', true );
+		$query = is_array( $store ) ? ( $store[ $qid ] ?? null ) : null;
+		if ( ! $query ) {
+			wp_send_json( [ 'message' => 'Query not found.' ], 404 );
+			return;
+		}
+
+		$tier  = Access_Tiers::instance()->quota( $uid );
+		if ( '*' !== $tier['schemas'] && ! in_array( $query['schema'], (array) $tier['schemas'], true ) ) {
+			wp_send_json( [ 'message' => 'Schema not included in your tier.' ], 403 );
+			return;
+		}
+
+		$columns = apply_filters( "publictech_columns_{$query['schema']}_{$query['table']}", [], $query['schema'], $query['table'] );
+		if ( ! $columns ) {
+			wp_send_json( [ 'message' => 'No exposed columns for this table.' ], 404 );
+			return;
+		}
+
+		// Bump the run counter, then stream.
+		$store[ $qid ]['runs'] = (int) ( $store[ $qid ]['runs'] ?? 0 ) + 1;
+		update_user_meta( $uid, 'pt_saved_queries', $store );
+
+		$filename = sanitize_file_name( $query['title'] ?: 'export' ) . '-' . gmdate( 'Ymd' ) . '.csv';
+		$limit    = (int) $tier['max_rows'];
+
+		try {
+			$stmt = publictech_db( $query['schema'] )->find(
+				$query['table'],
+				(array) $query['filters'],
+				$columns,
+				(string) $query['order'],
+				$limit
+			);
+			stream_csv_rows( $stmt, $filename );
+		} catch ( \Throwable $e ) {
+			error_log( '[PublicTech] export_query_csv failed: ' . $e->getMessage() );
+			wp_send_json( [ 'message' => 'Export failed.' ], 500 );
+		}
+		exit;
 	}
 
 	/* ---------- shaping ---------- */
