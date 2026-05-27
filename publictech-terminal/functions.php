@@ -37,6 +37,18 @@ add_action( 'wp_enqueue_scripts', static function () {
 		PUBLICTECH_TERMINAL_VERSION
 	);
 
+	// bbPress bridge stylesheet — only loaded on bbPress-rendered surfaces so
+	// it doesn't bloat unrelated pages. is_bbpress() covers every bbPress view
+	// (single forum/topic/reply, archives, search, user profile).
+	if ( function_exists( 'is_bbpress' ) && is_bbpress() ) {
+		wp_enqueue_style(
+			'publictech-bbpress',
+			PUBLICTECH_TERMINAL_URL . 'assets/css/bbpress.css',
+			[ 'publictech-terminal-overrides' ],
+			PUBLICTECH_TERMINAL_VERSION
+		);
+	}
+
 	wp_enqueue_script(
 		'publictech-terminal-app',
 		PUBLICTECH_TERMINAL_URL . 'assets/js/app.js',

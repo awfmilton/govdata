@@ -169,6 +169,11 @@ final class Asset_Pipeline {
 		if ( is_singular( 'forum-thread' ) || is_post_type_archive( 'forum-thread' ) ) {
 			return true;
 		}
+		// bbPress surfaces (forum/topic/reply/user). Loaded conditionally so
+		// non-bbPress installs ignore this branch.
+		if ( function_exists( 'is_bbpress' ) && is_bbpress() ) {
+			return true;
+		}
 		if ( is_page() ) {
 			$tpl = get_page_template_slug( get_queried_object_id() );
 			if ( $tpl && str_starts_with( $tpl, 'page-templates/template-' ) ) {
