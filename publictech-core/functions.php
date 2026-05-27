@@ -26,6 +26,8 @@ require_once PUBLICTECH_CORE_DIR . 'inc/class-rest-api.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-asset-pipeline.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-customizer.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-compat.php';
+require_once PUBLICTECH_CORE_DIR . 'inc/class-alerts.php';
+require_once PUBLICTECH_CORE_DIR . 'inc/class-anomalies.php';
 
 add_action( 'after_setup_theme', static function () {
 	load_theme_textdomain( 'publictech-core', PUBLICTECH_CORE_DIR . 'languages' );
@@ -55,7 +57,12 @@ add_action( 'plugins_loaded', static function () {
 	\PublicTech\Core\Asset_Pipeline::instance();
 	\PublicTech\Core\Chart_Customizer::instance();
 	\PublicTech\Core\Compat::instance();
+	\PublicTech\Core\Alerts::instance();
+	\PublicTech\Core\Anomalies::instance();
 } );
+
+// Clean up the cron schedule on theme switch.
+add_action( 'switch_theme', [ \PublicTech\Core\Alerts::class, 'unschedule' ] );
 
 /**
  * Template fallbacks. The child theme is free to ship its own
