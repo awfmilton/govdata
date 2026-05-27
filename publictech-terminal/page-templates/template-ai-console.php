@@ -12,6 +12,7 @@ defined( 'ABSPATH' ) || exit;
 
 $pt_quota   = \PublicTech\Core\Access_Tiers::instance()->quota( get_current_user_id() ?: null );
 $pt_schemas = \PublicTech\Core\Multi_DB::instance()->aliases();
+$pt_can_chart = \PublicTech\Core\Chart_Spec::user_can_create( $pt_quota );
 
 get_header(); ?>
 
@@ -42,6 +43,9 @@ get_header(); ?>
 							<button data-view="table"><?php esc_html_e( 'Table',    'publictech-terminal' ); ?></button>
 							<button data-view="sql"><?php esc_html_e( 'SQL',       'publictech-terminal' ); ?></button>
 							<button data-view="json"><?php esc_html_e( 'Raw JSON', 'publictech-terminal' ); ?></button>
+							<?php if ( $pt_can_chart ) : ?>
+								<a class="ai-build-chart" id="aiBuildChart" data-pt-build-chart href="<?php echo esc_url( home_url( '/chart-builder' ) ); ?>" hidden>◈ <?php esc_html_e( 'Build chart from these rows', 'publictech-terminal' ); ?></a>
+							<?php endif; ?>
 						</div>
 					</div>
 					<div class="bd">
