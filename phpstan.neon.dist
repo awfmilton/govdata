@@ -1,0 +1,23 @@
+includes:
+  - vendor/szepeviktor/phpstan-wordpress/extension.neon
+
+parameters:
+  level: 5
+  paths:
+    - publictech-core
+    - publictech-terminal
+    - publictech-mcp
+  excludePaths:
+    analyseAndScan:
+      - '*/vendor/*'
+      - '*/node_modules/*'
+  bootstrapFiles:
+    - tests/php/bootstrap-phpstan.php
+  treatPhpDocTypesAsCertain: false
+  reportUnmatchedIgnoredErrors: false
+  ignoreErrors:
+    # WP_Query / WP_Term tags arrays are dynamic; the WP stubs flag every access.
+    - '#Call to an undefined method WP_REST_Request#'
+    # Plugin-bridge classes only exist when Ninja Forms is loaded.
+    - '#Class NF_Abstracts_Action not found#'
+    - '#Class Ninja_Forms not found#'

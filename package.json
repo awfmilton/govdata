@@ -1,0 +1,25 @@
+{
+  "name": "publictech-govdata",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Build-time tooling for the PublicTech audit-terminal suite.",
+  "license": "GPL-2.0-or-later",
+  "scripts": {
+    "lint:js": "eslint \"publictech-core/assets/js/**/*.js\" \"publictech-terminal/assets/js/**/*.js\"",
+    "lint:css": "stylelint \"publictech-core/assets/css/**/*.css\" \"publictech-terminal/assets/css/**/*.css\"",
+    "lint:format": "prettier --check \"**/*.{js,css,md,json,yml,yaml}\" --ignore-path .gitignore",
+    "format": "prettier --write \"**/*.{js,css,md,json,yml,yaml}\" --ignore-path .gitignore",
+    "lint": "npm run lint:js && npm run lint:css && npm run lint:format",
+    "ci": "npm run lint"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.0",
+    "@wordpress/eslint-plugin": "^17.13.0",
+    "stylelint": "^16.10.0",
+    "stylelint-config-standard": "^36.0.1",
+    "prettier": "^3.3.3"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

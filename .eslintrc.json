@@ -1,0 +1,28 @@
+{
+  "root": true,
+  "env": {
+    "browser": true,
+    "es2022": true
+  },
+  "parserOptions": {
+    "ecmaVersion": 2022,
+    "sourceType": "script"
+  },
+  "extends": ["eslint:recommended"],
+  "globals": {
+    "d3": "readonly",
+    "PT_BOOT": "readonly",
+    "PT_THEME_DEFAULT": "readonly",
+    "PT": "writable",
+    "wp": "readonly"
+  },
+  "rules": {
+    "no-console": ["warn", { "allow": ["warn", "error"] }],
+    "no-unused-vars": ["warn", { "args": "none" }],
+    "no-empty": ["error", { "allowEmptyCatch": true }],
+    "no-useless-escape": "warn",
+    "no-prototype-builtins": "off",
+    "no-control-regex": "off",
+    "no-cond-assign": ["error", "except-parens"]
+  }
+}
