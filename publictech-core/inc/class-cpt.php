@@ -59,6 +59,39 @@ final class CPT {
 			'taxonomies'   => [ 'forum_category', 'forum_tag' ],
 		] );
 
+		register_post_type( 'pt_workspace', [
+			'labels' => [
+				'name'          => __( 'Workspaces',   'publictech-core' ),
+				'singular_name' => __( 'Workspace',    'publictech-core' ),
+				'add_new_item'  => __( 'New Workspace','publictech-core' ),
+			],
+			'public'              => true,
+			'publicly_queryable'  => true,
+			'show_in_rest'        => true,
+			'menu_icon'           => 'dashicons-portfolio',
+			'supports'            => [ 'title', 'editor', 'author', 'thumbnail', 'custom-fields' ],
+			'has_archive'         => 'workspaces',
+			'rewrite'             => [ 'slug' => 'workspace', 'with_front' => false ],
+			'capability_type'     => 'post',
+		] );
+
+		// Structured workspace meta — saved query IDs, pinned chart IDs,
+		// collaborator user IDs. Exposed via REST so the builder UI can
+		// read/write without ad-hoc endpoints. Auth check is post-level.
+		foreach ( [
+			'pt_saved_query_ids' => [ 'type' => 'array', 'show_in_rest' => [ 'schema' => [ 'type' => 'array', 'items' => [ 'type' => 'string' ] ] ] ],
+			'pt_pinned_chart_ids'=> [ 'type' => 'array', 'show_in_rest' => [ 'schema' => [ 'type' => 'array', 'items' => [ 'type' => 'integer' ] ] ] ],
+			'pt_collaborator_ids'=> [ 'type' => 'array', 'show_in_rest' => [ 'schema' => [ 'type' => 'array', 'items' => [ 'type' => 'integer' ] ] ] ],
+		] as $key => $args ) {
+			register_post_meta( 'pt_workspace', $key, array_merge( [
+				'single'       => true,
+				'show_in_rest' => true,
+				'auth_callback' => static function ( $allowed, $meta_key, $post_id ) {
+					return current_user_can( 'edit_post', $post_id );
+				},
+			], $args ) );
+		}
+
 		register_taxonomy( 'mp_party',       'member-parliament', $this->tax_args( __( 'Party',     'publictech-core' ), 'party' ) );
 		register_taxonomy( 'mp_region',      'member-parliament', $this->tax_args( __( 'Region',    'publictech-core' ), 'region' ) );
 		register_taxonomy( 'mp_committee',   'member-parliament', $this->tax_args( __( 'Committee', 'publictech-core' ), 'committee' ) );
