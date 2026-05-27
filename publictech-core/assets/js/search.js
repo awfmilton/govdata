@@ -70,15 +70,16 @@
 			return;
 		}
 		host.innerHTML = json.rows.map(function (r) {
-			const partyClass = (r.party || 'unknown').toLowerCase().replace(/\s+/g, '-');
-			return '<a class="mp-card" href="' + r.permalink + '" data-id="' + r.id + '">' +
-				'<div class="mp-portrait">' + initials(r.name) + '</div>' +
+			const partyClass = String(r.party || 'unknown').toLowerCase().replace(/[^a-z0-9-]/g, '-');
+			const href = safeHref(r.permalink);
+			return '<a class="mp-card" href="' + href + '" data-id="' + (+r.id || 0) + '">' +
+				'<div class="mp-portrait">' + escape(initials(r.name)) + '</div>' +
 				'<div class="mp-info"><div class="name">' + escape(r.name) + '</div>' +
-				'<div class="meta"><span><span class="party-bar party-' + partyClass + '"></span>' + escape(r.party) + '</span>' +
+				'<div class="meta"><span><span class="party-bar party-' + escape(partyClass) + '"></span>' + escape(r.party) + '</span>' +
 				'<span class="dim">·</span><span>' + escape(r.riding) + '</span></div></div>' +
-				'<div class="mp-stats"><b>$' + Math.round((r.spend || 0) / 1000) + 'k</b>' +
-				'<span>' + (r.votes || 0) + ' votes</span><br>' +
-				'<span>' + (r.flags || 0) + ' flag' + (r.flags === 1 ? '' : 's') + '</span></div></a>';
+				'<div class="mp-stats"><b>$' + escape(Math.round((+r.spend || 0) / 1000)) + 'k</b>' +
+				'<span>' + (+r.votes || 0) + ' votes</span><br>' +
+				'<span>' + (+r.flags || 0) + ' flag' + (r.flags === 1 ? '' : 's') + '</span></div></a>';
 		}).join('');
 		const meta = $('#mpResultsMeta');
 		if (meta) {
@@ -90,7 +91,13 @@
 		return (name || '').split(/\s+/).filter(Boolean).map(function (w) { return w[0]; }).slice(0, 2).join('').toUpperCase();
 	}
 	function escape(s) {
-		return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' })[c]; });
+		return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' })[c]; });
+	}
+	function safeHref(url) {
+		const s = String(url == null ? '' : url);
+		// Allow only same-origin / protocol-relative / absolute http(s).
+		if (/^(https?:)?\/\//i.test(s) || s.startsWith('/')) return escape(s);
+		return '#';
 	}
 
 	document.addEventListener('DOMContentLoaded', function () {

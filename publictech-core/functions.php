@@ -57,8 +57,15 @@ add_action( 'plugins_loaded', static function () {
 	\PublicTech\Core\Compat::instance();
 } );
 
+/**
+ * Template fallbacks. The child theme is free to ship its own
+ * `single-member-parliament.php` / `archive-member-parliament.php`; WP picks
+ * those up via the standard hierarchy and the parent's filter only kicks in
+ * when no child template exists.
+ */
 add_filter( 'single_template', static function ( string $template ): string {
-	if ( is_singular( 'member-parliament' ) ) {
+	if ( is_singular( 'member-parliament' )
+		&& basename( $template ) !== 'single-member-parliament.php' ) {
 		$candidate = PUBLICTECH_CORE_DIR . 'templates/single-mp.php';
 		if ( file_exists( $candidate ) ) {
 			return $candidate;
@@ -68,7 +75,8 @@ add_filter( 'single_template', static function ( string $template ): string {
 } );
 
 add_filter( 'archive_template', static function ( string $template ): string {
-	if ( is_post_type_archive( 'member-parliament' ) ) {
+	if ( is_post_type_archive( 'member-parliament' )
+		&& basename( $template ) !== 'archive-member-parliament.php' ) {
 		$candidate = PUBLICTECH_CORE_DIR . 'templates/archive-mp.php';
 		if ( file_exists( $candidate ) ) {
 			return $candidate;

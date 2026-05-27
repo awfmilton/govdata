@@ -12,8 +12,21 @@ defined( 'ABSPATH' ) || exit;
 $pt_user   = wp_get_current_user();
 $pt_name   = $pt_user && $pt_user->ID ? $pt_user->first_name ?: $pt_user->display_name : __( 'guest', 'publictech-terminal' );
 $pt_health = \PublicTech\Core\Multi_DB::instance()->aliases();
-$pt_total  = wp_count_posts( 'member-parliament' );
-$pt_flags  = wp_count_posts( 'audit-flag' );
+
+// wp_count_posts is a COUNT(*) over wp_posts; cache for 5 minutes on the
+// dashboard hot path. wp_count_posts can return false on disabled CPTs.
+$pt_total = wp_cache_get( 'pt_count_mp', 'publictech' );
+if ( false === $pt_total ) {
+	$counts   = wp_count_posts( 'member-parliament' );
+	$pt_total = is_object( $counts ) ? (int) ( $counts->publish ?? 0 ) : 0;
+	wp_cache_set( 'pt_count_mp', $pt_total, 'publictech', 300 );
+}
+$pt_flags = wp_cache_get( 'pt_count_flags', 'publictech' );
+if ( false === $pt_flags ) {
+	$counts   = wp_count_posts( 'audit-flag' );
+	$pt_flags = is_object( $counts ) ? (int) ( $counts->publish ?? 0 ) : 0;
+	wp_cache_set( 'pt_count_flags', $pt_flags, 'publictech', 300 );
+}
 
 get_header(); ?>
 
@@ -35,8 +48,8 @@ get_header(); ?>
 					</div>
 				</div>
 				<div class="hero-stats">
-					<div class="hero-stat"><div class="lab"><?php esc_html_e( 'Members', 'publictech-terminal' ); ?></div><div class="val"><?php echo esc_html( number_format_i18n( (int) ( $pt_total->publish ?? 0 ) ) ); ?></div></div>
-					<div class="hero-stat"><div class="lab"><?php esc_html_e( 'Open Flags', 'publictech-terminal' ); ?></div><div class="val"><?php echo esc_html( number_format_i18n( (int) ( $pt_flags->publish ?? 0 ) ) ); ?></div></div>
+					<div class="hero-stat"><div class="lab"><?php esc_html_e( 'Members', 'publictech-terminal' ); ?></div><div class="val"><?php echo esc_html( number_format_i18n( $pt_total ) ); ?></div></div>
+					<div class="hero-stat"><div class="lab"><?php esc_html_e( 'Open Flags', 'publictech-terminal' ); ?></div><div class="val"><?php echo esc_html( number_format_i18n( $pt_flags ) ); ?></div></div>
 					<div class="hero-stat"><div class="lab"><?php esc_html_e( 'Connected Schemas', 'publictech-terminal' ); ?></div><div class="val"><?php echo esc_html( count( $pt_health ) ); ?></div></div>
 					<div class="hero-stat"><div class="lab"><?php esc_html_e( 'Tier', 'publictech-terminal' ); ?></div><div class="val"><?php echo esc_html( ucfirst( \PublicTech\Core\Access_Tiers::instance()->user_tier( get_current_user_id() ?: null ) ) ); ?></div></div>
 				</div>
@@ -58,7 +71,7 @@ get_header(); ?>
 										<b><?php echo esc_html( $flag->post_title ); ?></b>
 										<div class="meta"><?php echo esc_html( get_post_meta( $flag->ID, 'schema', true ) ); ?></div>
 									</div>
-									<div class="when"><?php echo esc_html( human_time_diff( strtotime( $flag->post_date_gmt ) ) ); ?></div>
+									<div class="when"><?php echo esc_html( human_time_diff( (int) get_post_time( 'U', true, $flag ), time() ) ); ?></div>
 								</div>
 								<?php
 							endforeach;
@@ -105,7 +118,7 @@ get_header(); ?>
 										<div class="name"><?php echo esc_html( $t->post_title ); ?></div>
 										<div class="meta"><?php echo esc_html( get_comments_number( $t ) ); ?> <?php esc_html_e( 'replies', 'publictech-terminal' ); ?></div>
 									</div>
-									<div class="trend"><b><?php echo esc_html( human_time_diff( strtotime( $t->post_modified_gmt ) ) ); ?></b></div>
+									<div class="trend"><b><?php echo esc_html( human_time_diff( (int) get_post_modified_time( 'U', true, $t ), time() ) ); ?></b></div>
 								</a>
 								<?php
 							endforeach;
