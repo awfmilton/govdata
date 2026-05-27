@@ -73,6 +73,25 @@ add_action( 'wp_enqueue_scripts', static function () {
 		true
 	);
 
+	// Builder UI and Billboard-terminal skin: only on the chart-builder /
+	// chart-gallery / single-user-chart surfaces (the core layer decided
+	// whether to enqueue Billboard itself; we just bolt the UI on).
+	if ( wp_script_is( 'publictech-billboard-bridge', 'enqueued' ) ) {
+		wp_enqueue_style(
+			'publictech-billboard-terminal',
+			PUBLICTECH_TERMINAL_URL . 'assets/css/billboard-terminal.css',
+			[ 'billboard', 'publictech-terminal-overrides' ],
+			PUBLICTECH_TERMINAL_VERSION
+		);
+		wp_enqueue_script(
+			'publictech-chart-builder-ui',
+			PUBLICTECH_TERMINAL_URL . 'assets/js/chart-builder-ui.js',
+			[ 'publictech-billboard-bridge', 'wp-i18n' ],
+			PUBLICTECH_TERMINAL_VERSION,
+			true
+		);
+	}
+
 	wp_localize_script( 'publictech-theme-switch', 'PT_THEME_DEFAULT', [
 		'mode' => get_theme_mod( 'pt_default_theme', 'dark' ),
 	] );
@@ -89,11 +108,13 @@ add_action( 'wp_footer', static function () {
 /* ----- Template registration so users can pick our layouts in the page editor. */
 add_filter( 'theme_page_templates', static function ( array $tpls ): array {
 	return $tpls + [
-		'page-templates/template-dashboard.php'  => __( 'PT — Home Dashboard',  'publictech-terminal' ),
-		'page-templates/template-profile.php'    => __( 'PT — User Profile',    'publictech-terminal' ),
-		'page-templates/template-forum.php'      => __( 'PT — Forum',            'publictech-terminal' ),
-		'page-templates/template-ai-console.php' => __( 'PT — AI Console',       'publictech-terminal' ),
-		'page-templates/template-stream.php'     => __( 'PT — Stream Terminal',  'publictech-terminal' ),
+		'page-templates/template-dashboard.php'      => __( 'PT — Home Dashboard',  'publictech-terminal' ),
+		'page-templates/template-profile.php'        => __( 'PT — User Profile',    'publictech-terminal' ),
+		'page-templates/template-forum.php'          => __( 'PT — Forum',            'publictech-terminal' ),
+		'page-templates/template-ai-console.php'     => __( 'PT — AI Console',       'publictech-terminal' ),
+		'page-templates/template-stream.php'         => __( 'PT — Stream Terminal',  'publictech-terminal' ),
+		'page-templates/template-chart-builder.php'  => __( 'PT — Chart Builder',    'publictech-terminal' ),
+		'page-templates/template-chart-gallery.php'  => __( 'PT — Chart Gallery',    'publictech-terminal' ),
 	];
 } );
 

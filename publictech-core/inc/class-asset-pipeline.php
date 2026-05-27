@@ -25,6 +25,7 @@ final class Asset_Pipeline {
 		add_filter( 'script_loader_tag',  [ $this, 'add_sri' ], 10, 3 );
 		add_action( 'wp_head',            [ $this, 'preconnect_hints' ], 1 );
 		add_shortcode( 'publictech_terminal', [ $this, 'shortcode' ] );
+		add_shortcode( 'publictech_chart',    [ $this, 'shortcode_chart' ] );
 	}
 
 	/**
@@ -38,10 +39,14 @@ final class Asset_Pipeline {
 	 * mismatching default would break sites that override the URL.
 	 */
 	public function add_sri( string $tag, string $handle, string $src ): string {
-		if ( 'd3' !== $handle ) {
+		$filter = [
+			'd3'        => 'publictech_d3_sri',
+			'billboard' => 'publictech_billboard_sri',
+		][ $handle ] ?? '';
+		if ( '' === $filter ) {
 			return $tag;
 		}
-		$sri = (string) apply_filters( 'publictech_d3_sri', '' );
+		$sri = (string) apply_filters( $filter, '' );
 		if ( '' === $sri ) {
 			return $tag;
 		}
@@ -149,6 +154,10 @@ final class Asset_Pipeline {
 		wp_enqueue_script( 'publictech-stream' );
 		wp_enqueue_script( 'publictech-mcp-console' );
 
+		if ( $this->needs_billboard() ) {
+			$this->enqueue_billboard();
+		}
+
 		$uid     = get_current_user_id() ?: null;
 		$tiers   = Access_Tiers::instance();
 		$saved   = $uid ? json_decode( (string) get_user_meta( $uid, 'pt_chart_theme', true ), true ) : null;
@@ -176,7 +185,29 @@ final class Asset_Pipeline {
 		return '<div id="pt-terminal" class="pt-terminal-mount" data-content="' . esc_attr( $content ) . '"></div>';
 	}
 
-	private bool $force_d3 = false;
+	/**
+	 * [publictech_chart id="123"] embeds a saved Billboard chart anywhere.
+	 * The mount div is hydrated client-side via PT.billboard.hydrateMount().
+	 */
+	public function shortcode_chart( $atts = [], string $content = '' ): string {
+		$atts    = shortcode_atts( [ 'id' => 0, 'height' => 320 ], $atts, 'publictech_chart' );
+		$post_id = absint( $atts['id'] );
+		if ( ! $post_id || 'user-chart' !== get_post_type( $post_id ) ) {
+			return '';
+		}
+		$this->force_d3        = true;
+		$this->force_billboard = true;
+		$this->enqueue();
+		$height = max( 120, min( 900, (int) $atts['height'] ) );
+		return sprintf(
+			'<div class="pt-billboard-mount" data-pt-chart-id="%d" style="height:%dpx"></div>',
+			$post_id,
+			$height
+		);
+	}
+
+	private bool $force_d3        = false;
+	private bool $force_billboard = false;
 
 	private function needs_d3(): bool {
 		if ( $this->force_d3 ) {
@@ -186,6 +217,9 @@ final class Asset_Pipeline {
 			return true;
 		}
 		if ( is_singular( 'forum-thread' ) || is_post_type_archive( 'forum-thread' ) ) {
+			return true;
+		}
+		if ( is_singular( 'user-chart' ) || is_post_type_archive( 'user-chart' ) ) {
 			return true;
 		}
 		// bbPress surfaces (forum/topic/reply/user). Loaded conditionally so
@@ -200,5 +234,61 @@ final class Asset_Pipeline {
 			}
 		}
 		return (bool) apply_filters( 'publictech_force_assets', false );
+	}
+
+	/**
+	 * Billboard is loaded only where users actually compose, browse, or
+	 * embed a saved chart. The custom D3 wrappers above are not affected —
+	 * Billboard binds alongside them on its own mounts.
+	 */
+	private function needs_billboard(): bool {
+		if ( $this->force_billboard ) {
+			return true;
+		}
+		if ( is_singular( 'user-chart' ) || is_post_type_archive( 'user-chart' ) ) {
+			return true;
+		}
+		if ( is_page() ) {
+			$tpl = get_page_template_slug( get_queried_object_id() );
+			if ( 'page-templates/template-chart-builder.php' === $tpl
+				|| 'page-templates/template-chart-gallery.php' === $tpl ) {
+				return true;
+			}
+		}
+		return (bool) apply_filters( 'publictech_force_billboard', false );
+	}
+
+	private function enqueue_billboard(): void {
+		$bb_js  = (string) apply_filters( 'publictech_billboard_url',     'https://cdn.jsdelivr.net/npm/billboard.js@3.13.0/dist/billboard.min.js' );
+		$bb_css = (string) apply_filters( 'publictech_billboard_css_url', 'https://cdn.jsdelivr.net/npm/billboard.js@3.13.0/dist/billboard.min.css' );
+
+		wp_enqueue_style(
+			'billboard',
+			esc_url_raw( $bb_css ),
+			[],
+			'3.13.0'
+		);
+		wp_enqueue_script(
+			'billboard',
+			esc_url_raw( $bb_js ),
+			[ 'd3' ],
+			'3.13.0',
+			[ 'strategy' => 'defer' ]
+		);
+
+		wp_enqueue_script(
+			'publictech-chart-spec',
+			PUBLICTECH_CORE_URL . 'assets/js/chart-spec.js',
+			[],
+			PUBLICTECH_CORE_VERSION,
+			true
+		);
+		wp_enqueue_script(
+			'publictech-billboard-bridge',
+			PUBLICTECH_CORE_URL . 'assets/js/billboard-bridge.js',
+			[ 'billboard', 'publictech-chart-theme', 'publictech-chart-spec' ],
+			PUBLICTECH_CORE_VERSION,
+			true
+		);
 	}
 }
