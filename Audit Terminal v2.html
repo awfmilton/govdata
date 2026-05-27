@@ -1,0 +1,2047 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>PublicTech Audit Terminal</title>
+<meta name="viewport" content="width=1440" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<style>
+  :root{
+    --bg-0:#0b0d14;
+    --bg-1:#11141d;
+    --bg-2:#161a26;
+    --bg-3:#1a1a2e;
+    --line:#243042;
+    --line-2:#334756;
+    --ink-0:#e6edf3;
+    --ink-1:#a8b3c2;
+    --ink-2:#6b7686;
+    --ink-3:#475063;
+    --accent:#00a0d2;
+    --accent-soft:rgba(0,160,210,0.12);
+    --accent-glow:rgba(0,160,210,0.45);
+    --pos:#3ddc97;
+    --warn:#ffb454;
+    --neg:#ff6b6b;
+    --party-lib:#d6202b;
+    --party-con:#1a4fa0;
+    --party-ndp:#f37021;
+    --party-grn:#3a9b3a;
+    --party-blq:#0f9bd1;
+    --chart-curve:monotone;
+    --chart-stroke:1.8;
+    --chart-marker:3;
+    --chart-grid:1;
+    --chart-area:0.35;
+    --chart-font:"Montserrat";
+  }
+  /* ===== LIGHT THEME ===== */
+  :root[data-theme="light"]{
+    --bg-0:#f4f6f9;
+    --bg-1:#ffffff;
+    --bg-2:#f7f9fc;
+    --bg-3:#eef2f7;
+    --line:#dbe2ec;
+    --line-2:#b8c4d3;
+    --ink-0:#0e1726;
+    --ink-1:#3a4658;
+    --ink-2:#67748a;
+    --ink-3:#9aa6b8;
+    --accent:#0072a8;
+    --accent-soft:rgba(0,114,168,0.10);
+    --accent-glow:rgba(0,114,168,0.35);
+    --pos:#1f9b6c;
+    --warn:#c97a16;
+    --neg:#cc4b48;
+  }
+  :root[data-theme="light"] body{
+    background:
+      radial-gradient(1200px 600px at 80% -10%, rgba(0,114,168,0.05), transparent 60%),
+      radial-gradient(800px 400px at 0% 100%, rgba(0,114,168,0.03), transparent 60%),
+      var(--bg-0);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--bg-0);color:var(--ink-0);font-family:"Montserrat",system-ui,sans-serif;font-weight:400;-webkit-font-smoothing:antialiased}
+  body{min-height:100vh;background:
+    radial-gradient(1200px 600px at 80% -10%, rgba(0,160,210,0.06), transparent 60%),
+    radial-gradient(800px 400px at 0% 100%, rgba(0,160,210,0.04), transparent 60%),
+    var(--bg-0);
+  }
+  .mono{font-family:"JetBrains Mono",ui-monospace,monospace}
+  .uc{text-transform:uppercase;letter-spacing:0.12em}
+
+  /* ===== Top status rail ===== */
+  .rail{
+    display:flex;align-items:center;justify-content:space-between;
+    height:34px;padding:0 18px;
+    background:var(--bg-1);border-bottom:1px solid var(--line);
+    font-family:"JetBrains Mono",monospace;font-size:11px;color:var(--ink-2);
+  }
+  .rail .l,.rail .r{display:flex;gap:18px;align-items:center}
+  .rail .dot{width:6px;height:6px;border-radius:50%;background:var(--pos);box-shadow:0 0 8px var(--pos);display:inline-block;margin-right:6px}
+  .rail .dot.warn{background:var(--warn);box-shadow:0 0 8px var(--warn)}
+  .rail kbd{font:inherit;background:var(--bg-3);border:1px solid var(--line-2);padding:1px 5px;border-radius:3px;color:var(--ink-1)}
+
+  /* ===== Header ===== */
+  header.shell{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:14px 22px;border-bottom:1px solid var(--line);
+    background:linear-gradient(180deg,var(--bg-1),var(--bg-0));
+  }
+  .brand{display:flex;align-items:center;gap:14px}
+  .brand .mark{
+    width:34px;height:34px;border:1px solid var(--accent);border-radius:4px;
+    display:grid;place-items:center;position:relative;
+    background:radial-gradient(circle at 30% 30%, var(--accent-soft), transparent 70%);
+  }
+  .brand .mark::before,.brand .mark::after{
+    content:"";position:absolute;background:var(--accent);
+  }
+  .brand .mark::before{left:6px;right:6px;top:50%;height:1px;opacity:.7}
+  .brand .mark::after{top:6px;bottom:6px;left:50%;width:1px;opacity:.7}
+  .brand .mark span{width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 10px var(--accent-glow);z-index:1}
+  .brand h1{font-size:14px;margin:0;font-weight:600;letter-spacing:0.08em}
+  .brand h1 small{color:var(--ink-2);font-weight:400;display:block;font-size:10px;letter-spacing:0.18em;margin-top:2px}
+
+  nav.tabs{display:flex;gap:2px;background:var(--bg-2);border:1px solid var(--line);border-radius:6px;padding:3px}
+  nav.tabs button{
+    background:transparent;border:0;color:var(--ink-1);
+    font:500 11px/1 "Montserrat";letter-spacing:0.14em;text-transform:uppercase;
+    padding:8px 14px;border-radius:4px;cursor:pointer;display:flex;align-items:center;gap:7px;
+  }
+  nav.tabs button:hover{color:var(--ink-0);background:rgba(255,255,255,0.02)}
+  nav.tabs button.active{background:var(--accent-soft);color:var(--accent);box-shadow:inset 0 0 0 1px rgba(0,160,210,0.35)}
+  nav.tabs button .idx{font-family:"JetBrains Mono";font-size:9px;color:var(--ink-3);font-weight:500}
+  nav.tabs button.active .idx{color:var(--accent)}
+
+  .header-r{display:flex;align-items:center;gap:14px;font-size:11px;color:var(--ink-2)}
+  .header-r .pill{border:1px solid var(--line-2);padding:5px 10px;border-radius:3px;font-family:"JetBrains Mono";display:flex;align-items:center;gap:6px}
+  .header-r .pill b{color:var(--ink-0);font-weight:500}
+  .avatar{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#2a3a55,#0b1018);border:1px solid var(--line-2);display:grid;place-items:center;font-size:10px;color:var(--ink-0);font-weight:600}
+
+  /* ===== Layout ===== */
+  main{padding:18px 22px 32px;max-width:1440px;margin:0 auto}
+  .view{display:none}
+  .view.active{display:block}
+
+  .panel{background:var(--bg-1);border:1px solid var(--line);border-radius:6px}
+  .panel .hd{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:11px 14px;border-bottom:1px solid var(--line);background:var(--bg-2);
+    border-top-left-radius:6px;border-top-right-radius:6px;
+  }
+  .panel .hd h3{margin:0;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:var(--ink-1);font-weight:600;display:flex;align-items:center;gap:8px}
+  .panel .hd .meta{font-family:"JetBrains Mono";font-size:10px;color:var(--ink-2)}
+  .panel .bd{padding:14px}
+  .corner{position:relative}
+  .corner::before,.corner::after{content:"";position:absolute;width:8px;height:8px;border:1px solid var(--accent);opacity:0.6}
+  .corner::before{top:-1px;left:-1px;border-right:0;border-bottom:0}
+  .corner::after{bottom:-1px;right:-1px;border-left:0;border-top:0}
+
+  /* ===== Directory ===== */
+  .dir-grid{display:grid;grid-template-columns:280px 1fr;gap:18px}
+  .facets .group{padding:14px;border-bottom:1px solid var(--line)}
+  .facets .group:last-child{border-bottom:0}
+  .facets h4{margin:0 0 10px;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:var(--ink-2);display:flex;justify-content:space-between;align-items:center}
+  .facets h4 .count{font-family:"JetBrains Mono";color:var(--ink-3)}
+  .check{display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--ink-1);padding:5px 0;cursor:pointer}
+  .check:hover{color:var(--ink-0)}
+  .check input{appearance:none;-webkit-appearance:none;width:13px;height:13px;border:1px solid var(--line-2);background:var(--bg-2);border-radius:2px;margin-right:9px;position:relative;cursor:pointer;flex:0 0 13px}
+  .check input:checked{background:var(--accent);border-color:var(--accent)}
+  .check input:checked::after{content:"";position:absolute;left:3px;top:0px;width:4px;height:8px;border:solid #0b0d14;border-width:0 2px 2px 0;transform:rotate(45deg)}
+  .check label{display:flex;align-items:center;flex:1;min-width:0}
+  .check .n{font-family:"JetBrains Mono";font-size:10px;color:var(--ink-3)}
+  .range{display:flex;align-items:center;gap:8px;font-family:"JetBrains Mono";font-size:11px;color:var(--ink-1)}
+  .range input{flex:1;background:var(--bg-2);border:1px solid var(--line-2);color:var(--ink-0);padding:6px 8px;border-radius:3px;font:inherit;width:100%}
+  .range input:focus{outline:0;border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft)}
+
+  .search-bar{
+    display:flex;align-items:center;gap:0;background:var(--bg-1);border:1px solid var(--line);border-radius:6px;
+    padding:0;margin-bottom:14px;
+  }
+  .search-bar .icon{width:44px;display:grid;place-items:center;color:var(--accent);font-family:"JetBrains Mono";font-size:13px}
+  .search-bar input{
+    flex:1;background:transparent;border:0;color:var(--ink-0);
+    font:500 14px "Montserrat";padding:14px 4px;letter-spacing:0.02em;
+  }
+  .search-bar input:focus{outline:0}
+  .search-bar .shortcut{font-family:"JetBrains Mono";font-size:10px;color:var(--ink-3);padding:0 14px;display:flex;gap:6px;align-items:center}
+  .search-bar .shortcut kbd{background:var(--bg-3);border:1px solid var(--line-2);padding:1px 5px;border-radius:3px;color:var(--ink-1)}
+
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+  .chip{
+    display:inline-flex;align-items:center;gap:6px;font-family:"JetBrains Mono";font-size:10px;
+    background:var(--accent-soft);color:var(--accent);border:1px solid rgba(0,160,210,0.3);
+    padding:4px 8px;border-radius:3px;cursor:pointer;
+  }
+  .chip .x{opacity:0.6}
+  .chip:hover .x{opacity:1}
+
+  .res-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;font-family:"JetBrains Mono";font-size:11px;color:var(--ink-2)}
+  .res-meta .right{display:flex;gap:14px;align-items:center}
+  .res-meta .right a{color:var(--ink-1);text-decoration:none;cursor:pointer}
+  .res-meta .right a.on{color:var(--accent)}
+
+  .results{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+  .mp-card{
+    background:var(--bg-1);border:1px solid var(--line);border-radius:6px;
+    padding:14px;display:grid;grid-template-columns:46px 1fr auto;gap:12px;align-items:center;cursor:pointer;
+    transition:border-color .15s, background .15s, transform .15s;position:relative;
+  }
+  .mp-card:hover{border-color:var(--accent);background:var(--bg-2)}
+  .mp-card.sel{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent-glow), inset 3px 0 0 var(--accent)}
+  .mp-portrait{
+    width:46px;height:46px;border-radius:4px;background:var(--bg-3);border:1px solid var(--line-2);
+    display:grid;place-items:center;font-weight:600;font-size:14px;color:var(--ink-0);
+    background-image:
+      repeating-linear-gradient(45deg, rgba(255,255,255,0.02) 0 6px, transparent 6px 12px);
+  }
+  .mp-info .name{font-size:13px;font-weight:600;color:var(--ink-0);letter-spacing:0.02em}
+  .mp-info .meta{font-size:11px;color:var(--ink-2);margin-top:3px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .party-bar{display:inline-block;width:8px;height:8px;border-radius:1px;margin-right:2px}
+  .mp-stats{text-align:right;font-family:"JetBrains Mono";font-size:10px;color:var(--ink-2);line-height:1.5}
+  .mp-stats b{color:var(--ink-0);font-weight:500;font-size:11px;display:block}
+
+  /* ===== Profile ===== */
+  .prof-grid{display:grid;grid-template-columns:300px 1fr;gap:18px}
+  .prof-side{display:flex;flex-direction:column;gap:14px}
+  .prof-hero{padding:18px;text-align:center}
+  .prof-hero .portrait{
+    width:120px;height:120px;border-radius:6px;margin:0 auto 14px;border:1px solid var(--line-2);
+    background:var(--bg-3);
+    background-image:
+      repeating-linear-gradient(45deg, rgba(0,160,210,0.05) 0 8px, transparent 8px 16px),
+      radial-gradient(circle at 50% 35%, rgba(0,160,210,0.15), transparent 60%);
+    display:grid;place-items:end center;padding-bottom:10px;font-family:"JetBrains Mono";font-size:9px;color:var(--ink-3);
+  }
+  .prof-hero h2{margin:0;font-size:18px;font-weight:600;letter-spacing:0.02em}
+  .prof-hero .ttl{font-size:11px;color:var(--ink-2);margin-top:4px;letter-spacing:0.05em}
+  .prof-hero .id{font-family:"JetBrains Mono";font-size:10px;color:var(--accent);margin-top:10px;letter-spacing:0.12em}
+  .prof-hero .party-tag{
+    display:inline-flex;align-items:center;gap:6px;margin-top:12px;
+    padding:5px 10px;border:1px solid var(--line-2);border-radius:3px;font-size:11px;
+  }
+  .kvs{display:flex;flex-direction:column}
+  .kv{display:flex;justify-content:space-between;padding:10px 14px;font-size:11px;border-bottom:1px solid var(--line)}
+  .kv:last-child{border-bottom:0}
+  .kv .k{color:var(--ink-2);text-transform:uppercase;letter-spacing:0.1em;font-size:10px}
+  .kv .v{color:var(--ink-0);font-family:"JetBrains Mono";font-size:11px}
+
+  .prof-main{display:flex;flex-direction:column;gap:14px}
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+  .kpi{background:var(--bg-1);border:1px solid var(--line);border-radius:6px;padding:14px;position:relative;overflow:hidden}
+  .kpi .lab{font-size:9px;text-transform:uppercase;letter-spacing:0.18em;color:var(--ink-2)}
+  .kpi .val{font-size:24px;font-weight:600;color:var(--ink-0);margin-top:8px;font-family:"JetBrains Mono"}
+  .kpi .delta{font-size:11px;font-family:"JetBrains Mono";margin-top:4px;color:var(--ink-2)}
+  .kpi .delta.pos{color:var(--pos)}
+  .kpi .delta.neg{color:var(--neg)}
+  .kpi .spark{position:absolute;right:10px;top:10px;bottom:10px;width:60px;opacity:0.7}
+
+  .chart-row{display:grid;grid-template-columns:1.5fr 1fr;gap:14px}
+  .chart-host{height:280px;width:100%}
+  .chart-host.lg{height:340px}
+  .chart-host svg{width:100%;height:100%;display:block}
+  .axis text{fill:var(--ink-2);font-family:"JetBrains Mono";font-size:10px}
+  .axis path,.axis line{stroke:var(--line);stroke-width:1;shape-rendering:crispEdges}
+  .grid line{stroke:var(--line);stroke-dasharray:2,3;opacity:0.5}
+  .grid path{display:none}
+  .legend{display:flex;gap:14px;font-family:"JetBrains Mono";font-size:10px;color:var(--ink-1);flex-wrap:wrap}
+  .legend .sw{display:inline-block;width:10px;height:2px;margin-right:6px;vertical-align:middle}
+
+  /* Tooltip */
+  .ttip{
+    position:fixed;pointer-events:none;background:var(--bg-3);border:1px solid var(--accent);
+    padding:8px 10px;font-family:"JetBrains Mono";font-size:11px;color:var(--ink-0);
+    border-radius:3px;box-shadow:0 8px 24px rgba(0,0,0,0.6);z-index:100;opacity:0;transition:opacity .12s;min-width:140px;
+  }
+  .ttip .t-k{color:var(--ink-2);font-size:9px;text-transform:uppercase;letter-spacing:0.12em;margin-bottom:4px}
+  .ttip .t-row{display:flex;justify-content:space-between;gap:14px}
+  .ttip .t-row b{color:var(--accent);font-weight:500}
+
+  /* ===== Stream table ===== */
+  .stream-bar{
+    display:grid;grid-template-columns:1fr auto auto auto auto;gap:10px;
+    padding:10px 14px;background:var(--bg-2);border:1px solid var(--line);border-radius:6px;margin-bottom:12px;align-items:center;
+  }
+  .stream-bar input,.stream-bar select{
+    background:var(--bg-1);border:1px solid var(--line-2);color:var(--ink-0);
+    padding:8px 10px;border-radius:3px;font:500 12px "JetBrains Mono";
+  }
+  .stream-bar input:focus,.stream-bar select:focus{outline:0;border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft)}
+  .stream-bar .btn{
+    background:var(--accent-soft);color:var(--accent);border:1px solid rgba(0,160,210,0.3);
+    padding:8px 12px;font:600 10px "Montserrat";letter-spacing:0.16em;text-transform:uppercase;border-radius:3px;cursor:pointer;
+  }
+  .stream-bar .btn.ghost{background:transparent;color:var(--ink-1);border-color:var(--line-2)}
+
+  table.stream{width:100%;border-collapse:collapse;background:var(--bg-1);border:1px solid var(--line);font-size:12px}
+  table.stream th{
+    background:var(--bg-2);text-align:left;padding:10px 12px;font:600 10px "Montserrat";
+    letter-spacing:0.14em;text-transform:uppercase;color:var(--ink-2);border-bottom:1px solid var(--line);cursor:pointer;user-select:none;white-space:nowrap;
+  }
+  table.stream th:hover{color:var(--ink-0)}
+  table.stream th .arr{color:var(--accent);margin-left:4px;font-family:"JetBrains Mono"}
+  table.stream td{padding:9px 12px;border-bottom:1px solid var(--line);font-family:"JetBrains Mono";color:var(--ink-1);font-size:11px}
+  table.stream td.num{text-align:right;color:var(--ink-0);font-weight:500}
+  table.stream tr:hover td{background:rgba(0,160,210,0.04)}
+  table.stream tr.flag td{background:rgba(255,180,84,0.04)}
+  .tag{font:500 9px "Montserrat";letter-spacing:0.1em;text-transform:uppercase;padding:2px 6px;border-radius:2px;border:1px solid currentColor}
+  .tag.ok{color:var(--pos)}
+  .tag.flag{color:var(--warn)}
+  .tag.audit{color:var(--accent)}
+
+  .stream-foot{display:flex;justify-content:space-between;align-items:center;padding:12px 4px;font-family:"JetBrains Mono";font-size:11px;color:var(--ink-2)}
+  .pager{display:flex;gap:4px}
+  .pager button{background:var(--bg-2);border:1px solid var(--line);color:var(--ink-1);width:28px;height:28px;border-radius:3px;cursor:pointer;font:inherit}
+  .pager button.on{background:var(--accent-soft);color:var(--accent);border-color:rgba(0,160,210,0.35)}
+
+  /* ===== AI Console ===== */
+  .ai-grid{display:grid;grid-template-columns:1fr 280px;gap:18px}
+  .ai-prompt{
+    background:linear-gradient(180deg,var(--bg-2),var(--bg-1));border:1px solid var(--line);border-radius:6px;padding:18px;position:relative;
+  }
+  .ai-prompt::before{
+    content:"";position:absolute;inset:0;border-radius:6px;pointer-events:none;
+    background:radial-gradient(400px 200px at 20% 0%, rgba(0,160,210,0.07), transparent 70%);
+  }
+  .ai-prompt .ph{font:600 10px "Montserrat";letter-spacing:0.2em;text-transform:uppercase;color:var(--accent);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+  .ai-prompt .ph .pulse{width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 0 var(--accent-glow);animation:pulse 1.6s infinite}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(0,160,210,0.6)}70%{box-shadow:0 0 0 10px transparent}100%{box-shadow:0 0 0 0 transparent}}
+  .ai-input{
+    width:100%;background:var(--bg-0);border:1px solid var(--line-2);border-radius:4px;
+    color:var(--ink-0);font:500 15px "Montserrat";padding:16px 18px;min-height:64px;resize:vertical;letter-spacing:0.01em;
+  }
+  .ai-input:focus{outline:0;border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft)}
+  .ai-actions{display:flex;justify-content:space-between;align-items:center;margin-top:12px}
+  .ai-actions .hint{font-family:"JetBrains Mono";font-size:10px;color:var(--ink-3)}
+  .ai-actions .run{
+    background:var(--accent);color:#0b0d14;border:0;padding:10px 18px;border-radius:3px;
+    font:700 11px "Montserrat";letter-spacing:0.18em;text-transform:uppercase;cursor:pointer;display:flex;align-items:center;gap:8px;
+  }
+  .ai-actions .run:hover{box-shadow:0 0 18px var(--accent-glow)}
+
+  .suggestions{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:14px}
+  .sug{
+    background:var(--bg-1);border:1px solid var(--line);border-left:2px solid var(--accent);
+    padding:10px 12px;font-size:12px;color:var(--ink-1);cursor:pointer;border-radius:3px;
+  }
+  .sug:hover{background:var(--bg-2);color:var(--ink-0)}
+  .sug .lab{font-family:"JetBrains Mono";font-size:9px;color:var(--ink-3);text-transform:uppercase;letter-spacing:0.14em;margin-bottom:4px}
+
+  .resp-card{background:var(--bg-1);border:1px solid var(--line);border-radius:6px;margin-top:14px}
+  .resp-card .hd{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-bottom:1px solid var(--line);background:var(--bg-2);border-radius:6px 6px 0 0}
+  .resp-card .hd .tt{font:600 10px "Montserrat";letter-spacing:0.18em;text-transform:uppercase;color:var(--ink-1);display:flex;gap:8px;align-items:center}
+  .resp-card .hd .tt .ok{color:var(--pos);font-family:"JetBrains Mono"}
+  .resp-card .hd .switch{display:flex;gap:2px;background:var(--bg-3);border-radius:3px;padding:2px;border:1px solid var(--line-2)}
+  .resp-card .hd .switch button{background:transparent;border:0;color:var(--ink-2);padding:4px 10px;font:600 9px "Montserrat";letter-spacing:0.14em;text-transform:uppercase;border-radius:2px;cursor:pointer}
+  .resp-card .hd .switch button.on{background:var(--accent-soft);color:var(--accent)}
+  .resp-card .bd{padding:14px}
+  .resp-sql{
+    background:var(--bg-0);border:1px solid var(--line);border-radius:3px;padding:12px;
+    font-family:"JetBrains Mono";font-size:11px;color:var(--ink-1);line-height:1.6;margin-bottom:14px;overflow-x:auto;
+  }
+  .resp-sql .kw{color:var(--accent);font-weight:600}
+  .resp-sql .st{color:var(--pos)}
+  .resp-sql .nm{color:var(--warn)}
+  .resp-sql .cm{color:var(--ink-3)}
+
+  .ai-side .panel + .panel{margin-top:14px}
+  .hist-item{padding:10px 14px;border-bottom:1px solid var(--line);font-size:12px;cursor:pointer}
+  .hist-item:last-child{border-bottom:0}
+  .hist-item:hover{background:var(--bg-2)}
+  .hist-item .q{color:var(--ink-1);line-height:1.4}
+  .hist-item .m{font-family:"JetBrains Mono";font-size:9px;color:var(--ink-3);margin-top:4px;display:flex;justify-content:space-between}
+  .hist-item .m b{color:var(--accent);font-weight:500}
+
+  /* misc */
+  .dim{color:var(--ink-2)}
+  .hr{height:1px;background:var(--line);margin:14px 0}
+
+  /* ===== Header tools ===== */
+  .htool{
+    display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;
+    background:var(--bg-2);border:1px solid var(--line-2);border-radius:4px;color:var(--ink-1);
+    cursor:pointer;font-family:"JetBrains Mono";font-size:14px;transition:all .15s;
+  }
+  .htool:hover{color:var(--accent);border-color:var(--accent)}
+  .htool.on{background:var(--accent-soft);color:var(--accent);border-color:var(--accent)}
+  .avatar{cursor:pointer;transition:border-color .15s}
+  .avatar:hover{border-color:var(--accent)}
+
+  /* ===== HOME ===== */
+  .hero{
+    background:linear-gradient(180deg,var(--bg-2),var(--bg-1));border:1px solid var(--line);border-radius:6px;
+    padding:28px 32px;position:relative;overflow:hidden;margin-bottom:18px;
+  }
+  .hero::before{
+    content:"";position:absolute;inset:0;
+    background:
+      radial-gradient(600px 300px at 90% 50%, var(--accent-soft), transparent 70%),
+      repeating-linear-gradient(90deg, transparent 0 78px, rgba(0,160,210,0.05) 78px 79px);
+    pointer-events:none;
+  }
+  .hero-grid{display:grid;grid-template-columns:1fr 320px;gap:32px;position:relative;z-index:1}
+  .hero h2{margin:0;font-size:28px;letter-spacing:0.01em;font-weight:600;line-height:1.2}
+  .hero h2 .acc{color:var(--accent)}
+  .hero p.lede{color:var(--ink-1);font-size:14px;line-height:1.6;margin:14px 0 18px;max-width:560px}
+  .hero .ctas{display:flex;gap:10px;flex-wrap:wrap}
+  .hero .cta{
+    display:inline-flex;align-items:center;gap:8px;padding:10px 16px;
+    background:var(--accent);color:#0b0d14;border:0;border-radius:3px;cursor:pointer;
+    font:700 11px "Montserrat";letter-spacing:0.16em;text-transform:uppercase;text-decoration:none;
+  }
+  :root[data-theme="light"] .hero .cta{color:#fff}
+  .hero .cta:hover{box-shadow:0 0 22px var(--accent-glow)}
+  .hero .cta.ghost{background:transparent;color:var(--ink-0);border:1px solid var(--line-2)}
+  .hero .cta.ghost:hover{border-color:var(--accent);color:var(--accent);box-shadow:none}
+  .hero-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .hero-stat{background:var(--bg-3);border:1px solid var(--line);border-radius:4px;padding:14px}
+  .hero-stat .lab{font-size:9px;text-transform:uppercase;letter-spacing:0.16em;color:var(--ink-2)}
+  .hero-stat .val{font-family:"JetBrains Mono";font-size:22px;color:var(--ink-0);margin-top:6px}
+  .hero-stat .delta{font-family:"JetBrains Mono";font-size:10px;margin-top:2px;color:var(--ink-2)}
+  .hero-stat .delta.pos{color:var(--pos)}
+
+  .home-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:18px}
+  .home-col{display:flex;flex-direction:column;gap:14px}
+  .activity-row{display:flex;align-items:center;gap:12px;padding:11px 14px;border-bottom:1px solid var(--line);font-size:12px}
+  .activity-row:last-child{border-bottom:0}
+  .activity-row .ic{
+    width:28px;height:28px;border-radius:4px;background:var(--bg-3);border:1px solid var(--line-2);
+    display:grid;place-items:center;color:var(--accent);font-family:"JetBrains Mono";font-size:12px;flex-shrink:0;
+  }
+  .activity-row .ic.warn{color:var(--warn);border-color:var(--warn)}
+  .activity-row .ic.pos{color:var(--pos);border-color:var(--pos)}
+  .activity-row .body{flex:1;line-height:1.45}
+  .activity-row .body b{color:var(--ink-0);font-weight:500}
+  .activity-row .body .meta{color:var(--ink-2);font-family:"JetBrains Mono";font-size:10px;margin-top:2px}
+  .activity-row .when{font-family:"JetBrains Mono";font-size:10px;color:var(--ink-3);white-space:nowrap}
+
+  .watch-row{display:grid;grid-template-columns:32px 1fr auto;gap:10px;padding:10px 14px;border-bottom:1px solid var(--line);align-items:center;font-size:12px;cursor:pointer}
+  .watch-row:hover{background:var(--bg-2)}
+  .watch-row:last-child{border-bottom:0}
+  .watch-row .av{width:32px;height:32px;border-radius:3px;background:var(--bg-3);border:1px solid var(--line-2);display:grid;place-items:center;font-weight:600;font-size:11px}
+  .watch-row .name{font-weight:500;color:var(--ink-0)}
+  .watch-row .meta{font-size:10px;color:var(--ink-2);font-family:"JetBrains Mono";margin-top:2px}
+  .watch-row .trend{font-family:"JetBrains Mono";font-size:11px;text-align:right}
+  .watch-row .trend b{display:block;color:var(--ink-0)}
+  .watch-row .trend .d.pos{color:var(--pos)}
+  .watch-row .trend .d.neg{color:var(--neg)}
+
+  .featured{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:14px}
+  .featured-q{background:var(--bg-2);border:1px solid var(--line);border-left:2px solid var(--accent);padding:12px;border-radius:3px;cursor:pointer}
+  .featured-q:hover{background:var(--bg-3)}
+  .featured-q .lab{font:600 9px "Montserrat";letter-spacing:0.16em;text-transform:uppercase;color:var(--accent);margin-bottom:6px}
+  .featured-q .q{font-size:12px;color:var(--ink-0);line-height:1.45}
+  .featured-q .m{font-family:"JetBrains Mono";font-size:9px;color:var(--ink-3);margin-top:8px;display:flex;justify-content:space-between}
+
+  .home-chart{height:200px;padding:6px 14px 14px}
+
+  /* ===== FORUM ===== */
+  .forum-grid{display:grid;grid-template-columns:220px 1fr 280px;gap:18px}
+  .cat-list{padding:6px 0}
+  .cat-item{display:flex;justify-content:space-between;align-items:center;padding:9px 14px;font-size:12px;cursor:pointer;border-left:2px solid transparent;color:var(--ink-1)}
+  .cat-item:hover{background:var(--bg-2);color:var(--ink-0)}
+  .cat-item.on{border-left-color:var(--accent);color:var(--ink-0);background:var(--bg-2)}
+  .cat-item .n{font-family:"JetBrains Mono";font-size:10px;color:var(--ink-3)}
+  .cat-item .ico{color:var(--accent);margin-right:8px;font-family:"JetBrains Mono";font-size:11px;width:14px;display:inline-block}
+
+  .forum-toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:10px}
+  .forum-toolbar .filters{display:flex;gap:4px;background:var(--bg-2);border:1px solid var(--line);padding:3px;border-radius:4px}
+  .forum-toolbar .filters button{background:transparent;border:0;color:var(--ink-2);font:600 10px "Montserrat";letter-spacing:0.12em;text-transform:uppercase;padding:6px 10px;border-radius:3px;cursor:pointer}
+  .forum-toolbar .filters button.on{background:var(--accent-soft);color:var(--accent)}
+  .forum-toolbar .new-thread{
+    background:var(--accent);color:#0b0d14;border:0;padding:9px 16px;border-radius:3px;
+    font:700 10px "Montserrat";letter-spacing:0.16em;text-transform:uppercase;cursor:pointer;
+  }
+  :root[data-theme="light"] .forum-toolbar .new-thread{color:#fff}
+
+  .thread{
+    display:grid;grid-template-columns:auto 1fr auto auto;gap:14px;align-items:center;
+    padding:14px;border:1px solid var(--line);background:var(--bg-1);border-radius:5px;margin-bottom:8px;cursor:pointer;transition:border-color .15s;
+  }
+  .thread:hover{border-color:var(--accent)}
+  .thread.pinned{border-left:3px solid var(--warn)}
+  .thread .av{width:36px;height:36px;border-radius:4px;background:var(--bg-3);border:1px solid var(--line-2);display:grid;place-items:center;font-weight:600;font-size:12px}
+  .thread .ttl{font-size:13px;font-weight:600;color:var(--ink-0);line-height:1.35;letter-spacing:0.01em}
+  .thread .meta{font-family:"JetBrains Mono";font-size:10px;color:var(--ink-2);margin-top:4px;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .thread .tags{display:flex;gap:4px;flex-wrap:wrap}
+  .thread .tag-mini{font-family:"JetBrains Mono";font-size:9px;color:var(--accent);background:var(--accent-soft);padding:2px 6px;border-radius:2px;border:1px solid rgba(0,160,210,0.25)}
+  .thread .pin-mark{color:var(--warn);font-family:"JetBrains Mono";font-size:10px;letter-spacing:0.12em}
+  .thread .stats{display:flex;gap:14px;font-family:"JetBrains Mono";font-size:11px;color:var(--ink-1);text-align:center}
+  .thread .stats .col b{display:block;color:var(--ink-0);font-size:13px}
+  .thread .stats .col .lab{font-size:9px;color:var(--ink-3);letter-spacing:0.1em;text-transform:uppercase;margin-top:2px}
+  .thread .last{font-family:"JetBrains Mono";font-size:10px;color:var(--ink-2);text-align:right;min-width:90px}
+  .thread .last b{display:block;color:var(--ink-0);font-weight:500;font-size:11px}
+
+  .contributors .row{display:flex;align-items:center;gap:10px;padding:9px 14px;border-bottom:1px solid var(--line);font-size:12px}
+  .contributors .row:last-child{border-bottom:0}
+  .contributors .row .av{width:26px;height:26px;border-radius:3px;background:var(--bg-3);border:1px solid var(--line-2);display:grid;place-items:center;font-weight:600;font-size:10px}
+  .contributors .row .name{color:var(--ink-0);font-weight:500;flex:1}
+  .contributors .row .karma{font-family:"JetBrains Mono";font-size:10px;color:var(--accent)}
+
+  .tag-cloud{padding:14px;display:flex;flex-wrap:wrap;gap:6px}
+  .tag-cloud span{
+    font-family:"JetBrains Mono";font-size:10px;color:var(--ink-1);
+    border:1px solid var(--line-2);padding:3px 8px;border-radius:3px;cursor:pointer;
+  }
+  .tag-cloud span:hover{border-color:var(--accent);color:var(--accent)}
+
+  /* ===== USER PROFILE ===== */
+  .user-grid{display:grid;grid-template-columns:300px 1fr;gap:18px}
+  .user-hero{
+    background:linear-gradient(180deg,var(--bg-2),var(--bg-1));border:1px solid var(--line);border-radius:6px;
+    padding:24px;text-align:center;position:relative;overflow:hidden;
+  }
+  .user-hero::before{
+    content:"";position:absolute;inset:0 0 60% 0;
+    background:radial-gradient(circle at 50% 0%, var(--accent-soft), transparent 70%);
+    pointer-events:none;
+  }
+  .user-hero .av{
+    width:96px;height:96px;border-radius:6px;margin:0 auto 14px;
+    background:linear-gradient(135deg,#2a3a55,#0b1018);border:1px solid var(--accent);
+    display:grid;place-items:center;font-weight:700;font-size:32px;color:var(--accent);position:relative;z-index:1;
+    box-shadow:0 0 0 3px var(--bg-1), 0 0 30px var(--accent-glow);
+  }
+  :root[data-theme="light"] .user-hero .av{background:linear-gradient(135deg,#dbe7f3,#b8cde0)}
+  .user-hero .uname{font-size:18px;font-weight:600;margin:0;letter-spacing:0.01em}
+  .user-hero .handle{color:var(--accent);font-family:"JetBrains Mono";font-size:11px;letter-spacing:0.12em;margin-top:4px}
+  .user-hero .role{font-size:11px;color:var(--ink-2);margin-top:10px;letter-spacing:0.05em}
+  .user-hero .badges{display:flex;justify-content:center;gap:6px;margin-top:14px;flex-wrap:wrap;position:relative;z-index:1}
+  .user-hero .badge{
+    font-family:"JetBrains Mono";font-size:9px;padding:3px 8px;border-radius:2px;
+    border:1px solid currentColor;color:var(--accent);text-transform:uppercase;letter-spacing:0.1em;
+  }
+  .user-hero .badge.gold{color:var(--warn)}
+  .user-hero .badge.green{color:var(--pos)}
+
+  .settings-tabs{display:flex;gap:2px;border-bottom:1px solid var(--line);margin-bottom:14px}
+  .settings-tabs button{
+    background:transparent;border:0;color:var(--ink-2);padding:10px 14px;
+    font:600 10px "Montserrat";letter-spacing:0.16em;text-transform:uppercase;cursor:pointer;
+    border-bottom:2px solid transparent;margin-bottom:-1px;
+  }
+  .settings-tabs button.on{color:var(--accent);border-bottom-color:var(--accent)}
+
+  .setting-row{display:grid;grid-template-columns:1fr 220px;gap:18px;padding:14px;border-bottom:1px solid var(--line);align-items:center}
+  .setting-row:last-child{border-bottom:0}
+  .setting-row .label{font-size:13px;color:var(--ink-0);font-weight:500}
+  .setting-row .desc{font-size:11px;color:var(--ink-2);margin-top:4px;line-height:1.4}
+  .setting-row input[type=text],.setting-row input[type=email],.setting-row select{
+    width:100%;background:var(--bg-0);border:1px solid var(--line-2);color:var(--ink-0);
+    padding:8px 10px;border-radius:3px;font:500 12px "JetBrains Mono";
+  }
+
+  /* Switch */
+  .sw{position:relative;display:inline-block;width:36px;height:20px;cursor:pointer}
+  .sw input{opacity:0;width:0;height:0}
+  .sw .slot{position:absolute;inset:0;background:var(--bg-3);border:1px solid var(--line-2);border-radius:20px;transition:.15s}
+  .sw .slot::before{content:"";position:absolute;left:2px;top:1px;width:14px;height:14px;background:var(--ink-1);border-radius:50%;transition:.15s}
+  .sw input:checked+.slot{background:var(--accent-soft);border-color:var(--accent)}
+  .sw input:checked+.slot::before{left:18px;background:var(--accent)}
+
+  .saved-q{
+    display:grid;grid-template-columns:1fr auto auto;gap:14px;padding:12px 14px;border-bottom:1px solid var(--line);align-items:center;font-size:12px;cursor:pointer;
+  }
+  .saved-q:last-child{border-bottom:0}
+  .saved-q:hover{background:var(--bg-2)}
+  .saved-q .q{color:var(--ink-0);line-height:1.4}
+  .saved-q .schema{font-family:"JetBrains Mono";font-size:10px;color:var(--accent);margin-top:3px}
+  .saved-q .date{font-family:"JetBrains Mono";font-size:10px;color:var(--ink-3)}
+  .saved-q .runs{font-family:"JetBrains Mono";font-size:10px;color:var(--ink-2);text-align:right}
+  .saved-q .runs b{color:var(--ink-0);display:block;font-size:13px}
+
+  /* ===== CUSTOMIZER WINDOW ===== */
+  .scrim{position:fixed;inset:0;background:rgba(0,0,0,0.5);opacity:0;pointer-events:none;transition:opacity .2s;z-index:200}
+  .scrim.open{opacity:1;pointer-events:auto}
+  :root[data-theme="light"] .scrim{background:rgba(20,30,45,0.35)}
+
+  .customizer{
+    position:fixed;top:80px;right:22px;width:340px;max-height:calc(100vh - 110px);
+    background:var(--bg-1);border:1px solid var(--line-2);border-radius:6px;
+    box-shadow:0 24px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(0,160,210,0.15);
+    z-index:201;overflow:hidden;display:flex;flex-direction:column;
+    transform:translateX(380px);transition:transform .25s cubic-bezier(.2,.8,.2,1);
+  }
+  :root[data-theme="light"] .customizer{box-shadow:0 24px 60px rgba(20,40,60,0.18)}
+  .customizer.open{transform:translateX(0)}
+  .customizer .hd{
+    display:flex;justify-content:space-between;align-items:center;padding:12px 14px;
+    background:var(--bg-2);border-bottom:1px solid var(--line);
+  }
+  .customizer .hd h3{margin:0;font:600 11px "Montserrat";letter-spacing:0.18em;text-transform:uppercase;color:var(--accent);display:flex;align-items:center;gap:8px}
+  .customizer .hd .x{background:transparent;border:0;color:var(--ink-2);cursor:pointer;font-size:16px;width:24px;height:24px;border-radius:3px}
+  .customizer .hd .x:hover{background:var(--bg-3);color:var(--ink-0)}
+  .customizer .body{padding:6px 0;overflow-y:auto;flex:1}
+  .customizer .sec{padding:14px;border-bottom:1px solid var(--line)}
+  .customizer .sec:last-child{border-bottom:0}
+  .customizer .sec h4{margin:0 0 10px;font:600 10px "Montserrat";letter-spacing:0.16em;text-transform:uppercase;color:var(--ink-2);display:flex;justify-content:space-between;align-items:center}
+  .customizer .sec h4 .val{font-family:"JetBrains Mono";color:var(--accent);letter-spacing:0.05em;text-transform:none}
+
+  .swatches{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
+  .swatch{
+    aspect-ratio:1;border-radius:4px;cursor:pointer;border:1px solid var(--line);position:relative;
+  }
+  .swatch.on{border-color:var(--ink-0);box-shadow:0 0 0 2px var(--bg-1), 0 0 0 3px currentColor}
+  .swatch.on::after{content:"✓";position:absolute;inset:0;display:grid;place-items:center;color:#fff;font-size:13px;font-weight:700;mix-blend-mode:difference}
+
+  .segctl{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:0;background:var(--bg-2);border:1px solid var(--line-2);border-radius:4px;padding:2px}
+  .segctl button{
+    background:transparent;border:0;color:var(--ink-2);padding:7px 6px;
+    font:600 10px "Montserrat";letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;border-radius:3px;
+  }
+  .segctl button.on{background:var(--accent-soft);color:var(--accent)}
+
+  .slider-row{display:flex;align-items:center;gap:10px}
+  .slider-row input[type=range]{flex:1;-webkit-appearance:none;height:3px;background:var(--bg-3);border-radius:2px;outline:none}
+  .slider-row input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--accent);
+    box-shadow:0 0 0 3px var(--bg-1), 0 0 8px var(--accent-glow);cursor:pointer;
+  }
+  .slider-row input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;background:var(--accent);border:0;cursor:pointer}
+
+  .preview-mini{
+    margin-top:10px;background:var(--bg-0);border:1px solid var(--line);border-radius:4px;height:88px;padding:8px;
+  }
+
+  .cust-actions{display:flex;gap:8px;padding:12px 14px;border-top:1px solid var(--line);background:var(--bg-2)}
+  .cust-actions button{
+    flex:1;background:transparent;border:1px solid var(--line-2);color:var(--ink-1);
+    padding:9px;font:600 10px "Montserrat";letter-spacing:0.14em;text-transform:uppercase;cursor:pointer;border-radius:3px;
+  }
+  .cust-actions button.primary{background:var(--accent);color:#0b0d14;border-color:var(--accent)}
+  :root[data-theme="light"] .cust-actions button.primary{color:#fff}
+</style>
+</head>
+<body>
+
+<!-- Top status rail -->
+<div class="rail">
+  <div class="l">
+    <span><span class="dot"></span>SYSTEM ONLINE</span>
+    <span>DB-CLUSTER: <span style="color:var(--ink-0)">pt-finance-01 · pt-registry-04</span></span>
+    <span>LATENCY: <span style="color:var(--ink-0)">14ms</span></span>
+    <span>JSON STREAM: <span style="color:var(--pos)">OK</span></span>
+  </div>
+  <div class="r">
+    <span>BUILD <span style="color:var(--ink-0)">2.4.1-rc</span></span>
+    <span>SHIFT+K · COMMAND PALETTE</span>
+    <span>05.27.2026 · 14:22:08 UTC</span>
+  </div>
+</div>
+
+<!-- Header -->
+<header class="shell">
+  <div class="brand">
+    <div class="mark"><span></span></div>
+    <h1>PublicTech Audit Terminal<small>Government Spending Discovery · Public Records Interface</small></h1>
+  </div>
+  <nav class="tabs" id="tabs">
+    <button data-view="home"><span class="idx">00</span> Home</button>
+    <button class="active" data-view="directory"><span class="idx">01</span> Directory</button>
+    <button data-view="profile"><span class="idx">02</span> Member</button>
+    <button data-view="stream"><span class="idx">03</span> Stream</button>
+    <button data-view="ai"><span class="idx">04</span> AI Console</button>
+    <button data-view="forum"><span class="idx">05</span> Forum</button>
+  </nav>
+  <div class="header-r">
+    <div class="pill"><span class="dot" style="width:6px;height:6px;border-radius:50%;background:var(--pos);display:inline-block"></span>338 <b>Indexed</b></div>
+    <button class="htool" id="customizerBtn" title="Chart Customizer">◈</button>
+    <button class="htool" id="themeBtn" title="Toggle light / dark theme">◐</button>
+    <div class="avatar" id="avatarBtn" title="Account · Settings">AK</div>
+  </div>
+</header>
+
+<main>
+
+  <!-- ===== VIEW 01: DIRECTORY ===== -->
+  <section class="view active" data-view="directory">
+    <div class="search-bar corner">
+      <div class="icon">⌕</div>
+      <input id="globalSearch" placeholder="Search by name, riding, party, postal code, committee…" />
+      <div class="shortcut"><kbd>⌘</kbd><kbd>K</kbd></div>
+    </div>
+
+    <div class="chips">
+      <span class="chip">PARTY: NDP <span class="x">×</span></span>
+      <span class="chip">REGION: ONTARIO <span class="x">×</span></span>
+      <span class="chip">SPEND &gt; $250k <span class="x">×</span></span>
+      <span class="chip">FLAGGED ONLY <span class="x">×</span></span>
+    </div>
+
+    <div class="dir-grid">
+      <!-- Facets -->
+      <aside class="panel facets">
+        <div class="hd"><h3>◇ Facets</h3><span class="meta">12 active</span></div>
+        <div class="group">
+          <h4>Party <span class="count">5</span></h4>
+          <div class="check"><label><input type="checkbox" checked /><span class="party-bar" style="background:var(--party-lib)"></span>Liberal</label><span class="n">158</span></div>
+          <div class="check"><label><input type="checkbox" checked /><span class="party-bar" style="background:var(--party-con)"></span>Conservative</label><span class="n">119</span></div>
+          <div class="check"><label><input type="checkbox" checked /><span class="party-bar" style="background:var(--party-ndp)"></span>NDP</label><span class="n">25</span></div>
+          <div class="check"><label><input type="checkbox" /><span class="party-bar" style="background:var(--party-blq)"></span>Bloc</label><span class="n">32</span></div>
+          <div class="check"><label><input type="checkbox" /><span class="party-bar" style="background:var(--party-grn)"></span>Green</label><span class="n">4</span></div>
+        </div>
+        <div class="group">
+          <h4>Region <span class="count">13</span></h4>
+          <div class="check"><label><input type="checkbox" />Ontario</label><span class="n">121</span></div>
+          <div class="check"><label><input type="checkbox" />Quebec</label><span class="n">78</span></div>
+          <div class="check"><label><input type="checkbox" />British Columbia</label><span class="n">42</span></div>
+          <div class="check"><label><input type="checkbox" />Alberta</label><span class="n">34</span></div>
+          <div class="check"><label><input type="checkbox" />Prairies</label><span class="n">28</span></div>
+          <div class="check"><label><input type="checkbox" />Atlantic</label><span class="n">32</span></div>
+        </div>
+        <div class="group">
+          <h4>Spend Range (CAD)</h4>
+          <div class="range">
+            <input value="$50,000" />
+            <span class="dim">→</span>
+            <input value="$2.5M" />
+          </div>
+        </div>
+        <div class="group">
+          <h4>Postal Code</h4>
+          <div class="range"><input placeholder="K1A · M5V · V6B …" /></div>
+        </div>
+        <div class="group">
+          <h4>Committee Membership <span class="count">22</span></h4>
+          <div class="check"><label><input type="checkbox" />Finance (FINA)</label><span class="n">12</span></div>
+          <div class="check"><label><input type="checkbox" />Public Accounts (PACP)</label><span class="n">11</span></div>
+          <div class="check"><label><input type="checkbox" />Industry (INDU)</label><span class="n">12</span></div>
+          <div class="check"><label><input type="checkbox" />Environment (ENVI)</label><span class="n">10</span></div>
+        </div>
+      </aside>
+
+      <!-- Results -->
+      <div>
+        <div class="res-meta">
+          <span>Showing <span style="color:var(--ink-0)">42</span> of <span style="color:var(--ink-0)">302</span> records · query resolved in <span style="color:var(--accent)">18ms</span></span>
+          <div class="right">
+            <span>SORT:</span>
+            <a class="on">Highest Spend ▾</a>
+            <a>Last Updated</a>
+            <a>Name A–Z</a>
+          </div>
+        </div>
+        <div class="results" id="mpResults"></div>
+
+        <div class="stream-foot" style="margin-top:6px">
+          <span>Page <b style="color:var(--ink-0)">1</b> of 18 · 24 per page</span>
+          <div class="pager">
+            <button>‹</button><button class="on">1</button><button>2</button><button>3</button><button>4</button><button>5</button><button>›</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== VIEW 02: PROFILE ===== -->
+  <section class="view" data-view="profile">
+    <div class="prof-grid">
+      <!-- Side -->
+      <aside class="prof-side">
+        <div class="panel prof-hero corner">
+          <div class="portrait">portrait · placeholder</div>
+          <h2>Hon. Mira Eldenwood</h2>
+          <div class="ttl">Member of Parliament — Cascadia North</div>
+          <div class="party-tag"><span class="party-bar" style="background:var(--party-ndp)"></span>New Democratic Party · NDP</div>
+          <div class="id">MP_ID · 0xA47F · ELECTED 2019</div>
+        </div>
+
+        <div class="panel">
+          <div class="hd"><h3>◇ Record</h3><span class="meta">REGISTRY/04</span></div>
+          <div class="kvs">
+            <div class="kv"><span class="k">Riding</span><span class="v">Cascadia North</span></div>
+            <div class="kv"><span class="k">Province</span><span class="v">BC</span></div>
+            <div class="kv"><span class="k">Postal Codes</span><span class="v">V8L · V9A · V0R</span></div>
+            <div class="kv"><span class="k">Caucus Role</span><span class="v">Critic, Finance</span></div>
+            <div class="kv"><span class="k">Committees</span><span class="v">FINA · PACP</span></div>
+            <div class="kv"><span class="k">First Elected</span><span class="v">21 Oct 2019</span></div>
+            <div class="kv"><span class="k">Tenure</span><span class="v">6y · 7mo</span></div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="hd"><h3>◇ Audit Status</h3><span class="meta">AUTO</span></div>
+          <div class="bd" style="display:flex;flex-direction:column;gap:8px">
+            <div style="display:flex;justify-content:space-between;font-size:12px"><span class="dim">Integrity score</span><span style="color:var(--pos);font-family:'JetBrains Mono'">94 / 100</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:12px"><span class="dim">Open flags</span><span style="color:var(--warn);font-family:'JetBrains Mono'">3 minor</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:12px"><span class="dim">Last audit</span><span style="font-family:'JetBrains Mono'">2026-05-12</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:12px"><span class="dim">Data sources</span><span style="font-family:'JetBrains Mono'">4 linked</span></div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Main -->
+      <div class="prof-main">
+        <div class="kpis">
+          <div class="kpi corner">
+            <div class="lab">Total Office Spend ’25</div>
+            <div class="val">$487,210</div>
+            <div class="delta pos">▲ 4.8% vs prior year</div>
+            <svg class="spark" id="spk1"></svg>
+          </div>
+          <div class="kpi">
+            <div class="lab">Travel Expenses</div>
+            <div class="val">$62,940</div>
+            <div class="delta neg">▼ 11.2% YoY</div>
+            <svg class="spark" id="spk2"></svg>
+          </div>
+          <div class="kpi">
+            <div class="lab">Contracts Awarded</div>
+            <div class="val">14</div>
+            <div class="delta pos">▲ 2 new vendors</div>
+            <svg class="spark" id="spk3"></svg>
+          </div>
+          <div class="kpi">
+            <div class="lab">Votes Cast (38th)</div>
+            <div class="val">412</div>
+            <div class="delta">98.6% attendance</div>
+            <svg class="spark" id="spk4"></svg>
+          </div>
+        </div>
+
+        <div class="chart-row">
+          <div class="panel corner">
+            <div class="hd">
+              <h3>◇ Spending Breakdown · Fiscal 2019 – 2025</h3>
+              <span class="meta">SCHEMA: pt-finance-01.expenditures</span>
+            </div>
+            <div class="bd">
+              <div class="chart-host lg" id="lineChart"></div>
+              <div class="legend" style="margin-top:8px">
+                <span><span class="sw" style="background:var(--accent)"></span>Office Operations</span>
+                <span><span class="sw" style="background:var(--warn)"></span>Travel</span>
+                <span><span class="sw" style="background:var(--pos)"></span>Hospitality</span>
+                <span><span class="sw" style="background:var(--ink-1)"></span>Contracted Services</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel corner">
+            <div class="hd"><h3>◇ Category Comparison · Peer Average</h3><span class="meta">N=42</span></div>
+            <div class="bd">
+              <div class="chart-host lg" id="barChart"></div>
+              <div class="legend" style="margin-top:8px">
+                <span><span class="sw" style="background:var(--accent)"></span>Eldenwood</span>
+                <span><span class="sw" style="background:var(--ink-3)"></span>Peer Average</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel corner">
+          <div class="hd"><h3>◇ Funding Flow Network · Vendors → Categories</h3><span class="meta">FORCE-DIRECTED · 28 nodes / 41 edges</span></div>
+          <div class="bd">
+            <div class="chart-host" style="height:360px" id="netChart"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== VIEW 03: STREAM ===== -->
+  <section class="view" data-view="stream">
+    <div class="stream-bar corner">
+      <input id="streamFilter" placeholder="Filter rows · vendor, category, txn id, amount range (e.g. >5000)…" />
+      <select>
+        <option>SCHEMA: pt-finance-01</option>
+        <option>SCHEMA: pt-grants-02</option>
+        <option>SCHEMA: pt-contracts-03</option>
+      </select>
+      <select>
+        <option>FY 2025</option><option>FY 2024</option><option>FY 2023</option>
+      </select>
+      <button class="btn ghost">⤓ Export JSON</button>
+      <button class="btn">▶ Live Stream</button>
+    </div>
+
+    <table class="stream" id="streamTable">
+      <thead>
+        <tr>
+          <th data-sort="id">TXN ID</th>
+          <th data-sort="date">Date</th>
+          <th data-sort="vendor">Vendor / Payee</th>
+          <th data-sort="cat">Category</th>
+          <th data-sort="region">Region</th>
+          <th data-sort="amt" class="num">Amount (CAD) <span class="arr">▼</span></th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <div class="stream-foot">
+      <span>Streamed <b style="color:var(--ink-0)">1,247</b> rows · payload <span style="color:var(--accent)">418 kB</span> · render <span style="color:var(--accent)">42ms</span></span>
+      <div class="pager">
+        <button>‹</button><button class="on">1</button><button>2</button><button>3</button><button>4</button><button>5</button><button>…</button><button>52</button><button>›</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== VIEW 04: AI CONSOLE ===== -->
+  <section class="view" data-view="ai">
+    <div class="ai-grid">
+      <div>
+        <div class="ai-prompt corner">
+          <div class="ph"><span class="pulse"></span>NATURAL LANGUAGE · TEXT-TO-SQL</div>
+          <textarea class="ai-input" id="aiPrompt">Find all green tech grants in Ontario over $50k awarded between 2023 and 2025, grouped by recipient.</textarea>
+          <div class="ai-actions">
+            <span class="hint">⏎ to execute · ⇧⏎ for new line · routed to <b style="color:var(--ink-1)">pt-grants-02</b></span>
+            <button class="run">▶ Execute Query</button>
+          </div>
+          <div class="suggestions">
+            <div class="sug"><div class="lab">// Suggested</div>Compare travel spending of all BC MPs in FY2024</div>
+            <div class="sug"><div class="lab">// Suggested</div>Show vendors that received contracts from more than 3 MPs</div>
+            <div class="sug"><div class="lab">// Suggested</div>Flag any office expenditures &gt; $10k without invoice records</div>
+            <div class="sug"><div class="lab">// Suggested</div>Network diagram: defence contractors across Atlantic ridings</div>
+          </div>
+        </div>
+
+        <div class="resp-card">
+          <div class="hd">
+            <div class="tt">◇ Response · <span class="ok">200 OK</span> · 312ms</div>
+            <div class="switch">
+              <button class="on">Chart</button><button>Table</button><button>Map</button><button>Raw JSON</button>
+            </div>
+          </div>
+          <div class="bd">
+            <div class="resp-sql">
+<span class="cm">-- Compiled from prompt · auto-parameterized · injection-safe</span><br>
+<span class="kw">SELECT</span> recipient_name, <span class="kw">SUM</span>(amount_cad) <span class="kw">AS</span> total<br>
+<span class="kw">FROM</span> pt_grants_02.disbursements<br>
+<span class="kw">WHERE</span> category <span class="kw">=</span> <span class="st">'green_tech'</span><br>
+&nbsp;&nbsp;<span class="kw">AND</span> region <span class="kw">=</span> <span class="st">'ON'</span><br>
+&nbsp;&nbsp;<span class="kw">AND</span> amount_cad <span class="kw">&gt;</span> <span class="nm">50000</span><br>
+&nbsp;&nbsp;<span class="kw">AND</span> awarded_date <span class="kw">BETWEEN</span> <span class="st">'2023-01-01'</span> <span class="kw">AND</span> <span class="st">'2025-12-31'</span><br>
+<span class="kw">GROUP BY</span> recipient_name<br>
+<span class="kw">ORDER BY</span> total <span class="kw">DESC</span> <span class="kw">LIMIT</span> <span class="nm">25</span>;
+            </div>
+            <div class="chart-host" id="aiChart" style="height:300px"></div>
+          </div>
+        </div>
+      </div>
+
+      <aside class="ai-side">
+        <div class="panel corner">
+          <div class="hd"><h3>◇ Query History</h3><span class="meta">SESSION</span></div>
+          <div>
+            <div class="hist-item"><div class="q">Top 10 defence contractors by total disbursement, 2020–2025</div><div class="m"><span>14:18 · ai-04</span><b>412 rows</b></div></div>
+            <div class="hist-item"><div class="q">MPs with travel spending in the top decile</div><div class="m"><span>14:11 · ai-04</span><b>34 rows</b></div></div>
+            <div class="hist-item"><div class="q">Vendors receiving payments from 5+ ridings</div><div class="m"><span>13:54 · ai-04</span><b>118 rows</b></div></div>
+            <div class="hist-item"><div class="q">Flag duplicate invoice numbers across schemas</div><div class="m"><span>13:42 · ai-04</span><b>7 flags</b></div></div>
+            <div class="hist-item"><div class="q">Hospitality spend per riding, ranked</div><div class="m"><span>13:21 · ai-04</span><b>338 rows</b></div></div>
+          </div>
+        </div>
+
+        <div class="panel corner">
+          <div class="hd"><h3>◇ Connected Schemas</h3><span class="meta">4/4 OK</span></div>
+          <div>
+            <div class="kv"><span class="k">pt-finance-01</span><span class="v" style="color:var(--pos)">14ms</span></div>
+            <div class="kv"><span class="k">pt-grants-02</span><span class="v" style="color:var(--pos)">22ms</span></div>
+            <div class="kv"><span class="k">pt-contracts-03</span><span class="v" style="color:var(--pos)">31ms</span></div>
+            <div class="kv"><span class="k">pt-registry-04</span><span class="v" style="color:var(--warn)">88ms</span></div>
+          </div>
+        </div>
+
+        <div class="panel corner">
+          <div class="hd"><h3>◇ Safety Layer</h3><span class="meta">v2.4</span></div>
+          <div class="bd" style="font-size:11px;color:var(--ink-1);line-height:1.6">
+            All queries are auto-parameterized through the parent-theme PDO abstraction. Write operations are blocked at the schema level. Read scope is bounded to public disclosure tables.
+          </div>
+        </div>
+      </aside>
+    </div>
+  <!-- ===== VIEW 00: HOME ===== -->
+  <section class="view" data-view="home">
+    <div class="hero corner">
+      <div class="hero-grid">
+        <div>
+          <div class="mono uc" style="color:var(--accent);font-size:10px;letter-spacing:0.2em;margin-bottom:10px">◇ Public Records · Audit Workspace</div>
+          <h2>Good afternoon, Adaeze.<br/><span class="acc">487</span> new disclosures since your last sign-in.</h2>
+          <p class="lede">Three flagged transactions match your watchlist criteria. The federal Q1 contracts ledger finished re-indexing at 13:42 — all four schemas are live and stream-ready.</p>
+          <div class="ctas">
+            <a class="cta" data-go="ai">▶ Open AI Console</a>
+            <a class="cta ghost" data-go="directory">⌕ Browse Directory</a>
+            <a class="cta ghost" data-go="stream">≡ Stream Transactions</a>
+          </div>
+        </div>
+        <div class="hero-stats">
+          <div class="hero-stat"><div class="lab">Members</div><div class="val">338</div><div class="delta pos">▲ 4 updated today</div></div>
+          <div class="hero-stat"><div class="lab">Open Flags</div><div class="val">27</div><div class="delta">+3 since yesterday</div></div>
+          <div class="hero-stat"><div class="lab">Total Disclosures</div><div class="val">2.4M</div><div class="delta pos">▲ 487 today</div></div>
+          <div class="hero-stat"><div class="lab">Queries (24h)</div><div class="val">1,108</div><div class="delta">avg 312ms</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="home-grid">
+      <div class="home-col">
+        <div class="panel corner">
+          <div class="hd"><h3>◇ Activity Feed</h3><span class="meta">REAL-TIME</span></div>
+          <div>
+            <div class="activity-row">
+              <div class="ic warn">!</div>
+              <div class="body"><b>Flag raised</b> on TXN-2025-40217 — Atlas Audit Ltd. invoice exceeds quoted ceiling by 22%.<div class="meta">pt-finance-01 · auto-detector v2.4</div></div>
+              <div class="when">3m</div>
+            </div>
+            <div class="activity-row">
+              <div class="ic">⌬</div>
+              <div class="body">New comment from <b>m.vance</b> on thread <b>"Defence contract renewals — Q1 anomalies"</b><div class="meta">forum · audit-discussion</div></div>
+              <div class="when">14m</div>
+            </div>
+            <div class="activity-row">
+              <div class="ic pos">✓</div>
+              <div class="body">Schema <b>pt-grants-02</b> re-indexed · 12,488 new rows ingested<div class="meta">parent-theme · pdo-layer</div></div>
+              <div class="when">42m</div>
+            </div>
+            <div class="activity-row">
+              <div class="ic">↻</div>
+              <div class="body">Your saved query <b>"Green tech grants ON · &gt;$50k"</b> returned 8 new matches<div class="meta">ai-04 · auto-run nightly</div></div>
+              <div class="when">2h</div>
+            </div>
+            <div class="activity-row">
+              <div class="ic warn">!</div>
+              <div class="body">Watchlist: <b>Markus Halberstam</b> filed new travel disclosure ($14,820 · Calgary→Brussels)<div class="meta">pt-registry-04</div></div>
+              <div class="when">3h</div>
+            </div>
+            <div class="activity-row">
+              <div class="ic">⌬</div>
+              <div class="body">Build <b>v2.4.1-rc</b> deployed · D3 force-graph now hardware-accelerated<div class="meta">child-theme · changelog</div></div>
+              <div class="when">5h</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel corner">
+          <div class="hd"><h3>◇ Featured Queries</h3><span class="meta">CURATED</span></div>
+          <div class="featured">
+            <div class="featured-q" data-go="ai"><div class="lab">// Spending</div><div class="q">Office expenditures across all 338 members, ranked by Q1 variance</div><div class="m"><span>ai-04</span><span>★ 142</span></div></div>
+            <div class="featured-q" data-go="ai"><div class="lab">// Contracts</div><div class="q">Vendors awarded more than 5 sole-source contracts in the last 24 months</div><div class="m"><span>ai-04</span><span>★ 98</span></div></div>
+            <div class="featured-q" data-go="ai"><div class="lab">// Grants</div><div class="q">Green-tech disbursements to recipients with no prior public funding history</div><div class="m"><span>ai-04</span><span>★ 76</span></div></div>
+            <div class="featured-q" data-go="ai"><div class="lab">// Travel</div><div class="q">International travel claims clustering by destination and committee</div><div class="m"><span>ai-04</span><span>★ 54</span></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="home-col">
+        <div class="panel corner">
+          <div class="hd"><h3>◇ National Spend · 90d</h3><span class="meta">ROLLUP</span></div>
+          <div class="home-chart" id="homeChart"></div>
+        </div>
+
+        <div class="panel corner">
+          <div class="hd"><h3>◇ Watchlist</h3><span class="meta">5 members</span></div>
+          <div>
+            <div class="watch-row" data-go="profile">
+              <div class="av">ME</div>
+              <div><div class="name">Mira Eldenwood</div><div class="meta">NDP · Cascadia North, BC</div></div>
+              <div class="trend"><b>$487k</b><span class="d pos">▲ 4.8%</span></div>
+            </div>
+            <div class="watch-row" data-go="profile">
+              <div class="av">MH</div>
+              <div><div class="name">Markus Halberstam</div><div class="meta">CPC · Foothills West, AB</div></div>
+              <div class="trend"><b>$521k</b><span class="d pos">▲ 12.1%</span></div>
+            </div>
+            <div class="watch-row" data-go="profile">
+              <div class="av">AR</div>
+              <div><div class="name">Anya Rasmussen</div><div class="meta">LIB · Yellowknife Plains</div></div>
+              <div class="trend"><b>$634k</b><span class="d neg">▼ 2.4%</span></div>
+            </div>
+            <div class="watch-row" data-go="profile">
+              <div class="av">HO</div>
+              <div><div class="name">Hannah Okonkwo</div><div class="meta">NDP · Riverdale East, ON</div></div>
+              <div class="trend"><b>$412k</b><span class="d pos">▲ 1.8%</span></div>
+            </div>
+            <div class="watch-row" data-go="profile">
+              <div class="av">LC</div>
+              <div><div class="name">Liam Crosswell</div><div class="meta">CPC · Halifax Cove, NS</div></div>
+              <div class="trend"><b>$489k</b><span class="d pos">▲ 6.2%</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel corner">
+          <div class="hd"><h3>◇ Hot Forum Threads</h3><span class="meta">24h</span></div>
+          <div>
+            <div class="watch-row" data-go="forum">
+              <div class="av" style="color:var(--warn);border-color:var(--warn)">!</div>
+              <div><div class="name">Defence contract renewals — Q1 anomalies</div><div class="meta">audit-discussion · 47 replies</div></div>
+              <div class="trend"><b>247</b><span class="d" style="color:var(--ink-2)">views</span></div>
+            </div>
+            <div class="watch-row" data-go="forum">
+              <div class="av">⌬</div>
+              <div><div class="name">D3 force-graph performance on 10k+ nodes</div><div class="meta">tooling · 22 replies</div></div>
+              <div class="trend"><b>182</b><span class="d" style="color:var(--ink-2)">views</span></div>
+            </div>
+            <div class="watch-row" data-go="forum">
+              <div class="av">⌬</div>
+              <div><div class="name">Standardizing postal-code rollups across schemas</div><div class="meta">data-quality · 18 replies</div></div>
+              <div class="trend"><b>134</b><span class="d" style="color:var(--ink-2)">views</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== VIEW 05: FORUM ===== -->
+  <section class="view" data-view="forum">
+    <div class="forum-grid">
+      <aside class="panel corner">
+        <div class="hd"><h3>◇ Categories</h3><span class="meta">11</span></div>
+        <div class="cat-list">
+          <div class="cat-item on"><span><span class="ico">⌬</span>All Discussions</span><span class="n">1.2k</span></div>
+          <div class="cat-item"><span><span class="ico">!</span>Flagged Audits</span><span class="n">214</span></div>
+          <div class="cat-item"><span><span class="ico">$</span>Spending Analysis</span><span class="n">387</span></div>
+          <div class="cat-item"><span><span class="ico">◇</span>Data Quality</span><span class="n">156</span></div>
+          <div class="cat-item"><span><span class="ico">⌘</span>Tooling &amp; D3</span><span class="n">128</span></div>
+          <div class="cat-item"><span><span class="ico">⌕</span>Search Strategy</span><span class="n">94</span></div>
+          <div class="cat-item"><span><span class="ico">≡</span>Schema Requests</span><span class="n">71</span></div>
+          <div class="cat-item"><span><span class="ico">▶</span>AI Prompts</span><span class="n">202</span></div>
+          <div class="cat-item"><span><span class="ico">⌃</span>Meta &amp; Governance</span><span class="n">38</span></div>
+        </div>
+      </aside>
+
+      <div>
+        <div class="forum-toolbar">
+          <div class="filters">
+            <button class="on">Hot</button>
+            <button>Newest</button>
+            <button>Most Replies</button>
+            <button>Unanswered</button>
+            <button>Following</button>
+          </div>
+          <button class="new-thread">+ New Thread</button>
+        </div>
+
+        <div class="thread pinned">
+          <div class="av" style="color:var(--warn);border-color:var(--warn)">⌃</div>
+          <div>
+            <div class="ttl">📌 Read first — Audit etiquette, data citation rules, and how to file a flag</div>
+            <div class="meta">
+              <span class="pin-mark">[ PINNED · MOD ]</span>
+              <span>by <b style="color:var(--ink-0)">@m.vance</b></span>
+              <span>· in <b style="color:var(--accent)">meta-governance</b></span>
+              <div class="tags"><span class="tag-mini">guidelines</span><span class="tag-mini">welcome</span></div>
+            </div>
+          </div>
+          <div class="stats">
+            <div class="col"><b>34</b><div class="lab">Replies</div></div>
+            <div class="col"><b>2.4k</b><div class="lab">Views</div></div>
+          </div>
+          <div class="last"><b>m.vance</b>4 days ago</div>
+        </div>
+
+        <div class="thread">
+          <div class="av">DV</div>
+          <div>
+            <div class="ttl">Defence contract renewals — Q1 anomalies in pt-contracts-03</div>
+            <div class="meta">
+              <span>by <b style="color:var(--ink-0)">@d.volkov</b></span>
+              <span>· in <b style="color:var(--accent)">flagged-audits</b></span>
+              <div class="tags"><span class="tag-mini">defence</span><span class="tag-mini">sole-source</span><span class="tag-mini">q1-2025</span></div>
+            </div>
+          </div>
+          <div class="stats">
+            <div class="col"><b>47</b><div class="lab">Replies</div></div>
+            <div class="col"><b>247</b><div class="lab">Views</div></div>
+          </div>
+          <div class="last"><b>h.okonkwo</b>14 minutes ago</div>
+        </div>
+
+        <div class="thread">
+          <div class="av">AK</div>
+          <div>
+            <div class="ttl">D3 force-graph performance on 10k+ nodes — alpha decay vs. quadtree pruning</div>
+            <div class="meta">
+              <span>by <b style="color:var(--ink-0)">@a.kowalski</b></span>
+              <span>· in <b style="color:var(--accent)">tooling</b></span>
+              <div class="tags"><span class="tag-mini">d3</span><span class="tag-mini">performance</span><span class="tag-mini">canvas</span></div>
+            </div>
+          </div>
+          <div class="stats">
+            <div class="col"><b>22</b><div class="lab">Replies</div></div>
+            <div class="col"><b>182</b><div class="lab">Views</div></div>
+          </div>
+          <div class="last"><b>n.alfaridi</b>1 hour ago</div>
+        </div>
+
+        <div class="thread">
+          <div class="av">ST</div>
+          <div>
+            <div class="ttl">Standardizing postal-code rollups across pt-finance-01 and pt-registry-04</div>
+            <div class="meta">
+              <span>by <b style="color:var(--ink-0)">@s.tremblay</b></span>
+              <span>· in <b style="color:var(--accent)">data-quality</b></span>
+              <div class="tags"><span class="tag-mini">schema</span><span class="tag-mini">postal-codes</span></div>
+            </div>
+          </div>
+          <div class="stats">
+            <div class="col"><b>18</b><div class="lab">Replies</div></div>
+            <div class="col"><b>134</b><div class="lab">Views</div></div>
+          </div>
+          <div class="last"><b>g.moreau</b>2 hours ago</div>
+        </div>
+
+        <div class="thread">
+          <div class="av">PA</div>
+          <div>
+            <div class="ttl">Best AI prompt for catching cyclical vendor relationships?</div>
+            <div class="meta">
+              <span>by <b style="color:var(--ink-0)">@p.anand</b></span>
+              <span>· in <b style="color:var(--accent)">ai-prompts</b></span>
+              <div class="tags"><span class="tag-mini">text-to-sql</span><span class="tag-mini">network-analysis</span></div>
+            </div>
+          </div>
+          <div class="stats">
+            <div class="col"><b>31</b><div class="lab">Replies</div></div>
+            <div class="col"><b>198</b><div class="lab">Views</div></div>
+          </div>
+          <div class="last"><b>t.wisniewski</b>3 hours ago</div>
+        </div>
+
+        <div class="thread">
+          <div class="av">LC</div>
+          <div>
+            <div class="ttl">Atlantic ridings travel spend — is the inflation adjustment broken?</div>
+            <div class="meta">
+              <span>by <b style="color:var(--ink-0)">@l.crosswell</b></span>
+              <span>· in <b style="color:var(--accent)">spending-analysis</b></span>
+              <div class="tags"><span class="tag-mini">travel</span><span class="tag-mini">methodology</span></div>
+            </div>
+          </div>
+          <div class="stats">
+            <div class="col"><b>14</b><div class="lab">Replies</div></div>
+            <div class="col"><b>87</b><div class="lab">Views</div></div>
+          </div>
+          <div class="last"><b>a.rasmussen</b>6 hours ago</div>
+        </div>
+
+        <div class="thread">
+          <div class="av">EB</div>
+          <div>
+            <div class="ttl">Request: add fiscal-year fold-out columns to the streaming table</div>
+            <div class="meta">
+              <span>by <b style="color:var(--ink-0)">@e.boucher</b></span>
+              <span>· in <b style="color:var(--accent)">schema-requests</b></span>
+              <div class="tags"><span class="tag-mini">feature-req</span><span class="tag-mini">ui</span></div>
+            </div>
+          </div>
+          <div class="stats">
+            <div class="col"><b>9</b><div class="lab">Replies</div></div>
+            <div class="col"><b>62</b><div class="lab">Views</div></div>
+          </div>
+          <div class="last"><b>m.eldenwood</b>11 hours ago</div>
+        </div>
+
+        <div class="stream-foot">
+          <span>Showing <b style="color:var(--ink-0)">1–7</b> of 1,247 threads</span>
+          <div class="pager">
+            <button>‹</button><button class="on">1</button><button>2</button><button>3</button><button>4</button><button>…</button><button>›</button>
+          </div>
+        </div>
+      </div>
+
+      <aside>
+        <div class="panel corner contributors">
+          <div class="hd"><h3>◇ Top Contributors</h3><span class="meta">WEEKLY</span></div>
+          <div>
+            <div class="row"><div class="av">MV</div><div class="name">m.vance</div><div class="karma">↑ 1,284</div></div>
+            <div class="row"><div class="av">DV</div><div class="name">d.volkov</div><div class="karma">↑ 942</div></div>
+            <div class="row"><div class="av">NA</div><div class="name">n.alfaridi</div><div class="karma">↑ 818</div></div>
+            <div class="row"><div class="av">ST</div><div class="name">s.tremblay</div><div class="karma">↑ 706</div></div>
+            <div class="row"><div class="av">AK</div><div class="name">a.kowalski</div><div class="karma">↑ 612</div></div>
+          </div>
+        </div>
+
+        <div class="panel corner" style="margin-top:14px">
+          <div class="hd"><h3>◇ Trending Tags</h3><span class="meta">7d</span></div>
+          <div class="tag-cloud">
+            <span>#defence</span><span>#sole-source</span><span>#d3</span><span>#postal-codes</span>
+            <span>#travel</span><span>#text-to-sql</span><span>#green-tech</span><span>#methodology</span>
+            <span>#schema</span><span>#network-analysis</span><span>#performance</span><span>#q1-2025</span>
+          </div>
+        </div>
+
+        <div class="panel corner" style="margin-top:14px">
+          <div class="hd"><h3>◇ Forum Stats</h3><span class="meta">ALL-TIME</span></div>
+          <div>
+            <div class="kv"><span class="k">Threads</span><span class="v">14,827</span></div>
+            <div class="kv"><span class="k">Posts</span><span class="v">98,412</span></div>
+            <div class="kv"><span class="k">Members</span><span class="v">2,184</span></div>
+            <div class="kv"><span class="k">Active 24h</span><span class="v" style="color:var(--pos)">342</span></div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- ===== VIEW 06: USER PROFILE / SETTINGS ===== -->
+  <section class="view" data-view="user">
+    <div class="user-grid">
+      <aside style="display:flex;flex-direction:column;gap:14px">
+        <div class="user-hero corner">
+          <div class="av">AK</div>
+          <h2 class="uname">Adaeze Kowalski</h2>
+          <div class="handle">@a.kowalski · ID 0x2F19</div>
+          <div class="role">Senior Audit Analyst<br/>Public Accounts Office</div>
+          <div class="badges">
+            <span class="badge gold">★ Verified</span>
+            <span class="badge">Tier-2 Access</span>
+            <span class="badge green">612 ↑</span>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="hd"><h3>◇ Stats</h3><span class="meta">CAREER</span></div>
+          <div class="kvs">
+            <div class="kv"><span class="k">Queries Run</span><span class="v">4,182</span></div>
+            <div class="kv"><span class="k">Flags Filed</span><span class="v">47</span></div>
+            <div class="kv"><span class="k">Threads Started</span><span class="v">18</span></div>
+            <div class="kv"><span class="k">Member Since</span><span class="v">2023-04-11</span></div>
+            <div class="kv"><span class="k">Last Active</span><span class="v" style="color:var(--pos)">now</span></div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="hd"><h3>◇ Access Scope</h3><span class="meta">PDO-LAYER</span></div>
+          <div class="bd" style="display:flex;flex-direction:column;gap:8px;font-size:11px;color:var(--ink-1);line-height:1.6">
+            <div style="display:flex;justify-content:space-between"><span>pt-finance-01</span><span style="color:var(--pos);font-family:'JetBrains Mono'">READ</span></div>
+            <div style="display:flex;justify-content:space-between"><span>pt-grants-02</span><span style="color:var(--pos);font-family:'JetBrains Mono'">READ</span></div>
+            <div style="display:flex;justify-content:space-between"><span>pt-contracts-03</span><span style="color:var(--pos);font-family:'JetBrains Mono'">READ</span></div>
+            <div style="display:flex;justify-content:space-between"><span>pt-registry-04</span><span style="color:var(--pos);font-family:'JetBrains Mono'">READ</span></div>
+            <div style="display:flex;justify-content:space-between"><span>pt-flags-internal</span><span style="color:var(--accent);font-family:'JetBrains Mono'">R/W</span></div>
+          </div>
+        </div>
+      </aside>
+
+      <div>
+        <div class="settings-tabs">
+          <button class="on">◇ Profile</button>
+          <button>◇ Preferences</button>
+          <button>◇ Notifications</button>
+          <button>◇ Saved Queries</button>
+          <button>◇ Security</button>
+        </div>
+
+        <div class="panel corner" style="margin-bottom:14px">
+          <div class="hd"><h3>◇ Profile Information</h3><span class="meta">EDITABLE</span></div>
+          <div>
+            <div class="setting-row">
+              <div><div class="label">Display name</div><div class="desc">Shown on your forum posts and audit-flag attributions.</div></div>
+              <input type="text" value="Adaeze Kowalski" />
+            </div>
+            <div class="setting-row">
+              <div><div class="label">Handle</div><div class="desc">Used in @mentions across the forum and AI Console.</div></div>
+              <input type="text" value="@a.kowalski" />
+            </div>
+            <div class="setting-row">
+              <div><div class="label">Contact email</div><div class="desc">For digest summaries and flag-response notifications.</div></div>
+              <input type="email" value="adaeze.k@publictech.audit" />
+            </div>
+            <div class="setting-row">
+              <div><div class="label">Title &amp; affiliation</div><div class="desc">Displayed beneath your name on profile and contributions.</div></div>
+              <input type="text" value="Senior Audit Analyst — PAO" />
+            </div>
+            <div class="setting-row">
+              <div><div class="label">Public profile</div><div class="desc">Allow other auditors to view your published threads and flags.</div></div>
+              <label class="sw" style="justify-self:end"><input type="checkbox" checked><span class="slot"></span></label>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel corner" style="margin-bottom:14px">
+          <div class="hd"><h3>◇ Workspace Preferences</h3><span class="meta">LIVE</span></div>
+          <div>
+            <div class="setting-row">
+              <div><div class="label">Default theme</div><div class="desc">Override the auto-detected system theme.</div></div>
+              <select id="prefTheme"><option>Dark (terminal)</option><option>Light (paper)</option><option>Match system</option></select>
+            </div>
+            <div class="setting-row">
+              <div><div class="label">Default landing view</div><div class="desc">Where you start on each sign-in.</div></div>
+              <select><option>Home Dashboard</option><option>Directory</option><option>AI Console</option><option>Last viewed</option></select>
+            </div>
+            <div class="setting-row">
+              <div><div class="label">Stream row density</div><div class="desc">Tighter rows let you scan more transactions at once.</div></div>
+              <select><option>Comfortable</option><option>Compact</option><option>Ultra-dense</option></select>
+            </div>
+            <div class="setting-row">
+              <div><div class="label">Reduce motion</div><div class="desc">Disable chart entry animations and tooltip transitions.</div></div>
+              <label class="sw" style="justify-self:end"><input type="checkbox"><span class="slot"></span></label>
+            </div>
+            <div class="setting-row">
+              <div><div class="label">Mono numerals</div><div class="desc">Use tabular figures for currency columns.</div></div>
+              <label class="sw" style="justify-self:end"><input type="checkbox" checked><span class="slot"></span></label>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel corner">
+          <div class="hd"><h3>◇ Saved Queries</h3><span class="meta">12 SAVED</span></div>
+          <div>
+            <div class="saved-q">
+              <div><div class="q">Green tech grants in Ontario over $50k, grouped by recipient</div><div class="schema">// pt-grants-02 · auto-run nightly</div></div>
+              <div class="date">2025-11-04</div>
+              <div class="runs"><b>184</b>runs</div>
+            </div>
+            <div class="saved-q">
+              <div><div class="q">Defence contractors awarded ≥3 sole-source contracts in 2024</div><div class="schema">// pt-contracts-03</div></div>
+              <div class="date">2025-10-22</div>
+              <div class="runs"><b>96</b>runs</div>
+            </div>
+            <div class="saved-q">
+              <div><div class="q">MPs with travel spend exceeding 2σ of peer mean</div><div class="schema">// pt-finance-01 + pt-registry-04</div></div>
+              <div class="date">2025-09-08</div>
+              <div class="runs"><b>248</b>runs</div>
+            </div>
+            <div class="saved-q">
+              <div><div class="q">Duplicate invoice numbers across all four schemas (last 12 mo)</div><div class="schema">// cross-schema audit</div></div>
+              <div class="date">2025-07-14</div>
+              <div class="runs"><b>521</b>runs</div>
+            </div>
+            <div class="saved-q">
+              <div><div class="q">Hospitality rollup by riding, ranked, with peer-decile flag</div><div class="schema">// pt-finance-01</div></div>
+              <div class="date">2025-05-30</div>
+              <div class="runs"><b>67</b>runs</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- Tooltip -->
+<div class="ttip" id="ttip"></div>
+
+<!-- Scrim + Customizer -->
+<div class="scrim" id="scrim"></div>
+<aside class="customizer" id="customizer">
+  <div class="hd">
+    <h3><span style="color:var(--accent)">◈</span> Chart Customizer</h3>
+    <button class="x" id="custClose">✕</button>
+  </div>
+  <div class="body">
+    <div class="sec">
+      <h4>Accent Color <span class="val" id="vAccent">#00a0d2</span></h4>
+      <div class="swatches" id="swatches">
+        <div class="swatch on" style="background:#00a0d2;color:#00a0d2" data-color="#00a0d2"></div>
+        <div class="swatch" style="background:#3ddc97;color:#3ddc97" data-color="#3ddc97"></div>
+        <div class="swatch" style="background:#ffb454;color:#ffb454" data-color="#ffb454"></div>
+        <div class="swatch" style="background:#ff6b8a;color:#ff6b8a" data-color="#ff6b8a"></div>
+        <div class="swatch" style="background:#a78bfa;color:#a78bfa" data-color="#a78bfa"></div>
+        <div class="swatch" style="background:#f87171;color:#f87171" data-color="#f87171"></div>
+        <div class="swatch" style="background:#fbbf24;color:#fbbf24" data-color="#fbbf24"></div>
+        <div class="swatch" style="background:#34d399;color:#34d399" data-color="#34d399"></div>
+        <div class="swatch" style="background:#60a5fa;color:#60a5fa" data-color="#60a5fa"></div>
+        <div class="swatch" style="background:#f472b6;color:#f472b6" data-color="#f472b6"></div>
+        <div class="swatch" style="background:#22d3ee;color:#22d3ee" data-color="#22d3ee"></div>
+        <div class="swatch" style="background:#c084fc;color:#c084fc" data-color="#c084fc"></div>
+      </div>
+    </div>
+
+    <div class="sec">
+      <h4>Curve Style</h4>
+      <div class="segctl" data-knob="curve">
+        <button class="on" data-val="monotone">Smooth</button>
+        <button data-val="linear">Sharp</button>
+        <button data-val="step">Stepped</button>
+      </div>
+    </div>
+
+    <div class="sec">
+      <h4>Line Weight <span class="val" id="vStroke">1.8 px</span></h4>
+      <div class="slider-row">
+        <input type="range" id="strokeRange" min="1" max="4" step="0.2" value="1.8" />
+      </div>
+    </div>
+
+    <div class="sec">
+      <h4>Marker Size <span class="val" id="vMarker">3 px</span></h4>
+      <div class="slider-row">
+        <input type="range" id="markerRange" min="0" max="6" step="0.5" value="3" />
+      </div>
+    </div>
+
+    <div class="sec">
+      <h4>Grid</h4>
+      <div class="segctl" data-knob="grid">
+        <button data-val="off">Off</button>
+        <button class="on" data-val="dotted">Dotted</button>
+        <button data-val="solid">Solid</button>
+      </div>
+    </div>
+
+    <div class="sec">
+      <h4>Area Fill <span class="val" id="vArea">35%</span></h4>
+      <div class="slider-row">
+        <input type="range" id="areaRange" min="0" max="80" step="5" value="35" />
+      </div>
+    </div>
+
+    <div class="sec">
+      <h4>Bar Style</h4>
+      <div class="segctl" data-knob="bar">
+        <button class="on" data-val="solid">Solid</button>
+        <button data-val="stripe">Striped</button>
+        <button data-val="outline">Outline</button>
+      </div>
+    </div>
+
+    <div class="sec">
+      <h4>Typography</h4>
+      <div class="segctl" data-knob="font">
+        <button class="on" data-val="Montserrat">Montserrat</button>
+        <button data-val="JetBrains Mono">Mono</button>
+        <button data-val="Georgia">Serif</button>
+      </div>
+    </div>
+
+    <div class="sec">
+      <h4>Animation</h4>
+      <div class="segctl" data-knob="anim">
+        <button class="on" data-val="on">On</button>
+        <button data-val="off">Off</button>
+      </div>
+    </div>
+
+    <div class="sec" style="background:var(--bg-2)">
+      <h4>Live Preview</h4>
+      <div class="preview-mini" id="previewMini"></div>
+    </div>
+  </div>
+  <div class="cust-actions">
+    <button id="custReset">Reset</button>
+    <button class="primary" id="custApply">Apply to all</button>
+  </div>
+</aside>
+
+<script>
+/* ============================== CHART THEME (live, drives D3) ============================== */
+const chartTheme = {
+  accent: '#00a0d2',
+  curve: 'monotone',
+  stroke: 1.8,
+  marker: 3,
+  grid: 'dotted',
+  area: 0.35,
+  bar: 'solid',
+  font: 'Montserrat',
+  anim: true,
+  // Resolved CSS vars (refreshed on theme switch)
+  ink0:'',ink1:'',ink2:'',ink3:'',
+  bg0:'',bg1:'',line:'',line2:'',
+  warn:'',pos:'',neg:''
+};
+function refreshThemeVars(){
+  const cs = getComputedStyle(document.documentElement);
+  ['ink-0','ink-1','ink-2','ink-3','bg-0','bg-1','line','line-2','warn','pos','neg'].forEach(k=>{
+    chartTheme[k.replace('-','').replace('ink','ink').replace('bg','bg').replace('line2','line2')] = cs.getPropertyValue('--'+k).trim();
+  });
+  // simpler aliases
+  chartTheme.ink0 = cs.getPropertyValue('--ink-0').trim();
+  chartTheme.ink1 = cs.getPropertyValue('--ink-1').trim();
+  chartTheme.ink2 = cs.getPropertyValue('--ink-2').trim();
+  chartTheme.ink3 = cs.getPropertyValue('--ink-3').trim();
+  chartTheme.bg0  = cs.getPropertyValue('--bg-0').trim();
+  chartTheme.bg1  = cs.getPropertyValue('--bg-1').trim();
+  chartTheme.line = cs.getPropertyValue('--line').trim();
+  chartTheme.line2= cs.getPropertyValue('--line-2').trim();
+  chartTheme.warn = cs.getPropertyValue('--warn').trim();
+  chartTheme.pos  = cs.getPropertyValue('--pos').trim();
+  chartTheme.neg  = cs.getPropertyValue('--neg').trim();
+}
+function curveFn(){
+  return chartTheme.curve==='linear'?d3.curveLinear:chartTheme.curve==='step'?d3.curveStepAfter:d3.curveMonotoneX;
+}
+function gridOpacity(){return chartTheme.grid==='off'?0:chartTheme.grid==='solid'?0.8:0.5;}
+function gridDash(){return chartTheme.grid==='solid'?'none':'2,3';}
+
+/* ============================== NAV ============================== */
+const tabs = document.querySelectorAll('#tabs button');
+const views = document.querySelectorAll('.view');
+function goView(name){
+  tabs.forEach(x => x.classList.toggle('active', x.dataset.view === name));
+  views.forEach(v => v.classList.toggle('active', v.dataset.view === name));
+  if(name === 'profile'){ requestAnimationFrame(()=>{ drawLine(); drawBars(); drawNetwork(); drawSparks(); }); }
+  if(name === 'ai'){ requestAnimationFrame(drawAIChart); }
+  if(name === 'home'){ requestAnimationFrame(drawHomeChart); }
+  window.scrollTo({top:0,behavior:'instant'});
+}
+tabs.forEach(t => t.addEventListener('click', () => goView(t.dataset.view)));
+document.querySelectorAll('[data-go]').forEach(el => el.addEventListener('click', e => { goView(el.dataset.go); }));
+document.getElementById('avatarBtn').addEventListener('click', () => goView('user'));
+
+/* ============================== THEME TOGGLE ============================== */
+const themeBtn = document.getElementById('themeBtn');
+function setTheme(mode){
+  document.documentElement.setAttribute('data-theme', mode);
+  localStorage.setItem('pt-theme', mode);
+  themeBtn.classList.toggle('on', mode==='light');
+  themeBtn.textContent = mode==='light' ? '◑' : '◐';
+  themeBtn.title = `Theme: ${mode}`;
+  refreshThemeVars();
+  redrawAll();
+}
+themeBtn.addEventListener('click', () => {
+  const cur = document.documentElement.getAttribute('data-theme') || 'dark';
+  setTheme(cur==='light'?'dark':'light');
+});
+setTheme(localStorage.getItem('pt-theme') || 'dark');
+
+/* ============================== CUSTOMIZER ============================== */
+const customizer = document.getElementById('customizer');
+const scrim = document.getElementById('scrim');
+const custBtn = document.getElementById('customizerBtn');
+function openCust(){customizer.classList.add('open');scrim.classList.add('open');custBtn.classList.add('on');drawPreview();}
+function closeCust(){customizer.classList.remove('open');scrim.classList.remove('open');custBtn.classList.remove('on');}
+custBtn.addEventListener('click', openCust);
+document.getElementById('custClose').addEventListener('click', closeCust);
+scrim.addEventListener('click', closeCust);
+
+// Swatches
+document.querySelectorAll('#swatches .swatch').forEach(sw => sw.addEventListener('click', () => {
+  document.querySelectorAll('#swatches .swatch').forEach(s => s.classList.remove('on'));
+  sw.classList.add('on');
+  chartTheme.accent = sw.dataset.color;
+  document.getElementById('vAccent').textContent = sw.dataset.color;
+  // Also update CSS var so UI chrome follows
+  document.documentElement.style.setProperty('--accent', chartTheme.accent);
+  // Soft + glow
+  const hex = chartTheme.accent.replace('#','');
+  const r=parseInt(hex.slice(0,2),16),g=parseInt(hex.slice(2,4),16),b=parseInt(hex.slice(4,6),16);
+  document.documentElement.style.setProperty('--accent-soft', `rgba(${r},${g},${b},0.12)`);
+  document.documentElement.style.setProperty('--accent-glow', `rgba(${r},${g},${b},0.45)`);
+  refreshThemeVars();
+  redrawAll();
+  drawPreview();
+}));
+
+// Segmented controls
+document.querySelectorAll('.segctl').forEach(ctl => {
+  ctl.querySelectorAll('button').forEach(btn => btn.addEventListener('click', () => {
+    ctl.querySelectorAll('button').forEach(b=>b.classList.remove('on'));
+    btn.classList.add('on');
+    chartTheme[ctl.dataset.knob] = btn.dataset.val;
+    if(ctl.dataset.knob==='anim') chartTheme.anim = btn.dataset.val==='on';
+    if(ctl.dataset.knob==='font') document.documentElement.style.setProperty('--chart-font', btn.dataset.val);
+    redrawAll();
+    drawPreview();
+  }));
+});
+
+// Sliders
+function bindRange(id, key, label, fmt){
+  const el = document.getElementById(id);
+  el.addEventListener('input', () => {
+    const v = +el.value;
+    chartTheme[key] = key==='area' ? v/100 : v;
+    document.getElementById(label).textContent = fmt(v);
+    redrawAll();
+    drawPreview();
+  });
+}
+bindRange('strokeRange','stroke','vStroke', v=>v.toFixed(1)+' px');
+bindRange('markerRange','marker','vMarker', v=>v+' px');
+bindRange('areaRange','area','vArea', v=>v+'%');
+
+document.getElementById('custReset').addEventListener('click', () => {
+  chartTheme.accent='#00a0d2';chartTheme.curve='monotone';chartTheme.stroke=1.8;
+  chartTheme.marker=3;chartTheme.grid='dotted';chartTheme.area=0.35;
+  chartTheme.bar='solid';chartTheme.font='Montserrat';chartTheme.anim=true;
+  document.documentElement.style.setProperty('--accent','#00a0d2');
+  document.documentElement.style.setProperty('--accent-soft','rgba(0,160,210,0.12)');
+  document.documentElement.style.setProperty('--accent-glow','rgba(0,160,210,0.45)');
+  document.documentElement.style.setProperty('--chart-font','Montserrat');
+  // Update UI
+  document.querySelectorAll('#swatches .swatch').forEach((s,i)=>s.classList.toggle('on', i===0));
+  document.getElementById('vAccent').textContent='#00a0d2';
+  document.getElementById('strokeRange').value=1.8;document.getElementById('vStroke').textContent='1.8 px';
+  document.getElementById('markerRange').value=3;document.getElementById('vMarker').textContent='3 px';
+  document.getElementById('areaRange').value=35;document.getElementById('vArea').textContent='35%';
+  document.querySelectorAll('.segctl').forEach(ctl=>{
+    const def = {curve:'monotone',grid:'dotted',bar:'solid',font:'Montserrat',anim:'on'}[ctl.dataset.knob];
+    ctl.querySelectorAll('button').forEach(b=>b.classList.toggle('on', b.dataset.val===def));
+  });
+  refreshThemeVars();redrawAll();drawPreview();
+});
+document.getElementById('custApply').addEventListener('click', closeCust);
+
+function redrawAll(){
+  if(document.querySelector('.view.active')?.dataset.view==='home') drawHomeChart();
+  drawSparks();drawLine();drawBars();drawNetwork();drawAIChart();
+}
+
+/* ============================== DIRECTORY ============================== */
+const partyColor = {Liberal:'var(--party-lib)', Conservative:'var(--party-con)', NDP:'var(--party-ndp)', Green:'var(--party-grn)', Bloc:'var(--party-blq)'};
+const mps = [
+  {name:'Hon. Mira Eldenwood', initials:'ME', riding:'Cascadia North, BC', party:'NDP', spend:'$487k', flags:3, votes:412, sel:true},
+  {name:'Daniyar Volkov', initials:'DV', riding:'Eastbridge–Lakeshore, ON', party:'Liberal', spend:'$612k', flags:1, votes:398, sel:false},
+  {name:'Sophie Tremblay-Ortiz', initials:'ST', riding:'Saint-Émile, QC', party:'Liberal', spend:'$394k', flags:0, votes:421, sel:false},
+  {name:'Markus Halberstam', initials:'MH', riding:'Foothills West, AB', party:'Conservative', spend:'$521k', flags:2, votes:402, sel:false},
+  {name:'Priya Anand', initials:'PA', riding:'Brampton Mills, ON', party:'Liberal', spend:'$458k', flags:0, votes:415, sel:false},
+  {name:'Étienne Boucher', initials:'EB', riding:'Lac-Mégantic, QC', party:'Bloc', spend:'$372k', flags:1, votes:388, sel:false},
+  {name:'Hannah Okonkwo', initials:'HO', riding:'Riverdale East, ON', party:'NDP', spend:'$412k', flags:2, votes:419, sel:false},
+  {name:'Liam Crosswell', initials:'LC', riding:'Halifax Cove, NS', party:'Conservative', spend:'$489k', flags:4, votes:392, sel:false},
+  {name:'Anya Rasmussen', initials:'AR', riding:'Yellowknife Plains, NT', party:'Liberal', spend:'$634k', flags:1, votes:401, sel:false},
+  {name:'Tomasz Wiśniewski', initials:'TW', riding:'Prairie Reach, SK', party:'Conservative', spend:'$298k', flags:0, votes:414, sel:false},
+  {name:'Naima Al-Faridi', initials:'NA', riding:'Pacific Crescent, BC', party:'Green', spend:'$254k', flags:0, votes:423, sel:false},
+  {name:'Gabriel Moreau', initials:'GM', riding:'Trois-Rivières Nord, QC', party:'Bloc', spend:'$381k', flags:1, votes:406, sel:false}
+];
+const results = document.getElementById('mpResults');
+results.innerHTML = mps.map(m => `
+  <div class="mp-card ${m.sel?'sel':''}" data-name="${m.name}">
+    <div class="mp-portrait">${m.initials}</div>
+    <div class="mp-info">
+      <div class="name">${m.name}</div>
+      <div class="meta">
+        <span><span class="party-bar" style="background:${partyColor[m.party]}"></span>${m.party}</span>
+        <span class="dim">·</span>
+        <span>${m.riding}</span>
+      </div>
+    </div>
+    <div class="mp-stats">
+      <b>${m.spend}</b>
+      <span>${m.votes} votes</span><br>
+      <span style="color:${m.flags>2?'var(--warn)':'var(--ink-3)'}">${m.flags} flag${m.flags===1?'':'s'}</span>
+    </div>
+  </div>
+`).join('');
+results.querySelectorAll('.mp-card').forEach(card => {
+  card.addEventListener('click', () => {
+    results.querySelectorAll('.mp-card').forEach(c => c.classList.remove('sel'));
+    card.classList.add('sel');
+    document.querySelector('#tabs button[data-view="profile"]').click();
+  });
+});
+
+/* ============================== TOOLTIP HELPERS ============================== */
+const tooltip = document.getElementById('ttip');
+function showTip(html,e){tooltip.innerHTML=html;tooltip.style.opacity=1;moveTip(e);}
+function moveTip(e){const r=tooltip.getBoundingClientRect();let x=e.clientX+14,y=e.clientY+14;if(x+r.width>innerWidth)x=e.clientX-r.width-14;tooltip.style.left=x+'px';tooltip.style.top=y+'px';}
+function hideTip(){tooltip.style.opacity=0;}
+
+/* ============================== SPARKLINES ============================== */
+function spark(sel, data, color){
+  const el = document.querySelector(sel);
+  if(!el) return;
+  const w=60,h=34;
+  el.setAttribute('viewBox',`0 0 ${w} ${h}`);
+  el.innerHTML='';
+  const x = d3.scaleLinear().domain([0,data.length-1]).range([2,w-2]);
+  const y = d3.scaleLinear().domain(d3.extent(data)).range([h-2,2]);
+  const line = d3.line().x((d,i)=>x(i)).y(d=>y(d)).curve(d3.curveMonotoneX);
+  const ns='http://www.w3.org/2000/svg';
+  const path = document.createElementNS(ns,'path');
+  path.setAttribute('d',line(data));path.setAttribute('fill','none');path.setAttribute('stroke',color);path.setAttribute('stroke-width','1.5');
+  el.appendChild(path);
+}
+function drawSparks(){
+  spark('#spk1',[420,440,455,470,478,481,487],chartTheme.accent);
+  spark('#spk2',[78,82,75,70,68,65,62],chartTheme.warn);
+  spark('#spk3',[10,11,12,12,13,13,14],chartTheme.pos);
+  spark('#spk4',[388,402,410,408,411,412,412],chartTheme.ink1);
+}
+
+/* ============================== LINE CHART ============================== */
+const expenseData = (() => {
+  const years = d3.range(2019,2026);
+  const cats = [
+    {key:'Office Ops', useAccent:true, base:280, drift:18},
+    {key:'Travel', color:null, useWarn:true, base:72, drift:-4},
+    {key:'Hospitality', useAccent:false, usePos:true, base:24, drift:1.2},
+    {key:'Contracted', useInk:true, base:108, drift:6}
+  ];
+  return cats.map(c => ({
+    ...c,
+    values: years.map((y,i) => ({year:y, v: Math.max(8, c.base + c.drift*i + (Math.sin(i*1.3+c.base)*c.base*0.06))}))
+  }));
+})();
+
+function drawLine(){
+  const host = document.getElementById('lineChart');
+  if(!host) return;
+  host.innerHTML='';
+  const W = host.clientWidth, H = host.clientHeight;
+  if(W===0||H===0) return;
+  const m = {t:14,r:14,b:30,l:48};
+  const svg = d3.select(host).append('svg').attr('viewBox',`0 0 ${W} ${H}`);
+  const x = d3.scaleLinear().domain([2019,2025]).range([m.l, W-m.r]);
+  const y = d3.scaleLinear().domain([0, 360]).nice().range([H-m.b, m.t]);
+
+  if(chartTheme.grid !== 'off'){
+    svg.append('g').attr('class','grid').attr('transform',`translate(${m.l},0)`)
+      .call(d3.axisLeft(y).ticks(5).tickSize(-(W-m.l-m.r)).tickFormat(''))
+      .selectAll('line').attr('stroke',chartTheme.line).attr('stroke-dasharray',gridDash()).attr('opacity',gridOpacity());
+  }
+  const ax = svg.append('g').attr('class','axis').attr('transform',`translate(0,${H-m.b})`)
+    .call(d3.axisBottom(x).ticks(7).tickFormat(d3.format('d')));
+  const ay = svg.append('g').attr('class','axis').attr('transform',`translate(${m.l},0)`)
+    .call(d3.axisLeft(y).ticks(5).tickFormat(d => '$'+d+'k'));
+  [ax,ay].forEach(g=>{g.selectAll('text').attr('fill',chartTheme.ink2);g.selectAll('path,line').attr('stroke',chartTheme.line);});
+
+  const seriesColor = s => s.useAccent ? chartTheme.accent : s.useWarn ? chartTheme.warn : s.usePos ? chartTheme.pos : chartTheme.ink1;
+  const line = d3.line().x(d=>x(d.year)).y(d=>y(d.v)).curve(curveFn());
+
+  // gradient defs
+  const defs = svg.append('defs');
+  const grad = defs.append('linearGradient').attr('id','g1').attr('x1',0).attr('x2',0).attr('y1',0).attr('y2',1);
+  grad.append('stop').attr('offset','0%').attr('stop-color',chartTheme.accent).attr('stop-opacity',chartTheme.area);
+  grad.append('stop').attr('offset','100%').attr('stop-color',chartTheme.accent).attr('stop-opacity',0);
+
+  expenseData.forEach((s,i) => {
+    const col = seriesColor(s);
+    if(s.useAccent && chartTheme.area>0){
+      const area = d3.area().x(d=>x(d.year)).y0(H-m.b).y1(d=>y(d.v)).curve(curveFn());
+      svg.append('path').datum(s.values).attr('fill','url(#g1)').attr('d',area);
+    }
+    const p = svg.append('path').datum(s.values).attr('fill','none').attr('stroke',col).attr('stroke-width',chartTheme.stroke).attr('stroke-linecap','round').attr('stroke-linejoin','round').attr('d',line);
+    if(chartTheme.anim){
+      const len = p.node().getTotalLength();
+      p.attr('stroke-dasharray',len).attr('stroke-dashoffset',len)
+        .transition().duration(700).delay(i*80).attr('stroke-dashoffset',0);
+    }
+    if(chartTheme.marker>0){
+      svg.selectAll(`.dot-${i}`).data(s.values).enter().append('circle')
+        .attr('cx',d=>x(d.year)).attr('cy',d=>y(d.v)).attr('r',chartTheme.marker)
+        .attr('fill',chartTheme.bg0).attr('stroke',col).attr('stroke-width',1.5)
+        .style('opacity',chartTheme.anim?0:1)
+        .on('mousemove',(e,d)=>showTip(`<div class="t-k">${s.key} · ${d.year}</div><div class="t-row"><span>Amount</span><b>$${d.v.toFixed(1)}k</b></div>`,e))
+        .on('mouseleave',hideTip);
+      if(chartTheme.anim){svg.selectAll(`.dot-${i}`).transition().duration(400).delay(i*80+500).style('opacity',1);}
+    }
+  });
+}
+
+/* ============================== BAR COMPARE ============================== */
+const barData = [
+  {cat:'Office', a:287, b:241},
+  {cat:'Travel', a:62, b:78},
+  {cat:'Hosp.', a:28, b:21},
+  {cat:'Print', a:41, b:35},
+  {cat:'Telecom', a:18, b:22},
+  {cat:'Contract', a:118, b:96}
+];
+function drawBars(){
+  const host = document.getElementById('barChart');
+  if(!host) return;
+  host.innerHTML='';
+  const W = host.clientWidth, H = host.clientHeight;
+  if(W===0||H===0) return;
+  const m = {t:14,r:14,b:30,l:42};
+  const svg = d3.select(host).append('svg').attr('viewBox',`0 0 ${W} ${H}`);
+  const x = d3.scaleBand().domain(barData.map(d=>d.cat)).range([m.l,W-m.r]).padding(0.35);
+  const xs = d3.scaleBand().domain(['a','b']).range([0,x.bandwidth()]).padding(0.1);
+  const y = d3.scaleLinear().domain([0, d3.max(barData,d=>Math.max(d.a,d.b))*1.1]).range([H-m.b,m.t]);
+
+  if(chartTheme.grid!=='off'){
+    svg.append('g').attr('class','grid').attr('transform',`translate(${m.l},0)`)
+      .call(d3.axisLeft(y).ticks(5).tickSize(-(W-m.l-m.r)).tickFormat(''))
+      .selectAll('line').attr('stroke',chartTheme.line).attr('stroke-dasharray',gridDash()).attr('opacity',gridOpacity());
+  }
+  const ax = svg.append('g').attr('class','axis').attr('transform',`translate(0,${H-m.b})`).call(d3.axisBottom(x));
+  const ay = svg.append('g').attr('class','axis').attr('transform',`translate(${m.l},0)`).call(d3.axisLeft(y).ticks(5).tickFormat(d=>'$'+d+'k'));
+  [ax,ay].forEach(g=>{g.selectAll('text').attr('fill',chartTheme.ink2);g.selectAll('path,line').attr('stroke',chartTheme.line);});
+
+  // Stripe pattern (if needed)
+  if(chartTheme.bar==='stripe'){
+    const defs = svg.append('defs');
+    const p = defs.append('pattern').attr('id','stripeBar').attr('width',6).attr('height',6).attr('patternUnits','userSpaceOnUse').attr('patternTransform','rotate(45)');
+    p.append('rect').attr('width',6).attr('height',6).attr('fill',chartTheme.accent).attr('opacity',0.35);
+    p.append('rect').attr('width',3).attr('height',6).attr('fill',chartTheme.accent);
+  }
+  const accFill = chartTheme.bar==='stripe' ? 'url(#stripeBar)' : chartTheme.bar==='outline' ? 'none' : chartTheme.accent;
+  const accStroke = chartTheme.bar==='outline' ? chartTheme.accent : 'none';
+
+  barData.forEach((d,i)=>{
+    const g = svg.append('g').attr('transform',`translate(${x(d.cat)},0)`);
+    const r1 = g.append('rect').attr('x',xs('a')).attr('width',xs.bandwidth())
+      .attr('fill',accFill).attr('stroke',accStroke).attr('stroke-width',1.5).attr('opacity',chartTheme.bar==='outline'?1:0.9)
+      .on('mousemove',(e)=>showTip(`<div class="t-k">${d.cat} · Eldenwood</div><div class="t-row"><span>Amount</span><b>$${d.a}k</b></div>`,e))
+      .on('mouseleave',hideTip);
+    const r2 = g.append('rect').attr('x',xs('b')).attr('width',xs.bandwidth()).attr('fill',chartTheme.ink3 || chartTheme.ink2).attr('opacity',0.6)
+      .on('mousemove',(e)=>showTip(`<div class="t-k">${d.cat} · Peer Avg</div><div class="t-row"><span>Amount</span><b>$${d.b}k</b></div>`,e))
+      .on('mouseleave',hideTip);
+    if(chartTheme.anim){
+      r1.attr('y',H-m.b).attr('height',0).transition().duration(500).delay(i*60).attr('y',y(d.a)).attr('height',H-m.b-y(d.a));
+      r2.attr('y',H-m.b).attr('height',0).transition().duration(500).delay(i*60+40).attr('y',y(d.b)).attr('height',H-m.b-y(d.b));
+    }else{
+      r1.attr('y',y(d.a)).attr('height',H-m.b-y(d.a));
+      r2.attr('y',y(d.b)).attr('height',H-m.b-y(d.b));
+    }
+  });
+}
+
+/* ============================== NETWORK ============================== */
+function drawNetwork(){
+  const host = document.getElementById('netChart');
+  host.innerHTML='';
+  const W = host.clientWidth, H = host.clientHeight;
+  const svg = d3.select(host).append('svg').attr('viewBox',`0 0 ${W} ${H}`);
+
+  const categories = ['Office','Travel','Print','Telecom','Hospitality','Contracted'];
+  const vendors = ['Cascade Print Co.','Lumen Stationers','Northwave Travel','NorthRail','Maple Wireless','Cedar Catering','Atlas Audit Ltd','Pacific Office Sys.','Civic Strategy Inc.','Brightline Media','Granite IT','Inlet Couriers','Sumas Logistics','Vector Translations','Tidewater Mgmt','TerraData Inc.'];
+
+  const nodes = [
+    ...categories.map(c => ({id:c,type:'cat',r:14})),
+    ...vendors.map(v => ({id:v,type:'ven',r:5+Math.random()*5}))
+  ];
+  const links = [];
+  vendors.forEach((v,i) => {
+    const c1 = categories[i % categories.length];
+    links.push({source:v,target:c1,w:1+Math.random()*3});
+    if(Math.random()>0.55){links.push({source:v,target:categories[(i+2)%categories.length],w:1+Math.random()*2});}
+  });
+
+  const sim = d3.forceSimulation(nodes)
+    .force('link', d3.forceLink(links).id(d=>d.id).distance(d=> d.target.type==='cat' ? 70 : 50).strength(0.4))
+    .force('charge', d3.forceManyBody().strength(-120))
+    .force('center', d3.forceCenter(W/2, H/2))
+    .force('collide', d3.forceCollide().radius(d=>d.r+6));
+
+  const link = svg.append('g').attr('stroke','var(--line-2)').attr('stroke-opacity',0.6)
+    .selectAll('line').data(links).enter().append('line').attr('stroke-width',d=>d.w);
+
+  const node = svg.append('g').selectAll('g').data(nodes).enter().append('g')
+    .style('cursor','pointer')
+    .on('mousemove',(e,d)=>showTip(`<div class="t-k">${d.type==='cat'?'CATEGORY':'VENDOR'}</div><div class="t-row"><span>${d.id}</span></div>`,e))
+    .on('mouseleave',hideTip);
+
+  node.append('circle')
+    .attr('r', d=>d.r)
+    .attr('fill', d=>d.type==='cat'?'var(--accent)':'var(--bg-3)')
+    .attr('stroke', d=>d.type==='cat'?'var(--accent)':'var(--line-2)')
+    .attr('stroke-width', d=>d.type==='cat'?0:1)
+    .attr('opacity', d=>d.type==='cat'?0.9:1);
+
+  node.filter(d=>d.type==='cat').append('text')
+    .text(d=>d.id).attr('text-anchor','middle').attr('dy',-18)
+    .attr('fill','var(--ink-0)').style('font','600 10px Montserrat').style('letter-spacing','0.08em').style('text-transform','uppercase');
+
+  node.filter(d=>d.type==='ven').append('text')
+    .text(d=>d.id).attr('text-anchor','start').attr('dx',8).attr('dy',3)
+    .attr('fill','var(--ink-2)').style('font','10px JetBrains Mono');
+
+  sim.on('tick',()=>{
+    link.attr('x1',d=>d.source.x).attr('y1',d=>d.source.y).attr('x2',d=>d.target.x).attr('y2',d=>d.target.y);
+    node.attr('transform',d=>`translate(${d.x},${d.y})`);
+  });
+}
+
+/* ============================== STREAM TABLE ============================== */
+const vendors = ['Cascade Print Co.','Lumen Stationers','Northwave Travel','Maple Wireless','Atlas Audit Ltd','Cedar Catering','Pacific Office Sys.','Brightline Media','Granite IT','Inlet Couriers','Tidewater Mgmt','TerraData Inc.','Vector Translations','Civic Strategy Inc.','Sumas Logistics','NorthRail'];
+const cats = ['Office Ops','Travel','Hospitality','Telecom','Print','Contracted Services','Translation','IT Services'];
+const regions = ['ON','QC','BC','AB','NS','MB','SK','NT','NB'];
+const statuses = [['VERIFIED','ok'],['VERIFIED','ok'],['VERIFIED','ok'],['VERIFIED','ok'],['FLAG · REVIEW','flag'],['IN AUDIT','audit']];
+
+function pad(n,w){return String(n).padStart(w,'0');}
+function rng(seed){let s=seed;return ()=>{s=(s*9301+49297)%233280;return s/233280;}}
+const r = rng(42);
+
+const txns = d3.range(120).map((i)=>{
+  const d = new Date(2025, Math.floor(r()*12), 1+Math.floor(r()*27));
+  const st = statuses[Math.floor(r()*statuses.length)];
+  return {
+    id: 'TXN-2025-'+pad(40192+i,5),
+    date: d.toISOString().slice(0,10),
+    vendor: vendors[Math.floor(r()*vendors.length)],
+    cat: cats[Math.floor(r()*cats.length)],
+    region: regions[Math.floor(r()*regions.length)],
+    amt: +(r()* (r()>0.85 ? 28000 : 4800) + 80).toFixed(2),
+    st
+  };
+});
+
+let sortKey='amt', sortDir=-1;
+function renderTable(filter=''){
+  const tb = document.querySelector('#streamTable tbody');
+  let rows = txns.slice();
+  if(filter){
+    const f = filter.toLowerCase();
+    const gt = filter.match(/^>\s*(\d+)/);
+    const lt = filter.match(/^<\s*(\d+)/);
+    if(gt){rows = rows.filter(r=>r.amt > +gt[1]);}
+    else if(lt){rows = rows.filter(r=>r.amt < +lt[1]);}
+    else{rows = rows.filter(r => Object.values(r).some(v=>String(v).toLowerCase().includes(f)));}
+  }
+  rows.sort((a,b)=>{
+    let av=a[sortKey], bv=b[sortKey];
+    if(sortKey==='amt'){return (av-bv)*sortDir;}
+    return String(av).localeCompare(String(bv))*sortDir;
+  });
+  tb.innerHTML = rows.slice(0,24).map(r=>`
+    <tr class="${r.st[1]==='flag'?'flag':''}">
+      <td>${r.id}</td>
+      <td>${r.date}</td>
+      <td style="color:var(--ink-0)">${r.vendor}</td>
+      <td>${r.cat}</td>
+      <td>${r.region}</td>
+      <td class="num">$${r.amt.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}</td>
+      <td><span class="tag ${r.st[1]}">${r.st[0]}</span></td>
+    </tr>
+  `).join('');
+}
+document.querySelectorAll('#streamTable th[data-sort]').forEach(th=>{
+  th.addEventListener('click',()=>{
+    const k = th.dataset.sort==='amt'?'amt':th.dataset.sort==='date'?'date':th.dataset.sort==='vendor'?'vendor':th.dataset.sort==='cat'?'cat':th.dataset.sort==='region'?'region':'id';
+    if(sortKey===k) sortDir*=-1; else {sortKey=k; sortDir = k==='amt'?-1:1;}
+    document.querySelectorAll('#streamTable th .arr').forEach(a=>a.remove());
+    const s=document.createElement('span');s.className='arr';s.textContent=sortDir>0?'▲':'▼';th.appendChild(s);
+    renderTable(document.getElementById('streamFilter').value);
+  });
+});
+document.getElementById('streamFilter').addEventListener('input',e=>renderTable(e.target.value));
+renderTable();
+
+/* ============================== AI CHART ============================== */
+function drawAIChart(){
+  const host = document.getElementById('aiChart');
+  if(!host) return;
+  host.innerHTML='';
+  const W = host.clientWidth, H = host.clientHeight;
+  const m = {t:14,r:14,b:60,l:48};
+  const svg = d3.select(host).append('svg').attr('viewBox',`0 0 ${W} ${H}`);
+  const data = [
+    {n:'Solaris North Inc.', v:412},
+    {n:'GridPulse Energy', v:318},
+    {n:'Hydrogen Yards Ltd', v:284},
+    {n:'CleanCoast Systems', v:241},
+    {n:'Vortex Wind Co-op', v:198},
+    {n:'EmberCell Storage', v:174},
+    {n:'TerraHeat Geothermal', v:152},
+    {n:'BlueRoot Bio', v:128},
+    {n:'Mosswire Networks', v:96},
+    {n:'AltaCarbon Capture', v:72}
+  ];
+  const x = d3.scaleBand().domain(data.map(d=>d.n)).range([m.l, W-m.r]).padding(0.3);
+  const y = d3.scaleLinear().domain([0, d3.max(data,d=>d.v)*1.1]).range([H-m.b, m.t]);
+  svg.append('g').attr('class','grid').attr('transform',`translate(${m.l},0)`)
+    .call(d3.axisLeft(y).ticks(5).tickSize(-(W-m.l-m.r)).tickFormat(''));
+  svg.append('g').attr('class','axis').attr('transform',`translate(${m.l},0)`)
+    .call(d3.axisLeft(y).ticks(5).tickFormat(d=>'$'+d+'k'));
+  const xAx = svg.append('g').attr('class','axis').attr('transform',`translate(0,${H-m.b})`).call(d3.axisBottom(x));
+  xAx.selectAll('text').attr('transform','rotate(-28)').attr('text-anchor','end').attr('dx','-4').attr('dy','6');
+
+  svg.selectAll('rect.b').data(data).enter().append('rect').attr('class','b')
+    .attr('x',d=>x(d.n)).attr('width',x.bandwidth()).attr('y',d=>y(d.v)).attr('height',d=>H-m.b-y(d.v))
+    .attr('fill','var(--accent)').attr('opacity',0.85)
+    .on('mousemove',(e,d)=>showTip(`<div class="t-k">${d.n}</div><div class="t-row"><span>Total Grants</span><b>$${d.v}k</b></div>`,e))
+    .on('mouseleave',hideTip);
+}
+
+/* Initial draws */
+drawSparks();
+drawLine();
+drawBars();
+drawNetwork();
+drawAIChart();
+window.addEventListener('resize', () => {
+  drawLine(); drawBars(); drawNetwork(); drawAIChart();
+});
+</script>
+</body>
+</html>
