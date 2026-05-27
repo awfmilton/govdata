@@ -32,7 +32,11 @@ if ( ! function_exists( 'sanitize_key' ) ) {
 	function sanitize_key( $s ): string { return strtolower( preg_replace( '/[^a-z0-9_\-]/i', '', (string) $s ) ); }
 }
 if ( ! function_exists( 'sanitize_text_field' ) ) {
-	function sanitize_text_field( $s ): string { return trim( preg_replace( '/[\r\n\t]+/', ' ', (string) $s ) ); }
+	function sanitize_text_field( $s ): string {
+		$s = (string) $s;
+		$s = strip_tags( $s );
+		return trim( preg_replace( '/[\r\n\t]+/', ' ', $s ) );
+	}
 }
 if ( ! function_exists( 'wp_unslash' ) ) {
 	function wp_unslash( $s ) { return is_string( $s ) ? stripslashes( $s ) : $s; }
@@ -59,8 +63,38 @@ if ( ! function_exists( 'sanitize_hex_color' ) ) {
 		return preg_match( '/^#([A-Fa-f0-9]{3}){1,2}$/', $color ) ? $color : null;
 	}
 }
+if ( ! function_exists( 'sanitize_textarea_field' ) ) {
+	function sanitize_textarea_field( $s ): string {
+		return trim( strip_tags( (string) $s ) );
+	}
+}
+if ( ! function_exists( 'absint' ) ) {
+	function absint( $n ): int { return abs( (int) $n ); }
+}
 if ( ! function_exists( 'connection_aborted' ) ) {
 	function connection_aborted(): int { return 0; }
+}
+
+// Minimal WP_Error stand-in. Real WP_Error has a richer API but Chart_Spec
+// only uses get_error_code() / public props.
+if ( ! class_exists( '\WP_Error' ) ) {
+	class WP_Error {
+		public string $code;
+		public string $message;
+		public array  $data;
+		public function __construct( $code = '', $message = '', $data = [] ) {
+			$this->code    = (string) $code;
+			$this->message = (string) $message;
+			$this->data    = is_array( $data ) ? $data : [];
+		}
+		public function get_error_code(): string { return $this->code; }
+		public function get_error_message(): string { return $this->message; }
+		public function get_error_data(): array { return $this->data; }
+	}
+}
+
+if ( ! defined( 'PUBLICTECH_CORE_REST_NS' ) ) {
+	define( 'PUBLICTECH_CORE_REST_NS', 'publictech/v1' );
 }
 
 // Load only the engine files we want to unit-test. Don't trigger plugin/theme

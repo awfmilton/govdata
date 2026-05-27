@@ -41,7 +41,8 @@ final class Access_Tiers {
 	 *   label:string, price_monthly:int,
 	 *   rpm:int, rpd:int, max_rows:int,
 	 *   schemas:array<int,string>|string,
-	 *   mcp:bool, concurrent:int
+	 *   mcp:bool, concurrent:int,
+	 *   charts.create:bool
 	 * }>
 	 */
 	public function tiers(): array {
@@ -53,27 +54,32 @@ final class Access_Tiers {
 				'rpm' => 10, 'rpd' => 200, 'max_rows' => 100,
 				'schemas' => [ 'pt-finance-01' ],
 				'mcp' => false, 'concurrent' => 1,
+				'charts.create' => false,
 			],
 			'free' => [
 				'label' => 'Free', 'price_monthly' => 0,
 				'rpm' => 20, 'rpd' => 500, 'max_rows' => 500,
 				'schemas' => [ 'pt-finance-01', 'pt-grants-02' ],
 				'mcp' => false, 'concurrent' => 1,
+				'charts.create' => false,
 			],
 			'analyst' => [
 				'label' => 'Analyst', 'price_monthly' => 19,
 				'rpm' => 120, 'rpd' => 10_000, 'max_rows' => 5_000,
 				'schemas' => '*', 'mcp' => true, 'concurrent' => 3,
+				'charts.create' => true,
 			],
 			'newsroom' => [
 				'label' => 'Newsroom', 'price_monthly' => 79,
 				'rpm' => 600, 'rpd' => 100_000, 'max_rows' => 50_000,
 				'schemas' => '*', 'mcp' => true, 'concurrent' => 8,
+				'charts.create' => true,
 			],
 			'institutional' => [
 				'label' => 'Institutional', 'price_monthly' => 499,
 				'rpm' => 3_000, 'rpd' => 1_000_000, 'max_rows' => 250_000,
 				'schemas' => '*', 'mcp' => true, 'concurrent' => 32,
+				'charts.create' => true,
 			],
 		];
 		return apply_filters( 'publictech_tiers', $defaults );
