@@ -18,6 +18,7 @@ define( 'PUBLICTECH_CORE_REST_NS', 'publictech/v1' );
 
 require_once PUBLICTECH_CORE_DIR . 'inc/helpers.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-security.php';
+require_once PUBLICTECH_CORE_DIR . 'inc/class-hardening.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-multi-db.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-access-tiers.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-throttle.php';
@@ -50,6 +51,7 @@ add_action( 'after_setup_theme', static function () {
 } );
 
 add_action( 'plugins_loaded', static function () {
+	\PublicTech\Core\Hardening::instance();
 	\PublicTech\Core\Multi_DB::instance();
 	\PublicTech\Core\Access_Tiers::instance();
 	\PublicTech\Core\Throttle::instance();

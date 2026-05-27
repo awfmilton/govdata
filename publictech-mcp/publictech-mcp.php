@@ -5,6 +5,7 @@
  * Description:       Model Context Protocol server for PublicTech. Lets remote AI clients (Claude Desktop, Cursor, custom agents) discover and call tools that read from the audit-terminal database via the PublicTech Core multi-DB layer. Bearer-token authenticated, tier-throttled, strictly read-only.
  * Version:           1.0.0
  * Requires at least: 6.4
+ * Tested up to:      6.8
  * Requires PHP:      8.1
  * Author:            PublicTech
  * License:           GPL-2.0-or-later

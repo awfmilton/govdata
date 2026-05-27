@@ -1,0 +1,201 @@
+/* PublicTech Terminal — responsive layer.
+   Kept separate from terminal.css (which mirrors the prototype verbatim) and
+   from overrides.css (which bridges prototype → WP markup) so the breakpoints
+   are easy to find, audit, and tweak.
+
+   Breakpoints (mobile-last, since the prototype is desktop-first):
+     ≤ 1280px  small laptop / large tablet landscape
+     ≤  960px  tablet portrait
+     ≤  720px  large phone landscape / small tablet
+     ≤  480px  phone portrait
+*/
+
+/* ---------- Universal: stop wide media from forcing horizontal scroll ---- */
+img, svg, video, canvas, iframe { max-width: 100%; height: auto; }
+table.stream, .stream-bar { max-width: 100%; }
+
+/* ---------- ≤ 1280px : two-column dashboards lose their fixed sidebars --- */
+@media (max-width: 1280px) {
+	main { padding: 16px 18px 28px; }
+
+	.dir-grid,
+	.prof-grid,
+	.user-grid,
+	.ai-grid { grid-template-columns: 240px 1fr; gap: 14px; }
+
+	.forum-grid { grid-template-columns: 200px 1fr; }
+	.forum-grid .contributors,
+	.forum-grid .tag-cloud { display: none; }
+
+	.hero-grid { grid-template-columns: 1fr 280px; gap: 22px; }
+	.home-grid { grid-template-columns: 1fr 1fr; }
+
+	.kpis { grid-template-columns: repeat(2, 1fr); }
+	.chart-row { grid-template-columns: 1fr; }
+}
+
+/* ---------- ≤ 960px : collapse all asymmetric two-column grids ---------- */
+@media (max-width: 960px) {
+	main { padding: 14px 14px 24px; }
+
+	/* Top status rail: keep it readable, allow horizontal scroll of pills */
+	.rail { height: auto; padding: 6px 12px; flex-wrap: wrap; gap: 6px 12px; }
+	.rail .l, .rail .r { gap: 10px; flex-wrap: wrap; }
+
+	/* Header: stack brand + tabs + tools */
+	header.shell {
+		flex-wrap: wrap;
+		padding: 12px 14px;
+		gap: 10px;
+	}
+	.brand { flex: 1 1 auto; }
+	.header-r { order: 2; }
+	nav.tabs {
+		order: 3;
+		flex: 1 1 100%;
+		overflow-x: auto;
+		-webkit-overflow-scrolling: touch;
+		scrollbar-width: thin;
+	}
+	nav.tabs button,
+	nav.tabs a {
+		white-space: nowrap;
+		padding: 8px 12px;
+		font-size: 10.5px;
+	}
+
+	.dir-grid,
+	.prof-grid,
+	.user-grid,
+	.ai-grid,
+	.hero-grid,
+	.home-grid,
+	.forum-grid { grid-template-columns: 1fr; gap: 14px; }
+
+	/* Sidebars stop being column 1 — collapse to a tidy strip. */
+	.facets { display: grid; grid-template-columns: repeat(2, 1fr); }
+	.facets .group { border-right: 1px solid var(--line); }
+	.facets .group:nth-child(even) { border-right: 0; }
+
+	.prof-side,
+	.ai-side { flex-direction: column; }
+
+	/* Results grid drops to one column on tablet portrait. */
+	.results { grid-template-columns: 1fr; }
+
+	/* KPI cards still grid, just denser. */
+	.kpis { grid-template-columns: repeat(2, 1fr); }
+
+	/* Stream toolbar: rows wrap instead of staying in one line. */
+	.stream-bar { grid-template-columns: 1fr 1fr; }
+	.stream-bar input { grid-column: 1 / -1; }
+
+	/* Streaming table: enable horizontal scroll inside a wrapper. */
+	.panel .bd { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+	table.stream { min-width: 640px; }
+
+	/* Hero text size scales down. */
+	.hero { padding: 22px 22px; }
+	.hero h2 { font-size: 22px; }
+	.hero p.lede { font-size: 13px; }
+
+	/* Forum thread row: avatar + content on top, stats wrap below. */
+	.thread { grid-template-columns: 36px 1fr; gap: 10px 12px; }
+	.thread .stats { grid-column: 1 / -1; justify-content: flex-start; gap: 18px; }
+	.thread .last { grid-column: 1 / -1; text-align: left; }
+
+	/* Customizer drawer: takes near-full width, sits flush right. */
+	.customizer {
+		width: min(360px, calc(100vw - 24px));
+		right: 12px;
+		top: 64px;
+		max-height: calc(100vh - 80px);
+	}
+}
+
+/* ---------- ≤ 720px : phone landscape / small tablet ------------------- */
+@media (max-width: 720px) {
+	main { padding: 12px 12px 20px; }
+
+	/* Hide the long rail status strings; keep only the live dot + clock. */
+	.rail .l > span:nth-child(2),
+	.rail .r > span:first-child { display: none; }
+
+	/* Header brand: shrink mark, hide tagline. */
+	.brand h1 { font-size: 13px; }
+	.brand h1 small { display: none; }
+	.brand .mark { width: 28px; height: 28px; }
+
+	/* Hero stats: single column. */
+	.hero-stats { grid-template-columns: 1fr; }
+	.hero .ctas .cta { flex: 1 1 auto; justify-content: center; }
+
+	/* KPIs and featured cards: single column on phone. */
+	.kpis,
+	.featured,
+	.suggestions { grid-template-columns: 1fr; }
+
+	/* Stream toolbar: stack each control. */
+	.stream-bar { grid-template-columns: 1fr; }
+	.stream-bar input,
+	.stream-bar select,
+	.stream-bar .btn { grid-column: 1 / -1; width: 100%; }
+
+	/* Profile hero portrait smaller. */
+	.prof-hero .portrait { width: 96px; height: 96px; }
+	.prof-hero h2 { font-size: 16px; }
+
+	/* User-hero settings rows stack. */
+	.setting-row { grid-template-columns: 1fr; gap: 8px; }
+	.saved-q { grid-template-columns: 1fr; gap: 6px; }
+
+	/* MP card: portrait + info + stats wrap into rows. */
+	.mp-card { grid-template-columns: 46px 1fr; }
+	.mp-card .mp-stats { grid-column: 1 / -1; text-align: left; display: flex; gap: 14px; }
+	.mp-card .mp-stats b { display: inline; margin-right: 4px; }
+
+	/* Forum toolbar wraps. */
+	.forum-toolbar { flex-wrap: wrap; }
+
+	/* Drop tight letter-spacing tracking that hurts legibility at small sizes. */
+	nav.tabs button,
+	nav.tabs a,
+	.panel .hd h3 { letter-spacing: 0.1em; }
+}
+
+/* ---------- ≤ 480px : phone portrait ----------------------------------- */
+@media (max-width: 480px) {
+	main { padding: 10px 10px 18px; }
+
+	/* Rail: keep it minimal. */
+	.rail { font-size: 10px; padding: 5px 10px; }
+	.rail .l > span:nth-child(3) { display: none; }
+
+	/* Header tools tighter; avatar shrinks. */
+	.header-r { gap: 8px; }
+	.header-r .pill { padding: 4px 8px; font-size: 10px; }
+	.htool { width: 28px; height: 28px; }
+	.avatar { width: 26px; height: 26px; }
+
+	.hero { padding: 18px 16px; }
+	.hero h2 { font-size: 18px; }
+
+	.facets { grid-template-columns: 1fr; }
+	.facets .group { border-right: 0; }
+
+	/* Customizer takes the full viewport on tiny screens. */
+	.customizer {
+		width: calc(100vw - 16px);
+		right: 8px;
+		left: 8px;
+		top: 56px;
+		max-height: calc(100vh - 72px);
+	}
+	.swatches { grid-template-columns: repeat(5, 1fr); }
+}
+
+/* ---------- High-DPI tweaks ------------------------------------------- */
+@media (min-resolution: 2dppx) {
+	.brand .mark::before,
+	.brand .mark::after { opacity: 0.55; }
+}
