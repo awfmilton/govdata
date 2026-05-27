@@ -87,7 +87,7 @@ final class Tools {
 		];
 	}
 
-	public function list( ?int $user_id ): array {
+	public function available( ?int $user_id ): array {
 		$quota = Access_Tiers::instance()->quota( $user_id );
 		$tools = $this->definitions();
 

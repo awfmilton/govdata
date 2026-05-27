@@ -34,14 +34,17 @@ final class Throttle {
 		$min_used = (int) $this->incr( $key_min, 60 );
 		$day_used = (int) $this->incr( $key_day, 86400 );
 
+		$rpm   = (int) ( $quota['rpm'] ?? 0 );
+		$rpd   = (int) ( $quota['rpd'] ?? 0 );
 		$retry = 0;
 		$ok    = true;
-		if ( $min_used > $quota['rpm'] ) {
+		if ( $rpm > 0 && $min_used > $rpm ) {
 			$ok    = false;
 			$retry = 60 - ( time() % 60 );
-		} elseif ( $day_used > $quota['rpd'] ) {
+		} elseif ( $rpd > 0 && $day_used > $rpd ) {
 			$ok    = false;
-			$retry = ( ( gmmktime( 0, 0, 0 ) + 86400 ) - time() );
+			// Seconds until next UTC midnight.
+			$retry = strtotime( 'tomorrow midnight UTC' ) - time();
 		}
 
 		return [
@@ -69,15 +72,19 @@ final class Throttle {
 		] );
 	}
 
+	/**
+	 * Atomic-ish counter increment. The wp_cache_add()-then-incr() pattern
+	 * is race-free against most external object caches: add() is a no-op
+	 * when the key already exists (so racing callers don't reset to zero)
+	 * and incr() returns the post-increment value directly. Transient
+	 * fallback is not atomic but is only used on sites without a real
+	 * object cache, where concurrency is low.
+	 */
 	private function incr( string $key, int $ttl ): int {
 		if ( wp_using_ext_object_cache() ) {
-			$val = wp_cache_get( $key, 'publictech' );
-			if ( false === $val ) {
-				wp_cache_add( $key, 0, 'publictech', $ttl );
-				$val = 0;
-			}
-			wp_cache_incr( $key, 1, 'publictech' );
-			return (int) $val + 1;
+			wp_cache_add( $key, 0, 'publictech', $ttl );
+			$new = wp_cache_incr( $key, 1, 'publictech' );
+			return false === $new ? 1 : (int) $new;
 		}
 		$val = (int) get_transient( $key );
 		set_transient( $key, $val + 1, $ttl );

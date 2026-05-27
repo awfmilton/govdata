@@ -79,12 +79,22 @@ final class REST_API {
 	/* ---------- handlers ---------- */
 
 	public function status( \WP_REST_Request $req ): \WP_REST_Response {
-		return rest_ensure_response( [
-			'build'   => PUBLICTECH_CORE_VERSION,
-			'time'    => gmdate( 'c' ),
-			'health'  => Multi_DB::instance()->health(),
-			'tier'    => Access_Tiers::instance()->user_tier( get_current_user_id() ?: null ),
+		// Public shape: only ok-flags and latency, never error strings or hostnames.
+		$public_health = [];
+		foreach ( Multi_DB::instance()->health() as $alias => $row ) {
+			$public_health[ $alias ] = [
+				'ok'         => (bool) $row['ok'],
+				'latency_ms' => isset( $row['latency_ms'] ) ? (float) $row['latency_ms'] : null,
+			];
+		}
+		$resp = rest_ensure_response( [
+			'build'  => PUBLICTECH_CORE_VERSION,
+			'time'   => gmdate( 'c' ),
+			'health' => $public_health,
+			'tier'   => Access_Tiers::instance()->user_tier( get_current_user_id() ?: null ),
 		] );
+		$resp->header( 'Cache-Control', 'public, max-age=10' );
+		return $resp;
 	}
 
 	public function mp_search( \WP_REST_Request $req ): \WP_REST_Response|\WP_Error {
@@ -149,7 +159,8 @@ final class REST_API {
 			$stmt = publictech_db( $schema )->find( $table, $filters, $columns, $order, $limit, $offset );
 			stream_json_rows( $stmt );
 		} catch ( \Throwable $e ) {
-			wp_send_json( [ 'message' => $e->getMessage() ], 500 );
+			error_log( '[PublicTech] stream_rows failed: ' . $e->getMessage() );
+			wp_send_json( [ 'message' => 'Stream failed.' ], 500 );
 		}
 		exit;
 	}
@@ -158,20 +169,36 @@ final class REST_API {
 		if ( ( $gate = Throttle::instance()->enforce_rest( $req ) ) instanceof \WP_Error ) {
 			return $gate;
 		}
-		$mp_id = (int) $req['id'];
+		// Schema access is tier-gated even for the convenience /mp/{id}/spend route.
+		$tier = Access_Tiers::instance()->quota( get_current_user_id() ?: null );
+		if ( '*' !== $tier['schemas'] && ! in_array( 'pt-finance-01', (array) $tier['schemas'], true ) ) {
+			return new \WP_Error( 'pt_tier_locked', 'Finance schema not in your tier.', [ 'status' => 403 ] );
+		}
+		$mp_id  = absint( $req['id'] );
+		if ( $mp_id <= 0 || 'member-parliament' !== get_post_type( $mp_id ) ) {
+			return new \WP_Error( 'pt_not_found', 'Member not found.', [ 'status' => 404 ] );
+		}
 		$ext_id = (int) get_post_meta( $mp_id, 'external_mp_id', true );
-		if ( ! $ext_id ) {
+		if ( $ext_id <= 0 ) {
 			return new \WP_Error( 'pt_not_found', 'Member not linked to finance schema.', [ 'status' => 404 ] );
 		}
-		$rows = publictech_db( 'pt-finance-01' )->select(
-			'SELECT fiscal_year, category, SUM(amount_cad) AS total
-			   FROM expenditures
-			  WHERE mp_id = ? AND amount_cad > 0
-			  GROUP BY fiscal_year, category
-			  ORDER BY fiscal_year ASC, category ASC',
-			[ $ext_id ]
-		);
-		return rest_ensure_response( $rows );
+		try {
+			$rows = publictech_db( 'pt-finance-01' )->select(
+				'SELECT fiscal_year, category, SUM(amount_cad) AS total
+				   FROM expenditures
+				  WHERE mp_id = ? AND amount_cad > 0
+				  GROUP BY fiscal_year, category
+				  ORDER BY fiscal_year ASC, category ASC',
+				[ $ext_id ]
+			);
+		} catch ( \Throwable $e ) {
+			error_log( '[PublicTech] mp_spend failed: ' . $e->getMessage() );
+			return new \WP_Error( 'pt_db_error', 'Spending data temporarily unavailable.', [ 'status' => 503 ] );
+		}
+		$resp = rest_ensure_response( $rows );
+		$resp->header( 'Cache-Control', 'private, max-age=60' );
+		$resp->header( 'Vary', 'Authorization, Cookie' );
+		return $resp;
 	}
 
 	public function ai_query( \WP_REST_Request $req ): \WP_REST_Response|\WP_Error {
@@ -197,11 +224,39 @@ final class REST_API {
 		return rest_ensure_response( $payload );
 	}
 
-	public function customizer_save( \WP_REST_Request $req ): \WP_REST_Response {
+	public function customizer_save( \WP_REST_Request $req ): \WP_REST_Response|\WP_Error {
 		$uid = get_current_user_id();
 		$raw = (array) $req->get_json_params();
-		update_user_meta( $uid, 'pt_chart_theme', wp_json_encode( $raw ) );
-		return rest_ensure_response( [ 'ok' => true ] );
+
+		// Hard cap payload size before we look at the shape; user_meta is not a junk drawer.
+		if ( strlen( wp_json_encode( $raw ) ) > 2048 ) {
+			return new \WP_Error( 'pt_payload_too_large', 'Customizer payload too large.', [ 'status' => 413 ] );
+		}
+
+		// Whitelist + per-key validation. Anything not on the list is dropped silently.
+		$valid_curve = [ 'monotone', 'linear', 'step' ];
+		$valid_grid  = [ 'off', 'dotted', 'solid' ];
+		$valid_bar   = [ 'solid', 'stripe', 'outline' ];
+		$valid_font  = [ 'Montserrat', 'JetBrains Mono', 'Georgia' ];
+
+		$clean = [];
+		if ( isset( $raw['accent'] ) && is_string( $raw['accent'] ) ) {
+			$hex = sanitize_hex_color( $raw['accent'] );
+			if ( $hex ) {
+				$clean['accent'] = $hex;
+			}
+		}
+		if ( isset( $raw['curve'] ) && in_array( $raw['curve'], $valid_curve, true ) ) { $clean['curve'] = $raw['curve']; }
+		if ( isset( $raw['grid']  ) && in_array( $raw['grid'],  $valid_grid,  true ) ) { $clean['grid']  = $raw['grid']; }
+		if ( isset( $raw['bar']   ) && in_array( $raw['bar'],   $valid_bar,   true ) ) { $clean['bar']   = $raw['bar']; }
+		if ( isset( $raw['font']  ) && in_array( $raw['font'],  $valid_font,  true ) ) { $clean['font']  = $raw['font']; }
+		if ( isset( $raw['stroke'] ) ) { $clean['stroke'] = max( 0.5, min( 6.0,  (float) $raw['stroke'] ) ); }
+		if ( isset( $raw['marker'] ) ) { $clean['marker'] = max( 0,   min( 12,   (int)   $raw['marker'] ) ); }
+		if ( isset( $raw['area']   ) ) { $clean['area']   = max( 0,   min( 1.0,  (float) $raw['area']   ) ); }
+		if ( isset( $raw['anim']   ) ) { $clean['anim']   = (bool) $raw['anim']; }
+
+		update_user_meta( $uid, 'pt_chart_theme', wp_json_encode( $clean ) );
+		return rest_ensure_response( [ 'ok' => true, 'theme' => $clean ] );
 	}
 
 	/* ---------- shaping ---------- */

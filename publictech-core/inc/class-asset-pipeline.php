@@ -22,7 +22,39 @@ final class Asset_Pipeline {
 
 	private function __construct() {
 		add_action( 'wp_enqueue_scripts', [ $this, 'enqueue' ], 20 );
+		add_filter( 'script_loader_tag',  [ $this, 'add_sri' ], 10, 3 );
+		add_action( 'wp_head',            [ $this, 'preconnect_hints' ], 1 );
 		add_shortcode( 'publictech_terminal', [ $this, 'shortcode' ] );
+	}
+
+	/**
+	 * Add Subresource Integrity to the CDN-hosted D3 bundle. The hash is
+	 * pinned to the 7.9.0 release; bump together with the URL above.
+	 */
+	/**
+	 * Add SRI to the CDN-hosted D3 bundle when an operator has supplied a
+	 * verified hash via the `publictech_d3_sri` filter. We don't ship a
+	 * hard-coded hash because the CDN URL is itself filterable; supplying a
+	 * mismatching default would break sites that override the URL.
+	 */
+	public function add_sri( string $tag, string $handle, string $src ): string {
+		if ( 'd3' !== $handle ) {
+			return $tag;
+		}
+		$sri = (string) apply_filters( 'publictech_d3_sri', '' );
+		if ( '' === $sri ) {
+			return $tag;
+		}
+		return str_replace( '<script ', '<script integrity="' . esc_attr( $sri ) . '" crossorigin="anonymous" referrerpolicy="no-referrer" ', $tag );
+	}
+
+	public function preconnect_hints(): void {
+		if ( ! $this->needs_d3() ) {
+			return;
+		}
+		echo '<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>' . "\n";
+		echo '<link rel="preconnect" href="https://fonts.gstatic.com"  crossorigin>' . "\n";
+		echo '<link rel="preconnect" href="https://cdn.jsdelivr.net"    crossorigin>' . "\n";
 	}
 
 	public function enqueue(): void {
@@ -38,9 +70,16 @@ final class Asset_Pipeline {
 			return;
 		}
 
+		// Self-hosting D3 is preferable for production; sites can drop
+		// d3.v7.min.js into the parent theme's assets/vendor/ and override
+		// the URL via the `publictech_d3_url` filter.
+		$d3_url = apply_filters(
+			'publictech_d3_url',
+			'https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js'
+		);
 		wp_enqueue_script(
 			'd3',
-			'https://d3js.org/d3.v7.min.js',
+			esc_url_raw( $d3_url ),
 			[],
 			'7.9.0',
 			[ 'strategy' => 'defer' ]

@@ -46,6 +46,14 @@ final class Access_Tiers {
 	 */
 	public function tiers(): array {
 		$defaults = [
+			// Unauthenticated visitors. Intentionally tight to discourage
+			// drive-by scraping; signed-in free-tier users get the next bucket.
+			'anonymous' => [
+				'label' => 'Anonymous', 'price_monthly' => 0,
+				'rpm' => 10, 'rpd' => 200, 'max_rows' => 100,
+				'schemas' => [ 'pt-finance-01' ],
+				'mcp' => false, 'concurrent' => 1,
+			],
 			'free' => [
 				'label' => 'Free', 'price_monthly' => 0,
 				'rpm' => 20, 'rpd' => 500, 'max_rows' => 500,
@@ -76,7 +84,7 @@ final class Access_Tiers {
 	 */
 	public function user_tier( ?int $user_id ): string {
 		if ( ! $user_id ) {
-			return 'free';
+			return 'anonymous';
 		}
 		$slug = (string) get_user_meta( $user_id, self::META_TIER, true );
 		return isset( $this->tiers()[ $slug ] ) ? $slug : 'free';
@@ -88,18 +96,38 @@ final class Access_Tiers {
 
 	/**
 	 * Look up the user owning a given MCP bearer token.
+	 *
+	 * Performance: tokens are reverse-indexed in their own options row
+	 * (pt_tok_<short_hash>) so resolution is an O(1) options-table read
+	 * instead of a full-table scan over wp_usermeta.meta_value (unindexed).
+	 * The full sha256 is also stored as the value to guard against
+	 * collisions on the short hash.
 	 */
 	public function resolve_token( string $token ): ?int {
-		if ( strlen( $token ) < 32 ) {
+		if ( strlen( $token ) < 32 || ! ctype_alnum( str_replace( '_', '', $token ) ) ) {
 			return null;
 		}
-		global $wpdb;
-		$user_id = (int) $wpdb->get_var( $wpdb->prepare(
-			"SELECT user_id FROM {$wpdb->usermeta} WHERE meta_key = %s AND meta_value = %s LIMIT 1",
-			self::META_TOKEN,
-			hash( 'sha256', $token )
-		) );
-		return $user_id ?: null;
+		$full  = hash( 'sha256', $token );
+		$short = substr( $full, 0, 16 );
+		$row   = get_option( 'pt_tok_' . $short, null );
+		if ( ! is_array( $row ) || ! hash_equals( (string) ( $row['hash'] ?? '' ), $full ) ) {
+			return null;
+		}
+		return (int) ( $row['uid'] ?? 0 ) ?: null;
+	}
+
+	/**
+	 * Store/rotate a token reverse-index entry, removing the prior one if any.
+	 */
+	private function index_token( int $user_id, string $plain ): void {
+		$old = (string) get_user_meta( $user_id, self::META_TOKEN, true );
+		if ( $old ) {
+			delete_option( 'pt_tok_' . substr( $old, 0, 16 ) );
+		}
+		$full  = hash( 'sha256', $plain );
+		$short = substr( $full, 0, 16 );
+		update_user_meta( $user_id, self::META_TOKEN, $full );
+		update_option( 'pt_tok_' . $short, [ 'uid' => $user_id, 'hash' => $full ], false );
 	}
 
 	public function render_admin_token_box( \WP_User $user ): void {
@@ -150,7 +178,7 @@ final class Access_Tiers {
 		}
 		if ( ! empty( $_POST['pt_rotate_token'] ) ) {
 			$plain = 'pt_' . bin2hex( random_bytes( 24 ) );
-			update_user_meta( $user_id, self::META_TOKEN, hash( 'sha256', $plain ) );
+			$this->index_token( $user_id, $plain );
 			set_transient( 'pt_token_show_' . $user_id, $plain, 120 );
 		}
 	}

@@ -1,0 +1,238 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master, "claude/**"]
+  pull_request:
+    branches: [main, master]
+  workflow_dispatch:
+
+# Cancel superseded runs on the same branch — saves CI minutes on rapid pushes.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # PHP syntax + WordPress Coding Standards + PHPStan + PHPUnit + theme-check.
+  # ---------------------------------------------------------------------------
+  php:
+    name: PHP ${{ matrix.php }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ["8.1", "8.2", "8.3"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: pcov
+          tools: composer:v2, cs2pr
+          extensions: mbstring, intl, pdo_sqlite, json
+          ini-values: |
+            error_reporting=-1
+            display_errors=On
+            zend.assertions=1
+
+      - name: Validate composer.json
+        run: composer validate --strict --no-check-publish
+
+      - name: Cache composer
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/composer
+          key: composer-${{ matrix.php }}-${{ hashFiles('composer.json') }}
+          restore-keys: composer-${{ matrix.php }}-
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress --no-interaction
+
+      - name: PHP syntax (every file)
+        run: |
+          set -e
+          find publictech-core publictech-terminal publictech-mcp tests \
+            -name '*.php' -print0 \
+            | xargs -0 -n1 -P4 php -l > /tmp/lint.log 2>&1 || (cat /tmp/lint.log; exit 1)
+          grep -v "No syntax errors detected" /tmp/lint.log || echo "All files clean."
+
+      - name: PHPCS (WordPress Coding Standards)
+        run: composer run-script phpcs -- --report=checkstyle --report-file=/tmp/phpcs.xml || true
+      - name: Surface PHPCS findings
+        if: always()
+        run: cs2pr --graceful-warnings /tmp/phpcs.xml || true
+
+      - name: PHPStan
+        run: composer run-script phpstan -- --no-progress --error-format=github
+
+      - name: PHPUnit
+        run: vendor/bin/phpunit --testdox
+
+      - name: Coverage summary
+        if: matrix.php == '8.3'
+        run: vendor/bin/phpunit --coverage-text=php://stdout --coverage-clover=coverage/clover.xml
+
+      - name: Upload coverage artifact
+        if: matrix.php == '8.3'
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: coverage/
+
+  # ---------------------------------------------------------------------------
+  # JS + CSS linting + format check + dependency audit.
+  # ---------------------------------------------------------------------------
+  frontend:
+    name: Frontend (Node ${{ matrix.node }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: ["20", "22"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+
+      - run: npm install --no-audit --no-fund
+
+      - name: ESLint
+        run: npx eslint "publictech-core/assets/js/**/*.js" "publictech-terminal/assets/js/**/*.js" --format stylish
+
+      - name: Stylelint
+        run: npx stylelint "publictech-core/assets/css/**/*.css" "publictech-terminal/assets/css/**/*.css"
+
+      - name: Prettier (check only)
+        run: npx prettier --check "**/*.{js,css,md,json,yml,yaml}" --ignore-path .gitignore
+
+      - name: npm audit (high+)
+        run: npm audit --audit-level=high || true
+
+  # ---------------------------------------------------------------------------
+  # WordPress integration smoke: spin up wp-env, activate parent+child+plugin,
+  # hit a few REST endpoints, verify they 200 and emit JSON.
+  # ---------------------------------------------------------------------------
+  wp-integration:
+    name: WordPress integration
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mariadb:10.11
+        env:
+          MARIADB_ALLOW_EMPTY_ROOT_PASSWORD: "1"
+          MARIADB_DATABASE: wordpress_test
+        ports: [3306:3306]
+        options: >-
+          --health-cmd "mariadb-admin ping -h 127.0.0.1"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.2"
+          extensions: mbstring, intl, mysqli, pdo_mysql, json, curl, zip
+          tools: composer:v2, wp-cli
+
+      - name: Install WordPress
+        run: |
+          set -e
+          mkdir -p /tmp/wp
+          curl -sSL https://wordpress.org/latest.tar.gz | tar -xz -C /tmp/wp --strip-components=1
+          cd /tmp/wp
+          wp config create \
+            --dbname=wordpress_test \
+            --dbuser=root \
+            --dbhost=127.0.0.1 \
+            --skip-check
+          wp core install \
+            --url=http://localhost:8080 \
+            --title=PT \
+            --admin_user=admin \
+            --admin_email=admin@example.com \
+            --admin_password=admin123 \
+            --skip-email
+
+      - name: Link themes + plugin into the WP install
+        run: |
+          cp -R publictech-core     /tmp/wp/wp-content/themes/
+          cp -R publictech-terminal /tmp/wp/wp-content/themes/
+          cp -R publictech-mcp      /tmp/wp/wp-content/plugins/
+
+      - name: Activate, then sanity-check
+        working-directory: /tmp/wp
+        run: |
+          set -e
+          wp theme activate publictech-terminal
+          wp plugin activate publictech-mcp
+          wp option update permalink_structure '/%postname%/'
+          wp rewrite flush --hard
+          # Boot a server.
+          php -S 127.0.0.1:8080 -t /tmp/wp >/tmp/wp-server.log 2>&1 &
+          sleep 3
+          # /publictech/v1/status must return JSON with build + tier keys.
+          STATUS=$(curl -fsS http://127.0.0.1:8080/?rest_route=/publictech/v1/status)
+          echo "$STATUS" | jq -e '.build and .tier' > /dev/null
+          # /publictech-mcp/v1/manifest must announce the JSON-RPC endpoint.
+          MANIFEST=$(curl -fsS http://127.0.0.1:8080/?rest_route=/publictech-mcp/v1/manifest)
+          echo "$MANIFEST" | jq -e '.protocol and .name == "publictech"' > /dev/null
+
+  # ---------------------------------------------------------------------------
+  # Plugin Check (WordPress.org's official linter) on the MCP plugin.
+  # ---------------------------------------------------------------------------
+  plugin-check:
+    name: WordPress Plugin Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.2"
+          tools: composer:v2
+      - uses: wordpress/plugin-check-action@v1
+        with:
+          build-dir: ./publictech-mcp
+
+  # ---------------------------------------------------------------------------
+  # Theme Check on parent + child themes.
+  # ---------------------------------------------------------------------------
+  theme-check:
+    name: Theme metadata sanity
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.2"
+      - name: Verify theme headers parse
+        run: |
+          for theme in publictech-core publictech-terminal; do
+            test -f "$theme/style.css"
+            grep -q "Theme Name:" "$theme/style.css"
+            grep -q "Version:"    "$theme/style.css"
+          done
+          grep -q "Template: publictech-core" publictech-terminal/style.css
+
+  # ---------------------------------------------------------------------------
+  # Secret scanning so a stray AWS key or DB password never makes it onto main.
+  # ---------------------------------------------------------------------------
+  secrets:
+    name: Secret scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

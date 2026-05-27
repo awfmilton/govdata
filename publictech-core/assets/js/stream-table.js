@@ -61,10 +61,21 @@
 				})
 				.catch((err) => {
 					this.root.setAttribute('aria-busy', 'false');
-					this.body.innerHTML = '<tr><td colspan="99"><div class="pt-error">' + err.message + '</div></td></tr>';
+					if (!this.body) return;
+					const tr = document.createElement('tr');
+					const td = document.createElement('td');
+					td.colSpan = 99;
+					const div = document.createElement('div');
+					div.className = 'pt-error';
+					div.textContent = err && err.message ? String(err.message) : 'Stream failed.';
+					td.appendChild(div);
+					tr.appendChild(td);
+					this.body.replaceChildren(tr);
 				});
 		}
 		render() {
+			if (!this.body) return;
+			if (!this._cols) this._cols = Array.from(this.root.querySelectorAll('th')).map(function (th) { return th.dataset.sort; });
 			const f = this.filter.trim().toLowerCase();
 			let view = this.rows;
 			if (f) {
@@ -85,11 +96,11 @@
 			this.view = view;
 			const start = (this.page - 1) * this.pageSize;
 			const pageRows = view.slice(start, start + this.pageSize);
-			this.body.innerHTML = pageRows.map((row) => '<tr>' + Array.from(this.root.querySelectorAll('th')).map(function (th) {
-				const k = th.dataset.sort;
+			const cols = this._cols;
+			this.body.innerHTML = pageRows.map((row) => '<tr>' + cols.map(function (k) {
 				const v = row[k];
 				if (k === 'amount_cad' || k === 'amount') {
-					return '<td class="num">$' + Number(v || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '</td>';
+					return '<td class="num">$' + escape(Number(v || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })) + '</td>';
 				}
 				return '<td>' + escape(v) + '</td>';
 			}).join('') + '</tr>').join('');

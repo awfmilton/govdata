@@ -62,8 +62,16 @@ final class Security {
 	 * routes pipe arbitrary text through this before executing.
 	 */
 	public static function assert_read_only( string $sql ): void {
-		$stripped = preg_replace( '#/\*.*?\*/|--[^\n]*#s', '', $sql ) ?? '';
-		if ( preg_match( '/\b(INSERT|UPDATE|DELETE|REPLACE|DROP|ALTER|CREATE|TRUNCATE|GRANT|REVOKE|RENAME|CALL|LOAD|HANDLER|LOCK)\b/i', $stripped ) ) {
+		// 1) Strip comments. 2) Strip single- and double-quoted string literals
+		// so a SELECT that mentions "DELETE FROM" as a string isn't flagged.
+		// MySQL backtick-quoted identifiers are left alone since they can't
+		// contain SQL verbs that we'd misinterpret.
+		$stripped = preg_replace(
+			[ '#/\*.*?\*/|--[^\n]*#s', "#'(?:''|\\\\.|[^'\\\\])*'#s", '#"(?:""|\\\\.|[^"\\\\])*"#s' ],
+			'',
+			$sql
+		) ?? '';
+		if ( preg_match( '/\b(INSERT|UPDATE|DELETE|REPLACE|DROP|ALTER|CREATE|TRUNCATE|GRANT|REVOKE|RENAME|CALL|LOAD\s+DATA|HANDLER|LOCK\s+TABLES)\b/i', $stripped ) ) {
 			throw new \RuntimeException( 'Write operations are not permitted on this connection.' );
 		}
 	}

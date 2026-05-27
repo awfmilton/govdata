@@ -1,0 +1,74 @@
+/* Overrides bridging the prototype CSS (button-driven SPA) to WordPress
+   server-rendered markup (anchor-driven navigation). Kept in a separate
+   file so the verbatim prototype CSS in terminal.css stays diffable. */
+
+/* ----- Nav tabs: match the prototype's button styling for <a> elements
+   that wp_nav_menu / our fallback emit. */
+nav.tabs a,
+nav.tabs li > a {
+	background: transparent;
+	border: 0;
+	color: var(--ink-1);
+	font: 500 11px/1 "Montserrat";
+	letter-spacing: 0.14em;
+	text-transform: uppercase;
+	padding: 8px 14px;
+	border-radius: 4px;
+	cursor: pointer;
+	display: inline-flex;
+	align-items: center;
+	gap: 7px;
+	text-decoration: none;
+}
+nav.tabs a:hover { color: var(--ink-0); background: rgba(255, 255, 255, 0.02); }
+nav.tabs a.active,
+nav.tabs li.current-menu-item > a,
+nav.tabs li.current_page_item > a {
+	background: var(--accent-soft);
+	color: var(--accent);
+	box-shadow: inset 0 0 0 1px rgba(0, 160, 210, 0.35);
+}
+nav.tabs a .idx { font-family: "JetBrains Mono"; font-size: 9px; color: var(--ink-3); font-weight: 500; }
+nav.tabs a.active .idx,
+nav.tabs li.current-menu-item > a .idx,
+nav.tabs li.current_page_item > a .idx { color: var(--accent); }
+nav.tabs ul { list-style: none; margin: 0; padding: 0; display: flex; gap: 2px; }
+
+/* ----- Party bar colors: server-rendered cards set party via CSS class
+   so we don't repeat inline styles per row. */
+.party-bar { display: inline-block; width: 8px; height: 8px; border-radius: 1px; margin-right: 2px; background: var(--ink-3); }
+.party-bar.party-liberal      { background: var(--party-lib); }
+.party-bar.party-conservative { background: var(--party-con); }
+.party-bar.party-ndp          { background: var(--party-ndp); }
+.party-bar.party-green        { background: var(--party-grn); }
+.party-bar.party-bloc         { background: var(--party-blq); }
+
+/* ----- Featured-query cards rendered as anchors keep card styling. */
+.featured-q { color: inherit; text-decoration: none; display: block; }
+
+/* ----- WP nav menu fallback ul → strip the bullet list. */
+.pt-primary-menu { list-style: none; margin: 0; padding: 0; display: flex; gap: 2px; }
+.pt-primary-menu li { margin: 0; }
+
+/* ----- Stream-table input/select share the .stream-bar pattern even when
+   they live inside a <form>. */
+.stream-bar form { display: contents; }
+
+/* ----- Loading state for streaming tables so the row spans full width. */
+table.stream td .pt-loading { padding: 24px 0; justify-content: center; }
+
+/* ----- Reduce motion respect (extends the prototype which already does some). */
+@media (prefers-reduced-motion: reduce) {
+	.brand .mark span,
+	.ai-prompt .ph .pulse { animation: none !important; }
+	.customizer { transition: none !important; }
+}
+
+/* ----- Visually-hidden helper for accessibility (forms, landmarks). */
+.pt-sr-only { position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+
+/* ----- Make .cta usable as <a>. */
+a.cta { text-decoration: none; }
+
+/* ----- WP block content wrapper inside the terminal shell. */
+.pt-shell .entry-content > * + * { margin-top: 14px; }

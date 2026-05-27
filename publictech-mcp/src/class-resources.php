@@ -18,7 +18,7 @@ final class Resources {
 	private static ?self $instance = null;
 	public static function instance(): self { return self::$instance ??= new self(); }
 
-	public function list( ?int $user_id ): array {
+	public function available( ?int $user_id ): array {
 		$out = [
 			[ 'uri' => 'publictech://schemas', 'name' => 'Connected schemas', 'mimeType' => 'application/json' ],
 			[ 'uri' => 'publictech://tier',    'name' => 'Your access tier',  'mimeType' => 'application/json' ],

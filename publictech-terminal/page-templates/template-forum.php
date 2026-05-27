@@ -77,7 +77,7 @@ get_header(); ?>
 							<div class="stats">
 								<div class="col"><b><?php echo esc_html( get_comments_number() ); ?></b><div class="lab"><?php esc_html_e( 'Replies', 'publictech-terminal' ); ?></div></div>
 							</div>
-							<div class="last"><b><?php echo esc_html( human_time_diff( get_post_modified_time( 'U', true ) ) ); ?></b></div>
+							<div class="last"><b><?php echo esc_html( human_time_diff( (int) get_post_modified_time( 'U', true ), time() ) ); ?></b></div>
 						</a>
 						<?php
 					endwhile;

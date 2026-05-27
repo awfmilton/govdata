@@ -81,16 +81,24 @@ final class Server {
 		try {
 			$result = match ( $method ) {
 				'initialize'      => $this->initialize( $params ),
-				'tools/list'      => Tools::instance()->list( $user_id ),
+				'tools/list'      => Tools::instance()->available( $user_id ),
 				'tools/call'      => Tools::instance()->call( $user_id, (string) ( $params['name'] ?? '' ), (array) ( $params['arguments'] ?? [] ), (int) $state['quota']['max_rows'] ),
-				'resources/list'  => Resources::instance()->list( $user_id ),
+				'resources/list'  => Resources::instance()->available( $user_id ),
 				'resources/read'  => Resources::instance()->read( $user_id, (string) ( $params['uri'] ?? '' ), (int) $state['quota']['max_rows'] ),
 				'ping'            => [ 'ok' => true ],
 				default           => throw new \RuntimeException( 'Method not found: ' . $method, -32601 ),
 			};
 		} catch ( \Throwable $e ) {
 			$code = (int) $e->getCode();
-			return $this->err( $id, $code ?: -32603, $e->getMessage() );
+			// JSON-RPC error codes -32000..-32099 are application-defined; pass those through.
+			// Anything else (e.g. raw PDOException text) gets a generic message and is
+			// logged server-side instead of being shipped to the client.
+			$is_app_code = $code <= -32000 && $code >= -32099;
+			if ( ! $is_app_code ) {
+				error_log( '[PublicTech MCP] ' . $method . ' failed: ' . $e->getMessage() );
+				return $this->err( $id, -32603, 'Internal error' );
+			}
+			return $this->err( $id, $code, $e->getMessage() );
 		}
 
 		$resp = rest_ensure_response( [ 'jsonrpc' => '2.0', 'id' => $id, 'result' => $result ] );
