@@ -23,6 +23,7 @@ require_once PUBLICTECH_CORE_DIR . 'inc/class-access-tiers.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-throttle.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-cpt.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-rest-api.php';
+require_once PUBLICTECH_CORE_DIR . 'inc/class-charts-rest.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-asset-pipeline.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-customizer.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-compat.php';
@@ -54,6 +55,7 @@ add_action( 'plugins_loaded', static function () {
 	\PublicTech\Core\Throttle::instance();
 	\PublicTech\Core\CPT::instance();
 	\PublicTech\Core\REST_API::instance();
+	\PublicTech\Core\Charts_REST::instance();
 	\PublicTech\Core\Asset_Pipeline::instance();
 	\PublicTech\Core\Chart_Customizer::instance();
 	\PublicTech\Core\Compat::instance();
