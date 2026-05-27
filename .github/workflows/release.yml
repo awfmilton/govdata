@@ -1,0 +1,42 @@
+name: Release archives
+
+# Produces three downloadable zip artifacts (parent theme, child theme, MCP
+# plugin) on every tag push. Each archive is the exact subdirectory shape
+# WordPress expects when uploaded via Appearance → Themes / Plugins.
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  archives:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify tag matches plugin/theme versions
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          for path in publictech-core/style.css publictech-terminal/style.css publictech-mcp/publictech-mcp.php; do
+            if ! grep -qE "Version:\s+${VERSION}" "$path"; then
+              echo "::error file=$path::Header version does not match tag $VERSION"
+              exit 1
+            fi
+          done
+
+      - name: Build zips
+        run: |
+          mkdir -p dist
+          for pkg in publictech-core publictech-terminal publictech-mcp; do
+            zip -r "dist/${pkg}-${GITHUB_REF_NAME}.zip" "$pkg" \
+              -x "*.git*" "*/node_modules/*" "*/vendor/*" "*.DS_Store"
+          done
+          ls -la dist/
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*.zip
+          generate_release_notes: true
