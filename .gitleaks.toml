@@ -1,0 +1,19 @@
+# Gitleaks configuration. Extends the upstream default ruleset and adds a
+# small allowlist for the placeholder constants the unit-test bootstrap needs.
+
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "PublicTech test bootstrap constants and README placeholders"
+paths = [
+  '''tests/php/bootstrap\.php$''',
+  '''tests/php/bootstrap-phpstan\.php$''',
+  '''README\.md$''',
+  '''publictech-core/inc/class-access-tiers\.php$''',
+]
+regexes = [
+  '''pt-test-key''',
+  '''pt-test-salt''',
+  '''pass'\s*=>\s*'\.\.\.''',
+]

@@ -10,12 +10,11 @@
     "lint:format": "prettier --check \"**/*.{js,css,md,json,yml,yaml}\" --ignore-path .gitignore",
     "format": "prettier --write \"**/*.{js,css,md,json,yml,yaml}\" --ignore-path .gitignore",
     "lint": "npm run lint:js && npm run lint:css && npm run lint:format",
-    "check:plugin": "wp-scripts plugin-zip || true",
     "ci": "npm run lint"
   },
   "devDependencies": {
-    "eslint": "^9.13.0",
-    "@wordpress/eslint-plugin": "^21.4.0",
+    "eslint": "^8.57.0",
+    "@wordpress/eslint-plugin": "^17.13.0",
     "stylelint": "^16.10.0",
     "stylelint-config-standard": "^36.0.1",
     "prettier": "^3.3.3"
