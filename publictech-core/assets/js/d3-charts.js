@@ -68,8 +68,10 @@
 				.call(d3.axisLeft(y).ticks(5).tickSize(-(W - m.l - m.r)).tickFormat(''))
 				.selectAll('line').attr('stroke', t.line).attr('stroke-dasharray', PT.gridDash()).attr('opacity', PT.gridOpacity());
 		}
-		[ ['bottom', d3.axisBottom(x).ticks(7).tickFormat(d3.format('d')), 'translate(0,' + (H - m.b) + ')'],
-		  ['left',   d3.axisLeft(y).ticks(5).tickFormat(function (d) { return '$' + d3.format('.2s')(d); }), 'translate(' + m.l + ',0)'] ]
+		[
+			['bottom', d3.axisBottom(x).ticks(7).tickFormat(d3.format('d')), 'translate(0,' + (H - m.b) + ')'],
+			['left',   d3.axisLeft(y).ticks(5).tickFormat(function (d) { return '$' + d3.format('.2s')(d); }), 'translate(' + m.l + ',0)'],
+		]
 			.forEach(function (it) {
 				const g = sel.append('g').attr('class', 'axis').attr('transform', it[2]).call(it[1]);
 				g.selectAll('text').attr('fill', t.ink2);

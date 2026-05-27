@@ -82,9 +82,9 @@
 
 	PT.curveFn = function () {
 		if (!global.d3) return null;
-		return PT.chartTheme.curve === 'linear' ? d3.curveLinear
-			 : PT.chartTheme.curve === 'step'   ? d3.curveStepAfter
-			 : d3.curveMonotoneX;
+		if (PT.chartTheme.curve === 'linear') return d3.curveLinear;
+		if (PT.chartTheme.curve === 'step') return d3.curveStepAfter;
+		return d3.curveMonotoneX;
 	};
 	PT.gridOpacity = function () {
 		return PT.chartTheme.grid === 'off' ? 0 : PT.chartTheme.grid === 'solid' ? 0.8 : 0.5;
