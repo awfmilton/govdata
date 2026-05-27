@@ -5,6 +5,7 @@ dist/
 coverage/
 *.log
 .phpunit.result.cache
+.phpunit.cache/
 .phpcs.cache
 .phpcs-cache
 .phpstan.cache
