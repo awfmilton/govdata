@@ -197,7 +197,183 @@
 			.attr('d', d3.line().x(function (_, i) { return x(i); }).y(function (d) { return y(d); }).curve(d3.curveMonotoneX)(data));
 	}
 
-	const renderers = { line: drawLine, bar: drawBars, network: drawNetwork, spark: drawSpark };
+	/* Choropleth — accepts a TopoJSON URL (or a pre-fetched FeatureCollection)
+	   plus a {regionId: value} map. The first time we render a given URL we
+	   fetch + cache the topology and convert it to a FeatureCollection using
+	   topojson-client (loaded as a sibling vendor bundle). Subsequent draws of
+	   the same URL reuse the cached features. */
+	const topoCache = new Map(); // url -> Promise<FeatureCollection>
+	function loadTopology(url, objectName) {
+		if (topoCache.has(url)) return topoCache.get(url);
+		const p = fetch(url, { credentials: 'omit' })
+			.then(function (r) { return r.json(); })
+			.then(function (topo) {
+				if (!global.topojson || !global.topojson.feature) {
+					console.error('[PT] topojson-client not loaded; choropleth disabled.');
+					return null;
+				}
+				const objKey = objectName || Object.keys(topo.objects || {})[0];
+				return objKey ? global.topojson.feature(topo, topo.objects[objKey]) : null;
+			})
+			.catch(function () { return null; });
+		topoCache.set(url, p);
+		return p;
+	}
+
+	function drawChoropleth(host, rec) {
+		const t = PT.chartTheme;
+		const opts = rec.opts || {};
+		const data = rec.data || {};
+		const url = data.topojson_url || opts.topojson_url;
+		if (!url) return;
+		const valueBy = data.values || {};
+		const keyProp = data.key || opts.key || 'id';
+
+		const s = svg(host); if (!s) return;
+		const { W, H, sel } = s;
+
+		loadTopology(url, data.object).then(function (fc) {
+			if (!fc || !fc.features) return;
+			const values = Object.values(valueBy).filter(function (v) { return typeof v === 'number'; });
+			const extent = values.length ? d3.extent(values) : [0, 1];
+			const projection = d3.geoIdentity().reflectY(true).fitSize([W, H], fc);
+			const path = d3.geoPath(projection);
+			const color = d3.scaleSequential()
+				.domain([extent[0], extent[1] || 1])
+				.interpolator(function (v) {
+					// Map [0,1] onto a custom accent->bg gradient so the
+					// choropleth honours the active palette.
+					const hex = t.accent.replace('#', '');
+					const r = parseInt(hex.slice(0, 2), 16);
+					const g = parseInt(hex.slice(2, 4), 16);
+					const b = parseInt(hex.slice(4, 6), 16);
+					return 'rgba(' + r + ',' + g + ',' + b + ',' + (0.15 + v * 0.75) + ')';
+				});
+
+			sel.append('g').selectAll('path').data(fc.features).enter().append('path')
+				.attr('d', path)
+				.attr('fill', function (f) {
+					const id = f.properties && (f.properties[keyProp] != null ? f.properties[keyProp] : f.id);
+					const v  = valueBy[id];
+					return v != null ? color(v) : t.bg1;
+				})
+				.attr('stroke', t.line)
+				.attr('stroke-width', 0.5)
+				.on('mousemove', function (e, f) {
+					const id = f.properties && (f.properties[keyProp] != null ? f.properties[keyProp] : f.id);
+					const name = (f.properties && (f.properties.name || f.properties.PRENAME || f.properties.PRFNAME)) || id;
+					const v = valueBy[id];
+					tipShow('<div class="t-k">' + escape(String(name)) + '</div><div class="t-row"><span>Value</span><b>' + (v != null ? v : '—') + '</b></div>', e);
+				})
+				.on('mouseleave', tipHide);
+		});
+	}
+
+	function escape(s) {
+		return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' })[c]; });
+	}
+
+	/* Sankey — money-flow diagrams (Agency → Program → Vendor or arbitrary
+	   multi-stage flows). Data shape accepted in two forms:
+	     A) Already-shaped:  { nodes: [{name}], links: [{source, target, value}] }
+	     B) Flat rows + path: { rows: [...], path: ['agency','program','vendor'], value: 'amount' }
+	   Form B is converted via PT.sankeyFromRows below, so callers can hand us
+	   raw procurement rows straight from the stream endpoint. */
+	function drawSankey(host, rec) {
+		const t = PT.chartTheme;
+		if (!global.d3 || !global.d3.sankey) {
+			console.error('[PT] d3-sankey not loaded; sankey disabled.');
+			return;
+		}
+		const s = svg(host); if (!s) return;
+		const { W, H, sel } = s;
+
+		const data = (rec.data && rec.data.rows)
+			? PT.sankeyFromRows(rec.data.rows, rec.data.path || [], rec.data.value || 'amount')
+			: rec.data;
+		if (!data || !data.nodes || !data.nodes.length) return;
+
+		const sankey = d3.sankey()
+			.nodeId(function (d) { return d.name; })
+			.nodeWidth(14)
+			.nodePadding(10)
+			.extent([[1, 8], [W - 1, H - 8]]);
+
+		// Clone before sankey() — it mutates in place and we may redraw on theme changes.
+		const graph = sankey({
+			nodes: data.nodes.map(function (n) { return Object.assign({}, n); }),
+			links: data.links.map(function (l) { return Object.assign({}, l); }),
+		});
+
+		// Links.
+		sel.append('g').attr('fill', 'none').attr('stroke-opacity', 0.35)
+			.selectAll('path').data(graph.links).enter().append('path')
+			.attr('d', d3.sankeyLinkHorizontal())
+			.attr('stroke', t.accent)
+			.attr('stroke-width', function (d) { return Math.max(1, d.width); })
+			.on('mousemove', function (e, d) {
+				tipShow('<div class="t-k">' + escape(d.source.name) + ' → ' + escape(d.target.name) + '</div><div class="t-row"><span>Value</span><b>' + Number(d.value).toLocaleString() + '</b></div>', e);
+			})
+			.on('mouseleave', tipHide);
+
+		// Nodes.
+		const node = sel.append('g').selectAll('g').data(graph.nodes).enter().append('g');
+		node.append('rect')
+			.attr('x', function (d) { return d.x0; })
+			.attr('y', function (d) { return d.y0; })
+			.attr('width', function (d) { return d.x1 - d.x0; })
+			.attr('height', function (d) { return Math.max(1, d.y1 - d.y0); })
+			.attr('fill', t.accent)
+			.attr('stroke', t.line2)
+			.on('mousemove', function (e, d) {
+				tipShow('<div class="t-k">' + escape(d.name) + '</div><div class="t-row"><span>Total</span><b>' + Number(d.value || 0).toLocaleString() + '</b></div>', e);
+			})
+			.on('mouseleave', tipHide);
+		node.append('text')
+			.attr('x', function (d) { return d.x0 < W / 2 ? d.x1 + 6 : d.x0 - 6; })
+			.attr('y', function (d) { return (d.y1 + d.y0) / 2; })
+			.attr('dy', '0.35em')
+			.attr('text-anchor', function (d) { return d.x0 < W / 2 ? 'start' : 'end'; })
+			.attr('fill', t.ink1)
+			.style('font', '10px "JetBrains Mono", ui-monospace, monospace')
+			.text(function (d) { return d.name; });
+	}
+
+	/* Flat rows → Sankey nodes/links. Walks each row through the column list
+	   in `path` and sums values across adjacent pairs. Idempotent for repeat
+	   labels (the same Agency value across rows becomes one node). */
+	PT.sankeyFromRows = function (rows, path, valueKey) {
+		if (!Array.isArray(rows) || !Array.isArray(path) || path.length < 2) {
+			return { nodes: [], links: [] };
+		}
+		const nodeIndex = new Map();
+		const nodes = [];
+		function addNode(name) {
+			if (!nodeIndex.has(name)) { nodeIndex.set(name, nodes.length); nodes.push({ name: name }); }
+			return nodeIndex.get(name);
+		}
+		const linkAgg = new Map(); // "src→dst" -> value
+		rows.forEach(function (row) {
+			const v = +row[valueKey] || 0;
+			if (!v) return;
+			for (let i = 0; i < path.length - 1; i++) {
+				const a = String(row[path[i]]     || '');
+				const b = String(row[path[i + 1]] || '');
+				if (!a || !b) continue;
+				addNode(a); addNode(b);
+				const key = a + '→' + b;
+				linkAgg.set(key, (linkAgg.get(key) || 0) + v);
+			}
+		});
+		const links = [];
+		linkAgg.forEach(function (value, key) {
+			const parts = key.split('→');
+			links.push({ source: parts[0], target: parts[1], value: value });
+		});
+		return { nodes: nodes, links: links };
+	};
+
+	const renderers = { line: drawLine, bar: drawBars, network: drawNetwork, spark: drawSpark, choropleth: drawChoropleth, sankey: drawSankey };
 
 	function draw(host, rec) {
 		clear(host);

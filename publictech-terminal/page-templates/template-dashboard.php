@@ -4,10 +4,28 @@
  *
  * Hero + activity feed + watchlist + national rollup chart.
  *
+ * Also handles compare mode: if a `?compare=id1,id2[,id3,id4]` URL parameter
+ * resolves to 2–4 valid member-parliament posts, the dashboard re-routes to
+ * the split-screen comparison layout rendered by parts/compare-mps.php.
+ *
  * @package PublicTech\Terminal
  */
 
 defined( 'ABSPATH' ) || exit;
+
+// Compare mode short-circuits the regular dashboard render.
+$pt_compare_ids = [];
+if ( isset( $_GET['compare'] ) ) {
+	$pt_compare_ids = array_values( array_filter( array_map( 'absint', explode( ',', wp_unslash( (string) $_GET['compare'] ) ) ) ) );
+	$pt_compare_ids = array_values( array_filter( $pt_compare_ids, static function ( $id ) {
+		return 'member-parliament' === get_post_type( $id );
+	} ) );
+	$pt_compare_ids = array_slice( $pt_compare_ids, 0, 4 ); // hard cap — UI gets unreadable past 4.
+}
+if ( count( $pt_compare_ids ) >= 2 ) {
+	require PUBLICTECH_TERMINAL_DIR . 'parts/compare-mps.php';
+	return;
+}
 
 $pt_user   = wp_get_current_user();
 $pt_name   = $pt_user && $pt_user->ID ? $pt_user->first_name ?: $pt_user->display_name : __( 'guest', 'publictech-terminal' );

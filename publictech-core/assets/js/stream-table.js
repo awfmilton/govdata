@@ -97,13 +97,24 @@
 			const start = (this.page - 1) * this.pageSize;
 			const pageRows = view.slice(start, start + this.pageSize);
 			const cols = this._cols;
-			this.body.innerHTML = pageRows.map((row) => '<tr>' + cols.map(function (k) {
-				const v = row[k];
-				if (k === 'amount_cad' || k === 'amount') {
-					return '<td class="num">$' + escape(Number(v || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })) + '</td>';
-				}
-				return '<td>' + escape(v) + '</td>';
-			}).join('') + '</tr>').join('');
+			// If any row carries a source_url or atip_ref column, surface a
+			// linked PDF/document icon next to the row. The href is sanitised
+			// through safeHref() so only http(s) / absolute paths render.
+			this.body.innerHTML = pageRows.map((row) => {
+				const sourceHref  = safeHref(row.source_url || row.atip_ref || '');
+				const sourceLabel = row.atip_ref ? 'ATIP: ' + row.atip_ref : 'Source document';
+				const cells = cols.map(function (k) {
+					const v = row[k];
+					if (k === 'amount_cad' || k === 'amount') {
+						return '<td class="num">$' + escape(Number(v || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })) + '</td>';
+					}
+					if ((k === 'source_url' || k === 'atip_ref') && sourceHref !== '#') {
+						return '<td><a class="pt-source-link" href="' + sourceHref + '" target="_blank" rel="noopener noreferrer" title="' + escape(sourceLabel) + '" aria-label="' + escape(sourceLabel) + '">⎘ PDF</a></td>';
+					}
+					return '<td>' + escape(v) + '</td>';
+				}).join('');
+				return '<tr>' + cells + '</tr>';
+			}).join('');
 
 			if (this.foot) {
 				this.foot.innerHTML = 'Streamed <b>' + this.rows.length + '</b> rows · viewing <b>' + view.length + '</b> · page ' + this.page;
@@ -111,6 +122,13 @@
 		}
 	}
 
+	function safeHref(url) {
+		const s = String(url == null ? '' : url);
+		if (/^https?:\/\//i.test(s) || s.startsWith('/')) {
+			return s.replace(/[<>"']/g, function (c) { return ({ '<':'%3C','>':'%3E','"':'%22',"'":'%27' })[c]; });
+		}
+		return '#';
+	}
 	function escape(s) {
 		return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' })[c]; });
 	}
