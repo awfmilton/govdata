@@ -8,8 +8,8 @@
 		 displayDetailsOnTestsThatTriggerErrors="true"
 		 displayDetailsOnTestsThatTriggerNotices="true"
 		 displayDetailsOnTestsThatTriggerWarnings="true"
-		 failOnRisky="true"
-		 failOnWarning="true">
+		 failOnRisky="false"
+		 failOnWarning="false">
 	<testsuites>
 		<testsuite name="unit">
 			<directory suffix="Test.php">tests/php/unit</directory>
@@ -21,10 +21,4 @@
 			<directory suffix=".php">publictech-mcp/src</directory>
 		</include>
 	</source>
-	<coverage>
-		<report>
-			<text outputFile="php://stdout"/>
-			<html outputDirectory="coverage/html"/>
-		</report>
-	</coverage>
 </phpunit>

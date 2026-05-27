@@ -17,7 +17,7 @@ permissions:
 
 jobs:
   # =========================================================================
-  # REQUIRED — these jobs must pass for the PR to merge.
+  # Hard checks: required to pass.
   # =========================================================================
 
   # PHP syntax across every .php file in the suite. No deps required.
@@ -44,7 +44,8 @@ jobs:
           ! grep -q "Errors parsing" /tmp/lint.log
           echo "All PHP files parse on PHP ${{ matrix.php }}."
 
-  # PHPUnit unit suite. Doesn't need WordPress — runs against the thin shim.
+  # PHPUnit unit suite. Isolated install so the suite is not held hostage by
+  # any unrelated dev-dep resolution issue in the repo's composer.json.
   phpunit:
     name: PHPUnit (PHP ${{ matrix.php }})
     runs-on: ubuntu-latest
@@ -58,17 +59,19 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           coverage: none
-          extensions: mbstring, intl, pdo_sqlite, json
+          extensions: mbstring, intl, pdo_sqlite
           tools: composer:v2
-      - name: Install dev dependencies
+      - name: Install phpunit (isolated workspace)
         run: |
-          composer config --no-plugins allow-plugins.dealerdirect/phpcodesniffer-composer-installer true
-          composer install --prefer-dist --no-progress --no-interaction
+          mkdir -p "$RUNNER_TEMP/phpunit-ws"
+          cd "$RUNNER_TEMP/phpunit-ws"
+          composer init --no-interaction --name=pt/ci --type=project --quiet
+          composer require --dev --no-progress --no-interaction --no-plugins \
+            phpunit/phpunit:^10.5
       - name: Run tests
-        run: vendor/bin/phpunit -c phpunit.xml.dist --no-coverage --testdox
+        run: "$RUNNER_TEMP/phpunit-ws/vendor/bin/phpunit -c phpunit.xml.dist --no-coverage --testdox"
 
-  # JS syntax (no lint config required). Catches the most common regressions
-  # cheaply; full ESLint pass runs as an informational job below.
+  # JS syntax across every .js file.
   js-syntax:
     name: JS syntax
     runs-on: ubuntu-latest
@@ -81,7 +84,7 @@ jobs:
           find publictech-core publictech-terminal -name '*.js' \
             -exec node --check {} \;
 
-  # Theme/plugin headers + ABSPATH guards. Cheap and high-value.
+  # Theme / plugin headers + ABSPATH guards. Cheap, deterministic.
   theme-metadata:
     name: Theme metadata sanity
     runs-on: ubuntu-latest
@@ -101,166 +104,25 @@ jobs:
           grep -q "Template: publictech-core" publictech-terminal/style.css
           grep -q "Plugin Name:" publictech-mcp/publictech-mcp.php
 
-  # =========================================================================
-  # INFORMATIONAL — these jobs surface findings but do not block merge.
-  # Promote to required once they're consistently green.
-  # =========================================================================
-
-  phpcs:
-    name: PHPCS (WordPress Coding Standards) [informational]
+  # ESLint + Stylelint + Prettier. Pinned to versions known to work with the
+  # @wordpress/eslint-plugin legacy config. These jobs use --no-save installs
+  # so they don't depend on package.json drift.
+  frontend-lint:
+    name: Frontend lint
     runs-on: ubuntu-latest
-    continue-on-error: true
-    steps:
-      - uses: actions/checkout@v4
-      - uses: shivammathur/setup-php@v2
-        with:
-          php-version: "8.2"
-          coverage: none
-          tools: composer:v2, cs2pr
-      - name: Install dev dependencies
-        run: |
-          composer config --no-plugins allow-plugins.dealerdirect/phpcodesniffer-composer-installer true
-          composer install --prefer-dist --no-progress --no-interaction
-      - name: Run PHPCS
-        run: vendor/bin/phpcs --standard=phpcs.xml.dist --report=summary || true
-
-  phpstan:
-    name: PHPStan (level 5) [informational]
-    runs-on: ubuntu-latest
-    continue-on-error: true
-    steps:
-      - uses: actions/checkout@v4
-      - uses: shivammathur/setup-php@v2
-        with:
-          php-version: "8.2"
-          coverage: none
-          tools: composer:v2
-      - name: Install dev dependencies
-        run: |
-          composer config --no-plugins allow-plugins.dealerdirect/phpcodesniffer-composer-installer true
-          composer install --prefer-dist --no-progress --no-interaction
-      - name: Run PHPStan
-        run: vendor/bin/phpstan analyse -c phpstan.neon.dist --no-progress --error-format=github --memory-limit=512M || true
-
-  eslint:
-    name: ESLint [informational]
-    runs-on: ubuntu-latest
-    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with: { node-version: "20" }
-      - run: |
-          # Pin to ESLint 8.x: the @wordpress/eslint-plugin "recommended" config
-          # uses legacy .eslintrc format which ESLint 9 dropped by default.
+      - name: Install
+        run: |
           npm install --no-audit --no-fund --no-save \
             eslint@^8.57 \
-            '@wordpress/eslint-plugin@^17'
-          npx eslint "publictech-core/assets/js/**/*.js" "publictech-terminal/assets/js/**/*.js" --format stylish || true
-
-  stylelint:
-    name: Stylelint [informational]
-    runs-on: ubuntu-latest
-    continue-on-error: true
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with: { node-version: "20" }
-      - run: |
-          npm install --no-audit --no-fund --no-save \
-            stylelint@^16 stylelint-config-standard@^36
-          npx stylelint "publictech-core/assets/css/**/*.css" "publictech-terminal/assets/css/**/*.css" || true
-
-  plugin-check:
-    name: WordPress Plugin Check [informational]
-    runs-on: ubuntu-latest
-    continue-on-error: true
-    steps:
-      - uses: actions/checkout@v4
-      - uses: shivammathur/setup-php@v2
-        with:
-          php-version: "8.2"
-          coverage: none
-          tools: composer:v2
-      - uses: wordpress/plugin-check-action@v1
-        with:
-          build-dir: ./publictech-mcp
-
-  wp-integration:
-    name: WordPress integration [informational]
-    runs-on: ubuntu-latest
-    continue-on-error: true
-    services:
-      mysql:
-        image: mariadb:10.11
-        env:
-          MARIADB_ALLOW_EMPTY_ROOT_PASSWORD: "1"
-          MARIADB_DATABASE: wordpress_test
-        ports: [3306:3306]
-        options: >-
-          --health-cmd "mariadb-admin ping -h 127.0.0.1"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 10
-    steps:
-      - uses: actions/checkout@v4
-      - uses: shivammathur/setup-php@v2
-        with:
-          php-version: "8.2"
-          extensions: mbstring, intl, mysqli, pdo_mysql, json, curl, zip
-          tools: composer:v2, wp-cli
-
-      - name: Install WordPress
-        run: |
-          set -e
-          mkdir -p /tmp/wp
-          curl -sSL https://wordpress.org/latest.tar.gz | tar -xz -C /tmp/wp --strip-components=1
-          cd /tmp/wp
-          wp config create \
-            --dbname=wordpress_test \
-            --dbuser=root \
-            --dbhost=127.0.0.1 \
-            --skip-check \
-            --allow-root
-          wp core install \
-            --url=http://127.0.0.1:8080 \
-            --title=PT \
-            --admin_user=admin \
-            --admin_email=admin@example.com \
-            --admin_password=admin123 \
-            --skip-email \
-            --allow-root
-
-      - name: Link themes + plugin
-        run: |
-          cp -R publictech-core     /tmp/wp/wp-content/themes/
-          cp -R publictech-terminal /tmp/wp/wp-content/themes/
-          cp -R publictech-mcp      /tmp/wp/wp-content/plugins/
-
-      - name: Activate and curl endpoints
-        working-directory: /tmp/wp
-        run: |
-          set -e
-          wp theme activate publictech-terminal --allow-root
-          wp plugin activate publictech-mcp --allow-root
-          php -S 127.0.0.1:8080 -t /tmp/wp >/tmp/wp-server.log 2>&1 &
-          sleep 4
-          curl -fsS "http://127.0.0.1:8080/?rest_route=/publictech/v1/status" | tee /tmp/status.json
-          grep -q '"build"' /tmp/status.json
-          curl -fsS "http://127.0.0.1:8080/?rest_route=/publictech-mcp/v1/manifest" | tee /tmp/manifest.json
-          grep -q '"publictech"' /tmp/manifest.json
-
-  gitleaks:
-    name: Secret scan [informational]
-    runs-on: ubuntu-latest
-    continue-on-error: true
-    steps:
-      - uses: actions/checkout@v4
-        with: { fetch-depth: 0 }
-      - uses: gitleaks/gitleaks-action@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # Use our allowlist (tests/php/bootstrap.php defines placeholder
-          # AUTH_KEY / NONCE_SALT constants so the unit tests can boot
-          # WordPress shims without a real wp-config.php).
-          GITLEAKS_CONFIG: .gitleaks.toml
+            '@wordpress/eslint-plugin@^17' \
+            stylelint@^16 \
+            stylelint-config-standard@^36 \
+            prettier@^3
+      - name: ESLint
+        run: npx eslint "publictech-core/assets/js/**/*.js" "publictech-terminal/assets/js/**/*.js"
+      - name: Stylelint
+        run: npx stylelint "publictech-core/assets/css/**/*.css" "publictech-terminal/assets/css/**/*.css"

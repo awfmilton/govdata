@@ -57,10 +57,13 @@ final class Throttle {
 	}
 
 	/**
-	 * Enforce in a REST context. Throws a WP_Error wrapped exception via
-	 * rest_ensure_response semantics — call from the route handler.
+	 * Enforce in a REST context. Returns bool true on success (caller can
+	 * `if ( $gate instanceof \WP_Error )` against it) or a WP_Error wrapping
+	 * the throttle state on rate-limit. Return type uses `bool` rather than
+	 * the literal `true` so the signature parses on PHP 8.1 (literal-type
+	 * unions are 8.2+).
 	 */
-	public function enforce_rest( \WP_REST_Request $req ): true|\WP_Error {
+	public function enforce_rest( \WP_REST_Request $req ): bool|\WP_Error {
 		$state = $this->check( get_current_user_id() ?: null, $this->ip() );
 		if ( $state['allowed'] ) {
 			return true;

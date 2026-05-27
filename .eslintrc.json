@@ -8,9 +8,7 @@
     "ecmaVersion": 2022,
     "sourceType": "script"
   },
-  "extends": [
-    "plugin:@wordpress/eslint-plugin/recommended"
-  ],
+  "extends": ["eslint:recommended"],
   "globals": {
     "d3": "readonly",
     "PT_BOOT": "readonly",
@@ -20,14 +18,11 @@
   },
   "rules": {
     "no-console": ["warn", { "allow": ["warn", "error"] }],
-    "@wordpress/no-unsafe-wp-apis": "off",
     "no-unused-vars": ["warn", { "args": "none" }],
-    "prefer-const": "warn"
-  },
-  "overrides": [
-    {
-      "files": ["**/*.config.js", "**/.*rc.js"],
-      "env": { "node": true }
-    }
-  ]
+    "no-empty": ["error", { "allowEmptyCatch": true }],
+    "no-useless-escape": "warn",
+    "no-prototype-builtins": "off",
+    "no-control-regex": "off",
+    "no-cond-assign": ["error", "except-parens"]
+  }
 }
