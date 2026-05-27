@@ -1,0 +1,3 @@
+[submodule "bbpress"]
+	path = bbpress
+	url = https://github.com/bbpress/bbPress.git
