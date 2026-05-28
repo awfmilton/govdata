@@ -121,5 +121,3 @@ add_filter( 'archive_template', static function ( string $template ): string {
 function publictech_db( string $alias ): \PublicTech\Core\Connection {
 	return \PublicTech\Core\Multi_DB::instance()->connection( $alias );
 }
-ction( $alias );
-}
