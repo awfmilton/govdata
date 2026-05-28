@@ -290,8 +290,8 @@ them ahead of time: `mysql -u gdc_02 -p -h mysql.alexmilton.ca govdata_cache_02 
 
 ```bash
 # Recommended for the full run (not bound by the web server timeout):
-wp eval-file database/warm-riding-cache.php
-wp eval-file database/warm-riding-cache.php --riding=35055   # single riding, for a quick trial
+wp eval-file wp-content/database/warm-riding-cache.php
+wp eval-file wp-content/database/warm-riding-cache.php --riding=35055   # single riding, for a quick trial
 ```
 
 …or copy `database/mu-plugins/03-warm-riding-cache.php` to `mu-plugins/`, add
@@ -361,8 +361,8 @@ The CLI refresh script also honours `GOVDATA_CACHE_DB_HOST` / `_PORT` / `_NAME` 
 writes snapshots into the cache). Idempotent; safe to re-run:
 
 ```bash
-wp eval-file database/refresh-entity-cache.php                       # all entities
-wp eval-file database/refresh-entity-cache.php -- --slug=egale-canada # just one
+wp eval-file wp-content/database/refresh-entity-cache.php                       # all entities
+wp eval-file wp-content/database/refresh-entity-cache.php -- --slug=egale-canada # just one
 ```
 
 A **weekly** WP-cron event (`publictech_sync_entities`, Mondays 06:00 UTC) keeps
@@ -425,7 +425,7 @@ the registry (see `Entity_Reports::registry()`). Rather than create these by
 hand, scaffold them all at once (idempotent — re-run after editing the registry):
 
 ```bash
-wp eval-file database/create-entity-pages.php
+wp eval-file wp-content/database/create-entity-pages.php
 ```
 
 This creates a `/groups` parent page and a child page per organisation
