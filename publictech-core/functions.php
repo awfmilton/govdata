@@ -50,7 +50,11 @@ add_action( 'after_setup_theme', static function () {
 	] );
 } );
 
-add_action( 'plugins_loaded', static function () {
+// `plugins_loaded` fires before theme functions.php loads, so registering on
+// that hook here would never fire. `after_setup_theme` is the first hook the
+// theme can register on that runs after both plugins and themes are loaded,
+// and still well before `init` / `wp_enqueue_scripts` / `rest_api_init`.
+add_action( 'after_setup_theme', static function () {
 	\PublicTech\Core\Hardening::instance();
 	\PublicTech\Core\Multi_DB::instance();
 	\PublicTech\Core\Access_Tiers::instance();
@@ -63,7 +67,7 @@ add_action( 'plugins_loaded', static function () {
 	\PublicTech\Core\Compat::instance();
 	\PublicTech\Core\Alerts::instance();
 	\PublicTech\Core\Anomalies::instance();
-} );
+}, 5 );
 
 // Clean up the cron schedule on theme switch.
 add_action( 'switch_theme', [ \PublicTech\Core\Alerts::class, 'unschedule' ] );
