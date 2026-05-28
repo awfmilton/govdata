@@ -66,6 +66,15 @@ $pt_arg = static function ( string $key, string $default = '' ): string {
 $source = $pt_arg( 'source', Entity_Reports::SOURCE_ALIAS );
 $only   = sanitize_title( $pt_arg( 'slug', '' ) );
 
+// Temporarily lift the query timeout for this batch job so massive LIKE queries
+// against master_table don't trip the 8-second request limit.
+add_filter( 'publictech_db_connections', static function ( $defs ) use ( $source ) {
+	if ( isset( $defs[ $source ] ) ) {
+		$defs[ $source ]['query_timeout'] = 0;
+	}
+	return $defs;
+}, 999 );
+
 $entities = Entity_Reports::registry();
 if ( '' !== $only ) {
 	$entities = array_values( array_filter( $entities, static fn( $e ) => $e['slug'] === $only ) );
