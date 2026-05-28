@@ -62,6 +62,10 @@ it leaves the process.
 
 - **MP directory** with party/region/postal-code facets (FacetWP-aware).
 - **MP profile** pages with KPI cards and D3 spend-by-year charts.
+- **Organisation funding pages** (`/groups/…`) — per-recipient grant &
+  contribution totals, by-year / by-program / by-department charts, and in-page
+  search, served from a cached JSON snapshot in a second database so the source
+  data is never queried on page load.
 - **Streaming transactions table** that scrolls through millions of rows
   without buffering the whole result set.
 - **AI Console** — natural-language → SQL → table/chart, gated to paid tiers.
