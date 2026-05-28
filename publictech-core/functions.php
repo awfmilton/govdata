@@ -30,6 +30,7 @@ require_once PUBLICTECH_CORE_DIR . 'inc/class-customizer.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-compat.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-alerts.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-anomalies.php';
+require_once PUBLICTECH_CORE_DIR . 'inc/class-dashboard-stats.php';
 
 add_action( 'after_setup_theme', static function () {
 	load_theme_textdomain( 'publictech-core', PUBLICTECH_CORE_DIR . 'languages' );
@@ -68,6 +69,7 @@ add_action( 'after_setup_theme', static function () {
 	\PublicTech\Core\Compat::instance();
 	\PublicTech\Core\Alerts::instance();
 	\PublicTech\Core\Anomalies::instance();
+	\PublicTech\Core\Dashboard_Stats::instance();
 }, 5 );
 
 // Clean up the cron schedule on theme switch.
