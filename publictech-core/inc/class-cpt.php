@@ -54,7 +54,10 @@ final class CPT {
 			'labels'       => [ 'name' => __( 'Forum Threads', 'publictech-core' ), 'singular_name' => __( 'Thread', 'publictech-core' ) ],
 			'public'       => true,
 			'show_in_rest' => true,
-			'has_archive'  => 'forum',
+			// When bbPress is active it owns /forum/ through its root page; the
+			// forum-thread CPT archive would conflict with that URL and block
+			// bbPress from rendering. Disable the archive so bbPress wins.
+			'has_archive'  => function_exists( 'bbpress' ) ? false : 'forum',
 			'menu_icon'    => 'dashicons-format-chat',
 			'supports'     => [ 'title', 'editor', 'author', 'comments', 'custom-fields' ],
 			'rewrite'      => [ 'slug' => 'thread', 'with_front' => false ],
