@@ -72,13 +72,15 @@ add_action( 'wp_enqueue_scripts', static function () {
 		true
 	);
 
-	wp_enqueue_script(
-		'publictech-chart-customizer-ui',
-		PUBLICTECH_TERMINAL_URL . 'assets/js/chart-customizer-ui.js',
-		[ 'publictech-charts' ],
-		PUBLICTECH_TERMINAL_VERSION,
-		true
-	);
+	if ( wp_script_is( 'publictech-charts', 'registered' ) ) {
+		wp_enqueue_script(
+			'publictech-chart-customizer-ui',
+			PUBLICTECH_TERMINAL_URL . 'assets/js/chart-customizer-ui.js',
+			[ 'publictech-charts' ],
+			PUBLICTECH_TERMINAL_VERSION,
+			true
+		);
+	}
 
 	// Builder UI and Billboard-terminal skin: only on the chart-builder /
 	// chart-gallery / single-user-chart surfaces (the core layer decided

@@ -386,7 +386,7 @@
     background:var(--accent);color:#0b0d14;border:0;border-radius:3px;cursor:pointer;
     font:700 11px "Montserrat";letter-spacing:0.16em;text-transform:uppercase;text-decoration:none;
   }
-  :root[data-theme="light"] .hero .cta{color:#fff}
+  :root[data-theme="light"] .hero .cta:not(.ghost){color:#fff}
   .hero .cta:hover{box-shadow:0 0 22px var(--accent-glow)}
   .hero .cta.ghost{background:transparent;color:var(--ink-0);border:1px solid var(--line-2)}
   .hero .cta.ghost:hover{border-color:var(--accent);color:var(--accent);box-shadow:none}
