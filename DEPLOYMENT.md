@@ -312,6 +312,70 @@ You can also fetch a member's riding report directly with
 `pt-cache-02`. The MP pages resolve which riding a member belongs to from the
 `pt_mp_district` name (set by the MP importer, §4.5); to pin it explicitly, set
 the `pt_riding_number` post-meta on the MP/riding-report page.
+### 4.8 Configure the entity-funding cache (`govdata_cache_01`)
+
+The organisation funding pages (§5) never query `grantconts` on a page load.
+A refresh job rolls each organisation up into a JSON snapshot and writes it to a
+**second** database, `govdata_cache_01`. Pages serve the cached snapshot; the
+in-page search box queries the cache live. All writes flow through stored
+procedures — **no triggers** are used (they are disallowed on the shared host).
+
+**Step 1 — provision the database + user.** On the cache host
+(`mysql.govdata.ca`), the `gdc_01` user needs privileges on `govdata_cache_01`.
+In production, give the public/search path a read-only user and the refresh job
+a writer (see `GOVDATA_CACHE_DB_WRITER` below); in dev a single user is fine:
+
+```sql
+GRANT SELECT, INSERT, DELETE, EXECUTE ON govdata_cache_01.* TO 'gdc_01'@'%';
+```
+
+**Step 2 — apply the schema** (creates the tables + stored procedures; requires
+MySQL 8.0+ for `JSON_TABLE`; idempotent):
+
+```bash
+mysql -u gdc_01 -p -h mysql.govdata.ca govdata_cache_01 < database/cache-schema.sql
+```
+
+**Step 3 — declare the connection in `wp-config.php`** (same place as
+`PUBLICTECH_DB_CONNECTIONS`). The password lives here, never in the repo:
+
+```php
+define( 'GOVDATA_CACHE_DB', [
+    'host' => 'mysql.govdata.ca',
+    'port' => 3306,
+    'name' => 'govdata_cache_01',
+    'user' => 'gdc_01',
+    'pass' => 'YOUR_CACHE_DB_PASSWORD',
+] );
+
+// Optional: a higher-privilege account used only by the refresh/upsert path,
+// so the public search path can run as a read-only user. Same array shape.
+// define( 'GOVDATA_CACHE_DB_WRITER', [ /* … */ ] );
+```
+
+The CLI refresh script also honours `GOVDATA_CACHE_DB_HOST` / `_PORT` / `_NAME` /
+`_USER` / `_PASS` environment variables, so you can sync without editing
+`wp-config.php`.
+
+**Step 4 — run the first sync** (reads `grantconts` via `pt-grantconts-01`,
+writes snapshots into the cache). Idempotent; safe to re-run:
+
+```bash
+wp eval-file database/refresh-entity-cache.php                       # all entities
+wp eval-file database/refresh-entity-cache.php -- --slug=egale-canada # just one
+```
+
+A **weekly** WP-cron event (`publictech_sync_entities`, Mondays 06:00 UTC) keeps
+the cache fresh automatically — make sure real cron is wired (§1) so it fires.
+
+#### Verify
+
+```bash
+curl -s 'https://your-site.example/wp-json/publictech/v1/entity/egale-canada/summary' | jq '.total, .count, .updated_at'
+```
+
+A `404 pt_not_synced` means the snapshot hasn't been written yet — re-run the
+sync and check `debug.log` (connection errors are logged, never exposed).
 
 ---
 
@@ -353,6 +417,27 @@ the theme renders a sensible default tab strip (Home / Directory / Profile
   template should render without errors.
 - Visit `/stream` — should render the toolbar; choosing a schema/table
   should pull rows from your external DB.
+
+### 5.1 Organisation funding pages (`/groups/…`)
+
+The **PT — Entity Funding Report** template powers one page per organisation in
+the registry (see `Entity_Reports::registry()`). Rather than create these by
+hand, scaffold them all at once (idempotent — re-run after editing the registry):
+
+```bash
+wp eval-file database/create-entity-pages.php
+```
+
+This creates a `/groups` parent page and a child page per organisation
+(e.g. `/groups/egale-canada`), each wired to the template via the
+`pt_entity_slug` meta. Pages render the cached snapshot from §4.7; until the
+first sync runs they show an "awaiting first data sync" notice.
+
+To change which organisations get pages (add/remove, or tune the recipient-name
+match fragments and keywords), hook the `publictech_funding_entities` filter
+from an mu-plugin, then re-run both the scaffold and the sync. Presentation is
+deliberately neutral and identical for every entity; all figures are public
+Government of Canada open data and each page links back to the official portal.
 
 ---
 

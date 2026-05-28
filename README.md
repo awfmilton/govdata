@@ -68,6 +68,10 @@ it leaves the process.
   secondary cache DB (never querying the primary data at request time); see
   [DEPLOYMENT.md §4.7](DEPLOYMENT.md).
 - **Riding report** pages (one template, every riding) with the same rollups.
+- **Organisation funding pages** (`/groups/…`) — per-recipient grant &
+  contribution totals, by-year / by-program / by-department charts, and in-page
+  search, served from a cached JSON snapshot in a second database so the source
+  data is never queried on page load.
 - **Streaming transactions table** that scrolls through millions of rows
   without buffering the whole result set.
 - **AI Console** — natural-language → SQL → table/chart, gated to paid tiers.

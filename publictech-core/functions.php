@@ -21,12 +21,15 @@ require_once PUBLICTECH_CORE_DIR . 'inc/riding-cache-lib.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-security.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-hardening.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-multi-db.php';
+require_once PUBLICTECH_CORE_DIR . 'inc/class-cache-db.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-access-tiers.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-throttle.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-cpt.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-rest-api.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-riding-cache-warmer.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-riding-cache.php';
+require_once PUBLICTECH_CORE_DIR . 'inc/class-entity-reports.php';
+require_once PUBLICTECH_CORE_DIR . 'inc/class-entity-reports.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-charts-rest.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-asset-pipeline.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-customizer.php';
@@ -66,6 +69,7 @@ add_action( 'after_setup_theme', static function () {
 	\PublicTech\Core\Throttle::instance();
 	\PublicTech\Core\CPT::instance();
 	\PublicTech\Core\REST_API::instance();
+	\PublicTech\Core\Entity_Reports::instance();
 	\PublicTech\Core\Charts_REST::instance();
 	\PublicTech\Core\Asset_Pipeline::instance();
 	\PublicTech\Core\Chart_Customizer::instance();
@@ -79,6 +83,7 @@ add_action( 'after_setup_theme', static function () {
 // Clean up the cron schedules on theme switch.
 add_action( 'switch_theme', [ \PublicTech\Core\Alerts::class, 'unschedule' ] );
 add_action( 'switch_theme', [ \PublicTech\Core\Riding_Cache::class, 'unschedule' ] );
+add_action( 'switch_theme', [ \PublicTech\Core\Entity_Reports::class, 'unschedule' ] );
 
 /**
  * Template fallbacks. The child theme is free to ship its own
@@ -115,4 +120,6 @@ add_filter( 'archive_template', static function ( string $template ): string {
  */
 function publictech_db( string $alias ): \PublicTech\Core\Connection {
 	return \PublicTech\Core\Multi_DB::instance()->connection( $alias );
+}
+ction( $alias );
 }
