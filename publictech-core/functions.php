@@ -42,6 +42,7 @@ add_action( 'after_setup_theme', static function () {
 	add_theme_support( 'custom-spacing' );
 	add_theme_support( 'align-wide' );
 	add_theme_support( 'woocommerce' );
+	add_theme_support( 'bbpress' );
 
 	register_nav_menus( [
 		'primary'   => __( 'Primary Terminal Tabs', 'publictech-core' ),

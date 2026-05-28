@@ -47,11 +47,16 @@ get_header(); ?>
 			<aside class="prof-side">
 				<div class="panel prof-hero corner">
 					<div class="portrait" aria-hidden="true">
-						<?php if ( has_post_thumbnail() ) {
+						<?php
+						$pt_photo_url = (string) get_post_meta( $mp_id, 'pt_mp_photo_url', true );
+						if ( has_post_thumbnail() ) {
 							the_post_thumbnail( 'medium', [ 'alt' => esc_attr( get_the_title() ) ] );
+						} elseif ( $pt_photo_url ) {
+							echo '<img src="' . esc_url( $pt_photo_url ) . '" alt="' . esc_attr( get_the_title() ) . '" loading="lazy">';
 						} else {
-							echo esc_html__( 'portrait · placeholder', 'publictech-terminal' );
-						} ?>
+							echo '<span class="dim">' . esc_html__( 'portrait · placeholder', 'publictech-terminal' ) . '</span>';
+						}
+						?>
 					</div>
 					<h2><?php the_title(); ?></h2>
 					<div class="ttl"><?php
