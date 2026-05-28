@@ -20,10 +20,12 @@ require_once PUBLICTECH_CORE_DIR . 'inc/helpers.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-security.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-hardening.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-multi-db.php';
+require_once PUBLICTECH_CORE_DIR . 'inc/class-cache-db.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-access-tiers.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-throttle.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-cpt.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-rest-api.php';
+require_once PUBLICTECH_CORE_DIR . 'inc/class-entity-reports.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-charts-rest.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-asset-pipeline.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-customizer.php';
@@ -63,6 +65,7 @@ add_action( 'after_setup_theme', static function () {
 	\PublicTech\Core\Throttle::instance();
 	\PublicTech\Core\CPT::instance();
 	\PublicTech\Core\REST_API::instance();
+	\PublicTech\Core\Entity_Reports::instance();
 	\PublicTech\Core\Charts_REST::instance();
 	\PublicTech\Core\Asset_Pipeline::instance();
 	\PublicTech\Core\Chart_Customizer::instance();
@@ -72,8 +75,9 @@ add_action( 'after_setup_theme', static function () {
 	\PublicTech\Core\Dashboard_Stats::instance();
 }, 5 );
 
-// Clean up the cron schedule on theme switch.
+// Clean up the cron schedules on theme switch.
 add_action( 'switch_theme', [ \PublicTech\Core\Alerts::class, 'unschedule' ] );
+add_action( 'switch_theme', [ \PublicTech\Core\Entity_Reports::class, 'unschedule' ] );
 
 /**
  * Template fallbacks. The child theme is free to ship its own
