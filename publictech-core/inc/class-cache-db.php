@@ -13,7 +13,7 @@
  * Credentials are read from wp-config.php (or the environment) and are NEVER
  * committed to the repository:
  *
- *   define( 'GOVDATA_CACHE_DB', [
+ *   define( 'GOVDATA_CACHE_DB1', [
  *       'host' => 'mysql.govdata.ca',
  *       'port' => 3306,
  *       'name' => 'govdata_cache_01',
@@ -21,11 +21,11 @@
  *       'pass' => '…',          // the shared dev password lives here, not in git
  *   ] );
  *
- * Optionally define GOVDATA_CACHE_DB_WRITER with the same shape to give the
+ * Optionally define GOVDATA_CACHE_DB1_WRITER with the same shape to give the
  * refresh/upsert path a higher-privilege account than the public search path
  * (recommended for production; in dev both default to the same user).
  *
- * Falls back to GOVDATA_CACHE_DB_HOST / _PORT / _NAME / _USER / _PASS env vars
+ * Falls back to GOVDATA_CACHE_DB1_HOST / _PORT / _NAME / _USER / _PASS env vars
  * so the CLI refresh script can run without editing wp-config.
  *
  * @package PublicTech\Core
@@ -55,17 +55,17 @@ final class Cache_DB {
 	 */
 	private function config( string $role = 'reader' ): ?array {
 		// Writer role prefers its own definition, then falls back to the reader.
-		if ( 'writer' === $role && defined( 'GOVDATA_CACHE_DB_WRITER' ) && is_array( GOVDATA_CACHE_DB_WRITER ) ) {
-			$raw = GOVDATA_CACHE_DB_WRITER;
-		} elseif ( defined( 'GOVDATA_CACHE_DB' ) && is_array( GOVDATA_CACHE_DB ) ) {
-			$raw = GOVDATA_CACHE_DB;
+		if ( 'writer' === $role && defined( 'GOVDATA_CACHE_DB1_WRITER' ) && is_array( GOVDATA_CACHE_DB1_WRITER ) ) {
+			$raw = GOVDATA_CACHE_DB1_WRITER;
+		} elseif ( defined( 'GOVDATA_CACHE_DB1' ) && is_array( GOVDATA_CACHE_DB1 ) ) {
+			$raw = GOVDATA_CACHE_DB1;
 		} else {
 			$raw = [
-				'host' => getenv( 'GOVDATA_CACHE_DB_HOST' ) ?: '',
-				'port' => getenv( 'GOVDATA_CACHE_DB_PORT' ) ?: 3306,
-				'name' => getenv( 'GOVDATA_CACHE_DB_NAME' ) ?: '',
-				'user' => getenv( 'GOVDATA_CACHE_DB_USER' ) ?: '',
-				'pass' => getenv( 'GOVDATA_CACHE_DB_PASS' ),
+				'host' => getenv( 'GOVDATA_CACHE_DB1_HOST' ) ?: '',
+				'port' => getenv( 'GOVDATA_CACHE_DB1_PORT' ) ?: 3306,
+				'name' => getenv( 'GOVDATA_CACHE_DB1_NAME' ) ?: '',
+				'user' => getenv( 'GOVDATA_CACHE_DB1_USER' ) ?: '',
+				'pass' => getenv( 'GOVDATA_CACHE_DB1_PASS' ),
 			];
 		}
 

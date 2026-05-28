@@ -118,7 +118,7 @@ get_header(); ?>
 				<p style="margin:0 0 6px;color:var(--ink-2)">To populate it, run the one-time setup and refresh job:</p>
 				<ol class="mono" style="font-size:12px;color:var(--ink-2);line-height:1.8;margin:0 0 10px;padding-left:20px">
 					<li>Apply the cache schema: <code>mysql … govdata_cache_01 &lt; database/cache-schema.sql</code></li>
-					<li>Define <code>GOVDATA_CACHE_DB</code> in <code>wp-config.php</code></li>
+					<li>Define <code>GOVDATA_CACHE_DB1</code> in <code>wp-config.php</code></li>
 					<li>Sync: <code>wp eval-file database/refresh-entity-cache.php</code></li>
 				</ol>
 				<p style="margin:0">
