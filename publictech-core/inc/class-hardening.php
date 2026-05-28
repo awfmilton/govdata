@@ -71,7 +71,10 @@ final class Hardening {
 	 * Strip ?ver= from enqueued assets so WordPress and plugin versions
 	 * aren't fingerprintable from the public asset URLs.
 	 */
-	public function strip_version_arg( string $src ): string {
+	public function strip_version_arg( $src ): string {
+		if ( ! is_string( $src ) || '' === $src ) {
+			return (string) $src;
+		}
 		if ( str_contains( $src, 'ver=' ) ) {
 			$src = remove_query_arg( 'ver', $src );
 		}
