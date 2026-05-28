@@ -161,3 +161,36 @@ add_filter( 'publictech_columns_pt-grantconts-01_tbayrainy_view', static functio
 		'naics_identifier'       => '`tbayrainy_view`.`naics_identifier`',
 	];
 } );
+
+// ── pcbfr (Postal Code Federal Riding File) ────────────────────────────────────
+// Maps recipient postal codes to federal ridings — the link the riding-cache
+// warmer uses to attribute each agreement to a riding.
+add_filter( 'publictech_columns_pt-grantconts-01_pcbfr', static function () {
+	return [
+		'id'             => '`pcbfr`.`pcbfr_id`',
+		'postal_code'    => '`pcbfr`.`postal_code`',
+		'riding_number'  => '`pcbfr`.`riding_number`',
+		'riding_name_en' => '`pcbfr`.`riding_name_en`',
+		'riding_name_fr' => '`pcbfr`.`riding_name_fr`',
+		'unique_fed'     => '`pcbfr`.`unique_FED`',
+		'pop_weight'     => '`pcbfr`.`pop_weight`',
+	];
+} );
+
+// ── riding_cache (secondary cache DB, pt-cache-02) ──────────────────────────────
+// The precomputed per-riding spending JSON. Exposing it lets the stream/export
+// endpoints browse the cache directly; the MP pages read it via Riding_Cache.
+add_filter( 'publictech_columns_pt-cache-02_riding_cache', static function () {
+	return [
+		'riding_number'   => '`riding_cache`.`riding_number`',
+		'riding_slug'     => '`riding_cache`.`riding_slug`',
+		'riding_name_en'  => '`riding_cache`.`riding_name_en`',
+		'riding_name_fr'  => '`riding_cache`.`riding_name_fr`',
+		'province'        => '`riding_cache`.`province`',
+		'total_value'     => '`riding_cache`.`total_value`',
+		'agreement_count' => '`riding_cache`.`agreement_count`',
+		'first_year'      => '`riding_cache`.`first_year`',
+		'last_year'       => '`riding_cache`.`last_year`',
+		'generated_at'    => '`riding_cache`.`generated_at`',
+	];
+} );

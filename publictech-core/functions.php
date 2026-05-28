@@ -17,6 +17,7 @@ define( 'PUBLICTECH_CORE_URL', trailingslashit( get_template_directory_uri() ) )
 define( 'PUBLICTECH_CORE_REST_NS', 'publictech/v1' );
 
 require_once PUBLICTECH_CORE_DIR . 'inc/helpers.php';
+require_once PUBLICTECH_CORE_DIR . 'inc/riding-cache-lib.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-security.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-hardening.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-multi-db.php';
@@ -24,6 +25,8 @@ require_once PUBLICTECH_CORE_DIR . 'inc/class-access-tiers.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-throttle.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-cpt.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-rest-api.php';
+require_once PUBLICTECH_CORE_DIR . 'inc/class-riding-cache-warmer.php';
+require_once PUBLICTECH_CORE_DIR . 'inc/class-riding-cache.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-charts-rest.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-asset-pipeline.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-customizer.php';
@@ -70,10 +73,12 @@ add_action( 'after_setup_theme', static function () {
 	\PublicTech\Core\Alerts::instance();
 	\PublicTech\Core\Anomalies::instance();
 	\PublicTech\Core\Dashboard_Stats::instance();
+	\PublicTech\Core\Riding_Cache::instance();
 }, 5 );
 
-// Clean up the cron schedule on theme switch.
+// Clean up the cron schedules on theme switch.
 add_action( 'switch_theme', [ \PublicTech\Core\Alerts::class, 'unschedule' ] );
+add_action( 'switch_theme', [ \PublicTech\Core\Riding_Cache::class, 'unschedule' ] );
 
 /**
  * Template fallbacks. The child theme is free to ship its own

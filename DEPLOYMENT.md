@@ -140,11 +140,12 @@ Restrict the `'%'` host pattern to your WordPress server's IPs in production.
 
 ### 4.2 Database inventory
 
-| Alias              | Host             | Database     | Key tables PublicTech reads from |
-| ------------------ | ---------------- | ------------ | -------------------------------- |
-| `pt-grantconts-01` | `35.230.186.163` | `grantconts` | `master_table`, `agreements`, `recipients`, `programs`, `locations`, `mps`, `tbayrainy_view` |
+| Alias              | Host                  | Database           | Access    | Key tables PublicTech uses |
+| ------------------ | --------------------- | ------------------ | --------- | -------------------------- |
+| `pt-grantconts-01` | `35.230.186.163`      | `grantconts`       | read-only | `master_table`, `pcbfr`, `agreements`, `recipients`, `programs`, `locations`, `mps`, `tbayrainy_view` |
+| `pt-cache-02`      | `mysql.alexmilton.ca` | `govdata_cache_02` | read/write | `riding_cache`, `cache_meta` (created by the warmer; see §4.7) |
 
-The full column-level schema is in `database/grantconts-schema.json`.
+The full column-level schema for grantconts is in `database/grantconts-schema.json`.
 Column maps that expose those columns to the front end live in
 `database/mu-plugins/01-publictech-schemas.php` — see §4.4.
 
@@ -257,6 +258,61 @@ host/credentials and the MySQL user's grants. The `error` field is
 suppressed in the public response on purpose; tail the WordPress
 `debug.log` for the actual exception.
 
+### 4.7 Riding spending cache (secondary database)
+
+Every MP profile and the **PT — Riding Report** page show the federal grant &
+contribution spending for that member's riding: all-time total, spending by
+year, the top-10 recipients, the recipient-type split, top programs, and a
+scan of 20 frequently-scrutinised keywords. None of those pages query
+`grantconts` at request time — they read precomputed JSON from the secondary
+`pt-cache-02` database. A weekly batch job rebuilds that cache.
+
+**How agreements are attributed to a riding.** The warmer joins
+`master_table.recipient_postal_code` to the Postal Code Federal Riding File
+(`pcbfr`), exactly like the Thunder Bay–Rainy River sample. A postal code that
+spans two ridings contributes to both.
+
+**1 — Wire the two connections.** Copy
+`database/mu-plugins/00-db-connections.php` to `wp-content/mu-plugins/`. It
+registers both `pt-grantconts-01` and `pt-cache-02`.
+
+> ⚠ **The committed credentials are development-only and share one password.**
+> Before production: give each database its own strong password, move the
+> definitions into `wp-config.php` (or a secrets manager) and delete them from
+> the mu-plugin, and restrict the `pt_read` grantconts user to `SELECT` only.
+> The `gdc_02` cache user needs `SELECT, INSERT, UPDATE, CREATE` on
+> `govdata_cache_02`.
+
+The cache tables are created automatically on the first warm. To provision
+them ahead of time: `mysql -u gdc_02 -p -h mysql.alexmilton.ca govdata_cache_02 < database/cache-schema.sql`.
+
+**2 — Run the first warm.** Either:
+
+```bash
+# Recommended for the full run (not bound by the web server timeout):
+wp eval-file database/warm-riding-cache.php
+wp eval-file database/warm-riding-cache.php --riding=35055   # single riding, for a quick trial
+```
+
+…or copy `database/mu-plugins/03-warm-riding-cache.php` to `mu-plugins/`, add
+`define( 'PT_WARM_TOKEN', '…' );` to `wp-config.php`, and visit
+`https://your-site.example/?pt_warm_riding_cache=…`. Delete that file when done.
+
+After the first warm, the cache refreshes automatically every week via the
+`publictech_warm_riding_cache` WP-Cron event (ensure real cron is wired — §8.5).
+
+**3 — Verify.**
+
+```bash
+curl -s "https://your-site.example/wp-json/publictech/v1/riding/thunder-bay-rainy-river/report" | jq '.totals'
+```
+
+You can also fetch a member's riding report directly with
+`/wp-json/publictech/v1/mp/{post_id}/riding`. Both routes read only
+`pt-cache-02`. The MP pages resolve which riding a member belongs to from the
+`pt_mp_district` name (set by the MP importer, §4.5); to pin it explicitly, set
+the `pt_riding_number` post-meta on the MP/riding-report page.
+
 ---
 
 ## 5. Create the front-end pages
@@ -274,6 +330,7 @@ page per template at the slugs the navigation expects.
 | `stream`     | **PT — Stream Terminal**             | Streaming transactions table                 |
 | `charts`     | **PT — Chart Gallery**               | Public gallery of user-built charts          |
 | `chart-builder` | **PT — Chart Builder**            | Three-pane Billboard.js authoring surface    |
+| `riding-report` | **PT — Riding Report**            | Per-riding grant & contribution report (set `pt_riding_number` or `pt_riding_slug` meta; see §4.7) |
 
 **Create each one** in *Pages → Add New*:
 

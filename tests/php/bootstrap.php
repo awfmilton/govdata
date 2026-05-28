@@ -100,4 +100,5 @@ if ( ! defined( 'PUBLICTECH_CORE_REST_NS' ) ) {
 // Load only the engine files we want to unit-test. Don't trigger plugin/theme
 // bootstrap so we avoid global side effects.
 require_once dirname( __DIR__, 2 ) . '/publictech-core/inc/helpers.php';
+require_once dirname( __DIR__, 2 ) . '/publictech-core/inc/riding-cache-lib.php';
 require_once dirname( __DIR__, 2 ) . '/publictech-core/inc/class-security.php';

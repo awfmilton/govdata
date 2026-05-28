@@ -39,6 +39,18 @@ $integrity= (int)    get_post_meta( $mp_id, 'integrity_score',true ) ?: 0;
 $flags    = (int)    get_post_meta( $mp_id, 'open_flags',     true );
 $last_aud = (string) get_post_meta( $mp_id, 'last_audit',     true );
 
+/* ─── Riding grant & contribution rollups (read from the secondary cache DB) ─── */
+$pt_riding_payload = null;
+$pt_riding_label   = $riding ?: $region_n;
+if ( class_exists( \PublicTech\Core\Riding_Cache::class ) ) {
+	$pt_rc             = \PublicTech\Core\Riding_Cache::instance();
+	$pt_riding_payload = $pt_rc->report_for_post( $mp_id );
+	$pt_riding_entry   = $pt_rc->resolve_for_post( $mp_id );
+	if ( is_array( $pt_riding_entry ) && ! empty( $pt_riding_entry['name_en'] ) ) {
+		$pt_riding_label = (string) $pt_riding_entry['name_en'];
+	}
+}
+
 get_header(); ?>
 
 <main>
@@ -205,6 +217,12 @@ get_header(); ?>
 						<div class="chart-host" id="ptNetChart" style="height:360px"></div>
 					</div>
 				</div>
+
+				<?php
+				/* Federal grants & contributions for this member's riding — same
+				   templated section on every MP page, data from the cache DB. */
+				require PUBLICTECH_TERMINAL_DIR . 'parts/riding-spending.php';
+				?>
 			</div>
 		</div>
 	</section>
