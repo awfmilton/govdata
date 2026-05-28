@@ -82,6 +82,17 @@ add_action( 'wp_enqueue_scripts', static function () {
 		);
 	}
 
+	// Homepage dashboard: KPI counter animations + D3 horizontal bar charts.
+	if ( is_front_page() && wp_script_is( 'publictech-charts', 'registered' ) ) {
+		wp_enqueue_script(
+			'publictech-dashboard',
+			PUBLICTECH_TERMINAL_URL . 'assets/js/dashboard.js',
+			[ 'publictech-charts' ],
+			PUBLICTECH_TERMINAL_VERSION,
+			true
+		);
+	}
+
 	// Builder UI and Billboard-terminal skin: only on the chart-builder /
 	// chart-gallery / single-user-chart surfaces (the core layer decided
 	// whether to enqueue Billboard itself; we just bolt the UI on).

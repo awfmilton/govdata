@@ -607,3 +607,155 @@
   }
   .cust-actions button.primary{background:var(--accent);color:#0b0d14;border-color:var(--accent)}
   :root[data-theme="light"] .cust-actions button.primary{color:#fff}
+
+/* ══════════════════════════════════════════════════════════════
+   DASHBOARD: transaction ticker
+══════════════════════════════════════════════════════════════ */
+.ticker-wrap{
+  overflow:hidden;
+  border-top:1px solid var(--line);
+  border-bottom:1px solid var(--line);
+  background:var(--bg-1);
+  padding:6px 0;
+  margin-bottom:20px;
+}
+.ticker-track{
+  display:flex;
+  gap:0;
+  white-space:nowrap;
+  will-change:transform;
+}
+.ticker-track.ready{animation:pt-ticker 90s linear infinite}
+.ticker-track:hover{animation-play-state:paused}
+@keyframes pt-ticker{
+  from{transform:translateX(0)}
+  to{transform:translateX(-50%)}
+}
+.ticker-item{
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  padding:0 12px;
+  font-size:11px;
+  font-family:"JetBrains Mono",ui-monospace,monospace;
+  color:var(--ink-2);
+  flex-shrink:0;
+}
+.ticker-item .t-ico{color:var(--accent);opacity:.75}
+.ticker-item .t-name{color:var(--ink-0)}
+.ticker-item .t-val{color:var(--accent);font-weight:600}
+.ticker-item .t-prov{color:var(--ink-2)}
+.ticker-item .t-pipe{color:var(--line-2);padding:0 3px}
+.ticker-item .t-gap{color:transparent}
+
+/* ══════════════════════════════════════════════════════════════
+   DASHBOARD: KPI stat cards
+══════════════════════════════════════════════════════════════ */
+.dash-kpis{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:12px;
+  margin-bottom:20px;
+}
+.dash-kpi{
+  background:var(--bg-1);
+  border:1px solid var(--line);
+  padding:18px 20px;
+  position:relative;
+  overflow:hidden;
+}
+.dash-kpi::after{
+  content:'';
+  position:absolute;
+  top:0;left:0;right:0;
+  height:2px;
+  background:linear-gradient(90deg,var(--accent),transparent 70%);
+}
+.dash-kpi .dk-val{
+  font-size:26px;
+  font-weight:700;
+  font-family:"JetBrains Mono",ui-monospace,monospace;
+  color:var(--ink-0);
+  letter-spacing:-0.025em;
+  line-height:1;
+  min-height:1.2em;
+}
+.dash-kpi .dk-lab{
+  font-size:10px;
+  letter-spacing:0.14em;
+  text-transform:uppercase;
+  color:var(--ink-2);
+  margin-top:8px;
+  font-family:"Montserrat",sans-serif;
+}
+.dash-kpi .dk-sub{
+  font-size:11px;
+  color:var(--ink-2);
+  margin-top:3px;
+  font-family:"JetBrains Mono",ui-monospace,monospace;
+}
+:root[data-theme="light"] .dash-kpi{background:#fff}
+
+/* ══════════════════════════════════════════════════════════════
+   DASHBOARD: visualization row (3-column chart panels)
+══════════════════════════════════════════════════════════════ */
+.viz-row{
+  display:grid;
+  grid-template-columns:1.4fr 1fr 1fr;
+  gap:12px;
+  margin-bottom:20px;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   DASHBOARD: horizontal bar chart
+══════════════════════════════════════════════════════════════ */
+.dash-hbar-host{padding:10px 14px 10px}
+.dash-hbar-item{
+  display:flex;
+  align-items:center;
+  gap:7px;
+  margin-bottom:6px;
+}
+.dash-hbar-label{
+  font-size:10.5px;
+  font-family:"JetBrains Mono",ui-monospace,monospace;
+  color:var(--ink-1);
+  width:110px;
+  flex-shrink:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  text-align:right;
+}
+.dash-hbar-track{
+  flex:1;
+  height:13px;
+  background:var(--bg-2);
+  border-radius:1px;
+  overflow:hidden;
+}
+.dash-hbar-fill{
+  height:100%;
+  background:linear-gradient(90deg,var(--accent),var(--pos));
+  border-radius:1px;
+  width:0;
+  transition:width .85s cubic-bezier(.22,1,.36,1);
+}
+.dash-hbar-val{
+  font-size:10.5px;
+  font-family:"JetBrains Mono",ui-monospace,monospace;
+  color:var(--accent);
+  width:66px;
+  flex-shrink:0;
+  text-align:right;
+}
+
+/* ── Responsive: collapse viz-row and kpi-row on narrow screens ─── */
+@media(max-width:960px){
+  .viz-row{grid-template-columns:1fr 1fr}
+}
+@media(max-width:720px){
+  .viz-row{grid-template-columns:1fr}
+  .dash-kpis{grid-template-columns:1fr}
+  .ticker-item .t-pipe~.t-prov{display:none}
+}
