@@ -1,0 +1,2540 @@
+{
+  "agreements": {
+    "type": "BASE TABLE",
+    "columns": [
+      {
+        "field": "agreement_id",
+        "type": "int unsigned",
+        "null": "NO",
+        "key": "PRI"
+      },
+      {
+        "field": "source_row_id",
+        "type": "int unsigned",
+        "null": "NO",
+        "key": ""
+      },
+      {
+        "field": "ref_number",
+        "type": "varchar(50)",
+        "null": "NO",
+        "key": "MUL"
+      },
+      {
+        "field": "agreement_number",
+        "type": "varchar(100)",
+        "null": "YES",
+        "key": "MUL"
+      },
+      {
+        "field": "agreement_type",
+        "type": "char(1)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "agreement_value",
+        "type": "decimal(15,2)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "foreign_currency_type",
+        "type": "char(3)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "foreign_currency_value",
+        "type": "decimal(15,2)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "agreement_start_date",
+        "type": "date",
+        "null": "YES",
+        "key": "MUL"
+      },
+      {
+        "field": "year",
+        "type": "year",
+        "null": "YES",
+        "key": "MUL"
+      },
+      {
+        "field": "agreement_end_date",
+        "type": "date",
+        "null": "YES",
+        "key": "MUL"
+      },
+      {
+        "field": "coverage",
+        "type": "text",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "description_eng",
+        "type": "text",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "description_fr",
+        "type": "text",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "expected_results_en",
+        "type": "text",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "expected_results_fr",
+        "type": "text",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "additional_information_en",
+        "type": "text",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "additional_information_fr",
+        "type": "text",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "agreement_title_en",
+        "type": "varchar(800)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "agreement_title_fr",
+        "type": "varchar(800)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "recipient_id",
+        "type": "int unsigned",
+        "null": "NO",
+        "key": "MUL"
+      },
+      {
+        "field": "program_id",
+        "type": "int unsigned",
+        "null": "NO",
+        "key": "MUL"
+      },
+      {
+        "field": "location_id",
+        "type": "int unsigned",
+        "null": "NO",
+        "key": "MUL"
+      },
+      {
+        "field": "naics_id",
+        "type": "int unsigned",
+        "null": "NO",
+        "key": "MUL"
+      }
+    ]
+  },
+  "amendments": {
+    "type": "BASE TABLE",
+    "columns": [
+      {
+        "field": "amendment_id",
+        "type": "int unsigned",
+        "null": "NO",
+        "key": "PRI"
+      },
+      {
+        "field": "source_row_id",
+        "type": "int unsigned",
+        "null": "NO",
+        "key": ""
+      },
+      {
+        "field": "agreement_id",
+        "type": "int unsigned",
+        "null": "NO",
+        "key": "MUL"
+      },
+      {
+        "field": "amendment_number",
+        "type": "int unsigned",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "amendment_date",
+        "type": "date",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "additional_information_en",
+        "type": "text",
+        "null": "YES",
+        "key": ""
+      }
+    ]
+  },
+  "locations": {
+    "type": "BASE TABLE",
+    "columns": [
+      {
+        "field": "location_id",
+        "type": "int unsigned",
+        "null": "NO",
+        "key": "PRI"
+      },
+      {
+        "field": "source_row_id",
+        "type": "int unsigned",
+        "null": "NO",
+        "key": ""
+      },
+      {
+        "field": "recipient_country",
+        "type": "char(2)",
+        "null": "YES",
+        "key": "MUL"
+      },
+      {
+        "field": "recipient_province",
+        "type": "char(2)",
+        "null": "YES",
+        "key": "MUL"
+      },
+      {
+        "field": "recipient_city",
+        "type": "varchar(255)",
+        "null": "YES",
+        "key": "MUL"
+      },
+      {
+        "field": "recipient_postal_code",
+        "type": "varchar(10)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "federal_riding_name_en",
+        "type": "varchar(100)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "federal_riding_name_fr",
+        "type": "varchar(100)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "federal_riding_number",
+        "type": "int unsigned",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "mp_id",
+        "type": "varchar(10)",
+        "null": "YES",
+        "key": "MUL"
+      }
+    ]
+  },
+  "master_table": {
+    "type": "BASE TABLE",
+    "columns": [
+      {
+        "field": "primary_key",
+        "type": "int unsigned",
+        "null": "NO",
+        "key": "PRI"
+      },
+      {
+        "field": "ref_number",
+        "type": "varchar(50)",
+        "null": "YES",
+        "key": "MUL"
+      },
+      {
+        "field": "amendment_number",
+        "type": "int unsigned",
+        "null": "YES",
+        "key": "MUL"
+      },
+      {
+        "field": "amendment_date",
+        "type": "date",
+        "null": "YES",
+        "key": "MUL"
+      },
+      {
+        "field": "agreement_type",
+        "type": "char(1)",
+        "null": "YES",
+        "key": "MUL"
+      },
+      {
+        "field": "recipient_type",
+        "type": "char(1)",
+        "null": "YES",
+        "key": "MUL"
+      },
+      {
+        "field": "recipient_business_number",
+        "type": "varchar(255)",
+        "null": "YES",
+        "key": "MUL"
+      },
+      {
+        "field": "recipient_legal_name",
+        "type": "varchar(350)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "recipient_operating_name",
+        "type": "varchar(350)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "research_organization_name",
+        "type": "varchar(255)",
+        "null": "YES",
+        "key": "MUL"
+      },
+      {
+        "field": "recipient_country",
+        "type": "char(2)",
+        "null": "YES",
+        "key": "MUL"
+      },
+      {
+        "field": "recipient_province",
+        "type": "char(2)",
+        "null": "YES",
+        "key": "MUL"
+      },
+      {
+        "field": "recipient_city",
+        "type": "varchar(255)",
+        "null": "YES",
+        "key": "MUL"
+      },
+      {
+        "field": "recipient_postal_code",
+        "type": "char(7)",
+        "null": "YES",
+        "key": "MUL"
+      },
+      {
+        "field": "federal_riding_name_en",
+        "type": "varchar(100)",
+        "null": "YES",
+        "key": "MUL"
+      },
+      {
+        "field": "federal_riding_name_fr",
+        "type": "varchar(100)",
+        "null": "YES",
+        "key": "MUL"
+      },
+      {
+        "field": "federal_riding_number",
+        "type": "int unsigned",
+        "null": "YES",
+        "key": "MUL"
+      },
+      {
+        "field": "prog_name_en",
+        "type": "varchar(255)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "prog_name_fr",
+        "type": "varchar(255)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "prog_purpose_en",
+        "type": "text",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "prog_purpose_fr",
+        "type": "text",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "agreement_title_en",
+        "type": "varchar(800)",
+        "null": "YES",
+        "key": "MUL"
+      },
+      {
+        "field": "agreement_title_fr",
+        "type": "varchar(800)",
+        "null": "YES",
+        "key": "MUL"
+      },
+      {
+        "field": "agreement_number",
+        "type": "varchar(100)",
+        "null": "YES",
+        "key": "MUL"
+      },
+      {
+        "field": "agreement_value",
+        "type": "decimal(15,2)",
+        "null": "YES",
+        "key": "MUL"
+      },
+      {
+        "field": "foreign_currency_type",
+        "type": "char(3)",
+        "null": "YES",
+        "key": "MUL"
+      },
+      {
+        "field": "foreign_currency_value",
+        "type": "decimal(15,2)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "agreement_start_date",
+        "type": "date",
+        "null": "YES",
+        "key": "MUL"
+      },
+      {
+        "field": "year",
+        "type": "year",
+        "null": "YES",
+        "key": "MUL"
+      },
+      {
+        "field": "agreement_end_date",
+        "type": "date",
+        "null": "YES",
+        "key": "MUL"
+      },
+      {
+        "field": "coverage",
+        "type": "text",
+        "null": "YES",
+        "key": "MUL"
+      },
+      {
+        "field": "description_eng",
+        "type": "text",
+        "null": "YES",
+        "key": "MUL"
+      },
+      {
+        "field": "description_fr",
+        "type": "text",
+        "null": "YES",
+        "key": "MUL"
+      },
+      {
+        "field": "naics_identifier",
+        "type": "int unsigned",
+        "null": "YES",
+        "key": "MUL"
+      },
+      {
+        "field": "expected_results_en",
+        "type": "text",
+        "null": "YES",
+        "key": "MUL"
+      },
+      {
+        "field": "expected_results_fr",
+        "type": "text",
+        "null": "YES",
+        "key": "MUL"
+      },
+      {
+        "field": "additional_information_en",
+        "type": "text",
+        "null": "YES",
+        "key": "MUL"
+      },
+      {
+        "field": "additional_information_fr",
+        "type": "text",
+        "null": "YES",
+        "key": "MUL"
+      },
+      {
+        "field": "agreement_value_range_en",
+        "type": "text",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "coverage_en",
+        "type": "text",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "has_amendments_en",
+        "type": "varchar(3)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "format_en",
+        "type": "varchar(255)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "recipient_city_en",
+        "type": "varchar(255)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "fiscal_year",
+        "type": "varchar(9)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "quarter_en",
+        "type": "varchar(2)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "id",
+        "type": "varchar(255)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "owner_org_en",
+        "type": "text",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "owner_org_title",
+        "type": "text",
+        "null": "YES",
+        "key": ""
+      }
+    ]
+  },
+  "master_table_backup": {
+    "type": "BASE TABLE",
+    "columns": [
+      {
+        "field": "primary_key",
+        "type": "int unsigned",
+        "null": "NO",
+        "key": ""
+      },
+      {
+        "field": "ref_number",
+        "type": "varchar(50)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "amendment_number",
+        "type": "int unsigned",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "amendment_date",
+        "type": "date",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "agreement_type",
+        "type": "char(1)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "recipient_type",
+        "type": "char(1)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "recipient_business_number",
+        "type": "varchar(255)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "recipient_legal_name",
+        "type": "varchar(350)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "recipient_operating_name",
+        "type": "varchar(350)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "research_organization_name",
+        "type": "varchar(255)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "recipient_country",
+        "type": "char(2)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "recipient_province",
+        "type": "char(2)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "recipient_city",
+        "type": "varchar(255)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "recipient_postal_code",
+        "type": "char(7)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "federal_riding_name_en",
+        "type": "varchar(100)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "federal_riding_name_fr",
+        "type": "varchar(100)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "federal_riding_number",
+        "type": "int unsigned",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "prog_name_en",
+        "type": "varchar(255)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "prog_name_fr",
+        "type": "varchar(255)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "prog_purpose_en",
+        "type": "text",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "prog_purpose_fr",
+        "type": "text",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "agreement_title_en",
+        "type": "varchar(800)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "agreement_title_fr",
+        "type": "varchar(800)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "agreement_number",
+        "type": "varchar(100)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "agreement_value",
+        "type": "decimal(15,2)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "foreign_currency_type",
+        "type": "char(3)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "foreign_currency_value",
+        "type": "decimal(15,2)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "agreement_start_date",
+        "type": "date",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "year",
+        "type": "year",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "agreement_end_date",
+        "type": "date",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "coverage",
+        "type": "text",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "description_eng",
+        "type": "text",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "description_fr",
+        "type": "text",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "naics_identifier",
+        "type": "int unsigned",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "expected_results_en",
+        "type": "text",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "expected_results_fr",
+        "type": "text",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "additional_information_en",
+        "type": "text",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "additional_information_fr",
+        "type": "text",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "agreement_value_range_en",
+        "type": "text",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "coverage_en",
+        "type": "text",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "has_amendments_en",
+        "type": "varchar(3)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "format_en",
+        "type": "varchar(255)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "recipient_city_en",
+        "type": "varchar(255)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "fiscal_year",
+        "type": "varchar(9)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "quarter_en",
+        "type": "varchar(2)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "id",
+        "type": "varchar(255)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "owner_org_en",
+        "type": "text",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "owner_org_title",
+        "type": "text",
+        "null": "YES",
+        "key": ""
+      }
+    ]
+  },
+  "mp_postal_codes": {
+    "type": "VIEW",
+    "columns": [
+      {
+        "field": "mp_id",
+        "type": "varchar(10)",
+        "null": "NO",
+        "key": ""
+      },
+      {
+        "field": "first_name",
+        "type": "varchar(100)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "last_name",
+        "type": "varchar(100)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "district_name",
+        "type": "varchar(255)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "postal_codes",
+        "type": "text",
+        "null": "YES",
+        "key": ""
+      }
+    ]
+  },
+  "mps": {
+    "type": "BASE TABLE",
+    "columns": [
+      {
+        "field": "mp_id",
+        "type": "varchar(10)",
+        "null": "NO",
+        "key": "PRI"
+      },
+      {
+        "field": "district_name",
+        "type": "varchar(255)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "street_number",
+        "type": "varchar(20)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "street_name",
+        "type": "varchar(255)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "unit",
+        "type": "varchar(50)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "city",
+        "type": "varchar(100)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "province",
+        "type": "char(2)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "postal_code",
+        "type": "varchar(7)",
+        "null": "YES",
+        "key": "MUL"
+      },
+      {
+        "field": "first_name",
+        "type": "varchar(100)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "last_name",
+        "type": "varchar(100)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "gender",
+        "type": "char(1)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "party",
+        "type": "varchar(100)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "email",
+        "type": "varchar(255)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "photo_url",
+        "type": "text",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "source_url",
+        "type": "text",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "ottawa_office",
+        "type": "varchar(255)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "ottawa_address",
+        "type": "text",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "ottawa_phone",
+        "type": "varchar(20)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "ottawa_fax",
+        "type": "varchar(20)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "office_type",
+        "type": "varchar(50)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "const_phone",
+        "type": "varchar(20)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "const_fax",
+        "type": "varchar(20)",
+        "null": "YES",
+        "key": ""
+      }
+    ]
+  },
+  "mps_backup": {
+    "type": "BASE TABLE",
+    "columns": [
+      {
+        "field": "mp_id",
+        "type": "varchar(10)",
+        "null": "NO",
+        "key": "PRI"
+      },
+      {
+        "field": "district_name",
+        "type": "varchar(255)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "street_number",
+        "type": "varchar(20)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "street_name",
+        "type": "varchar(255)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "unit",
+        "type": "varchar(50)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "city",
+        "type": "varchar(100)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "province",
+        "type": "char(2)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "postal_code",
+        "type": "varchar(7)",
+        "null": "YES",
+        "key": "MUL"
+      },
+      {
+        "field": "first_name",
+        "type": "varchar(100)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "last_name",
+        "type": "varchar(100)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "gender",
+        "type": "char(1)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "party",
+        "type": "varchar(100)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "email",
+        "type": "varchar(255)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "photo_url",
+        "type": "text",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "source_url",
+        "type": "text",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "ottawa_office",
+        "type": "varchar(255)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "ottawa_address",
+        "type": "text",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "ottawa_phone",
+        "type": "varchar(20)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "ottawa_fax",
+        "type": "varchar(20)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "office_type",
+        "type": "varchar(50)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "const_phone",
+        "type": "varchar(20)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "const_fax",
+        "type": "varchar(20)",
+        "null": "YES",
+        "key": ""
+      }
+    ]
+  },
+  "naics": {
+    "type": "BASE TABLE",
+    "columns": [
+      {
+        "field": "naics_id",
+        "type": "int unsigned",
+        "null": "NO",
+        "key": "PRI"
+      },
+      {
+        "field": "source_row_id",
+        "type": "int unsigned",
+        "null": "NO",
+        "key": ""
+      },
+      {
+        "field": "naics_identifier",
+        "type": "varchar(10)",
+        "null": "YES",
+        "key": "MUL"
+      }
+    ]
+  },
+  "pcbfr": {
+    "type": "BASE TABLE",
+    "columns": [
+      {
+        "field": "postal_code",
+        "type": "varchar(7)",
+        "null": "NO",
+        "key": "MUL"
+      },
+      {
+        "field": "riding_number",
+        "type": "varchar(6)",
+        "null": "YES",
+        "key": "MUL"
+      },
+      {
+        "field": "riding_name_en",
+        "type": "varchar(150)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "riding_name_fr",
+        "type": "varchar(150)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "unique_FED",
+        "type": "varchar(1)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "pop_weight",
+        "type": "decimal(2,1)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "weight_information",
+        "type": "char(1)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "pcbfr_id",
+        "type": "int unsigned",
+        "null": "NO",
+        "key": "PRI"
+      }
+    ]
+  },
+  "pcbfr_backup": {
+    "type": "BASE TABLE",
+    "columns": [
+      {
+        "field": "postal_code",
+        "type": "varchar(7)",
+        "null": "NO",
+        "key": "MUL"
+      },
+      {
+        "field": "riding_number",
+        "type": "varchar(6)",
+        "null": "YES",
+        "key": "MUL"
+      },
+      {
+        "field": "riding_name_en",
+        "type": "varchar(150)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "riding_name_fr",
+        "type": "varchar(150)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "unique_FED",
+        "type": "varchar(1)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "pop_weight",
+        "type": "decimal(2,1)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "weight_information",
+        "type": "char(1)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "pcbfr_id",
+        "type": "int unsigned",
+        "null": "NO",
+        "key": "PRI"
+      }
+    ]
+  },
+  "programs": {
+    "type": "BASE TABLE",
+    "columns": [
+      {
+        "field": "program_id",
+        "type": "int unsigned",
+        "null": "NO",
+        "key": "PRI"
+      },
+      {
+        "field": "source_row_id",
+        "type": "int unsigned",
+        "null": "NO",
+        "key": ""
+      },
+      {
+        "field": "prog_name_en",
+        "type": "varchar(255)",
+        "null": "NO",
+        "key": "MUL"
+      },
+      {
+        "field": "prog_name_fr",
+        "type": "varchar(255)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "prog_purpose_en",
+        "type": "text",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "prog_purpose_fr",
+        "type": "text",
+        "null": "YES",
+        "key": ""
+      }
+    ]
+  },
+  "recipient_types": {
+    "type": "BASE TABLE",
+    "columns": [
+      {
+        "field": "recipient_type_code",
+        "type": "char(1)",
+        "null": "NO",
+        "key": "PRI"
+      },
+      {
+        "field": "recipient_type_description",
+        "type": "varchar(255)",
+        "null": "NO",
+        "key": ""
+      }
+    ]
+  },
+  "recipients": {
+    "type": "BASE TABLE",
+    "columns": [
+      {
+        "field": "recipient_id",
+        "type": "int unsigned",
+        "null": "NO",
+        "key": "PRI"
+      },
+      {
+        "field": "source_row_id",
+        "type": "int unsigned",
+        "null": "NO",
+        "key": ""
+      },
+      {
+        "field": "recipient_business_number",
+        "type": "varchar(255)",
+        "null": "YES",
+        "key": "MUL"
+      },
+      {
+        "field": "recipient_legal_name",
+        "type": "varchar(350)",
+        "null": "NO",
+        "key": "MUL"
+      },
+      {
+        "field": "recipient_operating_name",
+        "type": "varchar(350)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "recipient_type_code",
+        "type": "char(1)",
+        "null": "YES",
+        "key": "MUL"
+      },
+      {
+        "field": "research_organization_name",
+        "type": "varchar(255)",
+        "null": "YES",
+        "key": ""
+      }
+    ]
+  },
+  "staging": {
+    "type": "BASE TABLE",
+    "columns": [
+      {
+        "field": "ref_number",
+        "type": "varchar(50)",
+        "null": "YES",
+        "key": "MUL"
+      },
+      {
+        "field": "amendment_number",
+        "type": "int unsigned",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "amendment_date",
+        "type": "date",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "agreement_type",
+        "type": "char(1)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "recipient_type",
+        "type": "char(1)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "recipient_business_number",
+        "type": "varchar(255)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "recipient_legal_name",
+        "type": "varchar(255)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "research_organization_name",
+        "type": "varchar(255)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "recipient_country",
+        "type": "char(2)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "recipient_province",
+        "type": "char(2)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "recipient_city",
+        "type": "varchar(255)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "recipient_postal_code",
+        "type": "varchar(10)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "federal_riding_name_eng",
+        "type": "varchar(255)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "federal_riding_number",
+        "type": "int unsigned",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "prog_name_eng",
+        "type": "varchar(255)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "prog_purpose_eng",
+        "type": "text",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "agreement_title_eng",
+        "type": "varchar(255)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "agreement_number",
+        "type": "varchar(255)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "agreement_value",
+        "type": "decimal(15,2)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "foreign_currency_type",
+        "type": "char(3)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "foreign_currency_value",
+        "type": "decimal(15,2)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "agreement_start_date",
+        "type": "date",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "year",
+        "type": "year",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "agreement_end_date",
+        "type": "date",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "coverage",
+        "type": "text",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "description_eng",
+        "type": "text",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "naics_identifier",
+        "type": "varchar(10)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "expected_results_eng",
+        "type": "text",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "additional_information_en",
+        "type": "text",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "owner_org_en",
+        "type": "varchar(255)",
+        "null": "YES",
+        "key": "MUL"
+      },
+      {
+        "field": "coverage_en",
+        "type": "varchar(255)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "format",
+        "type": "varchar(255)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "recipient_city_en",
+        "type": "varchar(255)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "id",
+        "type": "varchar(255)",
+        "null": "YES",
+        "key": ""
+      }
+    ]
+  },
+  "tbay_rr_view": {
+    "type": "VIEW",
+    "columns": [
+      {
+        "field": "primary_key",
+        "type": "int unsigned",
+        "null": "NO",
+        "key": ""
+      },
+      {
+        "field": "ref_number",
+        "type": "varchar(50)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "amendment_number",
+        "type": "int unsigned",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "amendment_date",
+        "type": "date",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "agreement_type",
+        "type": "char(1)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "recipient_type",
+        "type": "char(1)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "recipient_business_number",
+        "type": "varchar(255)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "recipient_legal_name",
+        "type": "varchar(350)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "recipient_operating_name",
+        "type": "varchar(350)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "research_organization_name",
+        "type": "varchar(255)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "recipient_country",
+        "type": "char(2)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "recipient_province",
+        "type": "char(2)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "recipient_city",
+        "type": "varchar(255)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "recipient_postal_code",
+        "type": "char(7)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "federal_riding_name_en",
+        "type": "varchar(100)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "federal_riding_name_fr",
+        "type": "varchar(100)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "federal_riding_number",
+        "type": "int unsigned",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "prog_name_en",
+        "type": "varchar(255)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "prog_name_fr",
+        "type": "varchar(255)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "prog_purpose_en",
+        "type": "text",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "prog_purpose_fr",
+        "type": "text",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "agreement_title_en",
+        "type": "varchar(800)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "agreement_title_fr",
+        "type": "varchar(800)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "agreement_number",
+        "type": "varchar(100)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "agreement_value",
+        "type": "decimal(15,2)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "foreign_currency_type",
+        "type": "char(3)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "foreign_currency_value",
+        "type": "decimal(15,2)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "agreement_start_date",
+        "type": "date",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "year",
+        "type": "year",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "agreement_end_date",
+        "type": "date",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "coverage",
+        "type": "text",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "description_eng",
+        "type": "text",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "description_fr",
+        "type": "text",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "naics_identifier",
+        "type": "int unsigned",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "expected_results_en",
+        "type": "text",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "expected_results_fr",
+        "type": "text",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "additional_information_en",
+        "type": "text",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "additional_information_fr",
+        "type": "text",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "agreement_value_range_en",
+        "type": "text",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "coverage_en",
+        "type": "text",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "has_amendments_en",
+        "type": "varchar(3)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "format_en",
+        "type": "varchar(255)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "recipient_city_en",
+        "type": "varchar(255)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "fiscal_year",
+        "type": "varchar(9)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "quarter_en",
+        "type": "varchar(2)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "id",
+        "type": "varchar(255)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "owner_org_en",
+        "type": "text",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "owner_org_title",
+        "type": "text",
+        "null": "YES",
+        "key": ""
+      }
+    ]
+  },
+  "tbayrainy_view": {
+    "type": "VIEW",
+    "columns": [
+      {
+        "field": "primary_key",
+        "type": "int unsigned",
+        "null": "NO",
+        "key": ""
+      },
+      {
+        "field": "ref_number",
+        "type": "varchar(50)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "amendment_number",
+        "type": "int unsigned",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "amendment_date",
+        "type": "date",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "agreement_type",
+        "type": "char(1)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "recipient_type",
+        "type": "char(1)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "recipient_business_number",
+        "type": "varchar(255)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "recipient_legal_name",
+        "type": "varchar(350)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "recipient_operating_name",
+        "type": "varchar(350)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "research_organization_name",
+        "type": "varchar(255)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "recipient_country",
+        "type": "char(2)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "recipient_province",
+        "type": "char(2)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "recipient_city",
+        "type": "varchar(255)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "recipient_postal_code",
+        "type": "char(7)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "federal_riding_name_en",
+        "type": "varchar(100)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "federal_riding_name_fr",
+        "type": "varchar(100)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "federal_riding_number",
+        "type": "int unsigned",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "prog_name_en",
+        "type": "varchar(255)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "prog_name_fr",
+        "type": "varchar(255)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "prog_purpose_en",
+        "type": "text",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "prog_purpose_fr",
+        "type": "text",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "agreement_title_en",
+        "type": "varchar(800)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "agreement_title_fr",
+        "type": "varchar(800)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "agreement_number",
+        "type": "varchar(100)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "agreement_value",
+        "type": "decimal(15,2)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "foreign_currency_type",
+        "type": "char(3)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "foreign_currency_value",
+        "type": "decimal(15,2)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "agreement_start_date",
+        "type": "date",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "year",
+        "type": "year",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "agreement_end_date",
+        "type": "date",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "coverage",
+        "type": "text",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "description_eng",
+        "type": "text",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "description_fr",
+        "type": "text",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "naics_identifier",
+        "type": "int unsigned",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "expected_results_en",
+        "type": "text",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "expected_results_fr",
+        "type": "text",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "additional_information_en",
+        "type": "text",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "additional_information_fr",
+        "type": "text",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "agreement_value_range_en",
+        "type": "text",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "coverage_en",
+        "type": "text",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "has_amendments_en",
+        "type": "varchar(3)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "format_en",
+        "type": "varchar(255)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "recipient_city_en",
+        "type": "varchar(255)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "fiscal_year",
+        "type": "varchar(9)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "quarter_en",
+        "type": "varchar(2)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "id",
+        "type": "varchar(255)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "owner_org_en",
+        "type": "text",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "owner_org_title",
+        "type": "text",
+        "null": "YES",
+        "key": ""
+      }
+    ]
+  },
+  "thunder_bay_rainy_river_agreements": {
+    "type": "VIEW",
+    "columns": [
+      {
+        "field": "primary_key",
+        "type": "int unsigned",
+        "null": "NO",
+        "key": ""
+      },
+      {
+        "field": "ref_number",
+        "type": "varchar(50)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "amendment_number",
+        "type": "int unsigned",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "amendment_date",
+        "type": "date",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "agreement_type",
+        "type": "char(1)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "recipient_type",
+        "type": "char(1)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "recipient_business_number",
+        "type": "varchar(255)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "recipient_legal_name",
+        "type": "varchar(350)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "recipient_operating_name",
+        "type": "varchar(350)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "research_organization_name",
+        "type": "varchar(255)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "recipient_country",
+        "type": "char(2)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "recipient_province",
+        "type": "char(2)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "recipient_city",
+        "type": "varchar(255)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "recipient_postal_code",
+        "type": "char(7)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "federal_riding_name_en",
+        "type": "varchar(100)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "federal_riding_name_fr",
+        "type": "varchar(100)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "federal_riding_number",
+        "type": "int unsigned",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "prog_name_en",
+        "type": "varchar(255)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "prog_name_fr",
+        "type": "varchar(255)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "prog_purpose_en",
+        "type": "text",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "prog_purpose_fr",
+        "type": "text",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "agreement_title_en",
+        "type": "varchar(800)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "agreement_title_fr",
+        "type": "varchar(800)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "agreement_number",
+        "type": "varchar(100)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "agreement_value",
+        "type": "decimal(15,2)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "foreign_currency_type",
+        "type": "char(3)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "foreign_currency_value",
+        "type": "decimal(15,2)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "agreement_start_date",
+        "type": "date",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "year",
+        "type": "year",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "agreement_end_date",
+        "type": "date",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "coverage",
+        "type": "text",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "description_eng",
+        "type": "text",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "description_fr",
+        "type": "text",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "naics_identifier",
+        "type": "int unsigned",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "expected_results_en",
+        "type": "text",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "expected_results_fr",
+        "type": "text",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "additional_information_en",
+        "type": "text",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "additional_information_fr",
+        "type": "text",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "agreement_value_range_en",
+        "type": "text",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "coverage_en",
+        "type": "text",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "has_amendments_en",
+        "type": "varchar(3)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "format_en",
+        "type": "varchar(255)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "recipient_city_en",
+        "type": "varchar(255)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "fiscal_year",
+        "type": "varchar(9)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "quarter_en",
+        "type": "varchar(2)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "id",
+        "type": "varchar(255)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "owner_org_en",
+        "type": "text",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "owner_org_title",
+        "type": "text",
+        "null": "YES",
+        "key": ""
+      }
+    ]
+  },
+  "view_agreement_count": {
+    "type": "VIEW",
+    "columns": [
+      {
+        "field": "agreement_count",
+        "type": "bigint",
+        "null": "NO",
+        "key": ""
+      }
+    ]
+  },
+  "view_amendment_count": {
+    "type": "VIEW",
+    "columns": [
+      {
+        "field": "amendment_count",
+        "type": "bigint",
+        "null": "NO",
+        "key": ""
+      }
+    ]
+  },
+  "view_average_funding": {
+    "type": "VIEW",
+    "columns": [
+      {
+        "field": "average_funding",
+        "type": "decimal(19,6)",
+        "null": "YES",
+        "key": ""
+      }
+    ]
+  },
+  "view_max_funding": {
+    "type": "VIEW",
+    "columns": [
+      {
+        "field": "max_funding",
+        "type": "decimal(15,2)",
+        "null": "YES",
+        "key": ""
+      }
+    ]
+  },
+  "view_min_funding": {
+    "type": "VIEW",
+    "columns": [
+      {
+        "field": "min_funding",
+        "type": "decimal(15,2)",
+        "null": "YES",
+        "key": ""
+      }
+    ]
+  },
+  "view_total_funding": {
+    "type": "VIEW",
+    "columns": [
+      {
+        "field": "total_funding",
+        "type": "decimal(37,2)",
+        "null": "YES",
+        "key": ""
+      }
+    ]
+  }
+}
