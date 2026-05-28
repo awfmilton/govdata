@@ -460,7 +460,7 @@ final class Entity_Reports {
 			$rows = publictech_db( $source_alias )->select( $sql, $params );
 		} catch ( \Throwable $e ) {
 			error_log( '[PublicTech] source read failed for ' . ( $entity['slug'] ?? '?' ) . ': ' . $e->getMessage() );
-			return [ 'ok' => false, 'reason' => 'source read failed' ];
+			return [ 'ok' => false, 'reason' => 'read failed: ' . $e->getMessage() ];
 		}
 
 		$snapshot           = self::build_snapshot( $rows, $entity );
