@@ -212,6 +212,21 @@
 #bbpress-forums .bbp-author-name{color:var(--ink-0);font-weight:600;}
 #bbpress-forums .bbp-author-role{font-family:"JetBrains Mono",monospace;font-size:9px;color:var(--ink-3);text-transform:uppercase;letter-spacing:0.1em;}
 
+/* ===== Override bbPress default even/odd row backgrounds ===== */
+/* bbpress.min.css hardcodes white/near-white for .even/.odd — reset to theme vars */
+#bbpress-forums div.even,
+#bbpress-forums ul.even{background:var(--bg-1);}
+#bbpress-forums div.odd,
+#bbpress-forums ul.odd{background:var(--bg-0);}
+#bbpress-forums .status-spam.even,
+#bbpress-forums .status-trash.even{background:rgba(255,80,80,0.08);}
+#bbpress-forums .status-spam.odd,
+#bbpress-forums .status-trash.odd{background:rgba(255,80,80,0.05);}
+#bbpress-forums .status-pending.even,
+#bbpress-forums .status-pending.odd{background:rgba(255,180,84,0.07);}
+#bbpress-forums .status-pending.even a,
+#bbpress-forums .status-pending.odd a{color:var(--accent);}
+
 /* ===== Light theme parity (our terminal.css already swaps the vars) ===== */
 :root[data-theme="light"] #bbpress-forums .bbp-template-notice{background:rgba(0,114,168,0.06);color:var(--accent);}
 
