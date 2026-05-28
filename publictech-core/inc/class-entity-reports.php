@@ -474,11 +474,14 @@ final class Entity_Reports {
 			$snapshot
 		);
 
-		if ( $ok ) {
-			delete_transient( 'pt_entity_snap_' . $entity['slug'] );
+		if ( ! $ok ) {
+			return [ 'ok' => false, 'reason' => 'cache db upsert failed' ];
 		}
+
+		delete_transient( 'pt_entity_snap_' . $entity['slug'] );
+
 		return [
-			'ok'    => $ok,
+			'ok'    => true,
 			'rows'  => count( $rows ),
 			'total' => $snapshot['totals']['total_funding'],
 		];
