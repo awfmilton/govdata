@@ -172,7 +172,10 @@ final class Cache_DB {
 			$this->drain( $stmt );
 			return true;
 		} catch ( \Throwable $e ) {
-			error_log( '[PublicTech] cache upsert failed for ' . $slug . ': ' . $e->getMessage() );
+			error_log( "[PublicTech] Cache upsert failed for {$slug}: " . $e->getMessage() );
+			if ( defined( 'WP_CLI' ) && WP_CLI ) {
+				\WP_CLI::warning( "Upsert failed: " . $e->getMessage() );
+			}
 			return false;
 		}
 	}
