@@ -36,13 +36,27 @@ final class Multi_DB {
 	private function __construct() {}
 
 	/**
+	 * Resolve the full connection map: the PUBLICTECH_DB_CONNECTIONS constant
+	 * (when defined) merged through the `publictech_db_connections` filter so
+	 * mu-plugins can register additional aliases (e.g. the riding cache DB)
+	 * without having to be the sole definer of the constant.
+	 *
+	 * @return array<string,array<string,mixed>>
+	 */
+	public static function connections(): array {
+		$defs = defined( 'PUBLICTECH_DB_CONNECTIONS' ) ? PUBLICTECH_DB_CONNECTIONS : [];
+		$defs = apply_filters( 'publictech_db_connections', $defs );
+		return is_array( $defs ) ? $defs : [];
+	}
+
+	/**
 	 * Return (and lazily build) a Connection for the given alias.
 	 */
 	public function connection( string $alias ): Connection {
 		if ( isset( $this->pool[ $alias ] ) ) {
 			return $this->pool[ $alias ];
 		}
-		$defs = defined( 'PUBLICTECH_DB_CONNECTIONS' ) ? PUBLICTECH_DB_CONNECTIONS : [];
+		$defs = self::connections();
 		if ( ! isset( $defs[ $alias ] ) ) {
 			throw new \RuntimeException( "Unknown PublicTech DB alias: {$alias}" );
 		}
@@ -52,7 +66,7 @@ final class Multi_DB {
 
 	/** @return string[] */
 	public function aliases(): array {
-		return defined( 'PUBLICTECH_DB_CONNECTIONS' ) ? array_keys( PUBLICTECH_DB_CONNECTIONS ) : [];
+		return array_keys( self::connections() );
 	}
 
 	/**
