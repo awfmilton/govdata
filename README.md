@@ -61,7 +61,13 @@ it leaves the process.
 ### For visitors
 
 - **MP directory** with party/region/postal-code facets (FacetWP-aware).
-- **MP profile** pages with KPI cards and D3 spend-by-year charts.
+- **MP profile** pages with KPI cards and D3 spend-by-year charts, plus the
+  federal grant & contribution spending for the member's riding — all-time
+  total, spending by year, top-10 recipients, recipient-type split, top
+  programs, and a 20-keyword scrutiny scan. Served from a precomputed
+  secondary cache DB (never querying the primary data at request time); see
+  [DEPLOYMENT.md §4.7](DEPLOYMENT.md).
+- **Riding report** pages (one template, every riding) with the same rollups.
 - **Streaming transactions table** that scrolls through millions of rows
   without buffering the whole result set.
 - **AI Console** — natural-language → SQL → table/chart, gated to paid tiers.
