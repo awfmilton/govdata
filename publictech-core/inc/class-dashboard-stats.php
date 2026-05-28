@@ -45,13 +45,26 @@ final class Dashboard_Stats {
 	}
 
 	/**
-	 * Return aggregated dashboard stats. Safe to call from templates — uses
-	 * the object cache and never throws (returns empty payload on DB failure).
+	 * Return aggregated dashboard stats. Safe to call from templates — uses a
+	 * two-layer cache (in-memory object cache + persistent DB transient) and
+	 * never throws (returns empty payload on DB failure).
+	 *
+	 * On hosts without a persistent object cache (Memcached/Redis), wp_cache
+	 * resets every request. The transient layer ensures the expensive DB
+	 * aggregation only runs once per CACHE_TTL period regardless of host config.
 	 */
 	public static function get(): array {
+		// Layer 1: in-memory object cache (free hit if Redis/Memcached is configured).
 		$cached = wp_cache_get( self::CACHE_KEY, self::CACHE_GROUP );
 		if ( is_array( $cached ) ) {
 			return $cached;
+		}
+
+		// Layer 2: persistent DB transient — survives across PHP processes.
+		$transient = get_transient( self::CACHE_KEY );
+		if ( is_array( $transient ) ) {
+			wp_cache_set( self::CACHE_KEY, $transient, self::CACHE_GROUP, self::CACHE_TTL );
+			return $transient;
 		}
 
 		$aliases = Multi_DB::instance()->aliases();
@@ -66,6 +79,7 @@ final class Dashboard_Stats {
 			$payload = self::empty_payload();
 		}
 
+		set_transient( self::CACHE_KEY, $payload, self::CACHE_TTL );
 		wp_cache_set( self::CACHE_KEY, $payload, self::CACHE_GROUP, self::CACHE_TTL );
 		return $payload;
 	}
