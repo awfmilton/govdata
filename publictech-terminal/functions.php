@@ -136,6 +136,7 @@ add_filter( 'theme_page_templates', static function ( array $tpls ): array {
 		'page-templates/template-chart-builder.php'  => __( 'PT — Chart Builder',    'publictech-terminal' ),
 		'page-templates/template-chart-gallery.php'  => __( 'PT — Chart Gallery',    'publictech-terminal' ),
 		'page-templates/template-riding-report.php'  => __( 'PT — Riding Report',    'publictech-terminal' ),
+		'page-templates/template-entity-report.php'  => __( 'PT — Entity Funding Report', 'publictech-terminal' ),
 	];
 } );
 
