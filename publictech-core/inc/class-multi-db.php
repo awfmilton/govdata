@@ -113,12 +113,15 @@ final class Connection {
 			$this->cfg['name'],
 			$this->cfg['charset'] ?? 'utf8mb4'
 		);
+		$connect_timeout = (int) ( $this->cfg['connect_timeout'] ?? 5 );
+		$query_timeout   = (int) ( $this->cfg['query_timeout']   ?? 8000 ); // milliseconds for MAX_EXECUTION_TIME
 		$this->pdo = new \PDO( $dsn, $this->cfg['user'], $this->cfg['pass'], [
 			\PDO::ATTR_ERRMODE            => \PDO::ERRMODE_EXCEPTION,
 			\PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC,
 			\PDO::ATTR_EMULATE_PREPARES   => false,
 			\PDO::ATTR_PERSISTENT         => true,
-			\PDO::MYSQL_ATTR_INIT_COMMAND => "SET time_zone='+00:00'",
+			\PDO::ATTR_TIMEOUT            => $connect_timeout,
+			\PDO::MYSQL_ATTR_INIT_COMMAND => "SET time_zone='+00:00', SESSION MAX_EXECUTION_TIME={$query_timeout}",
 		] );
 		return $this->pdo;
 	}
