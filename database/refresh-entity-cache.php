@@ -15,7 +15,7 @@
  *   1. PUBLICTECH_DB_CONNECTIONS['pt-grantconts-01'] is configured in wp-config.php
  *      (the read-only grantconts credentials — already used by the MP importer).
  *   2. The cache schema has been applied (database/cache-schema.sql) and
- *      GOVDATA_CACHE_DB is defined in wp-config.php (or the GOVDATA_CACHE_DB_*
+ *      GOVDATA_CACHE_DB1 is defined in wp-config.php (or the GOVDATA_CACHE_DB1_*
  *      environment variables are set for this invocation).
  *
  * The script is idempotent — each run replaces the entity's cached snapshot.
@@ -49,7 +49,7 @@ if ( ! class_exists( Entity_Reports::class ) || ! class_exists( Cache_DB::class 
 }
 
 if ( ! Cache_DB::instance()->available() ) {
-	$pt_log( 'Cache database is not configured. Define GOVDATA_CACHE_DB in wp-config.php (or set GOVDATA_CACHE_DB_* env vars).', 'error' );
+	$pt_log( 'Cache database is not configured. Define GOVDATA_CACHE_DB1 in wp-config.php (or set GOVDATA_CACHE_DB1_* env vars).', 'error' );
 	return;
 }
 

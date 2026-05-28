@@ -323,7 +323,7 @@ procedures — **no triggers** are used (they are disallowed on the shared host)
 **Step 1 — provision the database + user.** On the cache host
 (`mysql.govdata.ca`), the `gdc_01` user needs privileges on `govdata_cache_01`.
 In production, give the public/search path a read-only user and the refresh job
-a writer (see `GOVDATA_CACHE_DB_WRITER` below); in dev a single user is fine:
+a writer (see `GOVDATA_CACHE_DB1_WRITER` below); in dev a single user is fine:
 
 ```sql
 GRANT SELECT, INSERT, DELETE, EXECUTE ON govdata_cache_01.* TO 'gdc_01'@'%';
@@ -340,7 +340,7 @@ mysql -u gdc_01 -p -h mysql.govdata.ca govdata_cache_01 < database/cache-schema.
 `PUBLICTECH_DB_CONNECTIONS`). The password lives here, never in the repo:
 
 ```php
-define( 'GOVDATA_CACHE_DB', [
+define( 'GOVDATA_CACHE_DB1', [
     'host' => 'mysql.govdata.ca',
     'port' => 3306,
     'name' => 'govdata_cache_01',
@@ -350,10 +350,10 @@ define( 'GOVDATA_CACHE_DB', [
 
 // Optional: a higher-privilege account used only by the refresh/upsert path,
 // so the public search path can run as a read-only user. Same array shape.
-// define( 'GOVDATA_CACHE_DB_WRITER', [ /* … */ ] );
+// define( 'GOVDATA_CACHE_DB1_WRITER', [ /* … */ ] );
 ```
 
-The CLI refresh script also honours `GOVDATA_CACHE_DB_HOST` / `_PORT` / `_NAME` /
+The CLI refresh script also honours `GOVDATA_CACHE_DB1_HOST` / `_PORT` / `_NAME` /
 `_USER` / `_PASS` environment variables, so you can sync without editing
 `wp-config.php`.
 
