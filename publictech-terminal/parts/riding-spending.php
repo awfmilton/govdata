@@ -179,7 +179,7 @@ foreach ( $pt_keywords as $row ) {
 </section>
 
 <script>
-(function () {
+document.addEventListener('DOMContentLoaded', function () {
 	'use strict';
 	if (!window.PT || !PT.chart) { return; }
 
@@ -209,5 +209,5 @@ foreach ( $pt_keywords as $row ) {
 		var kwData = keywords.map(function (r) { return { label: r[0], value: r[1], color: pos }; });
 		PT.chart('#ptRidingKwChart', 'bar', kwData);
 	}
-})();
+});
 </script>
