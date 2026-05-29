@@ -177,6 +177,11 @@
 			.attr('stroke-width', function (d) { return d.type === 'cat' ? 0 : 1; });
 
 		sim.on('tick', function () {
+			nodes.forEach(function (d) {
+				const r = (d.r || 6) + 2;
+				d.x = Math.max(r, Math.min(W - r, d.x));
+				d.y = Math.max(r, Math.min(H - r, d.y));
+			});
 			link.attr('x1', function (d) { return d.source.x; })
 				.attr('y1', function (d) { return d.source.y; })
 				.attr('x2', function (d) { return d.target.x; })
