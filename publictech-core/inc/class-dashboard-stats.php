@@ -20,7 +20,7 @@ final class Dashboard_Stats {
 
 	private const CACHE_KEY   = 'pt_dash_stats_v2';
 	private const CACHE_GROUP = 'publictech';
-	private const CACHE_TTL   = 900; // 15 minutes
+	private const CACHE_TTL   = 90000; // 25 hours — refreshed by nightly cron at 02:00
 
 	public static function instance(): self {
 		return self::$instance ??= new self();

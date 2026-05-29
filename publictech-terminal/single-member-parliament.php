@@ -229,7 +229,7 @@ get_header(); ?>
 </main>
 
 <script>
-(function () {
+document.addEventListener('DOMContentLoaded', function () {
 	'use strict';
 	if (!window.PT || !window.PT_BOOT) return;
 
@@ -292,7 +292,7 @@ get_header(); ?>
 			}
 			if (nodes.length > 1) PT.chart('#ptNetChart', 'network', { nodes: nodes, links: links });
 		});
-})();
+});
 </script>
 
 <?php get_footer();

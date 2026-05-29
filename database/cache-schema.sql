@@ -126,17 +126,17 @@ DELIMITER //
 -- searchable agreement rows are expanded from the JSON payload via JSON_TABLE.
 -- -----------------------------------------------------------------------------
 CREATE PROCEDURE `sp_upsert_entity_snapshot` (
-	IN p_slug      VARCHAR(80),
-	IN p_name      VARCHAR(350),
-	IN p_keywords  TEXT,
-	IN p_source    VARCHAR(40),
+	IN p_slug      VARCHAR(80)  CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+	IN p_name      VARCHAR(350) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+	IN p_keywords  TEXT         CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+	IN p_source    VARCHAR(40)  CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
 	IN p_total     DECIMAL(18,2),
 	IN p_positive  DECIMAL(18,2),
 	IN p_negative  DECIMAL(18,2),
 	IN p_count     INT UNSIGNED,
 	IN p_first_yr  SMALLINT,
 	IN p_last_yr   SMALLINT,
-	IN p_snapshot  LONGTEXT
+	IN p_snapshot  LONGTEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
 )
 SQL SECURITY INVOKER
 BEGIN
@@ -208,7 +208,7 @@ END //
 -- warm the page-level (WordPress transient) cache on a miss.
 -- -----------------------------------------------------------------------------
 CREATE PROCEDURE `sp_get_entity_snapshot` (
-	IN p_slug VARCHAR(80)
+	IN p_slug VARCHAR(80) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
 )
 SQL SECURITY INVOKER
 BEGIN
@@ -227,8 +227,8 @@ END //
 -- (natural language) plus a LIKE fallback so short / partial tokens still hit.
 -- -----------------------------------------------------------------------------
 CREATE PROCEDURE `sp_search_entity_agreements` (
-	IN p_slug  VARCHAR(80),
-	IN p_query VARCHAR(255),
+	IN p_slug  VARCHAR(80)  CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+	IN p_query VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
 	IN p_limit INT
 )
 SQL SECURITY INVOKER
