@@ -10,10 +10,11 @@ client (Claude Desktop, Cursor, custom agents) can query the data directly.
 > **Setting up a new install?** Skip to [DEPLOYMENT.md](DEPLOYMENT.md) for
 > step-by-step server, database, and AI-wiring instructions.
 
-> **MP profile charts showing zeros?** The `pt-finance-01` database
-> connection and the KPI aggregation step are not yet configured. See
-> [MP-FINANCE-DATA.md](MP-FINANCE-DATA.md) for the schema, `wp-config.php`
-> snippet, and the WP-CLI aggregation script to run once that data is ready.
+> **MP profile charts showing zeros?** Run
+> `wp eval-file database/warm-mp-finance-cache.php` to populate the cache
+> from the HoC expenditure tables in `grantconts`. See
+> [MP-FINANCE-DATA.md](MP-FINANCE-DATA.md) for full details and the
+> verification checklist.
 
 ---
 

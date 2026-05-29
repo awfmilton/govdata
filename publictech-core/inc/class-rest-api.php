@@ -194,12 +194,7 @@ final class REST_API {
 		if ( ( $gate = Throttle::instance()->enforce_rest( $req ) ) instanceof \WP_Error ) {
 			return $gate;
 		}
-		// Schema access is tier-gated even for the convenience /mp/{id}/spend route.
-		$tier = Access_Tiers::instance()->quota( get_current_user_id() ?: null );
-		if ( '*' !== $tier['schemas'] && ! in_array( 'pt-finance-01', (array) $tier['schemas'], true ) ) {
-			return new \WP_Error( 'pt_tier_locked', 'Finance schema not in your tier.', [ 'status' => 403 ] );
-		}
-		$mp_id  = absint( $req['id'] );
+		$mp_id = absint( $req['id'] );
 		if ( $mp_id <= 0 || 'member-parliament' !== get_post_type( $mp_id ) ) {
 			return new \WP_Error( 'pt_not_found', 'Member not found.', [ 'status' => 404 ] );
 		}
@@ -208,12 +203,11 @@ final class REST_API {
 			return new \WP_Error( 'pt_not_found', 'Member not linked to finance schema.', [ 'status' => 404 ] );
 		}
 		try {
-			$rows = publictech_db( 'pt-finance-01' )->select(
-				'SELECT fiscal_year, category, SUM(amount_cad) AS total
-				   FROM expenditures
-				  WHERE mp_id = ? AND amount_cad > 0
-				  GROUP BY fiscal_year, category
-				  ORDER BY fiscal_year ASC, category ASC',
+			$rows = publictech_db( MP_Finance_Warmer::cache_alias() )->select(
+				'SELECT `fiscal_year`, `category`, `total`
+				   FROM `mp_expenditure_periods`
+				  WHERE `mp_id` = ?
+				  ORDER BY `fiscal_year` ASC, `category` ASC',
 				[ $ext_id ]
 			);
 		} catch ( \Throwable $e ) {
@@ -221,8 +215,7 @@ final class REST_API {
 			return new \WP_Error( 'pt_db_error', 'Spending data temporarily unavailable.', [ 'status' => 503 ] );
 		}
 		$resp = rest_ensure_response( $rows );
-		$resp->header( 'Cache-Control', 'private, max-age=60' );
-		$resp->header( 'Vary', 'Authorization, Cookie' );
+		$resp->header( 'Cache-Control', 'public, max-age=300' );
 		return $resp;
 	}
 

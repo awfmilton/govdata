@@ -28,6 +28,7 @@ require_once PUBLICTECH_CORE_DIR . 'inc/class-cpt.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-rest-api.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-riding-cache-warmer.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-riding-cache.php';
+require_once PUBLICTECH_CORE_DIR . 'inc/class-mp-finance-warmer.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-entity-reports.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-entity-reports.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-charts-rest.php';
@@ -80,9 +81,13 @@ add_action( 'after_setup_theme', static function () {
 	\PublicTech\Core\Riding_Cache::instance();
 }, 5 );
 
+add_action( 'init', [ \PublicTech\Core\MP_Finance_Warmer::class, 'schedule' ] );
+add_action( \PublicTech\Core\MP_Finance_Warmer::HOOK, [ \PublicTech\Core\MP_Finance_Warmer::class, 'run_warm' ] );
+
 // Clean up the cron schedules on theme switch.
 add_action( 'switch_theme', [ \PublicTech\Core\Alerts::class, 'unschedule' ] );
 add_action( 'switch_theme', [ \PublicTech\Core\Riding_Cache::class, 'unschedule' ] );
+add_action( 'switch_theme', [ \PublicTech\Core\MP_Finance_Warmer::class, 'unschedule' ] );
 add_action( 'switch_theme', [ \PublicTech\Core\Entity_Reports::class, 'unschedule' ] );
 
 /**
