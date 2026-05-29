@@ -72,22 +72,28 @@ final class Dashboard_Stats {
 			return self::empty_payload();
 		}
 
+		$failed = false;
 		try {
 			$payload = self::query( Multi_DB::instance()->connection( $aliases[0] ) );
 		} catch ( \Throwable $e ) {
 			error_log( '[PublicTech] Dashboard_Stats::query failed — ' . $e->getMessage() );
 			$payload = self::empty_payload();
+			$failed  = true;
 		}
 
-		set_transient( self::CACHE_KEY, $payload, self::CACHE_TTL );
-		wp_cache_set( self::CACHE_KEY, $payload, self::CACHE_GROUP, self::CACHE_TTL );
+		// On failure store a short TTL so the next request retries quickly;
+		// on success store the full 25-hour TTL.
+		$ttl = $failed ? 60 : self::CACHE_TTL;
+		set_transient( self::CACHE_KEY, $payload, $ttl );
+		wp_cache_set( self::CACHE_KEY, $payload, self::CACHE_GROUP, $ttl );
 		return $payload;
 	}
 
 	private static function query( Connection $db ): array {
-		// Aggregate queries over master_table take 30-120 s on shared MySQL —
-		// remove the per-statement limit for this cached batch job.
-		$db->pdo()->exec( 'SET SESSION max_execution_time=0' );
+		// Aggregate queries over master_table can be slow; cap at 30 s so MySQL
+		// kills the statement and the catch handler returns empty payload rather
+		// than letting PHP's own execution limit kill the process (→ 503).
+		$db->pdo()->exec( 'SET SESSION max_execution_time=30000' );
 
 		// Headline totals.
 		$head = $db->select(
