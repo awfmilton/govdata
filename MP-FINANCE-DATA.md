@@ -1,327 +1,175 @@
 # MP Profile — Finance Data Setup Guide
 
-This document covers the two remaining steps needed to make MP profile pages
-display live financial data. The code is already written and bug-free; only
-data and infrastructure are missing.
+This document covers wiring the HoC expenditure tables (already in `grantconts`)
+into the MP profile pages. The warmer reads from `pt-grantconts-01` and writes
+precomputed rows into `pt-cache-02` (govdata_cache_02), following the same
+pattern as the riding-cache system.
 
-**What works today (post-bugfix):**
-- MP directory with name, party, region, and riding data ✓
-- Profile sidebar (photo, postal codes, committees, region) ✓
-- Riding grant & contribution panels (served from `pt-cache-02`) ✓
+**What works after running the warmer:**
+- KPI cards: Total Office Spend, Travel Expenses, Contract Spend, Votes Cast*
+- Spending Breakdown line chart (salaries / travel / hospitality / contracts by fiscal year)
+- Category Comparison bar chart (latest year)
+- Funding Flow Network diagram (derived from the category series)
 
-**What still shows zeros until this guide is completed:**
-- KPI cards: Total Office Spend, Travel Expenses, Contracts Awarded, Votes Cast
-- Spending Breakdown line chart (by fiscal year and category)
-- Category Comparison bar chart (latest year vs peer average)
-- Funding Flow Network diagram (vendors → categories)
+*Votes Cast will remain 0 until a parliamentary votes data source is added.
 
 ---
 
-## Part 1 — Wire the `pt-finance-01` database connection
+## Source schema (in `grantconts`)
 
-The `/wp-json/publictech/v1/mp/{id}/spend` REST endpoint and the MCP
-`mp.spending` tool both query a database aliased **`pt-finance-01`**.
-This alias is referenced throughout the code but is not yet declared in
-`wp-config.php` because the data source wasn't ready at deployment time.
+Three tables were created by the Python ETL pipeline:
 
-### 1.1 Required schema
+### `hoc_expenditures_raw` — staging only, not queried by PHP
 
-The alias must point to a MySQL database that contains an `expenditures`
-table with at least these columns:
+### `hoc_reporting_periods`
+
+| Column                | Type         | Notes                                    |
+| --------------------- | ------------ | ---------------------------------------- |
+| `period_id`           | INT PK       | Auto-increment                           |
+| `fiscal_year`         | VARCHAR(20)  | e.g. `"2024-2025"`                       |
+| `quarter`             | VARCHAR(10)  | e.g. `"Q3"`                              |
+| `quarter_name`        | VARCHAR(50)  | e.g. `"third-quarter"`                   |
+| `reporting_period_desc` | VARCHAR(255) | Original long-form description          |
+| **UNIQUE** `idx_period` | (fiscal_year, quarter) |                              |
+
+### `hoc_member_expenditures`
+
+| Column          | Type           | Notes                                                 |
+| --------------- | -------------- | ----------------------------------------------------- |
+| `expenditure_id` | INT PK        | Auto-increment                                        |
+| `mp_id`         | VARCHAR(10) FK | References `mps(mp_id)` — varchar e.g. `"P0001"`, `"HIST-001"` |
+| `period_id`     | INT FK         | References `hoc_reporting_periods(period_id)`         |
+| `salaries`      | DECIMAL(15,2)  |                                                       |
+| `travel`        | DECIMAL(15,2)  |                                                       |
+| `hospitality`   | DECIMAL(15,2)  |                                                       |
+| `contracts`     | DECIMAL(15,2)  |                                                       |
+
+**Important:** `mp_id` is a VARCHAR matching the `external_mp_id` post meta on each
+`member-parliament` CPT post (e.g. `"P0001"`). Historical/retired MPs not in the
+current `mps` snapshot were assigned stable `HIST-NNN` IDs during the ETL import.
+Those will not match any WP post and are silently skipped during post meta sync.
+
+---
+
+## Cache schema (auto-created in `govdata_cache_02`)
+
+The warmer (`class-mp-finance-warmer.php`) calls `ensure_schema()` on every run,
+so these tables are created automatically on first use. For manual provisioning:
+
+### `mp_expenditure_periods`
 
 ```sql
-CREATE TABLE expenditures (
-    txn_id       VARCHAR(64)    NOT NULL,
-    txn_date     DATE           NOT NULL,
-    vendor_name  VARCHAR(255)   NOT NULL,
-    category     VARCHAR(128)   NOT NULL,
-    region       VARCHAR(64)    NOT NULL,
-    amount_cad   DECIMAL(14, 2) NOT NULL DEFAULT 0,
-    mp_id        VARCHAR(32)    NOT NULL,   -- matches external_mp_id post meta, e.g. "P0001"
-    PRIMARY KEY  (txn_id),
-    KEY idx_mp   (mp_id),
-    KEY idx_year (txn_date, category)
-);
+CREATE TABLE IF NOT EXISTS `mp_expenditure_periods` (
+    `id`          INT           NOT NULL AUTO_INCREMENT,
+    `mp_id`       VARCHAR(10)   NOT NULL,
+    `fiscal_year` SMALLINT      NOT NULL,   -- start year, e.g. 2024 for "2024-2025"
+    `category`    VARCHAR(20)   NOT NULL,   -- 'Salaries' | 'Travel' | 'Hospitality' | 'Contracts'
+    `total`       DECIMAL(15,2) NOT NULL DEFAULT 0.00,
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `idx_mp_year_cat` (`mp_id`, `fiscal_year`, `category`),
+    KEY `idx_mp` (`mp_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 ```
 
-> **Critical**: `mp_id` must be VARCHAR and must contain the same values
-> stored in the `external_mp_id` post meta on each `member-parliament` CPT
-> post (e.g. `"P0001"`, not a numeric integer). The importer sets this from
-> `grantconts.mps.mp_id` — the two columns must match exactly.
+Queried by `GET /wp-json/publictech/v1/mp/{id}/spend`. Returns
+`[{fiscal_year: INT, category: STRING, total: DECIMAL}]` — the exact shape
+the profile page JS expects for D3 chart rendering.
 
-The column-level filter exposing `expenditures` to the stream/export
-endpoints is already registered in
-`publictech-terminal/functions.php`:
-
-```php
-add_filter( 'publictech_columns_pt-finance-01_expenditures', function () {
-    return [
-        'txn_id'     => '`expenditures`.`txn_id`',
-        'date'       => '`expenditures`.`txn_date`',
-        'vendor'     => '`expenditures`.`vendor_name`',
-        'category'   => '`expenditures`.`category`',
-        'region'     => '`expenditures`.`region`',
-        'amount_cad' => '`expenditures`.`amount_cad`',
-        'mp_id'      => '`expenditures`.`mp_id`',
-    ];
-} );
-```
-
-No code changes are needed here.
-
-### 1.2 Provision the read-only MySQL user
+### `mp_kpi_cache`
 
 ```sql
-CREATE USER 'pt_finance_read'@'%' IDENTIFIED BY 'strong-password-here';
-GRANT SELECT ON finance_db.expenditures TO 'pt_finance_read'@'%';
-FLUSH PRIVILEGES;
+CREATE TABLE IF NOT EXISTS `mp_kpi_cache` (
+    `mp_id`           VARCHAR(10)   NOT NULL,
+    `total_spend`     DECIMAL(15,2) NOT NULL DEFAULT 0.00,
+    `travel_spend`    DECIMAL(15,2) NOT NULL DEFAULT 0.00,
+    `contracts_spend` DECIMAL(15,2) NOT NULL DEFAULT 0.00,
+    `updated_at`      DATETIME      NOT NULL,
+    PRIMARY KEY (`mp_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 ```
 
-Restrict the `'%'` host pattern to your WordPress server's IP in production.
-
-### 1.3 Declare the connection in `wp-config.php`
-
-Add `pt-finance-01` alongside the existing connections in `PUBLICTECH_DB_CONNECTIONS`
-**above** the `require_once ABSPATH . 'wp-settings.php';` line:
-
-```php
-define( 'PUBLICTECH_DB_CONNECTIONS', [
-    'pt-grantconts-01' => [
-        'host' => '35.230.186.163',
-        'port' => 3306,
-        'name' => 'grantconts',
-        'user' => 'pt_read',
-        'pass' => 'YOUR_PT_READ_PASSWORD',
-    ],
-    'pt-finance-01' => [                // ← add this block
-        'host' => 'YOUR_FINANCE_DB_HOST',
-        'port' => 3306,
-        'name' => 'YOUR_FINANCE_DB_NAME',
-        'user' => 'pt_finance_read',
-        'pass' => 'YOUR_FINANCE_DB_PASSWORD',
-    ],
-] );
-```
-
-> If the finance data lives in the same MySQL instance as `grantconts`,
-> just point `pt-finance-01` at the same host with a different `name`. The
-> connection pool opens one PDO handle per alias.
-
-### 1.4 Verify
-
-```bash
-curl -s https://your-site.example/wp-json/publictech/v1/status | jq '.health'
-```
-
-Expected — both aliases report `"ok": true`:
-
-```json
-{
-  "pt-grantconts-01": { "ok": true, "latency_ms": 2.1 },
-  "pt-finance-01":    { "ok": true, "latency_ms": 1.8 }
-}
-```
-
-Then test the spend endpoint directly for any MP whose `external_mp_id` is set:
-
-```bash
-# Replace 316 with the WP post ID of an MP you know has expenditure rows.
-curl -s "https://your-site.example/wp-json/publictech/v1/mp/316/spend" | jq '.[0]'
-```
-
-Expected shape:
-
-```json
-{ "fiscal_year": "2022", "category": "Travel", "total": "48320.00" }
-```
-
-A `503` means the connection failed — check credentials and firewall.
-A `404 pt_not_found` with "Member not linked" means `external_mp_id` is
-not set on that post — re-run the MP importer (DEPLOYMENT.md §4.5).
+Used only by the warmer to write WP post meta. Not queried at request time.
 
 ---
 
-## Part 2 — Populate MP KPI post meta
+## Running the warmer
 
-The profile page KPI cards read their numbers from WordPress post meta at
-render time. The importer (`database/import-mps.php`) only writes
-identity/contact fields; the aggregated spend metrics must be written in a
-separate step after `pt-finance-01` has data.
-
-### 2.1 Meta keys used by the profile template
-
-| Meta key          | Type    | Description                                                              |
-| ----------------- | ------- | ------------------------------------------------------------------------ |
-| `total_spend`     | integer | All-time total `amount_cad` from `expenditures` for this MP (CAD cents or whole dollars — be consistent) |
-| `travel_spend`    | integer | Total `amount_cad` where `category` = `'Travel'` (adjust to match your category labels) |
-| `contracts_n`     | integer | Count of distinct `vendor_name` values (proxy for contracts awarded)     |
-| `votes_cast`      | integer | Parliamentary votes attendance count — source depends on your data pipeline (see note below) |
-| `integrity_score` | integer | 0–100 audit score; rendered as `—` when 0; shown in amber when < 80     |
-| `open_flags`      | integer | Count of `audit-flag` CPT posts linked to this MP, or a computed value   |
-
-> **`votes_cast` note**: This field is not in `grantconts` or `pt-finance-01`.
-> If you have a parliamentary votes data source, populate it during that
-> import. If not, leave it at 0 — the KPI card will show `0 attendance`
-> but won't error.
-
-> **`integrity_score` / `open_flags` note**: These are intentionally
-> pluggable — the `publictech_mp_affiliations` filter and the `audit-flag`
-> CPT are the canonical hooks. Populate from your own scoring logic or leave
-> at 0 until that pipeline exists.
-
-### 2.2 Aggregation script
-
-Create `database/aggregate-mp-kpis.php`. Run it via WP-CLI after
-`pt-finance-01` is wired up and populated:
+### First run (manual, via WP-CLI)
 
 ```bash
-wp eval-file database/aggregate-mp-kpis.php
+wp eval-file database/warm-mp-finance-cache.php
 ```
 
-Skeleton — adapt `category` values to match your actual data:
+Expected output:
 
-```php
-<?php
-/**
- * Populate MP KPI post meta from pt-finance-01.expenditures.
- *
- * Run via: wp eval-file database/aggregate-mp-kpis.php
- *
- * Safe to re-run — uses update_post_meta (upsert). Skips MPs with no
- * external_mp_id or no rows in the expenditures table.
- */
-
-defined( 'ABSPATH' ) || die( "Run via: wp eval-file\n" );
-
-$mps = get_posts( [
-    'post_type'      => 'member-parliament',
-    'post_status'    => 'publish',
-    'posts_per_page' => -1,
-    'fields'         => 'ids',
-] );
-
-$db       = publictech_db( 'pt-finance-01' );
-$progress = WP_CLI\Utils\make_progress_bar( 'Aggregating MP KPIs', count( $mps ) );
-$updated  = 0;
-$skipped  = 0;
-
-foreach ( $mps as $post_id ) {
-    $ext_id = (string) get_post_meta( $post_id, 'external_mp_id', true );
-    if ( '' === $ext_id ) {
-        $skipped++;
-        $progress->tick();
-        continue;
-    }
-
-    try {
-        $rows = $db->select(
-            'SELECT
-                 COALESCE(SUM(amount_cad), 0)                                    AS total_spend,
-                 COALESCE(SUM(CASE WHEN category = ? THEN amount_cad END), 0)    AS travel_spend,
-                 COUNT(DISTINCT vendor_name)                                      AS contracts_n
-               FROM expenditures
-              WHERE mp_id = ? AND amount_cad > 0',
-            [ 'Travel', $ext_id ]   // adjust 'Travel' to match your category label
-        );
-    } catch ( \Throwable $e ) {
-        WP_CLI::warning( "DB error for ext_id={$ext_id}: " . $e->getMessage() );
-        $skipped++;
-        $progress->tick();
-        continue;
-    }
-
-    if ( empty( $rows ) ) {
-        $skipped++;
-        $progress->tick();
-        continue;
-    }
-
-    $row = $rows[0];
-    update_post_meta( $post_id, 'total_spend',  (int) $row['total_spend'] );
-    update_post_meta( $post_id, 'travel_spend', (int) $row['travel_spend'] );
-    update_post_meta( $post_id, 'contracts_n',  (int) $row['contracts_n'] );
-    $updated++;
-    $progress->tick();
-}
-
-$progress->finish();
-WP_CLI::success( "Done. Updated: {$updated}  Skipped (no ext_id or no rows): {$skipped}" );
+```
+Starting MP finance cache warm…
+Loading expenditure rows from source…
+Loaded 3549 fiscal-year rows for 592 MPs.
+Period rows written to cache.
+KPI rows written for 592 MPs.
+Post meta updated for 336 WP posts.
+Warm complete in 4.2s.
+Success: Done. 592 unique MPs cached, 336 WP posts updated with KPI meta, completed in 4.2s.
 ```
 
-### 2.3 Keep it fresh with WP-Cron
+The warmer is idempotent — safe to re-run after a data refresh.
 
-Once the initial run completes, schedule weekly re-aggregation alongside the
-riding cache warmer. Add to an mu-plugin or `wp-config.php`:
+### Ongoing — weekly WP-Cron
 
-```php
-// Schedule MP KPI aggregation weekly (Sundays 04:00 UTC).
-add_action( 'publictech_aggregate_mp_kpis', function () {
-    $mps = get_posts( [
-        'post_type'      => 'member-parliament',
-        'post_status'    => 'publish',
-        'posts_per_page' => -1,
-        'fields'         => 'ids',
-    ] );
-    $db = publictech_db( 'pt-finance-01' );
-    foreach ( $mps as $post_id ) {
-        $ext_id = (string) get_post_meta( $post_id, 'external_mp_id', true );
-        if ( '' === $ext_id ) {
-            continue;
-        }
-        try {
-            $rows = $db->select(
-                'SELECT
-                     COALESCE(SUM(amount_cad), 0)                                 AS total_spend,
-                     COALESCE(SUM(CASE WHEN category = ? THEN amount_cad END), 0) AS travel_spend,
-                     COUNT(DISTINCT vendor_name)                                   AS contracts_n
-                   FROM expenditures
-                  WHERE mp_id = ? AND amount_cad > 0',
-                [ 'Travel', $ext_id ]
-            );
-            if ( ! empty( $rows ) ) {
-                update_post_meta( $post_id, 'total_spend',  (int) $rows[0]['total_spend'] );
-                update_post_meta( $post_id, 'travel_spend', (int) $rows[0]['travel_spend'] );
-                update_post_meta( $post_id, 'contracts_n',  (int) $rows[0]['contracts_n'] );
-            }
-        } catch ( \Throwable $e ) {
-            error_log( '[PublicTech] KPI aggregation failed for post ' . $post_id . ': ' . $e->getMessage() );
-        }
-    }
-} );
+The cron event (`publictech_warm_mp_finance`) is registered in
+`publictech-core/functions.php` and schedules itself for Sundays at 05:00 UTC
+on first activation. It runs one week after the riding-cache warm (Sundays 04:00)
+so the two batch jobs don't overlap.
 
-if ( ! wp_next_scheduled( 'publictech_aggregate_mp_kpis' ) ) {
-    wp_schedule_event( strtotime( 'next Sunday 04:00:00' ), 'weekly', 'publictech_aggregate_mp_kpis' );
-}
+Verify the schedule:
+
+```bash
+wp cron event list | grep mp_finance
 ```
 
-Ensure real cron is wired (DEPLOYMENT.md §8.5) so this event actually fires.
+Ensure real cron is wired (DEPLOYMENT.md §8.5) so it fires reliably.
 
 ---
 
-## Part 3 — Completion checklist
+## Verification checklist
 
-Work through these in order. Each step is independently verifiable before
-moving on.
-
-- [ ] `pt-finance-01` MySQL user provisioned with `SELECT` on `expenditures`
-- [ ] `PUBLICTECH_DB_CONNECTIONS` updated in `wp-config.php` with `pt-finance-01` block
-- [ ] `/wp-json/publictech/v1/status` shows `"pt-finance-01": { "ok": true }` 
-- [ ] `/wp-json/publictech/v1/mp/{id}/spend` returns rows for at least one MP
-- [ ] Charts (Spending Breakdown, Category Comparison, Funding Flow Network) render on the MP profile page
-- [ ] `database/aggregate-mp-kpis.php` script created and run via WP-CLI
-- [ ] KPI cards on the MP profile page show non-zero values
-- [ ] Weekly WP-Cron event registered for ongoing re-aggregation
-- [ ] Cron event verified with `wp cron event list | grep publictech_aggregate`
+- [ ] Both connections show `"ok": true` in `/wp-json/publictech/v1/status`
+- [ ] Warmer runs without errors: `wp eval-file database/warm-mp-finance-cache.php`
+- [ ] Rows in cache: `SELECT COUNT(*) FROM mp_expenditure_periods` (expect ~14 000)
+- [ ] KPIs in cache: `SELECT COUNT(*) FROM mp_kpi_cache` (expect ~592)
+- [ ] Spend endpoint returns rows: `curl .../wp-json/publictech/v1/mp/{id}/spend`
+- [ ] Line chart renders on an MP profile page (Spending Breakdown)
+- [ ] Bar chart renders (Category Comparison)
+- [ ] KPI cards show non-zero dollar values (Total Office Spend, Travel Expenses, Contract Spend)
+- [ ] WP-Cron event is scheduled: `wp cron event list | grep mp_finance`
 
 ---
 
-## Background — bugs fixed during investigation (2026-05-28)
+## Data notes
 
-These three code bugs were found and fixed while diagnosing the empty
-profile pages. They are committed on `main` and require no further action.
+| Field         | Source                  | Notes                                                     |
+| ------------- | ----------------------- | --------------------------------------------------------- |
+| Total Spend   | salaries+travel+hosp+contracts | All four HoC expense categories summed          |
+| Travel Spend  | travel column           | Matches HoC "Members' Travel" line                        |
+| Contract Spend | contracts column       | HoC "Contracts" line — dollar amount, not vendor count    |
+| Votes Cast    | *no source yet*         | Remains 0 until a parliamentary votes feed is added       |
+| Fiscal year (chart x-axis) | LEFT(fiscal_year,4) | Stored as start year INT, e.g. 2024 for "2024-2025" |
+
+**Why `pt-cache-02` and not a new `pt-finance-01`?** The original plan assumed
+a separate finance DB. Since the data already lives in `grantconts` and the
+cache infrastructure (`pt-cache-02`) is already wired, pre-computing into the
+cache avoids an extra DB connection and keeps all the precomputed data in one
+place alongside the riding rollups.
+
+---
+
+## Bugs fixed during investigation (2026-05-28)
+
+These are committed on `main` and require no further action.
 
 | File | Bug | Fix |
 | ---- | --- | --- |
-| `publictech-terminal/single-member-parliament.php` | Inline `<script>` ran before `get_footer()`, so `window.PT` (deferred `d3-charts.js`) and `window.PT_BOOT` (`wp_localize_script` output) were both undefined — the `!window.PT` guard silently exited, no API calls were made, no charts rendered | Wrapped the block in `document.addEventListener('DOMContentLoaded', …)` so it runs after all deferred scripts |
-| `publictech-core/inc/class-rest-api.php` | `external_mp_id` was cast `(int)` — a varchar like `"P0001"` became `0`, failing the `<= 0` guard and returning 404 "Member not linked" | Changed to string comparison: `(string)` cast, check `'' === $ext_id` |
-| `publictech-core/inc/class-rest-api.php` + `publictech-terminal/archive-member-parliament.php` | Both read `riding` post meta; the importer writes `pt_mp_district` — riding names appeared empty on directory cards | Updated both to use `pt_mp_district` with `riding` as fallback (matching the single-MP template's existing pattern) |
+| `publictech-terminal/single-member-parliament.php` | Inline `<script>` ran before `get_footer()`, so `window.PT` and `window.PT_BOOT` were undefined — the guard silently exited, no charts rendered | Wrapped in `document.addEventListener('DOMContentLoaded', …)` |
+| `publictech-core/inc/class-rest-api.php` | `external_mp_id` was cast `(int)` — varchar `"P0001"` became `0`, returning 404 "Member not linked" | Changed to `(string)` cast with `'' === $ext_id` guard |
+| `publictech-core/inc/class-rest-api.php` + `publictech-terminal/archive-member-parliament.php` | Both read `riding` post meta; the importer writes `pt_mp_district` — riding names empty on directory cards | Updated to use `pt_mp_district` with `riding` as fallback |

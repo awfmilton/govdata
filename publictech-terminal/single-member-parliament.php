@@ -178,9 +178,9 @@ get_header(); ?>
 						<svg class="spark" id="ptSpark2" aria-hidden="true"></svg>
 					</div>
 					<div class="kpi">
-						<div class="lab"><?php esc_html_e( 'Contracts Awarded', 'publictech-terminal' ); ?></div>
-						<div class="val"><?php echo esc_html( number_format_i18n( $contracts ) ); ?></div>
-						<div class="delta dim"><?php esc_html_e( 'vendors', 'publictech-terminal' ); ?></div>
+						<div class="lab"><?php esc_html_e( 'Contract Spend', 'publictech-terminal' ); ?></div>
+						<div class="val">$<?php echo esc_html( number_format_i18n( $contracts ) ); ?></div>
+						<div class="delta dim"><?php esc_html_e( 'total', 'publictech-terminal' ); ?></div>
 						<svg class="spark" id="ptSpark3" aria-hidden="true"></svg>
 					</div>
 					<div class="kpi">
