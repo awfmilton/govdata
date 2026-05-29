@@ -144,6 +144,14 @@ Restrict the `'%'` host pattern to your WordPress server's IPs in production.
 | ------------------ | --------------------- | ------------------ | --------- | -------------------------- |
 | `pt-grantconts-01` | `35.230.186.163`      | `grantconts`       | read-only | `master_table`, `pcbfr`, `agreements`, `recipients`, `programs`, `locations`, `mps`, `tbayrainy_view` |
 | `pt-cache-02`      | `mysql.alexmilton.ca` | `govdata_cache_02` | read/write | `riding_cache`, `cache_meta` (created by the warmer; see §4.7) |
+| `pt-finance-01`    | *(not yet configured)* | *(pending)*       | read-only  | `expenditures` — per-MP office spend by fiscal year, category, vendor |
+
+> **`pt-finance-01` is not wired up yet.** MP profile KPI cards (Total Office
+> Spend, Travel Expenses, Contracts Awarded) and the Spending Breakdown,
+> Category Comparison, and Funding Flow charts all require this connection.
+> When your finance data source is ready, follow
+> [MP-FINANCE-DATA.md](../MP-FINANCE-DATA.md) — it covers the expected schema,
+> the `wp-config.php` snippet, and the WP-CLI KPI aggregation script.
 
 The full column-level schema for grantconts is in `database/grantconts-schema.json`.
 Column maps that expose those columns to the front end live in
@@ -741,6 +749,8 @@ Hide & Security Enhancer Pro.
 | `/wp-json/publictech/v1/status` returns `404` | REST not enabled / rewritten by a security plugin | If using *WP Hide & Security Enhancer Pro* the Compat shim already allow-lists PublicTech; otherwise add the namespace manually. |
 | Stream table loads, then "Stream failed." | Schema/table not registered via `publictech_columns_{alias}_{table}` | See §4.4. |
 | 403 on a stream endpoint | Caller's tier doesn't include that schema | See `Access_Tiers::tiers()` and `publictech_tiers` filter (§6.3). |
+| MP profile KPI cards all show `$0` / `0` and charts are blank | `pt-finance-01` DB connection not declared in `wp-config.php`, or KPI post meta not yet aggregated | See [MP-FINANCE-DATA.md](../MP-FINANCE-DATA.md). |
+| `mp.spending` returns "Member not linked to finance schema" | `external_mp_id` post meta is empty on that MP post — importer not yet run, or ran before data was in the source DB | Re-run the MP importer (§4.5). Note: `external_mp_id` is a VARCHAR like `"P0001"`, not a number. |
 | `mp.spending` returns "Member not linked to grant row" | `external_mp_id` user-meta missing on the MP post | See §4.5. |
 | AI Console returns the stub SQL `-- text-to-sql backend not configured` | `publictech_text_to_sql` filter not wired | See §7.1. |
 | MCP `curl` returns `-32001 Unauthorized` | Token wrong, expired/rotated, or not sent with `Bearer ` prefix | Rotate the token (§6.2) and use the freshly displayed value. |

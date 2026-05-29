@@ -203,8 +203,8 @@ final class REST_API {
 		if ( $mp_id <= 0 || 'member-parliament' !== get_post_type( $mp_id ) ) {
 			return new \WP_Error( 'pt_not_found', 'Member not found.', [ 'status' => 404 ] );
 		}
-		$ext_id = (int) get_post_meta( $mp_id, 'external_mp_id', true );
-		if ( $ext_id <= 0 ) {
+		$ext_id = (string) get_post_meta( $mp_id, 'external_mp_id', true );
+		if ( '' === $ext_id ) {
 			return new \WP_Error( 'pt_not_found', 'Member not linked to finance schema.', [ 'status' => 404 ] );
 		}
 		try {
@@ -420,7 +420,7 @@ final class REST_API {
 			'slug'    => get_post_field( 'post_name', $post_id ),
 			'party'   => $party_terms[0] ?? '',
 			'region'  => $region_terms[0] ?? '',
-			'riding'  => (string) get_post_meta( $post_id, 'riding', true ),
+			'riding'  => (string) ( get_post_meta( $post_id, 'pt_mp_district', true ) ?: get_post_meta( $post_id, 'riding', true ) ),
 			'spend'   => (int) get_post_meta( $post_id, 'total_spend', true ),
 			'flags'   => (int) get_post_meta( $post_id, 'open_flags', true ),
 			'votes'   => (int) get_post_meta( $post_id, 'votes_cast', true ),
