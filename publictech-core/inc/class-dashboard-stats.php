@@ -85,8 +85,9 @@ final class Dashboard_Stats {
 	}
 
 	private static function query( Connection $db ): array {
-		// Aggregate queries over master_table can exceed the default 8 s limit.
-		$db->pdo()->exec( 'SET SESSION MAX_EXECUTION_TIME=30000' );
+		// Aggregate queries over master_table take 30-120 s on shared MySQL —
+		// remove the per-statement limit for this cached batch job.
+		$db->pdo()->exec( 'SET SESSION max_execution_time=0' );
 
 		// Headline totals.
 		$head = $db->select(

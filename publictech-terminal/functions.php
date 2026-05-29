@@ -83,7 +83,7 @@ add_action( 'wp_enqueue_scripts', static function () {
 	}
 
 	// Homepage dashboard: KPI counter animations + D3 horizontal bar charts.
-	if ( is_front_page() && wp_script_is( 'publictech-charts', 'registered' ) ) {
+	if ( ( is_front_page() || is_page_template( 'page-templates/template-dashboard.php' ) ) && wp_script_is( 'publictech-charts', 'registered' ) ) {
 		wp_enqueue_script(
 			'publictech-dashboard',
 			PUBLICTECH_TERMINAL_URL . 'assets/js/dashboard.js',
