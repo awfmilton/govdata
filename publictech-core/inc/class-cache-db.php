@@ -124,6 +124,10 @@ final class Cache_DB {
 			\PDO::ATTR_TIMEOUT            => 5,
 		] );
 
+		// Match the collation used by entity_snapshots / entity_agreements tables so
+		// stored-procedure parameter comparisons don't fail with collation mismatch errors.
+		$pdo->exec( "SET NAMES 'utf8mb4' COLLATE 'utf8mb4_unicode_ci'" );
+
 		if ( 'writer' === $role ) {
 			$this->writer = $pdo;
 		} else {

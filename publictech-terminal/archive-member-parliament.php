@@ -108,7 +108,7 @@ get_header(); ?>
 							$region   = get_the_terms( $mp_id, 'mp_region' );
 							$party_n  = $party  && ! is_wp_error( $party )  ? $party[0]->name  : '';
 							$region_n = $region && ! is_wp_error( $region ) ? $region[0]->name : '';
-							$riding   = (string) get_post_meta( $mp_id, 'riding', true );
+							$riding   = (string) ( get_post_meta( $mp_id, 'pt_mp_district', true ) ?: get_post_meta( $mp_id, 'riding', true ) );
 							$spend    = (int) get_post_meta( $mp_id, 'total_spend', true );
 							$flags    = (int) get_post_meta( $mp_id, 'open_flags',  true );
 							$votes    = (int) get_post_meta( $mp_id, 'votes_cast',  true );
