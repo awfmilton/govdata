@@ -85,6 +85,9 @@ final class Dashboard_Stats {
 	}
 
 	private static function query( Connection $db ): array {
+		// Aggregate queries over master_table can exceed the default 8 s limit.
+		$db->pdo()->exec( 'SET SESSION MAX_EXECUTION_TIME=30000' );
+
 		// Headline totals.
 		$head = $db->select(
 			'SELECT
