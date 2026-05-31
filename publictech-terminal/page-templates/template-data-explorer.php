@@ -205,4 +205,16 @@ get_header(); ?>
 	'recaptchaSiteKey' => $recaptcha_site_key,
 ] ); ?></script>
 
+<?php
+// Inline the column list so the query builder renders it INSTANTLY, with no
+// REST round-trip. The /schema endpoint costs ~0.3s of WordPress bootstrap per
+// call and only fires after all page JS loads (~1.2s perceived). The list is
+// static and known at render time, so we ship it in the page. query-builder-ui.js
+// reads window.PT_QB_COLUMNS first and only falls back to the REST fetch if absent.
+$pt_inline_cols = class_exists( '\\PublicTech\\Core\\REST_API' )
+	? \PublicTech\Core\REST_API::columns_for( (string) $pt_schema, (string) $pt_table )
+	: [];
+?>
+<script>window.PT_QB_COLUMNS = <?php echo wp_json_encode( $pt_inline_cols ); ?>;</script>
+
 <?php get_footer();
