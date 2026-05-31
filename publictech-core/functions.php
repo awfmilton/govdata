@@ -11,7 +11,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'PUBLICTECH_CORE_VERSION', '1.0.0' );
+define( 'PUBLICTECH_CORE_VERSION', '1.1.0' );
 define( 'PUBLICTECH_CORE_DIR', trailingslashit( get_template_directory() ) );
 define( 'PUBLICTECH_CORE_URL', trailingslashit( get_template_directory_uri() ) );
 define( 'PUBLICTECH_CORE_REST_NS', 'publictech/v1' );

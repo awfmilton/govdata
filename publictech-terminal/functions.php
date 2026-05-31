@@ -11,7 +11,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'PUBLICTECH_TERMINAL_VERSION', '1.0.0' );
+define( 'PUBLICTECH_TERMINAL_VERSION', '1.1.0' );
 define( 'PUBLICTECH_TERMINAL_URL',     trailingslashit( get_stylesheet_directory_uri() ) );
 define( 'PUBLICTECH_TERMINAL_DIR',     trailingslashit( get_stylesheet_directory() ) );
 
