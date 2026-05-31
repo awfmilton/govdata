@@ -768,6 +768,20 @@
 		const table  = elTable.value.trim();
 		if ( ! schema || ! table ) { setStatus( 'Select a schema and enter a table name.', true ); return; }
 
+		// Fast path: columns inlined into the page (window.PT_QB_COLUMNS) render
+		// instantly with no REST round-trip. The server endpoint costs ~0.3s of
+		// WP bootstrap and only fires after all page JS loads. Only fall through
+		// to fetch() when no inline columns are present (e.g. the standalone
+		// query-builder page where the table can be changed by the user).
+		if ( Array.isArray( window.PT_QB_COLUMNS ) && window.PT_QB_COLUMNS.length ) {
+			columns = window.PT_QB_COLUMNS;
+			if ( elLoadCols ) elLoadCols.disabled = false;
+			populateSortSelect();
+			setStatus( columns.length + ' columns ready.', false );
+			if ( elCondEmpty ) elCondEmpty.style.display = 'none';
+			return;
+		}
+
 		setStatus( 'Loading columns…', false );
 		if ( elLoadCols ) elLoadCols.disabled = true;
 
