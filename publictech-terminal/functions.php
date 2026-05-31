@@ -123,7 +123,7 @@ add_action( 'wp_enqueue_scripts', static function () {
 				esc_url_raw( 'https://www.google.com/recaptcha/api.js?render=' . urlencode( $recaptcha_key ) ),
 				[],
 				null,
-				true
+				[ 'strategy' => 'defer', 'in_footer' => true ]
 			);
 		}
 
@@ -136,7 +136,7 @@ add_action( 'wp_enqueue_scripts', static function () {
 			) ),
 			[],
 			'14.14.4',
-			true
+			[ 'strategy' => 'defer', 'in_footer' => true ]
 		);
 
 		// Query builder module (provides PT.QueryBuilder + PT.NLP).
@@ -145,7 +145,7 @@ add_action( 'wp_enqueue_scripts', static function () {
 			PUBLICTECH_TERMINAL_URL . 'assets/js/query-builder-ui.js',
 			[ 'compromise', 'wp-i18n' ],
 			PUBLICTECH_TERMINAL_VERSION,
-			true
+			[ 'strategy' => 'defer', 'in_footer' => true ]
 		);
 
 		// Data explorer orchestration (charts + tier notify + analytics + captcha).
@@ -154,7 +154,7 @@ add_action( 'wp_enqueue_scripts', static function () {
 			PUBLICTECH_TERMINAL_URL . 'assets/js/data-explorer.js',
 			[ 'publictech-query-builder-ui', 'publictech-billboard-bridge' ],
 			PUBLICTECH_TERMINAL_VERSION,
-			true
+			[ 'strategy' => 'defer', 'in_footer' => true ]
 		);
 	}
 
@@ -168,14 +168,14 @@ add_action( 'wp_enqueue_scripts', static function () {
 			) ),
 			[],
 			'14.14.4',
-			true
+			[ 'strategy' => 'defer', 'in_footer' => true ]
 		);
 		wp_enqueue_script(
 			'publictech-query-builder-ui',
 			PUBLICTECH_TERMINAL_URL . 'assets/js/query-builder-ui.js',
 			[ 'compromise', 'wp-i18n' ],
 			PUBLICTECH_TERMINAL_VERSION,
-			true
+			[ 'strategy' => 'defer', 'in_footer' => true ]
 		);
 	}
 
@@ -183,6 +183,13 @@ add_action( 'wp_enqueue_scripts', static function () {
 		'mode' => get_theme_mod( 'pt_default_theme', 'dark' ),
 	] );
 }, 25 );
+
+// Google Fonts is loaded on every page; add preconnect unconditionally so the
+// browser can resolve the CDN before the stylesheet request fires.
+add_action( 'wp_head', static function () {
+	echo '<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>' . "\n";
+	echo '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>' . "\n";
+}, 1 );
 
 add_action( 'wp_body_open', static function () {
 	require PUBLICTECH_TERMINAL_DIR . 'parts/header-rail.php';
@@ -213,15 +220,6 @@ add_filter( 'theme_page_templates', static function ( array $tpls ): array {
 add_filter( 'publictech_force_billboard', static function ( bool $force ): bool {
 	if ( ! is_page() ) return $force;
 	return $force || is_page_template( 'page-templates/template-data-explorer.php' );
-} );
-
-/* ----- Frontend opt-in to the D3 asset pipeline whenever a PT page template is used. */
-add_filter( 'publictech_force_assets', static function ( bool $force ): bool {
-	if ( ! is_page() ) {
-		return $force;
-	}
-	$tpl = get_page_template_slug( get_queried_object_id() );
-	return $force || str_starts_with( (string) $tpl, 'page-templates/' );
 } );
 
 /* ----- Default schema columns exposed via the stream endpoint. Sites with

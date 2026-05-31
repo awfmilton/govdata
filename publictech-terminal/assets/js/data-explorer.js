@@ -104,22 +104,32 @@
 	/** Send an event to the analytics endpoint (fire-and-forget). */
 	function track( eventType, data ) {
 		if ( ! boot.rest || ! boot.nonce ) return;
+		const payload = JSON.stringify( {
+			session_id : sessionId,
+			event_type : eventType,
+			page       : global.location.href,
+			referrer   : document.referrer || '',
+			browser    : _browser,
+			data       : data || {},
+		} );
+		const url = boot.rest + '/analytics/event';
+		// sendBeacon is designed for fire-and-forget analytics — it queues the
+		// request to the browser's idle time and survives page unload natively.
+		// Fall back to keepalive fetch on browsers that lack Beacon API.
+		if ( global.navigator && global.navigator.sendBeacon ) {
+			try {
+				const blob = new Blob( [ payload ], { type: 'application/json' } );
+				if ( global.navigator.sendBeacon( url, blob ) ) return;
+			} catch ( _ ) {}
+		}
 		try {
-			fetch( boot.rest + '/analytics/event', {
+			fetch( url, {
 				method     : 'POST',
 				credentials: 'same-origin',
 				headers    : { 'Content-Type': 'application/json', 'x-wp-nonce': boot.nonce },
-				// keepalive: true so the request survives page unload (for session_end events)
 				keepalive  : true,
-				body       : JSON.stringify( {
-					session_id : sessionId,
-					event_type : eventType,
-					page       : global.location.href,
-					referrer   : document.referrer || '',
-					browser    : _browser,
-					data       : data || {},
-				} ),
-			} ).catch( () => {} ); // silently swallow errors
+				body       : payload,
+			} ).catch( () => {} );
 		} catch ( _ ) {}
 	}
 
