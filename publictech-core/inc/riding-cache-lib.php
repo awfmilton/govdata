@@ -106,6 +106,76 @@ function pt_riding_keyword_text_sql( string $alias = 'm' ): string {
 }
 
 /**
+ * Build the MATCH() column list for the FULLTEXT index `ft_riding_scan`.
+ *
+ * The column set MUST exactly match the ft_riding_scan index definition on
+ * master_table, or MySQL raises "Can't find FULLTEXT index matching the column
+ * list". These are the same columns as pt_riding_keyword_text_columns().
+ *
+ * @param string $alias Table alias used in the query (e.g. "m").
+ */
+function pt_riding_keyword_fulltext_columns_sql( string $alias = 'm' ): string {
+	$alias = preg_replace( '/[^A-Za-z0-9_]/', '', $alias ) ?: 'm';
+	$cols  = [];
+	foreach ( pt_riding_keyword_text_columns() as $col ) {
+		$cols[] = "`{$alias}`.`{$col}`";
+	}
+	return 'MATCH(' . implode( ', ', $cols ) . ')';
+}
+
+/**
+ * Build the BOOLEAN-MODE AGAINST literal that pre-filters rows to those matching
+ * ANY keyword pattern at word level — a fast FULLTEXT superset of the exact LIKE
+ * attribution done per-keyword afterwards (the "hybrid": index pre-filter +
+ * exact substring confirm).
+ *
+ * Each pattern is emitted as a quoted phrase so multi-word and punctuated
+ * patterns ("Canada Periodical Fund", "anti-hate") match as phrases; FULLTEXT
+ * boolean operators are stripped from inside the phrase so they are treated
+ * literally. Space-separated phrases are OR semantics in boolean mode.
+ *
+ * NOTE: FULLTEXT matches whole words, so this pre-filter intentionally drops
+ * infix-only substring hits (e.g. "Egale" inside "légale") — those are noise.
+ *
+ * @param array<int,array{key:string,label:string,patterns:string[]}> $keywords
+ * @return string A SQL string literal ready to drop into AGAINST ( … ).
+ */
+function pt_riding_keyword_fulltext_against( array $keywords ): string {
+	$phrases = [];
+	$seen    = [];
+	foreach ( $keywords as $kw ) {
+		foreach ( (array) ( $kw['patterns'] ?? [] ) as $pattern ) {
+			$pattern = trim( (string) $pattern );
+			if ( '' === $pattern ) {
+				continue;
+			}
+			// Strip FULLTEXT boolean operators / punctuation that would change
+			// the meaning, collapse whitespace, and keep only tokens >= the
+			// min token size are handled by MySQL itself.
+			$clean = preg_replace( '/["()<>~*+@\-]/', ' ', $pattern );
+			$clean = trim( preg_replace( '/\s+/', ' ', (string) $clean ) );
+			if ( '' === $clean ) {
+				continue;
+			}
+			$key = strtolower( $clean );
+			if ( isset( $seen[ $key ] ) ) {
+				continue;
+			}
+			$seen[ $key ] = true;
+			$phrases[]    = '"' . $clean . '"';
+		}
+	}
+	if ( ! $phrases ) {
+		// No usable phrases — match nothing (boolean term that cannot occur).
+		return "'+~~~no~~~match~~~'";
+	}
+	$against = implode( ' ', $phrases );
+	// Escape for a single-quoted SQL string literal.
+	$escaped = str_replace( [ '\\', "'" ], [ '\\\\', "''" ], $against );
+	return "'" . $escaped . "'";
+}
+
+/**
  * Quote and escape a needle as a MySQL `LIKE '%needle%'` literal.
  *
  * LIKE wildcards (`%`, `_`) and the escape char (`\`) are neutralised so the
