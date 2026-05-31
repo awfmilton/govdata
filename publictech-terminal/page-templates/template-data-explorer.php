@@ -72,6 +72,11 @@ get_header(); ?>
 
 	<!-- ── FILTER BUILDER PANEL ─────────────────────────────────────────── -->
 	<div id="de-panel-filter">
+		<?php // query-builder-ui.js reads schema/table from these elements at load
+		      // time (captured as constants). The data-explorer UI is otherwise
+		      // de-*; without these its loadColumns() bails before fetching. ?>
+		<input type="hidden" id="pt-qb-schema" value="pt-grantconts-01">
+		<input type="hidden" id="pt-qb-table" value="master_table">
 		<div class="panel corner" style="margin-bottom:12px">
 			<div class="hd" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
 				<h3>◇ <?php esc_html_e( 'Filter Conditions', 'publictech-terminal' ); ?></h3>
