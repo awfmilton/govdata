@@ -287,14 +287,20 @@
 
 		try {
 			if ( currentMode === 'nl' ) {
-				// NL mode: apply NL parse first (populates filter rows), then run
+				// NL mode: apply NL parse first (populates filter rows), then run.
+				// applyNL returns false when parsing fails — skip the query in that case
+				// so a failed parse doesn't silently run an unfiltered full-table scan.
+				let nlOk = true;
 				if ( PT.QueryBuilder && typeof PT.QueryBuilder.applyNL === 'function' ) {
-					await PT.QueryBuilder.applyNL();
+					const result = await PT.QueryBuilder.applyNL();
+					if ( result === false ) nlOk = false;
 				}
 				track( 'nl_search', {
 					query : elNLInput ? elNLInput.value : '',
 					mode  : 'nl',
+					parsed: nlOk,
 				} );
+				if ( ! nlOk ) return;
 			} else {
 				track( 'search_run', {
 					mode         : 'filter',
