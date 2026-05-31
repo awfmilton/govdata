@@ -359,7 +359,8 @@ get_header(); ?>
 	var boot = (window.PT && PT.boot) || {};
 
 	/* ── Charts ───────────────────────────────────────────────────────────── */
-	if (window.PT && PT.chart && DATA && DATA.totals) {
+	function ptEntDrawCharts() {
+		if (!(window.PT && PT.chart && DATA && DATA.totals)) { return; }
 		var accent = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#00a0d2';
 		var pos    = getComputedStyle(document.documentElement).getPropertyValue('--pos').trim()    || '#3ddc97';
 		var ink2   = getComputedStyle(document.documentElement).getPropertyValue('--ink-2').trim()  || '#6b7686';
@@ -406,6 +407,23 @@ get_header(); ?>
 		PT.chart(document.getElementById('ptEntSparkTotal'), 'spark', trend, { color: accent });
 		PT.chart(document.getElementById('ptEntSparkCount'), 'spark', counts, { color: pos });
 	}
+
+	// Defer chart rendering until window.PT (the chart library) is available.
+	// This inline script runs in the page body, BEFORE the footer-enqueued
+	// publictech-charts script, so a one-time guard skipped every chart. Draw
+	// now if ready, otherwise on DOMContentLoaded, otherwise poll briefly.
+	(function ptEntChartsReady() {
+		if (window.PT && PT.chart) { ptEntDrawCharts(); return; }
+		if (document.readyState === 'loading') {
+			document.addEventListener('DOMContentLoaded', ptEntChartsReady);
+			return;
+		}
+		var tries = 0;
+		var iv = setInterval(function () {
+			if (window.PT && PT.chart) { clearInterval(iv); ptEntDrawCharts(); }
+			else if (++tries > 100) { clearInterval(iv); }
+		}, 50);
+	})();
 
 	/* ── In-page live search → cache database via REST ──────────────────────── */
 	var form = document.getElementById('ptEntSearchForm');
