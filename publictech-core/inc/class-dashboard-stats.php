@@ -4,8 +4,12 @@
  *
  * Aggregates master_table into a compact payload used both by the homepage
  * template (inlined as window.PT_DASH) and the public REST endpoint
- * GET /publictech/v1/dashboard/stats. Result is cached 15 minutes in the
- * WP object cache to avoid hitting the DB on every page load.
+ * GET /publictech/v1/dashboard/stats.
+ *
+ * The DB query NEVER runs during a page request. get() returns the cached
+ * value instantly and, on a cache miss, schedules an immediate background
+ * cron event (run_warm) to repopulate the transient. A recurring daily cron
+ * keeps the cache fresh between miss/warm cycles.
  *
  * @package PublicTech\Core
  */
@@ -18,9 +22,10 @@ final class Dashboard_Stats {
 
 	private static ?self $instance = null;
 
+	public  const CRON_HOOK  = 'publictech_refresh_dashboard_stats';
 	private const CACHE_KEY   = 'pt_dash_stats_v2';
 	private const CACHE_GROUP = 'publictech';
-	private const CACHE_TTL   = 90000; // 25 hours — refreshed by nightly cron at 02:00
+	private const CACHE_TTL   = 90000; // 25 hours
 
 	public static function instance(): self {
 		return self::$instance ??= new self();
@@ -29,6 +34,8 @@ final class Dashboard_Stats {
 	private function __construct() {
 		add_action( 'rest_api_init', [ $this, 'register' ] );
 	}
+
+	// ── REST ─────────────────────────────────────────────────────────────────
 
 	public function register(): void {
 		register_rest_route( PUBLICTECH_CORE_REST_NS, '/dashboard/stats', [
@@ -40,62 +47,86 @@ final class Dashboard_Stats {
 
 	public function rest_handler( \WP_REST_Request $req ): \WP_REST_Response {
 		$resp = rest_ensure_response( self::get() );
-		$resp->header( 'Cache-Control', 'public, max-age=' . self::CACHE_TTL );
+		$resp->header( 'Cache-Control', 'public, max-age=3600' );
 		return $resp;
 	}
 
+	// ── Public API ────────────────────────────────────────────────────────────
+
 	/**
-	 * Return aggregated dashboard stats. Safe to call from templates — uses a
-	 * two-layer cache (in-memory object cache + persistent DB transient) and
-	 * never throws (returns empty payload on DB failure).
-	 *
-	 * On hosts without a persistent object cache (Memcached/Redis), wp_cache
-	 * resets every request. The transient layer ensures the expensive DB
-	 * aggregation only runs once per CACHE_TTL period regardless of host config.
+	 * Return cached dashboard stats. Always returns immediately — never blocks
+	 * on a DB query. If the cache is cold, returns the empty payload and
+	 * schedules a background warm so the next page load has real data.
 	 */
 	public static function get(): array {
-		// Layer 1: in-memory object cache (free hit if Redis/Memcached is configured).
+		// Layer 1: in-memory object cache (free hit when Redis/Memcached is up).
 		$cached = wp_cache_get( self::CACHE_KEY, self::CACHE_GROUP );
 		if ( is_array( $cached ) ) {
 			return $cached;
 		}
 
-		// Layer 2: persistent DB transient — survives across PHP processes.
+		// Layer 2: persistent transient (survives PHP restarts without Redis).
 		$transient = get_transient( self::CACHE_KEY );
 		if ( is_array( $transient ) ) {
 			wp_cache_set( self::CACHE_KEY, $transient, self::CACHE_GROUP, self::CACHE_TTL );
 			return $transient;
 		}
 
+		// Cache is cold — kick off a background refresh and return empty immediately.
+		// The page never waits for the DB.
+		self::schedule_immediate_warm();
+		return self::empty_payload();
+	}
+
+	// ── Cron scheduling ───────────────────────────────────────────────────────
+
+	/** Register a daily recurring warm (called on `init`). */
+	public static function schedule(): void {
+		if ( ! wp_next_scheduled( self::CRON_HOOK ) ) {
+			wp_schedule_event( time(), 'daily', self::CRON_HOOK );
+		}
+	}
+
+	/** Remove all scheduled events (called on theme switch). */
+	public static function unschedule(): void {
+		wp_clear_scheduled_hook( self::CRON_HOOK );
+	}
+
+	/** Schedule a single immediate warm if one is not already pending. */
+	private static function schedule_immediate_warm(): void {
+		if ( ! wp_next_scheduled( self::CRON_HOOK ) ) {
+			wp_schedule_single_event( time(), self::CRON_HOOK );
+		}
+	}
+
+	// ── Background warm (runs via WP-Cron, never on a page request) ───────────
+
+	public static function run_warm(): void {
 		$aliases = Multi_DB::instance()->aliases();
 		if ( empty( $aliases ) ) {
-			return self::empty_payload();
+			return;
 		}
 
-		$failed = false;
 		try {
 			$payload = self::query( Multi_DB::instance()->connection( $aliases[0] ) );
 		} catch ( \Throwable $e ) {
-			error_log( '[PublicTech] Dashboard_Stats::query failed — ' . $e->getMessage() );
-			$payload = self::empty_payload();
-			$failed  = true;
+			error_log( '[PublicTech] Dashboard_Stats::run_warm failed — ' . $e->getMessage() );
+			// Preserve any stale cache rather than writing empty data.
+			// Schedule a retry in 10 minutes so we try again soon.
+			wp_schedule_single_event( time() + 600, self::CRON_HOOK );
+			return;
 		}
 
-		// On failure store a short TTL so the next request retries quickly;
-		// on success store the full 25-hour TTL.
-		$ttl = $failed ? 60 : self::CACHE_TTL;
-		set_transient( self::CACHE_KEY, $payload, $ttl );
-		wp_cache_set( self::CACHE_KEY, $payload, self::CACHE_GROUP, $ttl );
-		return $payload;
+		set_transient( self::CACHE_KEY, $payload, self::CACHE_TTL );
+		wp_cache_set( self::CACHE_KEY, $payload, self::CACHE_GROUP, self::CACHE_TTL );
 	}
 
+	// ── DB query (only called from run_warm, never from get()) ────────────────
+
 	private static function query( Connection $db ): array {
-		// Aggregate queries over master_table can be slow; cap at 30 s so MySQL
-		// kills the statement and the catch handler returns empty payload rather
-		// than letting PHP's own execution limit kill the process (→ 503).
+		// 30-second MySQL statement timeout — acceptable in a background cron context.
 		$db->pdo()->exec( 'SET SESSION max_execution_time=30000' );
 
-		// Headline totals.
 		$head = $db->select(
 			'SELECT
 			    COALESCE(SUM(agreement_value), 0) AS total_spend,
@@ -105,7 +136,6 @@ final class Dashboard_Stats {
 			 WHERE agreement_value > 0'
 		);
 
-		// Annual spend (line chart — year column is MySQL YEAR type, cast to unsigned).
 		$by_year = $db->select(
 			'SELECT CAST(year AS UNSIGNED) AS x, COALESCE(SUM(agreement_value), 0) AS y
 			 FROM master_table
@@ -114,7 +144,6 @@ final class Dashboard_Stats {
 			 ORDER BY year ASC'
 		);
 
-		// Spend by Canadian province (horizontal bar chart).
 		$by_province = $db->select(
 			"SELECT
 			    recipient_province                AS label,
@@ -129,7 +158,6 @@ final class Dashboard_Stats {
 			 LIMIT 13"
 		);
 
-		// Top 10 recipients by total received (horizontal bar chart).
 		$top_recipients = $db->select(
 			"SELECT
 			    COALESCE(NULLIF(TRIM(recipient_operating_name), ''), TRIM(recipient_legal_name)) AS label,
@@ -144,7 +172,6 @@ final class Dashboard_Stats {
 			 LIMIT 10"
 		);
 
-		// 20 largest agreements for the scrolling ticker.
 		$recent_large = $db->select(
 			"SELECT
 			    COALESCE(NULLIF(TRIM(recipient_operating_name), ''), TRIM(recipient_legal_name)) AS name,
