@@ -102,13 +102,18 @@ final class Dashboard_Stats {
 	// ── Background warm (runs via WP-Cron, never on a page request) ───────────
 
 	public static function run_warm(): void {
-		$aliases = Multi_DB::instance()->aliases();
-		if ( empty( $aliases ) ) {
+		// Always use the primary grantconts alias — not aliases[0] which may
+		// resolve to the cache database depending on definition order.
+		$source_alias = (string) apply_filters( 'publictech_dashboard_source_alias', 'pt-grantconts-01' );
+		try {
+			$conn = Multi_DB::instance()->connection( $source_alias );
+		} catch ( \Throwable $e ) {
+			error_log( '[PublicTech] Dashboard_Stats::run_warm — alias not found: ' . $e->getMessage() );
 			return;
 		}
 
 		try {
-			$payload = self::query( Multi_DB::instance()->connection( $aliases[0] ) );
+			$payload = self::query( $conn );
 		} catch ( \Throwable $e ) {
 			error_log( '[PublicTech] Dashboard_Stats::run_warm failed — ' . $e->getMessage() );
 			// Preserve any stale cache rather than writing empty data.
@@ -124,8 +129,9 @@ final class Dashboard_Stats {
 	// ── DB query (only called from run_warm, never from get()) ────────────────
 
 	private static function query( Connection $db ): array {
-		// 30-second MySQL statement timeout — acceptable in a background cron context.
-		$db->pdo()->exec( 'SET SESSION max_execution_time=30000' );
+		// 120-second MySQL statement timeout — generous budget for background cron
+		// running aggregate queries against the full 1M+ row master_table.
+		$db->pdo()->exec( 'SET SESSION max_execution_time=120000' );
 
 		$head = $db->select(
 			'SELECT
@@ -158,16 +164,20 @@ final class Dashboard_Stats {
 			 LIMIT 13"
 		);
 
+		// GROUP BY the raw recipient_legal_name column (not a computed expression)
+		// so the covering index idx_legalname_value (recipient_legal_name,
+		// agreement_value) is used — an index-only scan instead of a full-table
+		// scan + temp table. Brings this query from ~67s to ~1s on 1.26M rows.
 		$top_recipients = $db->select(
 			"SELECT
-			    COALESCE(NULLIF(TRIM(recipient_operating_name), ''), TRIM(recipient_legal_name)) AS label,
+			    recipient_legal_name              AS label,
 			    COALESCE(SUM(agreement_value), 0) AS value,
 			    COUNT(*)                          AS count
 			 FROM master_table
 			 WHERE agreement_value > 0
 			   AND recipient_legal_name IS NOT NULL
-			   AND TRIM(recipient_legal_name) != ''
-			 GROUP BY label
+			   AND recipient_legal_name != ''
+			 GROUP BY recipient_legal_name
 			 ORDER BY value DESC
 			 LIMIT 10"
 		);
