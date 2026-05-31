@@ -112,6 +112,73 @@ add_action( 'wp_enqueue_scripts', static function () {
 		);
 	}
 
+	// Data Explorer: query builder + NL search + charts + analytics + reCAPTCHA.
+	if ( is_page_template( 'page-templates/template-data-explorer.php' ) ) {
+		$recaptcha_key = \PublicTech\Core\Captcha::site_key();
+
+		// reCAPTCHA v3 (invisible) — only load when a site key is configured.
+		if ( $recaptcha_key ) {
+			wp_enqueue_script(
+				'google-recaptcha-v3',
+				esc_url_raw( 'https://www.google.com/recaptcha/api.js?render=' . urlencode( $recaptcha_key ) ),
+				[],
+				null,
+				true
+			);
+		}
+
+		// Compromise.js NLP router.
+		wp_enqueue_script(
+			'compromise',
+			esc_url_raw( apply_filters(
+				'publictech_compromise_url',
+				'https://cdn.jsdelivr.net/npm/compromise@14.14.4/builds/compromise.min.js'
+			) ),
+			[],
+			'14.14.4',
+			true
+		);
+
+		// Query builder module (provides PT.QueryBuilder + PT.NLP).
+		wp_enqueue_script(
+			'publictech-query-builder-ui',
+			PUBLICTECH_TERMINAL_URL . 'assets/js/query-builder-ui.js',
+			[ 'compromise', 'wp-i18n' ],
+			PUBLICTECH_TERMINAL_VERSION,
+			true
+		);
+
+		// Data explorer orchestration (charts + tier notify + analytics + captcha).
+		wp_enqueue_script(
+			'publictech-data-explorer',
+			PUBLICTECH_TERMINAL_URL . 'assets/js/data-explorer.js',
+			[ 'publictech-query-builder-ui', 'publictech-billboard-bridge' ],
+			PUBLICTECH_TERMINAL_VERSION,
+			true
+		);
+	}
+
+	// Query builder + Compromise.js NLP router: only on the query-builder template.
+	if ( is_page_template( 'page-templates/template-query-builder.php' ) ) {
+		wp_enqueue_script(
+			'compromise',
+			esc_url_raw( apply_filters(
+				'publictech_compromise_url',
+				'https://cdn.jsdelivr.net/npm/compromise@14.14.4/builds/compromise.min.js'
+			) ),
+			[],
+			'14.14.4',
+			true
+		);
+		wp_enqueue_script(
+			'publictech-query-builder-ui',
+			PUBLICTECH_TERMINAL_URL . 'assets/js/query-builder-ui.js',
+			[ 'compromise', 'wp-i18n' ],
+			PUBLICTECH_TERMINAL_VERSION,
+			true
+		);
+	}
+
 	wp_localize_script( 'publictech-theme-switch', 'PT_THEME_DEFAULT', [
 		'mode' => get_theme_mod( 'pt_default_theme', 'dark' ),
 	] );
@@ -137,7 +204,15 @@ add_filter( 'theme_page_templates', static function ( array $tpls ): array {
 		'page-templates/template-chart-gallery.php'  => __( 'PT — Chart Gallery',    'publictech-terminal' ),
 		'page-templates/template-riding-report.php'  => __( 'PT — Riding Report',    'publictech-terminal' ),
 		'page-templates/template-entity-report.php'  => __( 'PT — Entity Funding Report', 'publictech-terminal' ),
+		'page-templates/template-query-builder.php'  => __( 'PT — Query Builder',         'publictech-terminal' ),
+		'page-templates/template-data-explorer.php'  => __( 'PT — Data Explorer',         'publictech-terminal' ),
 	];
+} );
+
+/* ----- Force Billboard on the data-explorer template (chart auto-render needs it). */
+add_filter( 'publictech_force_billboard', static function ( bool $force ): bool {
+	if ( ! is_page() ) return $force;
+	return $force || is_page_template( 'page-templates/template-data-explorer.php' );
 } );
 
 /* ----- Frontend opt-in to the D3 asset pipeline whenever a PT page template is used. */
