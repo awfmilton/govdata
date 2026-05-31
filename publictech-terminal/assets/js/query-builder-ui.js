@@ -97,11 +97,15 @@
 		'fnmi'                 : 'A', 'a type'              : 'A',
 		// F = For-profit
 		'for-profit'           : 'F', 'for profit'          : 'F',
+		'for-profits'          : 'F', 'for profits'         : 'F',
 		'forprofit'            : 'F', 'business'            : 'F',
-		'corporation'          : 'F', 'company'             : 'F',
-		'corporate'            : 'F', 'private sector'      : 'F',
-		'private company'      : 'F', 'commercial'          : 'F',
-		'enterprise'           : 'F', 'f type'              : 'F',
+		'businesses'           : 'F', 'corporation'         : 'F',
+		'corporations'         : 'F', 'company'             : 'F',
+		'companies'            : 'F', 'corporate'           : 'F',
+		'private sector'       : 'F', 'private company'     : 'F',
+		'private companies'    : 'F', 'commercial'          : 'F',
+		'enterprise'           : 'F', 'enterprises'         : 'F',
+		'f type'               : 'F',
 		// G = Government
 		'government'           : 'G', 'government recipient': 'G',
 		'gov'                  : 'G', 'municipal'           : 'G',
@@ -115,12 +119,17 @@
 		'i type'                    : 'I',
 		// N = Not-for-profit
 		'not-for-profit'       : 'N', 'not for profit'      : 'N',
+		'not-for-profits'      : 'N', 'not for profits'     : 'N',
 		'nonprofit'            : 'N', 'non-profit'          : 'N',
+		'nonprofits'           : 'N', 'non-profits'         : 'N',
 		'nfp'                  : 'N', 'charity'             : 'N',
 		'charities'            : 'N', 'ngo'                 : 'N',
-		'charitable'           : 'N', 'foundation'          : 'N',
-		'association'          : 'N', 'registered charity'  : 'N',
+		'ngos'                 : 'N', 'charitable'          : 'N',
+		'foundation'           : 'N', 'foundations'         : 'N',
+		'association'          : 'N', 'associations'        : 'N',
+		'registered charity'   : 'N', 'registered charities': 'N',
 		'civil society'        : 'N', 'community organization': 'N',
+		'community organizations': 'N',
 		'n type'               : 'N',
 		// O = Other
 		'other'                : 'O', 'other recipient'     : 'O',
@@ -132,12 +141,18 @@
 		'independent'          : 'P', 'p type'              : 'P',
 		// S = Academia
 		'academia'             : 'S', 'academic'            : 'S',
-		'university'           : 'S', 'college'             : 'S',
-		'research'             : 'S', 'school'              : 'S',
+		'university'           : 'S', 'universities'        : 'S',
+		'college'              : 'S', 'colleges'            : 'S',
+		'school'               : 'S', 'schools'             : 'S',
 		'educational'          : 'S', 'institute'           : 'S',
-		'research institution' : 'S', 'polytechnic'         : 'S',
-		'cégep'                : 'S', 'cegep'               : 'S',
+		'institutes'           : 'S', 'polytechnic'         : 'S',
+		'polytechnics'         : 'S', 'cégep'               : 'S',
+		'cegep'                : 'S', 'cegeps'              : 'S',
+		'research institution' : 'S', 'research institutions': 'S',
+		'research institute'   : 'S', 'research institutes' : 'S',
+		'research organization': 'S', 'research organisations': 'S',
 		'higher education'     : 'S', 'post-secondary'      : 'S',
+		'postsecondary'        : 'S',
 		's type'               : 'S',
 	};
 
@@ -485,24 +500,45 @@
 			}
 		}
 
-		// ── 10. Recipient name ────────────────────────────────────────────────
+		// ── 10. Fulltext search trigger ─────────────────────────────────────
+		// Must run before recipient-name extraction so "related to X" / "about X"
+		// phrases aren't captured as recipient names.
+		// Routes to description_eng LIKE (fulltext:true columns in metadata)
+		{
+			const ftRe = /(?:about|related\s+to|involving|mentioning|description\s+(?:includes?|contains?|with)|expected\s+results?\s+(?:includes?|contains?)|keyword\s*:?|search\s+for|containing\s+the\s+word|with\s+the\s+word)\s+(.{3,120})/i;
+			const ft = ftRe.exec( consumed );
+			if ( ft && ft[1] ) {
+				params.fulltext = ft[1].trim().replace( /['"]/g, '' );
+				intentName      = 'fulltext_search';
+				consume( ft[0] );
+			}
+		}
+
+		// ── 11. Recipient name ────────────────────────────────────────────────
 		// Patterns: "to [Org]", "received by", "awarded to", "given to", "paid to",
 		//           "for [Org]", "granted to", "beneficiary", "[Org] received", etc.
+		// Lookahead allows entity at end-of-string (no trailing \s+ required before $).
+		// Capital-letter check (post-match, without i-flag) ensures we only capture
+		// proper nouns — prevents topic phrases like "climate change research" from
+		// being mistaken for org names when matched via the "for" prefix.
 		{
-			const recipRe = /(?:(?:to|received\s+by|awarded\s+to|given\s+to|paid\s+to|for|granted\s+to|recipient\s*:|beneficiary\s*:|donated\s+to|transferred\s+to)\s+)([A-Z][A-Za-z\s&',.\-]{3,120}?)(?=\s+(?:in|from|over|under|for|that|which|and|received|got|$))/i;
+			const recipRe = /(?:(?:to|received\s+by|awarded\s+to|given\s+to|paid\s+to|for|granted\s+to|recipient\s*:|beneficiary\s*:|donated\s+to|transferred\s+to)\s+)([A-Z][A-Za-z\s&',.\-]{3,120}?)(?=(?:\s+(?:in|from|over|under|for|that|which|and|received|got)|$))/i;
 			const rm = recipRe.exec( consumed );
 			if ( rm && rm[1] && rm[1].trim().length > 3 ) {
 				const cand = rm[1].trim().replace( /[,.]$/, '' );
-				// Avoid re-capturing department
-				const deptLc = ( params.department || '' ).toLowerCase().slice( 0, 8 );
-				if ( ! deptLc || ! cand.toLowerCase().startsWith( deptLc ) ) {
-					params.recipient = cand;
-					consume( rm[0] );
+				// Require genuine proper noun: first char must be uppercase (case-sensitive)
+				if ( /^[A-Z]/.test( cand ) ) {
+					// Avoid re-capturing department
+					const deptLc = ( params.department || '' ).toLowerCase().slice( 0, 8 );
+					if ( ! deptLc || ! cand.toLowerCase().startsWith( deptLc ) ) {
+						params.recipient = cand;
+						consume( rm[0] );
+					}
 				}
 			}
 		}
 
-		// ── 11. Federal riding / constituency ────────────────────────────────
+		// ── 12. Federal riding / constituency ────────────────────────────────
 		// Patterns: "[X] riding", "constituency of [X]", "electoral district of [X]"
 		{
 			const ridingRe = /(?:(?:in\s+the\s+|the\s+)?([A-Z][A-Za-z\s\-']{5,80}?)\s+(?:riding|constituency|electoral\s+district|electoral\s+area|federal\s+riding)|(?:riding\s+of|constituency\s+of|electoral\s+district\s+of)\s+([A-Z][A-Za-z\s\-']{3,80}))/i;
@@ -513,33 +549,25 @@
 			}
 		}
 
-		// ── 12. City ─────────────────────────────────────────────────────────
-		// Only if province hasn't already consumed the location phrase
+		// ── 13. City ─────────────────────────────────────────────────────────
+		// Only if province hasn't already consumed the location phrase.
+		// Lookahead allows city name at end-of-string (no trailing \s+ before $).
+		// Capital-letter check (post-match, case-sensitive) ensures we only capture
+		// proper noun city names, not lowercase residue like "the fiscal year".
 		if ( ! params.province ) {
-			const cityRe = /(?:in\s+|city\s+of\s+|located\s+in\s+|based\s+in\s+|recipients?\s+in\s+|organizations?\s+in\s+)([A-Z][A-Za-z\s\-']{2,50}?)(?=\s+(?:that|which|and|$|,))/i;
+			const cityRe = /(?:in\s+|city\s+of\s+|located\s+in\s+|based\s+in\s+|recipients?\s+in\s+|organizations?\s+in\s+)([A-Z][A-Za-z\s\-']{2,50}?)(?=(?:\s+(?:that|which|and|,)|$))/i;
 			const cm = cityRe.exec( consumed );
 			if ( cm && cm[1] ) {
 				const cand = cm[1].trim();
-				// Don't capture a province name as a city
+				// Require genuine proper noun: first char must be uppercase (case-sensitive)
+				// and must not be a province name
 				const isProvince = Object.keys( PROVINCE_MAP ).some(
 					k => k.length > 2 && k === cand.toLowerCase()
 				);
-				if ( ! isProvince ) {
+				if ( /^[A-Z]/.test( cand ) && ! isProvince ) {
 					params.city = cand;
 					consume( cm[0] );
 				}
-			}
-		}
-
-		// ── 13. Fulltext search trigger ──────────────────────────────────────
-		// Routes to description_eng LIKE (fulltext:true columns in metadata)
-		{
-			const ftRe = /(?:about|related\s+to|involving|mentioning|description\s+(?:includes?|contains?|with)|expected\s+results?\s+(?:includes?|contains?)|keyword\s*:?|search\s+for|containing\s+the\s+word|with\s+the\s+word)\s+(.{3,120})/i;
-			const ft = ftRe.exec( consumed );
-			if ( ft && ft[1] ) {
-				params.fulltext = ft[1].trim().replace( /['"]/g, '' );
-				intentName      = 'fulltext_search';
-				consume( ft[0] );
 			}
 		}
 
@@ -568,13 +596,15 @@
 		}
 
 		// ── 16. Residual text → recipient_legal_name LIKE (last resort) ──────
+		// Only promote if the residual looks like a proper noun (capital-letter start)
+		// to prevent fragments like "me everything" or bare words from firing.
 		{
 			const residual = consumed
-				.replace( /\b(show|find|list|get|fetch|give\s+me|display|all|the|some|any|grants?|contributions?|agreements?|funding|payments?|records?|data|where|how|which|what|who|tell\s+me|i\s+want|look\s+for|looking\s+for)\b/gi, '' )
+				.replace( /\b(show|find|list|get|fetch|give\s+me|display|all|the|some|any|grants?|contributions?|agreements?|funding|payments?|records?|data|where|how|which|what|who|tell\s+me|i\s+want|look\s+for|looking\s+for|me)\b/gi, '' )
 				.replace( /[^A-Za-z0-9\s&'\-,\.]/g, '' )
 				.replace( /\s{2,}/g, ' ' )
 				.trim();
-			if ( residual.length > 3 && ! params.recipient ) {
+			if ( residual.length > 3 && /^[A-Z]/.test( residual ) && ! params.recipient ) {
 				params.recipient_hint = residual; // Mark as hint — lower confidence
 			}
 		}
@@ -1163,11 +1193,11 @@
 
 	async function applyNL() {
 		const text = elNLInput ? elNLInput.value.trim() : '';
-		if ( ! text ) return;
+		if ( ! text ) return false;
 
 		if ( ! columns.length ) {
 			setNLPreview( 'Load columns before using NL Quick Search.', true );
-			return;
+			return false;
 		}
 
 		if ( elNLApply ) elNLApply.disabled = true;
@@ -1184,13 +1214,13 @@
 
 			if ( ! filters.length ) {
 				setNLPreview( 'Parsed intent "' + blueprint.intent + '" had no matching columns for this table.', true );
-				return;
+				return false;
 			}
 
 			filters.forEach( f => addConditionRow( { col: f.col, op: f.op, val: f.val } ) );
 			const summary = filters.map( f => `${f.col} ${f.op}` ).join( ', ' );
 			setNLPreview( `${filters.length} condition${filters.length === 1 ? '' : 's'} added — ${summary}` );
-			return;
+			return true;
 		}
 
 		// ── AI fallback path — POST to PHP endpoint ──────────────────────────
@@ -1215,12 +1245,15 @@
 			if ( data.filters && Array.isArray( data.filters ) && data.filters.length ) {
 				data.filters.forEach( f => addConditionRow( { col: f.col, op: f.op, val: f.val } ) );
 				setNLPreview( `AI (${data.source || 'ai'}) added ${data.filters.length} condition${data.filters.length === 1 ? '' : 's'}.` );
+				return true;
 			} else {
 				setNLPreview( data.message || 'AI layer returned no filters.', true );
+				return false;
 			}
 		} catch ( e ) {
 			if ( elNLApply ) elNLApply.disabled = false;
 			setNLPreview( 'AI fallback unavailable: ' + ( e.message || 'network error' ), true );
+			return false;
 		}
 	}
 

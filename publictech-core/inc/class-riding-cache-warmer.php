@@ -324,42 +324,38 @@ final class Riding_Cache_Warmer {
 		// keyword at word level (uses index ft_riding_scan), then the exact
 		// per-keyword LIKE CASE attributes spend to specific keywords. Only the
 		// small candidate set is scanned, so this avoids the full-table LIKE pass.
+		// ONE query PER keyword (not all keywords combined). A combined MATCH over
+		// broad terms (e.g. "Indigenous" matches 200k+ rows) blows InnoDB's FTS
+		// result cache (error 188: "FTS query exceeds result cache limit"), which
+		// is a global limit we cannot raise on shared hosting. A single keyword's
+		// match set stays well within the cache, so we loop. The $out keyword rows
+		// were pre-seeded (zero-filled, in $keywords order) by empty_keyword_rows().
 		if ( $keywords ) {
-			$text_sql   = pt_riding_keyword_text_sql( 'm' );
-			$ft_cols    = pt_riding_keyword_fulltext_columns_sql( 'm' );
-			$ft_against = pt_riding_keyword_fulltext_against( $keywords );
+			$text_sql = pt_riding_keyword_text_sql( 'm' );
+			$ft_cols  = pt_riding_keyword_fulltext_columns_sql( 'm' );
 
-			$kw_cols = [];
 			foreach ( $keywords as $i => $kw ) {
-				$match     = pt_riding_keyword_match_sql( $kw['patterns'], $text_sql );
-				$kw_cols[] = "SUM(CASE WHEN {$match} THEN `m`.`agreement_value` ELSE 0 END) AS kw{$i}_total";
-				$kw_cols[] = "SUM(CASE WHEN {$match} THEN 1 ELSE 0 END) AS kw{$i}_count";
-			}
-			$kw_select = implode( ",\n\t\t\t\t", $kw_cols );
+				$ft_against = pt_riding_keyword_fulltext_against( [ $kw ] ); // this keyword only
+				$like       = pt_riding_keyword_match_sql( $kw['patterns'], $text_sql );
 
-			$sql_kw = "SELECT p.rn AS rn,
-					{$kw_select}
-				FROM `" . self::SOURCE_TABLE . "` m
-				{$join}
-				WHERE `m`.`recipient_postal_code` IS NOT NULL AND `m`.`recipient_postal_code` <> ''{$only}
-					AND {$ft_cols} AGAINST ({$ft_against} IN BOOLEAN MODE)
-				GROUP BY p.rn";
+				$sql_kw = "SELECT p.rn AS rn,
+						SUM(`m`.`agreement_value`) AS kw_total,
+						COUNT(*) AS kw_count
+					FROM `" . self::SOURCE_TABLE . "` m
+					{$join}
+					WHERE `m`.`recipient_postal_code` IS NOT NULL AND `m`.`recipient_postal_code` <> ''{$only}
+						AND {$ft_cols} AGAINST ({$ft_against} IN BOOLEAN MODE)
+						AND {$like}
+					GROUP BY p.rn";
 
-			foreach ( $this->source->query( $sql_kw ) as $row ) {
-				$rn = (string) $row['rn'];
-				if ( ! isset( $out[ $rn ] ) ) {
-					continue; // riding had no main-total row; skip stray keyword group
+				foreach ( $this->source->query( $sql_kw ) as $row ) {
+					$rn = (string) $row['rn'];
+					if ( ! isset( $out[ $rn ]['keywords'][ $i ] ) ) {
+						continue;
+					}
+					$out[ $rn ]['keywords'][ $i ]['total']      = (float) $row['kw_total'];
+					$out[ $rn ]['keywords'][ $i ]['agreements'] = (int) $row['kw_count'];
 				}
-				$kw_rows = [];
-				foreach ( $keywords as $i => $kw ) {
-					$kw_rows[] = [
-						'key'        => $kw['key'],
-						'label'      => $kw['label'],
-						'total'      => (float) ( $row[ "kw{$i}_total" ] ?? 0 ),
-						'agreements' => (int) ( $row[ "kw{$i}_count" ] ?? 0 ),
-					];
-				}
-				$out[ $rn ]['keywords'] = $kw_rows;
 			}
 		}
 
