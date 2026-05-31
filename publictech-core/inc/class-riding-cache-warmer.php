@@ -283,18 +283,11 @@ final class Riding_Cache_Warmer {
 	 * @return array<string,array{main:array<string,mixed>,keywords:array<int,array<string,mixed>>}>
 	 */
 	private function aggregate_main( array $keywords, string $only_riding ): array {
-		$text_sql = pt_riding_keyword_text_sql( 'm' );
-		$kw_cols  = [];
-		foreach ( $keywords as $i => $kw ) {
-			$match     = pt_riding_keyword_match_sql( $kw['patterns'], $text_sql );
-			$kw_cols[] = "SUM(CASE WHEN {$match} THEN `m`.`agreement_value` ELSE 0 END) AS kw{$i}_total";
-			$kw_cols[] = "SUM(CASE WHEN {$match} THEN 1 ELSE 0 END) AS kw{$i}_count";
-		}
-		$kw_select = $kw_cols ? ( ",\n\t\t\t\t" . implode( ",\n\t\t\t\t", $kw_cols ) ) : '';
-
 		$join = $this->pcfrf_join();
 		$only = $this->only_clause( $only_riding );
-		$sql  = "SELECT p.rn AS rn,
+
+		// ── Query 1: per-riding main totals over ALL agreements (no keywords). ──
+		$sql_main = "SELECT p.rn AS rn,
 					COUNT(*) AS agreements,
 					SUM(`m`.`agreement_value`) AS total,
 					SUM(CASE WHEN `m`.`agreement_value` > 0 THEN `m`.`agreement_value` ELSE 0 END) AS positive_total,
@@ -302,25 +295,15 @@ final class Riding_Cache_Warmer {
 					SUM(CASE WHEN `m`.`agreement_value` < 0 THEN 1 ELSE 0 END) AS negative_agreements,
 					MIN(NULLIF(`m`.`year`, 0)) AS first_year,
 					MAX(NULLIF(`m`.`year`, 0)) AS last_year,
-					MAX(ABS(`m`.`agreement_value`)) AS max_value{$kw_select}
+					MAX(ABS(`m`.`agreement_value`)) AS max_value
 				FROM `" . self::SOURCE_TABLE . "` m
 				{$join}
 				WHERE `m`.`recipient_postal_code` IS NOT NULL AND `m`.`recipient_postal_code` <> ''{$only}
 				GROUP BY p.rn";
 
-		$out  = [];
-		$stmt = $this->source->query( $sql );
-		foreach ( $stmt as $row ) {
+		$out = [];
+		foreach ( $this->source->query( $sql_main ) as $row ) {
 			$rn = (string) $row['rn'];
-			$kw_rows = [];
-			foreach ( $keywords as $i => $kw ) {
-				$kw_rows[] = [
-					'key'        => $kw['key'],
-					'label'      => $kw['label'],
-					'total'      => (float) ( $row[ "kw{$i}_total" ] ?? 0 ),
-					'agreements' => (int) ( $row[ "kw{$i}_count" ] ?? 0 ),
-				];
-			}
 			$out[ $rn ] = [
 				'main'     => [
 					'agreements'          => (int) $row['agreements'],
@@ -332,10 +315,74 @@ final class Riding_Cache_Warmer {
 					'last_year'           => (int) $row['last_year'],
 					'max_value'           => (float) $row['max_value'],
 				],
-				'keywords' => $kw_rows,
+				'keywords' => $this->empty_keyword_rows( $keywords ),
 			];
 		}
+
+		// ── Query 2: per-riding keyword totals (HYBRID). ────────────────────────
+		// FULLTEXT MATCH() in the WHERE fast-pre-filters to rows matching ANY
+		// keyword at word level (uses index ft_riding_scan), then the exact
+		// per-keyword LIKE CASE attributes spend to specific keywords. Only the
+		// small candidate set is scanned, so this avoids the full-table LIKE pass.
+		if ( $keywords ) {
+			$text_sql   = pt_riding_keyword_text_sql( 'm' );
+			$ft_cols    = pt_riding_keyword_fulltext_columns_sql( 'm' );
+			$ft_against = pt_riding_keyword_fulltext_against( $keywords );
+
+			$kw_cols = [];
+			foreach ( $keywords as $i => $kw ) {
+				$match     = pt_riding_keyword_match_sql( $kw['patterns'], $text_sql );
+				$kw_cols[] = "SUM(CASE WHEN {$match} THEN `m`.`agreement_value` ELSE 0 END) AS kw{$i}_total";
+				$kw_cols[] = "SUM(CASE WHEN {$match} THEN 1 ELSE 0 END) AS kw{$i}_count";
+			}
+			$kw_select = implode( ",\n\t\t\t\t", $kw_cols );
+
+			$sql_kw = "SELECT p.rn AS rn,
+					{$kw_select}
+				FROM `" . self::SOURCE_TABLE . "` m
+				{$join}
+				WHERE `m`.`recipient_postal_code` IS NOT NULL AND `m`.`recipient_postal_code` <> ''{$only}
+					AND {$ft_cols} AGAINST ({$ft_against} IN BOOLEAN MODE)
+				GROUP BY p.rn";
+
+			foreach ( $this->source->query( $sql_kw ) as $row ) {
+				$rn = (string) $row['rn'];
+				if ( ! isset( $out[ $rn ] ) ) {
+					continue; // riding had no main-total row; skip stray keyword group
+				}
+				$kw_rows = [];
+				foreach ( $keywords as $i => $kw ) {
+					$kw_rows[] = [
+						'key'        => $kw['key'],
+						'label'      => $kw['label'],
+						'total'      => (float) ( $row[ "kw{$i}_total" ] ?? 0 ),
+						'agreements' => (int) ( $row[ "kw{$i}_count" ] ?? 0 ),
+					];
+				}
+				$out[ $rn ]['keywords'] = $kw_rows;
+			}
+		}
+
 		return $out;
+	}
+
+	/**
+	 * Zero-filled keyword rows for ridings with no keyword matches.
+	 *
+	 * @param array<int,array{key:string,label:string,patterns:string[]}> $keywords
+	 * @return array<int,array<string,mixed>>
+	 */
+	private function empty_keyword_rows( array $keywords ): array {
+		$rows = [];
+		foreach ( $keywords as $kw ) {
+			$rows[] = [
+				'key'        => $kw['key'],
+				'label'      => $kw['label'],
+				'total'      => 0.0,
+				'agreements' => 0,
+			];
+		}
+		return $rows;
 	}
 
 	/**
