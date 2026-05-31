@@ -190,6 +190,7 @@ table.stream, .stream-bar { max-width: 100%; }
 		left: 8px;
 		top: 56px;
 		max-height: calc(100vh - 72px);
+		transform: translateX(calc(100% + 20px));
 	}
 	.swatches { grid-template-columns: repeat(5, 1fr); }
 }
