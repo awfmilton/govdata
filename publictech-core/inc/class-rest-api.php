@@ -226,12 +226,32 @@ final class REST_API {
 	 * GET /publictech/v1/schema/{schema}/{table}
 	 */
 	public function schema_columns( \WP_REST_Request $req ): \WP_REST_Response {
-		$schema  = sanitize_key( (string) $req['schema'] );
-		$table   = sanitize_key( (string) $req['table'] );
-		$columns = apply_filters( "publictech_columns_{$schema}_{$table}", [], $schema, $table );
+		$schema = sanitize_key( (string) $req['schema'] );
+		$table  = sanitize_key( (string) $req['table'] );
+		$cols   = self::columns_for( $schema, $table );
 
-		if ( ! $columns ) {
+		if ( ! $cols ) {
 			return new \WP_REST_Response( [ 'message' => 'No exposed columns for this table.' ], 404 );
+		}
+
+		$resp = rest_ensure_response( [ 'columns' => $cols ] );
+		$resp->header( 'Cache-Control', 'public, max-age=300' );
+		return $resp;
+	}
+
+	/**
+	 * Build the [{alias,label}] column payload for a schema/table pair.
+	 *
+	 * Shared by the REST endpoint above AND the data-explorer template, which
+	 * inlines the result into the page so the column list renders instantly
+	 * (no REST round-trip — the endpoint costs ~0.3s of WP bootstrap per call).
+	 *
+	 * @return array<int,array{alias:string,label:string}>
+	 */
+	public static function columns_for( string $schema, string $table ): array {
+		$columns = apply_filters( "publictech_columns_{$schema}_{$table}", [], $schema, $table );
+		if ( ! $columns ) {
+			return [];
 		}
 
 		// Domain-specific friendly labels sourced from nlp-schema-metadata.json and
@@ -300,9 +320,7 @@ final class REST_API {
 			];
 		}
 
-		$resp = rest_ensure_response( [ 'columns' => $cols ] );
-		$resp->header( 'Cache-Control', 'public, max-age=300' );
-		return $resp;
+		return $cols;
 	}
 
 	/**
