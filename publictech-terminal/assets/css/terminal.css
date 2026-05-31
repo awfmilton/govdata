@@ -349,6 +349,35 @@
   .hist-item .m{font-family:"JetBrains Mono";font-size:9px;color:var(--ink-3);margin-top:4px;display:flex;justify-content:space-between}
   .hist-item .m b{color:var(--accent);font-weight:500}
 
+  /* ===== Standalone button ===== */
+  .btn{
+    background:var(--accent-soft);color:var(--accent);border:1px solid rgba(0,160,210,0.3);
+    padding:8px 14px;font:600 10px "Montserrat";letter-spacing:0.16em;text-transform:uppercase;
+    border-radius:3px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;
+    transition:background .12s,box-shadow .12s;
+  }
+  .btn:hover:not(:disabled){background:rgba(0,160,210,0.2)}
+  .btn:disabled{opacity:0.4;cursor:not-allowed}
+  .btn.ghost{background:transparent;color:var(--ink-1);border-color:var(--line-2)}
+  .btn.ghost:hover:not(:disabled){color:var(--ink-0);border-color:var(--ink-1)}
+
+  /* ===== Segmented control ===== */
+  .pt-seg{display:inline-flex;background:var(--bg-2);border:1px solid var(--line-2);border-radius:4px;padding:2px}
+  .pt-seg button{
+    background:transparent;border:0;color:var(--ink-2);padding:7px 10px;
+    font:600 10px "Montserrat";letter-spacing:0.12em;text-transform:uppercase;
+    cursor:pointer;border-radius:3px;white-space:nowrap;
+  }
+  .pt-seg button:hover{color:var(--ink-0)}
+  .pt-seg button.on{background:var(--accent-soft);color:var(--accent)}
+
+  /* ===== Tier badge ===== */
+  .pt-tier-badge{
+    font-family:"JetBrains Mono",ui-monospace,monospace;font-size:10px;
+    background:var(--accent-soft);color:var(--accent);border:1px solid rgba(0,160,210,0.3);
+    padding:5px 10px;border-radius:3px;letter-spacing:0.1em;text-transform:uppercase;white-space:nowrap;
+  }
+
   /* misc */
   .dim{color:var(--ink-2)}
   .hr{height:1px;background:var(--line);margin:14px 0}
@@ -758,4 +787,30 @@
   .viz-row{grid-template-columns:1fr}
   .dash-kpis{grid-template-columns:1fr}
   .ticker-item .t-pipe~.t-prov{display:none}
+}
+
+/* ══════════════════════════════════════════════════════════════
+   DATA EXPLORER: static form elements
+   (dynamic condition-row inputs are styled via inline inputStyle())
+══════════════════════════════════════════════════════════════ */
+section[data-pt-view="data-explorer"] select,
+section[data-pt-view="data-explorer"] input[type="number"],
+section[data-pt-view="data-explorer"] input[type="text"]{
+  background:var(--bg-1);border:1px solid var(--line-2);color:var(--ink-0);
+  padding:7px 10px;border-radius:3px;
+  font:500 12px "JetBrains Mono",ui-monospace,monospace;
+}
+section[data-pt-view="data-explorer"] select:focus,
+section[data-pt-view="data-explorer"] input[type="number"]:focus,
+section[data-pt-view="data-explorer"] input[type="text"]:focus{
+  outline:0;border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft)
+}
+section[data-pt-view="data-explorer"] textarea{
+  background:var(--bg-1);border:1px solid var(--line-2);color:var(--ink-0);
+  padding:10px 12px;border-radius:3px;
+  font:500 13px "Montserrat",system-ui,sans-serif;
+  line-height:1.5;
+}
+section[data-pt-view="data-explorer"] textarea:focus{
+  outline:0;border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft)
 }

@@ -802,7 +802,7 @@
         "field": "id",
         "type": "varchar(255)",
         "null": "YES",
-        "key": ""
+        "key": "UNI"
       },
       {
         "field": "owner_org_en",
@@ -1111,7 +1111,7 @@
       }
     ]
   },
-  "master_table_rebuild": {
+  "master_table_pre_rebuild_20260531": {
     "type": "BASE TABLE",
     "columns": [
       {
@@ -1124,37 +1124,37 @@
         "field": "ref_number",
         "type": "varchar(50)",
         "null": "YES",
-        "key": ""
+        "key": "MUL"
       },
       {
         "field": "amendment_number",
         "type": "int unsigned",
         "null": "YES",
-        "key": ""
+        "key": "MUL"
       },
       {
         "field": "amendment_date",
         "type": "date",
         "null": "YES",
-        "key": ""
+        "key": "MUL"
       },
       {
         "field": "agreement_type",
         "type": "char(1)",
         "null": "YES",
-        "key": ""
+        "key": "MUL"
       },
       {
         "field": "recipient_type",
         "type": "char(1)",
         "null": "YES",
-        "key": ""
+        "key": "MUL"
       },
       {
         "field": "recipient_business_number",
         "type": "varchar(255)",
         "null": "YES",
-        "key": ""
+        "key": "MUL"
       },
       {
         "field": "recipient_legal_name",
@@ -1172,49 +1172,49 @@
         "field": "research_organization_name",
         "type": "varchar(255)",
         "null": "YES",
-        "key": ""
+        "key": "MUL"
       },
       {
         "field": "recipient_country",
         "type": "char(2)",
         "null": "YES",
-        "key": ""
+        "key": "MUL"
       },
       {
         "field": "recipient_province",
         "type": "char(2)",
         "null": "YES",
-        "key": ""
+        "key": "MUL"
       },
       {
         "field": "recipient_city",
         "type": "varchar(255)",
         "null": "YES",
-        "key": ""
+        "key": "MUL"
       },
       {
         "field": "recipient_postal_code",
         "type": "char(7)",
         "null": "YES",
-        "key": ""
+        "key": "MUL"
       },
       {
         "field": "federal_riding_name_en",
         "type": "varchar(100)",
         "null": "YES",
-        "key": ""
+        "key": "MUL"
       },
       {
         "field": "federal_riding_name_fr",
         "type": "varchar(100)",
         "null": "YES",
-        "key": ""
+        "key": "MUL"
       },
       {
         "field": "federal_riding_number",
         "type": "int unsigned",
         "null": "YES",
-        "key": ""
+        "key": "MUL"
       },
       {
         "field": "prog_name_en",
@@ -1244,31 +1244,31 @@
         "field": "agreement_title_en",
         "type": "varchar(800)",
         "null": "YES",
-        "key": ""
+        "key": "MUL"
       },
       {
         "field": "agreement_title_fr",
         "type": "varchar(800)",
         "null": "YES",
-        "key": ""
+        "key": "MUL"
       },
       {
         "field": "agreement_number",
         "type": "varchar(100)",
         "null": "YES",
-        "key": ""
+        "key": "MUL"
       },
       {
         "field": "agreement_value",
         "type": "decimal(15,2)",
         "null": "YES",
-        "key": ""
+        "key": "MUL"
       },
       {
         "field": "foreign_currency_type",
         "type": "char(3)",
         "null": "YES",
-        "key": ""
+        "key": "MUL"
       },
       {
         "field": "foreign_currency_value",
@@ -1280,67 +1280,67 @@
         "field": "agreement_start_date",
         "type": "date",
         "null": "YES",
-        "key": ""
+        "key": "MUL"
       },
       {
         "field": "year",
         "type": "year",
         "null": "YES",
-        "key": ""
+        "key": "MUL"
       },
       {
         "field": "agreement_end_date",
         "type": "date",
         "null": "YES",
-        "key": ""
+        "key": "MUL"
       },
       {
         "field": "coverage",
         "type": "text",
         "null": "YES",
-        "key": ""
+        "key": "MUL"
       },
       {
         "field": "description_eng",
         "type": "text",
         "null": "YES",
-        "key": ""
+        "key": "MUL"
       },
       {
         "field": "description_fr",
         "type": "text",
         "null": "YES",
-        "key": ""
+        "key": "MUL"
       },
       {
         "field": "naics_identifier",
         "type": "int unsigned",
         "null": "YES",
-        "key": ""
+        "key": "MUL"
       },
       {
         "field": "expected_results_en",
         "type": "text",
         "null": "YES",
-        "key": ""
+        "key": "MUL"
       },
       {
         "field": "expected_results_fr",
         "type": "text",
         "null": "YES",
-        "key": ""
+        "key": "MUL"
       },
       {
         "field": "additional_information_en",
         "type": "text",
         "null": "YES",
-        "key": ""
+        "key": "MUL"
       },
       {
         "field": "additional_information_fr",
         "type": "text",
         "null": "YES",
-        "key": ""
+        "key": "MUL"
       },
       {
         "field": "agreement_value_range_en",
