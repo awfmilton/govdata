@@ -89,7 +89,7 @@ add_action( 'wp_enqueue_scripts', static function () {
 			PUBLICTECH_TERMINAL_URL . 'assets/js/dashboard.js',
 			[ 'publictech-charts' ],
 			PUBLICTECH_TERMINAL_VERSION,
-			true
+			[ 'strategy' => 'defer', 'in_footer' => true ]
 		);
 	}
 

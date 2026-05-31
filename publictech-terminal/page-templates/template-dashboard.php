@@ -172,16 +172,27 @@ get_header(); ?>
 					<div class="hd"><h3>◇ <?php esc_html_e( 'Activity Feed', 'publictech-terminal' ); ?></h3><span class="meta"><?php esc_html_e( 'RECENT', 'publictech-terminal' ); ?></span></div>
 					<div>
 						<?php
-						$activity = get_posts( [ 'post_type' => 'audit-flag', 'posts_per_page' => 6, 'post_status' => [ 'publish', 'pending' ] ] );
+						$activity = get_transient( 'pt_activity_feed' );
+						if ( false === $activity ) {
+							$_posts = get_posts( [ 'post_type' => 'audit-flag', 'posts_per_page' => 6, 'post_status' => [ 'publish', 'pending' ] ] );
+							$activity = array_map( static function ( \WP_Post $p ): array {
+								return [
+									'title'     => $p->post_title,
+									'schema'    => (string) get_post_meta( $p->ID, 'schema', true ),
+									'timestamp' => (int) get_post_time( 'U', true, $p ),
+								];
+							}, $_posts );
+							set_transient( 'pt_activity_feed', $activity, 120 );
+						}
 						if ( $activity ) :
 							foreach ( $activity as $flag ) : ?>
 								<div class="activity-row">
 									<div class="ic warn">!</div>
 									<div class="body">
-										<b><?php echo esc_html( $flag->post_title ); ?></b>
-										<div class="meta"><?php echo esc_html( get_post_meta( $flag->ID, 'schema', true ) ); ?></div>
+										<b><?php echo esc_html( $flag['title'] ); ?></b>
+										<div class="meta"><?php echo esc_html( $flag['schema'] ); ?></div>
 									</div>
-									<div class="when"><?php echo esc_html( human_time_diff( (int) get_post_time( 'U', true, $flag ), time() ) ); ?></div>
+									<div class="when"><?php echo esc_html( human_time_diff( $flag['timestamp'], time() ) ); ?></div>
 								</div>
 							<?php endforeach;
 						else : ?>
@@ -215,16 +226,28 @@ get_header(); ?>
 					<div class="hd"><h3>◇ <?php esc_html_e( 'Hot Forum Threads', 'publictech-terminal' ); ?></h3><span class="meta">24h</span></div>
 					<div>
 						<?php
-						$threads = get_posts( [ 'post_type' => 'forum-thread', 'posts_per_page' => 5, 'orderby' => 'comment_count', 'order' => 'DESC' ] );
+						$threads = get_transient( 'pt_forum_threads' );
+						if ( false === $threads ) {
+							$_posts = get_posts( [ 'post_type' => 'forum-thread', 'posts_per_page' => 5, 'orderby' => 'comment_count', 'order' => 'DESC' ] );
+							$threads = array_map( static function ( \WP_Post $p ): array {
+								return [
+									'title'         => $p->post_title,
+									'permalink'     => get_permalink( $p->ID ),
+									'comment_count' => (int) $p->comment_count,
+									'modified'      => (int) get_post_modified_time( 'U', true, $p ),
+								];
+							}, $_posts );
+							set_transient( 'pt_forum_threads', $threads, 120 );
+						}
 						if ( $threads ) :
 							foreach ( $threads as $t ) : ?>
-								<a class="watch-row" href="<?php echo esc_url( get_permalink( $t ) ); ?>">
+								<a class="watch-row" href="<?php echo esc_url( $t['permalink'] ); ?>">
 									<div class="av">⌬</div>
 									<div>
-										<div class="name"><?php echo esc_html( $t->post_title ); ?></div>
-										<div class="meta"><?php echo esc_html( get_comments_number( $t ) ); ?> <?php esc_html_e( 'replies', 'publictech-terminal' ); ?></div>
+										<div class="name"><?php echo esc_html( $t['title'] ); ?></div>
+										<div class="meta"><?php echo esc_html( number_format_i18n( $t['comment_count'] ) ); ?> <?php esc_html_e( 'replies', 'publictech-terminal' ); ?></div>
 									</div>
-									<div class="trend"><b><?php echo esc_html( human_time_diff( (int) get_post_modified_time( 'U', true, $t ), time() ) ); ?></b></div>
+									<div class="trend"><b><?php echo esc_html( human_time_diff( $t['modified'], time() ) ); ?></b></div>
 								</a>
 							<?php endforeach;
 						else : ?>
