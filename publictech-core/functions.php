@@ -88,11 +88,15 @@ add_action( 'after_setup_theme', static function () {
 add_action( 'init', [ \PublicTech\Core\MP_Finance_Warmer::class, 'schedule' ] );
 add_action( \PublicTech\Core\MP_Finance_Warmer::HOOK, [ \PublicTech\Core\MP_Finance_Warmer::class, 'run_warm' ] );
 
+add_action( 'init', [ \PublicTech\Core\Dashboard_Stats::class, 'schedule' ] );
+add_action( \PublicTech\Core\Dashboard_Stats::CRON_HOOK, [ \PublicTech\Core\Dashboard_Stats::class, 'run_warm' ] );
+
 // Clean up the cron schedules on theme switch.
 add_action( 'switch_theme', [ \PublicTech\Core\Alerts::class, 'unschedule' ] );
 add_action( 'switch_theme', [ \PublicTech\Core\Riding_Cache::class, 'unschedule' ] );
 add_action( 'switch_theme', [ \PublicTech\Core\MP_Finance_Warmer::class, 'unschedule' ] );
 add_action( 'switch_theme', [ \PublicTech\Core\Entity_Reports::class, 'unschedule' ] );
+add_action( 'switch_theme', [ \PublicTech\Core\Dashboard_Stats::class, 'unschedule' ] );
 
 /**
  * Template fallbacks. The child theme is free to ship its own
