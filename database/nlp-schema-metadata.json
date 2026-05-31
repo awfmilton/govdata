@@ -1,0 +1,108 @@
+{
+  "_comment": "Companion metadata for the compromise.js NLP->SQL layer. Pairs with grantconts-schema.json (full column-level schema). This file adds query-facing table selection, code decode maps, join relationships, and natural-language hints. Generated from the live grantconts DB. Excludes transient/backup/pipeline tables.",
+  "_generated_for": "deterministic NLP->SQL router (compromise.js)",
+
+  "canonical_query_tables": {
+    "master_table": {
+      "role": "PRIMARY denormalised table — best target for most NL queries (search, filter, aggregate). One row per agreement record, keyed on the globally-unique `id` (org,ref_number,amendment). After the rebuild, `id` is UNIQUE and populated for every row.",
+      "grain": "one row per agreement record (current rows have amendment_number NULL; amendments have amendment_number 1..N)",
+      "key_columns": ["id", "ref_number", "amendment_number", "recipient_legal_name", "agreement_value", "agreement_start_date", "agreement_end_date", "year", "recipient_province", "recipient_city", "prog_name_en", "owner_org_en", "naics_identifier", "federal_riding_name_en"],
+      "money_column": "agreement_value",
+      "date_columns": ["agreement_start_date", "agreement_end_date", "amendment_date"],
+      "fulltext_columns": ["coverage", "description_eng", "description_fr", "expected_results_en", "expected_results_fr", "additional_information_en", "additional_information_fr"]
+    },
+    "agreements": {
+      "role": "Normalised agreement facts. Join out to recipients/programs/locations/naics via *_id FKs.",
+      "joins": {"recipient_id": "recipients.recipient_id", "program_id": "programs.program_id", "location_id": "locations.location_id", "naics_id": "naics.naics_id"}
+    },
+    "recipients": {
+      "role": "Who received the grant/contribution.",
+      "key_columns": ["recipient_id", "recipient_legal_name", "recipient_operating_name", "recipient_type_code", "recipient_business_number"],
+      "decode": {"recipient_type_code": "recipient_types"}
+    },
+    "programs": {"role": "Grant program catalogue.", "key_columns": ["program_id", "prog_name_en", "prog_name_fr", "prog_purpose_en"]},
+    "locations": {"role": "Geographic data per agreement (province, city, postal, federal riding, mp_id).", "key_columns": ["location_id", "recipient_province", "recipient_city", "recipient_postal_code", "federal_riding_name_en", "federal_riding_number", "mp_id"]},
+    "naics": {"role": "Industry classification code per agreement.", "key_columns": ["naics_id", "naics_identifier"]},
+    "amendments": {"role": "Amendment events per base agreement (join agreement_id -> agreements.agreement_id).", "joins": {"agreement_id": "agreements.agreement_id"}},
+    "mps": {"role": "Members of Parliament with riding + contact info. mp_id like 'P0001'.", "key_columns": ["mp_id", "first_name", "last_name", "district_name", "party", "province", "postal_code"]},
+    "recipient_types": {"role": "Lookup: recipient_type_code -> description.", "key_columns": ["recipient_type_code", "recipient_type_description"]},
+    "pcbfr": {"role": "Postal Code -> Federal Riding mapping.", "key_columns": ["postal_code", "riding_number", "riding_name_en"]},
+    "agreement_urls": {"role": "Canonical gov portal URL per record. URL pattern: https://search.open.canada.ca/grants/record/{url-encoded record_id}. Join on record_id = master_table.id.", "key_columns": ["record_id", "ref_number", "url", "url_type"]},
+    "corrections_history": {"role": "Field-level audit of every change applied to master_table. Query by field_name / change_source / changed_at for 'what changed' questions, especially monetary (field_name='agreement_value').", "key_columns": ["record_id", "ref_number", "field_name", "old_value", "new_value", "change_source", "changed_at"]},
+    "hoc_member_expenditures": {"role": "House of Commons MP expenditures (salaries, travel, hospitality, contracts) by reporting period.", "joins": {"reporting_period_id": "hoc_reporting_periods"}},
+    "hoc_reporting_periods": {"role": "Fiscal-year/quarter reporting periods for HoC expenditures."}
+  },
+
+  "aggregate_views": {
+    "view_total_funding": "SUM(agreement_value) across all agreements -> column total_funding",
+    "view_agreement_count": "COUNT of agreements -> column agreement_count",
+    "view_amendment_count": "COUNT of amendments -> column amendment_count",
+    "view_average_funding": "AVG(agreement_value) -> column average_funding",
+    "view_max_funding": "MAX(agreement_value) -> column max_funding",
+    "view_min_funding": "MIN(agreement_value) -> column min_funding",
+    "tbayrainy_view": "Pre-filtered: agreements in Thunder Bay-Rainy River ridings only"
+  },
+
+  "exclude_from_nlp": {
+    "_reason": "Transient, backup, or internal-pipeline tables — never expose to the NLP->SQL layer.",
+    "tables": ["master_table_rebuild", "master_table_backup", "mps_backup", "pcbfr_backup", "staging", "hoc_expenditures_raw"]
+  },
+
+  "code_decode_maps": {
+    "agreement_type": {
+      "_column": "master_table.agreement_type (char(1)), agreements.agreement_type",
+      "C": "Contribution",
+      "G": "Grant",
+      "O": "Other transfer payment"
+    },
+    "recipient_type": {
+      "_column": "master_table.recipient_type (char(1)); recipients.recipient_type_code",
+      "A": "Aboriginal recipients",
+      "F": "For-profit organizations",
+      "G": "Government",
+      "I": "International (non-government)",
+      "N": "Not-for-profit organizations and charities",
+      "O": "Other",
+      "P": "Individual or sole proprietorships",
+      "S": "Academia"
+    },
+    "url_type": ["detail", "search", "amendments"],
+    "change_source": ["government_update", "data_cleaning", "new_record", "needs_review"]
+  },
+
+  "value_domains": {
+    "province_codes": ["AB", "BC", "MB", "NB", "NL", "NS", "NT", "NU", "ON", "PE", "QC", "SK", "YT"],
+    "top_country_codes": ["CA", "US", "CH", "FR", "GB", "IT", "AT", "KE", "NL", "MX", "DE", "BE", "ID", "PH", "JO"],
+    "year_range": [2001, 2100],
+    "_year_note": "Most data 2004-2027. Values beyond ~2030 are forward-dated agreement years and likely data artefacts; clamp suspicious far-future years in NL parsing."
+  },
+
+  "nlp_synonym_hints": {
+    "_note": "Seed synonyms per intent target for the compromise.js dictionary. Expand to 15+ per intent as specified.",
+    "agreement_type=G": ["grant", "grants", "grant funding", "awarded a grant"],
+    "agreement_type=C": ["contribution", "contributions", "contribution agreement"],
+    "agreement_value": ["amount", "value", "funding", "dollars", "money", "how much", "total", "spending", "cost", "worth", "sum"],
+    "recipient_legal_name": ["recipient", "who got", "organization", "company", "grantee", "awarded to", "received by"],
+    "recipient_province": ["province", "in ontario", "in quebec", "which province", "located in"],
+    "owner_org_en": ["department", "agency", "ministry", "funded by", "which department", "granting org"],
+    "prog_name_en": ["program", "initiative", "fund", "under what program"],
+    "agreement_start_date": ["started", "begins", "start date", "signed", "from"],
+    "agreement_end_date": ["ends", "expires", "completion", "until", "end date"],
+    "naics_identifier": ["industry", "sector", "naics", "type of business"],
+    "federal_riding_name_en": ["riding", "constituency", "electoral district"],
+    "corrections_history.field_name=agreement_value": ["changed amount", "value change", "revised funding", "corrected amount", "what changed", "amendments to value"]
+  },
+
+  "join_relationships": {
+    "_note": "Normalised joins. master_table is fully denormalised — prefer it for single-table NL queries; use these only for normalised-path queries.",
+    "agreements->recipients": "agreements.recipient_id = recipients.recipient_id",
+    "agreements->programs": "agreements.program_id = programs.program_id",
+    "agreements->locations": "agreements.location_id = locations.location_id",
+    "agreements->naics": "agreements.naics_id = naics.naics_id",
+    "amendments->agreements": "amendments.agreement_id = agreements.agreement_id",
+    "locations->mps": "locations.mp_id = mps.mp_id",
+    "agreement_urls->master_table": "agreement_urls.record_id = master_table.id",
+    "corrections_history->master_table": "corrections_history.record_id = master_table.id",
+    "pcbfr->locations": "pcbfr.postal_code = locations.recipient_postal_code"
+  }
+}

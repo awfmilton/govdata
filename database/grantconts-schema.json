@@ -1,4 +1,63 @@
 {
+  "agreement_urls": {
+    "type": "BASE TABLE",
+    "columns": [
+      {
+        "field": "url_id",
+        "type": "int unsigned",
+        "null": "NO",
+        "key": "PRI"
+      },
+      {
+        "field": "record_id",
+        "type": "varchar(255)",
+        "null": "NO",
+        "key": "MUL"
+      },
+      {
+        "field": "ref_number",
+        "type": "varchar(50)",
+        "null": "NO",
+        "key": "MUL"
+      },
+      {
+        "field": "amendment_number",
+        "type": "int unsigned",
+        "null": "YES",
+        "key": "MUL"
+      },
+      {
+        "field": "url_type",
+        "type": "enum('detail','search','amendments')",
+        "null": "NO",
+        "key": "MUL"
+      },
+      {
+        "field": "url",
+        "type": "varchar(1000)",
+        "null": "NO",
+        "key": ""
+      },
+      {
+        "field": "verified_at",
+        "type": "timestamp",
+        "null": "YES",
+        "key": "MUL"
+      },
+      {
+        "field": "http_status",
+        "type": "smallint unsigned",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "created_at",
+        "type": "timestamp",
+        "null": "YES",
+        "key": ""
+      }
+    ]
+  },
   "agreements": {
     "type": "BASE TABLE",
     "columns": [
@@ -184,6 +243,218 @@
       {
         "field": "additional_information_en",
         "type": "text",
+        "null": "YES",
+        "key": ""
+      }
+    ]
+  },
+  "corrections_history": {
+    "type": "BASE TABLE",
+    "columns": [
+      {
+        "field": "correction_id",
+        "type": "int unsigned",
+        "null": "NO",
+        "key": "PRI"
+      },
+      {
+        "field": "record_id",
+        "type": "varchar(255)",
+        "null": "NO",
+        "key": "MUL"
+      },
+      {
+        "field": "ref_number",
+        "type": "varchar(50)",
+        "null": "NO",
+        "key": "MUL"
+      },
+      {
+        "field": "amendment_number",
+        "type": "int unsigned",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "field_name",
+        "type": "varchar(100)",
+        "null": "NO",
+        "key": "MUL"
+      },
+      {
+        "field": "old_value",
+        "type": "mediumtext",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "new_value",
+        "type": "mediumtext",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "change_source",
+        "type": "enum('government_update','data_cleaning','new_record','needs_review')",
+        "null": "NO",
+        "key": "MUL"
+      },
+      {
+        "field": "changed_at",
+        "type": "timestamp",
+        "null": "YES",
+        "key": "MUL"
+      }
+    ]
+  },
+  "hoc_expenditures_raw": {
+    "type": "BASE TABLE",
+    "columns": [
+      {
+        "field": "fiscal_year",
+        "type": "varchar(20)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "quarter",
+        "type": "varchar(10)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "quarter_name",
+        "type": "varchar(50)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "reporting_period",
+        "type": "varchar(255)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "name",
+        "type": "varchar(255)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "constituency",
+        "type": "varchar(190)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "caucus",
+        "type": "varchar(100)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "salaries",
+        "type": "decimal(15,2)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "travel",
+        "type": "decimal(15,2)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "hospitality",
+        "type": "decimal(15,2)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "contracts",
+        "type": "decimal(15,2)",
+        "null": "YES",
+        "key": ""
+      }
+    ]
+  },
+  "hoc_member_expenditures": {
+    "type": "BASE TABLE",
+    "columns": [
+      {
+        "field": "expenditure_id",
+        "type": "int",
+        "null": "NO",
+        "key": "PRI"
+      },
+      {
+        "field": "mp_id",
+        "type": "varchar(10)",
+        "null": "NO",
+        "key": "MUL"
+      },
+      {
+        "field": "period_id",
+        "type": "int",
+        "null": "NO",
+        "key": "MUL"
+      },
+      {
+        "field": "salaries",
+        "type": "decimal(15,2)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "travel",
+        "type": "decimal(15,2)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "hospitality",
+        "type": "decimal(15,2)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "contracts",
+        "type": "decimal(15,2)",
+        "null": "YES",
+        "key": ""
+      }
+    ]
+  },
+  "hoc_reporting_periods": {
+    "type": "BASE TABLE",
+    "columns": [
+      {
+        "field": "period_id",
+        "type": "int",
+        "null": "NO",
+        "key": "PRI"
+      },
+      {
+        "field": "fiscal_year",
+        "type": "varchar(20)",
+        "null": "NO",
+        "key": "MUL"
+      },
+      {
+        "field": "quarter",
+        "type": "varchar(10)",
+        "null": "NO",
+        "key": ""
+      },
+      {
+        "field": "quarter_name",
+        "type": "varchar(50)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "reporting_period_desc",
+        "type": "varchar(255)",
         "null": "YES",
         "key": ""
       }
@@ -555,6 +826,299 @@
         "type": "int unsigned",
         "null": "NO",
         "key": ""
+      },
+      {
+        "field": "ref_number",
+        "type": "varchar(50)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "amendment_number",
+        "type": "int unsigned",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "amendment_date",
+        "type": "date",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "agreement_type",
+        "type": "char(1)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "recipient_type",
+        "type": "char(1)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "recipient_business_number",
+        "type": "varchar(255)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "recipient_legal_name",
+        "type": "varchar(350)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "recipient_operating_name",
+        "type": "varchar(350)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "research_organization_name",
+        "type": "varchar(255)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "recipient_country",
+        "type": "char(2)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "recipient_province",
+        "type": "char(2)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "recipient_city",
+        "type": "varchar(255)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "recipient_postal_code",
+        "type": "char(7)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "federal_riding_name_en",
+        "type": "varchar(100)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "federal_riding_name_fr",
+        "type": "varchar(100)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "federal_riding_number",
+        "type": "int unsigned",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "prog_name_en",
+        "type": "varchar(255)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "prog_name_fr",
+        "type": "varchar(255)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "prog_purpose_en",
+        "type": "text",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "prog_purpose_fr",
+        "type": "text",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "agreement_title_en",
+        "type": "varchar(800)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "agreement_title_fr",
+        "type": "varchar(800)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "agreement_number",
+        "type": "varchar(100)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "agreement_value",
+        "type": "decimal(15,2)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "foreign_currency_type",
+        "type": "char(3)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "foreign_currency_value",
+        "type": "decimal(15,2)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "agreement_start_date",
+        "type": "date",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "year",
+        "type": "year",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "agreement_end_date",
+        "type": "date",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "coverage",
+        "type": "text",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "description_eng",
+        "type": "text",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "description_fr",
+        "type": "text",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "naics_identifier",
+        "type": "int unsigned",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "expected_results_en",
+        "type": "text",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "expected_results_fr",
+        "type": "text",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "additional_information_en",
+        "type": "text",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "additional_information_fr",
+        "type": "text",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "agreement_value_range_en",
+        "type": "text",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "coverage_en",
+        "type": "text",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "has_amendments_en",
+        "type": "varchar(3)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "format_en",
+        "type": "varchar(255)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "recipient_city_en",
+        "type": "varchar(255)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "fiscal_year",
+        "type": "varchar(9)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "quarter_en",
+        "type": "varchar(2)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "id",
+        "type": "varchar(255)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "owner_org_en",
+        "type": "text",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "owner_org_title",
+        "type": "text",
+        "null": "YES",
+        "key": ""
+      }
+    ]
+  },
+  "master_table_rebuild": {
+    "type": "BASE TABLE",
+    "columns": [
+      {
+        "field": "primary_key",
+        "type": "int unsigned",
+        "null": "NO",
+        "key": "PRI"
       },
       {
         "field": "ref_number",
@@ -1586,6 +2150,36 @@
       },
       {
         "field": "id",
+        "type": "varchar(255)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "agreement_value_range_en",
+        "type": "text",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "has_amendments_en",
+        "type": "varchar(3)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "fiscal_year",
+        "type": "varchar(9)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "quarter_en",
+        "type": "varchar(2)",
+        "null": "YES",
+        "key": ""
+      },
+      {
+        "field": "report_type",
         "type": "varchar(255)",
         "null": "YES",
         "key": ""
