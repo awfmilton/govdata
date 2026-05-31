@@ -30,7 +30,6 @@ require_once PUBLICTECH_CORE_DIR . 'inc/class-riding-cache-warmer.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-riding-cache.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-mp-finance-warmer.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-entity-reports.php';
-require_once PUBLICTECH_CORE_DIR . 'inc/class-entity-reports.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-charts-rest.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-asset-pipeline.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-customizer.php';
