@@ -57,6 +57,27 @@ final class REST_API {
 			'callback'            => [ $this, 'stream_rows' ],
 		] );
 
+		// Query builder: column discovery (reveals alias keys only, no data — safe as public).
+		register_rest_route( PUBLICTECH_CORE_REST_NS, '/schema/(?P<schema>[a-z0-9\-]+)/(?P<table>[a-z0-9_]+)', [
+			'methods'             => \WP_REST_Server::READABLE,
+			'permission_callback' => '__return_true',
+			'callback'            => [ $this, 'schema_columns' ],
+		] );
+
+		// NLP fallback slot: deterministic Compromise.js failed → future LLM hook.
+		register_rest_route( PUBLICTECH_CORE_REST_NS, '/nlp/query', [
+			'methods'             => \WP_REST_Server::CREATABLE,
+			'permission_callback' => $auth,
+			'callback'            => [ $this, 'nlp_query' ],
+		] );
+
+		// reCAPTCHA v3 token verification (used by admin test button + data-explorer).
+		register_rest_route( PUBLICTECH_CORE_REST_NS, '/captcha/verify', [
+			'methods'             => \WP_REST_Server::CREATABLE,
+			'permission_callback' => $auth,
+			'callback'            => [ $this, 'captcha_verify' ],
+		] );
+
 		register_rest_route( PUBLICTECH_CORE_REST_NS, '/mp/(?P<id>\d+)/spend', [
 			'methods'             => \WP_REST_Server::READABLE,
 			'permission_callback' => '__return_true',
@@ -160,6 +181,13 @@ final class REST_API {
 			return;
 		}
 
+		// Optional reCAPTCHA v3 check — only enforced when a secret key is configured.
+		$captcha_token = sanitize_text_field( (string) $req->get_param( 'captcha' ) );
+		if ( $captcha_token && ! Captcha::verify( $captcha_token, 'data_explorer_search' ) ) {
+			wp_send_json( [ 'message' => 'Bot check failed. Please try again.' ], 403 );
+			return;
+		}
+
 		$schema = sanitize_key( (string) $req['schema'] );
 		$table  = sanitize_key( (string) $req['table'] );
 		$tier   = Access_Tiers::instance()->quota( get_current_user_id() ?: null );
@@ -188,6 +216,185 @@ final class REST_API {
 			wp_send_json( [ 'message' => 'Stream failed.' ], 500 );
 		}
 		exit;
+	}
+
+	/**
+	 * Return the allowlisted column aliases for a schema/table pair.
+	 * Response: { columns: [ { alias: string, label: string } ] }
+	 * Used by the query builder to populate column dropdowns without exposing data.
+	 *
+	 * GET /publictech/v1/schema/{schema}/{table}
+	 */
+	public function schema_columns( \WP_REST_Request $req ): \WP_REST_Response {
+		$schema  = sanitize_key( (string) $req['schema'] );
+		$table   = sanitize_key( (string) $req['table'] );
+		$columns = apply_filters( "publictech_columns_{$schema}_{$table}", [], $schema, $table );
+
+		if ( ! $columns ) {
+			return new \WP_REST_Response( [ 'message' => 'No exposed columns for this table.' ], 404 );
+		}
+
+		// Domain-specific friendly labels sourced from nlp-schema-metadata.json and
+		// the column alias map in mu-plugins/01-publictech-schemas.php.
+		$label_overrides = [
+			'id'                       => 'Record ID',
+			'ref_number'               => 'Reference Number',
+			'agreement_type'           => 'Agreement Type',
+			'agreement_number'         => 'Agreement Number',
+			'agreement_value'          => 'Agreement Value ($)',
+			'agreement_start_date'     => 'Start Date',
+			'agreement_end_date'       => 'End Date',
+			'year'                     => 'Year',
+			'fiscal_year'              => 'Fiscal Year',
+			'agreement_title_en'       => 'Agreement Title',
+			'description_eng'          => 'Description',
+			'expected_results_en'      => 'Expected Results',
+			'coverage'                 => 'Coverage',
+			'recipient_type'           => 'Recipient Type',
+			'recipient_legal_name'     => 'Recipient (Legal Name)',
+			'recipient_operating_name' => 'Recipient (Operating Name)',
+			'recipient_country'        => 'Country',
+			'recipient_province'       => 'Province / Territory',
+			'recipient_city'           => 'City',
+			'recipient_postal_code'    => 'Postal Code',
+			'federal_riding_name_en'   => 'Federal Riding',
+			'federal_riding_number'    => 'Riding Number',
+			'prog_name_en'             => 'Program Name',
+			'prog_purpose_en'          => 'Program Purpose',
+			'naics_identifier'         => 'NAICS Code',
+			'owner_org_en'             => 'Funding Department',
+			'owner_org_title'          => 'Department Title',
+			'mp_id'                    => 'MP ID',
+			'first_name'               => 'First Name',
+			'last_name'                => 'Last Name',
+			'district_name'            => 'District / Riding',
+			'party'                    => 'Party',
+			'province'                 => 'Province',
+			'postal_code'              => 'Postal Code',
+			'email'                    => 'Email',
+			'photo_url'                => 'Photo URL',
+			'riding_number'            => 'Riding Number',
+			'riding_slug'              => 'Riding Slug',
+			'riding_name_en'           => 'Riding Name (EN)',
+			'riding_name_fr'           => 'Riding Name (FR)',
+			'total_value'              => 'Total Value ($)',
+			'agreement_count'          => 'Agreement Count',
+			'first_year'               => 'First Year',
+			'last_year'                => 'Last Year',
+			'generated_at'             => 'Generated At',
+			'recipient_id'             => 'Recipient ID',
+			'program_id'               => 'Program ID',
+			'location_id'              => 'Location ID',
+			'naics_id'                 => 'NAICS ID',
+			'recipient_type_code'      => 'Recipient Type Code',
+			'recipient_business_number' => 'Business Number',
+			'unique_fed'               => 'Unique FED',
+			'pop_weight'               => 'Population Weight',
+		];
+
+		$cols = [];
+		foreach ( array_keys( $columns ) as $alias ) {
+			$cols[] = [
+				'alias' => $alias,
+				'label' => $label_overrides[ $alias ] ?? ucwords( str_replace( '_', ' ', $alias ) ),
+			];
+		}
+
+		$resp = rest_ensure_response( [ 'columns' => $cols ] );
+		$resp->header( 'Cache-Control', 'public, max-age=300' );
+		return $resp;
+	}
+
+	/**
+	 * NLP query fallback — receives an Intent Blueprint from the client-side
+	 * Compromise.js router when no deterministic pattern matched.
+	 *
+	 * The AI hook slot below is the ONLY thing that changes when an LLM is added.
+	 * The LLM must return: { "filters": [{"col":"alias","op":"=","val":"value"}], "source":"ai" }
+	 * using column aliases from the publictech_columns_* filters for the given table.
+	 *
+	 * POST /publictech/v1/nlp/query
+	 */
+	public function nlp_query( \WP_REST_Request $req ): \WP_REST_Response {
+		if ( ( $gate = Throttle::instance()->enforce_rest( $req ) ) instanceof \WP_Error ) {
+			return new \WP_REST_Response(
+				[ 'code' => 'rate_limited', 'message' => $gate->get_error_message(), 'filters' => null ],
+				429
+			);
+		}
+
+		$params      = $req->get_json_params();
+		$ai_fallback = (bool) ( $params['ai_fallback'] ?? true );
+
+		if ( ! $ai_fallback ) {
+			// Deterministic path must be resolved client-side; should not reach here.
+			return new \WP_REST_Response(
+				[ 'code' => 'error', 'message' => 'Deterministic intent should be resolved client-side.', 'filters' => null ],
+				400
+			);
+		}
+
+		// ══════════════════════════════════════════════════════════════════════
+		// FUTURE AI HOOK SLOT
+		// To activate the AI layer, replace the return below with your LLM call.
+		//
+		// Available context:
+		//   $raw_text = sanitize_text_field( $params['parameters']['raw_text'] ?? '' );
+		//   $schema   = sanitize_key( $params['schema'] ?? 'pt-grantconts-01' );
+		//   $table    = sanitize_key( $params['table']  ?? 'master_table' );
+		//
+		// Fetch column aliases for the prompt:
+		//   $columns = apply_filters( "publictech_columns_{$schema}_{$table}", [] );
+		//   $aliases = array_keys( $columns );
+		//
+		// Call your LLM with $raw_text + $aliases, parse the JSON response, and
+		// return it in this exact format (frontend requires zero changes):
+		//   return rest_ensure_response( [ 'filters' => $filter_array, 'source' => 'ai' ] );
+		// ══════════════════════════════════════════════════════════════════════
+		return new \WP_REST_Response( [
+			'code'    => 'ai_unavailable',
+			'filters' => null,
+			'message' => 'Pattern not recognized. The AI query layer is not yet configured.',
+		], 503 );
+	}
+
+	/**
+	 * Verify a reCAPTCHA v3 token and return the score.
+	 * Used by the admin test button and by data-explorer.js pre-search check.
+	 *
+	 * POST /publictech/v1/captcha/verify
+	 * Body: { token: string, action: string }
+	 * Response: { passed: bool, score: float|null }
+	 */
+	public function captcha_verify( \WP_REST_Request $req ): \WP_REST_Response {
+		$params = $req->get_json_params();
+		$token  = sanitize_text_field( (string) ( $params['token']  ?? '' ) );
+		$action = sanitize_key( (string) ( $params['action'] ?? '' ) );
+
+		if ( '' === $token ) {
+			return new \WP_REST_Response( [ 'passed' => false, 'score' => null, 'message' => 'No token provided.' ], 400 );
+		}
+
+		$secret = (string) get_option( Captcha::OPT_SECRET_KEY, '' );
+		if ( '' === $secret ) {
+			return new \WP_REST_Response( [ 'passed' => true, 'score' => null, 'message' => 'Captcha not configured — skipped.' ] );
+		}
+
+		$response = wp_remote_post( 'https://www.google.com/recaptcha/api/siteverify', [
+			'timeout' => 5,
+			'body'    => [ 'secret' => $secret, 'response' => $token ],
+		] );
+
+		if ( is_wp_error( $response ) ) {
+			return new \WP_REST_Response( [ 'passed' => true, 'score' => null, 'message' => 'Verify request failed.' ], 503 );
+		}
+
+		$data      = json_decode( wp_remote_retrieve_body( $response ), true );
+		$score     = isset( $data['score'] ) ? (float) $data['score'] : null;
+		$threshold = (float) get_option( Captcha::OPT_THRESHOLD, 0.5 );
+		$passed    = $score !== null && $score >= $threshold;
+
+		return rest_ensure_response( [ 'passed' => $passed, 'score' => $score ] );
 	}
 
 	public function mp_spend( \WP_REST_Request $req ): \WP_REST_Response|\WP_Error {
