@@ -10,7 +10,8 @@
     "lint:format": "prettier --check \"**/*.{js,css,md,json,yml,yaml}\" --ignore-path .gitignore",
     "format": "prettier --write \"**/*.{js,css,md,json,yml,yaml}\" --ignore-path .gitignore",
     "lint": "npm run lint:js && npm run lint:css && npm run lint:format",
-    "ci": "npm run lint"
+    "test:nlp": "node --test tests/js/nlp-parser.test.js",
+    "ci": "npm run lint && npm run test:nlp"
   },
   "devDependencies": {
     "eslint": "^8.57.0",
