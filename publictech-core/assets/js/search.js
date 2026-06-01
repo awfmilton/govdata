@@ -127,6 +127,23 @@
 			});
 		});
 
+		$$('[data-pt-sort]').forEach(function (el) {
+			// Reflect initial state.
+			el.classList.toggle('on', el.dataset.ptSort === state.sort);
+			el.addEventListener('click', function (e) {
+				e.preventDefault();
+				state.sort = el.dataset.ptSort;
+				state.page = 1;
+				$$('[data-pt-sort]').forEach(function (s) {
+					s.classList.toggle('on', s.dataset.ptSort === state.sort);
+					// Update arrow indicator on active link.
+					s.textContent = s.textContent.replace(/\s*[▴▾]$/, '');
+					if (s === el) s.textContent += ' ▾';
+				});
+				search();
+			});
+		});
+
 		document.addEventListener('facetwp-loaded', function () {
 			// FacetWP updates its own results — just keep our URL state aligned.
 			pushToURL();
