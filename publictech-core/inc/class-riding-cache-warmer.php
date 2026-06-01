@@ -31,6 +31,16 @@ final class Riding_Cache_Warmer {
 	/** Source (read) table name on grantconts. */
 	private const SOURCE_TABLE = 'master_table';
 
+	/**
+	 * Representation-order ID used for the postal→riding mapping.
+	 * 1 = 2013 RO (338 ridings, in effect 2015-2025).
+	 * 2 = 2023 RO (343 ridings, in effect 2025-present).
+	 *
+	 * Phase 2: fixed to the current RO so postal codes are unambiguous.
+	 * Phase 4: replace with a per-agreement era join keyed on agreement_start_date.
+	 */
+	private const PCFRF_RO_ID = 2;
+
 	/** @var callable(string,string):void Progress logger: (message, level). */
 	private $logger;
 
@@ -216,6 +226,7 @@ final class Riding_Cache_Warmer {
 					COUNT(DISTINCT `postal_code`) AS pc_count
 				FROM `pcbfr`
 				WHERE `riding_number` IS NOT NULL AND `riding_number` <> ''
+				  AND `ro_id` = " . self::PCFRF_RO_ID . "
 				GROUP BY `riding_number`";
 		$out = [];
 		$stmt = $this->source->query( $sql );
@@ -263,6 +274,7 @@ final class Riding_Cache_Warmer {
 					FROM `pcbfr`
 					WHERE `postal_code` IS NOT NULL AND `postal_code` <> ''
 						AND `riding_number` IS NOT NULL AND `riding_number` <> ''
+						AND `ro_id` = " . self::PCFRF_RO_ID . "
 				) p ON p.pc = {$src_pc}";
 	}
 

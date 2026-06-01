@@ -148,20 +148,73 @@ final class REST_API {
 			return $gate;
 		}
 
+		// Parse sort parameter into WP_Query orderby args.
+		// Posts without total_spend meta (new MPs) are included but sink to the bottom.
+		$sort     = sanitize_text_field( (string) $req['sort'] );
+		$meta_q   = array_filter( [
+			$req['postal']   ? [ 'key' => 'postal_codes', 'value' => sanitize_text_field( (string) $req['postal'] ), 'compare' => 'LIKE' ] : null,
+			$req['spend_gt'] ? [ 'key' => 'total_spend', 'value' => (int) $req['spend_gt'], 'compare' => '>', 'type' => 'NUMERIC' ] : null,
+		] );
+
+		switch ( $sort ) {
+			case 'name ASC':
+				$orderby = 'title';
+				$order   = 'ASC';
+				break;
+			case 'modified DESC':
+				$orderby = 'modified';
+				$order   = 'DESC';
+				break;
+			case 'riding ASC':
+				$orderby = [ 'riding_clause' => 'ASC', 'title' => 'ASC' ];
+				$order   = 'ASC';
+				$meta_q  = array_merge(
+					[ 'relation' => 'OR',
+					  'riding_clause' => [ 'key' => 'pt_mp_district', 'compare' => 'EXISTS' ],
+					  [ 'key' => 'pt_mp_district', 'compare' => 'NOT EXISTS' ],
+					],
+					array_values( $meta_q )
+				);
+				break;
+			case 'year ASC':
+				$orderby = [ 'year_clause' => 'ASC', 'title' => 'ASC' ];
+				$order   = 'ASC';
+				$meta_q  = array_merge(
+					[ 'relation' => 'OR',
+					  'year_clause' => [ 'key' => 'mp_term_start', 'compare' => 'EXISTS', 'type' => 'DATE' ],
+					  [ 'key' => 'mp_term_start', 'compare' => 'NOT EXISTS' ],
+					],
+					array_values( $meta_q )
+				);
+				break;
+			case 'spend DESC':
+			default:
+				// Include MPs without total_spend meta (treat as 0, sort to bottom).
+				$orderby = [ 'spend_clause' => 'DESC', 'title' => 'ASC' ];
+				$order   = 'DESC';
+				$meta_q  = array_merge(
+					[ 'relation' => 'OR',
+					  'spend_clause' => [ 'key' => 'total_spend', 'compare' => 'EXISTS', 'type' => 'NUMERIC' ],
+					  [ 'key' => 'total_spend', 'compare' => 'NOT EXISTS' ],
+					],
+					array_values( $meta_q )
+				);
+				break;
+		}
+
 		$args = [
 			'post_type'      => 'member-parliament',
 			'posts_per_page' => (int) $req['per_page'],
 			'paged'          => (int) $req['page'],
 			's'              => sanitize_text_field( (string) $req['q'] ),
 			'fields'         => 'ids',
+			'orderby'        => $orderby,
+			'order'          => $order,
 			'tax_query'      => array_filter( [
 				$req['party']  ? [ 'taxonomy' => 'mp_party',  'field' => 'slug', 'terms' => array_map( 'sanitize_title', (array) $req['party'] ) ] : null,
 				$req['region'] ? [ 'taxonomy' => 'mp_region', 'field' => 'slug', 'terms' => array_map( 'sanitize_title', (array) $req['region'] ) ] : null,
 			] ),
-			'meta_query'     => array_filter( [
-				$req['postal']    ? [ 'key' => 'postal_codes', 'value' => sanitize_text_field( (string) $req['postal'] ), 'compare' => 'LIKE' ] : null,
-				$req['spend_gt']  ? [ 'key' => 'total_spend', 'value' => (int) $req['spend_gt'], 'compare' => '>', 'type' => 'NUMERIC' ] : null,
-			] ),
+			'meta_query'     => $meta_q ?: [],
 		];
 
 		$q    = new \WP_Query( $args );

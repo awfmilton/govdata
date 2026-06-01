@@ -93,8 +93,9 @@ get_header(); ?>
 					<div class="right">
 						<span><?php esc_html_e( 'SORT:', 'publictech-terminal' ); ?></span>
 						<a data-pt-sort="spend DESC" class="on"><?php esc_html_e( 'Highest Spend', 'publictech-terminal' ); ?> ▾</a>
-						<a data-pt-sort="modified DESC"><?php esc_html_e( 'Last Updated', 'publictech-terminal' ); ?></a>
 						<a data-pt-sort="name ASC"><?php esc_html_e( 'Name A–Z', 'publictech-terminal' ); ?></a>
+						<a data-pt-sort="riding ASC"><?php esc_html_e( 'Riding A–Z', 'publictech-terminal' ); ?></a>
+						<a data-pt-sort="year ASC"><?php esc_html_e( 'Year Elected', 'publictech-terminal' ); ?></a>
 					</div>
 				</div>
 
