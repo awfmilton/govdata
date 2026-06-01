@@ -135,10 +135,12 @@
 		'other'                : 'O', 'other recipient'     : 'O',
 		'o type'               : 'O',
 		// P = Individual / sole proprietor
-		'individual'           : 'P', 'sole proprietor'     : 'P',
+		'individual'           : 'P', 'individuals'         : 'P',
+		'sole proprietor'      : 'P', 'sole proprietors'    : 'P',
 		'personal'             : 'P', 'person'              : 'P',
 		'self-employed'        : 'P', 'sole trader'         : 'P',
-		'independent'          : 'P', 'p type'              : 'P',
+		'sole traders'         : 'P', 'independent'         : 'P',
+		'p type'               : 'P',
 		// S = Academia
 		'academia'             : 'S', 'academic'            : 'S',
 		'university'           : 'S', 'universities'        : 'S',

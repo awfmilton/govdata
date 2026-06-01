@@ -126,3 +126,16 @@ jobs:
         run: npx eslint "publictech-core/assets/js/**/*.js" "publictech-terminal/assets/js/**/*.js"
       - name: Stylelint
         run: npx stylelint "publictech-core/assets/css/**/*.css" "publictech-terminal/assets/css/**/*.css"
+
+  # NLP parser unit tests — runs PT.NLP.parseQuery() + intentToFilters() in a
+  # minimal Node shim. No browser or server required. 35 test cases covering
+  # all 5 bug-fix regressions and all known query patterns.
+  nlp-tests:
+    name: NLP parser unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: "20" }
+      - name: Run NLP tests
+        run: node --test tests/js/nlp-parser.test.js
