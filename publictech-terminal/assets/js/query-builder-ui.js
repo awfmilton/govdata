@@ -1,6 +1,6 @@
 /* PublicTech Query Builder + Compromise.js NLP Router
  *
- * Architecture:
+ * A`rchitecture:
  *   1. Structured query builder — column/op/value rows → /stream/{schema}/{table}
  *   2. Deterministic NLP layer — Compromise.js parses text → Intent Blueprint
  *      → intentToFilters() populates query builder rows (no server round-trip)

@@ -634,7 +634,7 @@ final class REST_API {
 		$region_terms = wp_get_object_terms( $post_id, 'mp_region', [ 'fields' => 'names' ] );
 		return [
 			'id'      => $post_id,
-			'name'    => get_the_title( $post_id ),
+			'name'    => html_entity_decode( get_the_title( $post_id ), ENT_QUOTES | ENT_HTML5, 'UTF-8' ),
 			'slug'    => get_post_field( 'post_name', $post_id ),
 			'party'   => $party_terms[0] ?? '',
 			'region'  => $region_terms[0] ?? '',
