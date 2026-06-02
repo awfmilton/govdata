@@ -202,6 +202,7 @@ add_action( 'wp_head', static function () {
 }, 1 );
 
 add_action( 'wp_body_open', static function () {
+	echo '<a class="pt-skip" href="#pt-main">' . esc_html__( 'Skip to content', 'publictech-terminal' ) . '</a>' . "\n";
 	require PUBLICTECH_TERMINAL_DIR . 'parts/header-rail.php';
 } );
 

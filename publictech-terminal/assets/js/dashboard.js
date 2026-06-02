@@ -9,6 +9,10 @@
 		ON: 'Ontario', PE: 'P.E.I.', QC: 'Québec', SK: 'Saskatchewan', YT: 'Yukon'
 	};
 
+	// Honour the OS "reduce motion" setting (WCAG 2.3.3 / 2.2.2): skip the
+	// count-up tween and the marquee ticker, painting final/static state instead.
+	var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
 	/* ── Formatting helpers ─────────────────────────────────────────── */
 
 	function fmtMoney(n) {
@@ -29,6 +33,12 @@
 		var unit     = el.dataset.countUnit || 'count';
 		var duration = 1600;
 		var startTs  = null;
+
+		// Reduced motion: paint the final value immediately, no animation.
+		if (reduceMotion) {
+			el.textContent = unit === 'money' ? fmtMoney(target) : fmtCount(target);
+			return;
+		}
 
 		function step(ts) {
 			if (!startTs) startTs = ts;
@@ -69,6 +79,8 @@
 	function initTicker() {
 		var track = document.querySelector('.ticker-track');
 		if (!track) return;
+		// Reduced motion: leave the items static — no clone, no marquee animation.
+		if (reduceMotion) return;
 		track.innerHTML += track.innerHTML; // clone once — CSS animation runs -50%
 		track.classList.add('ready');
 	}

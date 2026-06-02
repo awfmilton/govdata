@@ -44,7 +44,7 @@ $pt_kinds = get_terms( [ 'taxonomy' => 'chart_kind', 'hide_empty' => true ] );
 
 get_header(); ?>
 
-<main>
+<main id="pt-main" tabindex="-1">
 	<section class="view active" data-pt-view="chart-gallery">
 
 		<div class="hero corner" style="margin-bottom:24px">

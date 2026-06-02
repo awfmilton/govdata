@@ -29,7 +29,7 @@ $nlp_available = wp_script_is( 'compromise', 'enqueued' ) || wp_script_is( 'comp
 
 get_header(); ?>
 
-<main>
+<main id="pt-main" tabindex="-1">
 <section class="view active" data-pt-view="query-builder">
 
 	<!-- ── HEADER: schema / table selector ────────────────────────────────── -->
@@ -107,7 +107,7 @@ get_header(); ?>
 		<button class="btn ghost" id="pt-qb-export" disabled>
 			⤓ <?php esc_html_e( 'Export CSV', 'publictech-terminal' ); ?>
 		</button>
-		<span id="pt-qb-status" class="mono dim" style="font-size:11px;margin-left:auto"></span>
+		<span id="pt-qb-status" class="mono dim" style="font-size:11px;margin-left:auto" role="status" aria-live="polite"></span>
 	</div>
 
 	<!-- ── NL QUICK SEARCH ───────────────────────────────────────────────── -->
