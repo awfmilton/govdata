@@ -1,4 +1,6 @@
-vendor/
+# Composer dependencies (anchored to repo root so it does NOT match the
+# self-hosted libraries under publictech-core/assets/vendor/).
+/vendor/
 node_modules/
 build/
 dist/

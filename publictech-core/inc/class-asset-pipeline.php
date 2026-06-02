@@ -26,6 +26,61 @@ final class Asset_Pipeline {
 		add_action( 'wp_head',            [ $this, 'preconnect_hints' ], 1 );
 		add_shortcode( 'publictech_terminal', [ $this, 'shortcode' ] );
 		add_shortcode( 'publictech_chart',    [ $this, 'shortcode_chart' ] );
+
+		// Serve minified theme assets when they exist (gated on SCRIPT_DEBUG).
+		add_filter( 'script_loader_src', [ $this, 'maybe_min' ], 20, 2 );
+		add_filter( 'style_loader_src',  [ $this, 'maybe_min' ], 20, 2 );
+
+		// Self-host D3 / Billboard / topojson / d3-sankey / compromise from
+		// assets/vendor/ by default — no third-party CDN, no SRI gap, and a
+		// faster first paint (same origin). Registered at priority 5 so an
+		// operator's own filter at the default priority (10) still wins and can
+		// point these back at a CDN.
+		$vendor = [
+			'publictech_d3_url'            => 'assets/vendor/d3.v7.min.js',
+			'publictech_topojson_url'      => 'assets/vendor/topojson-client.min.js',
+			'publictech_d3_sankey_url'     => 'assets/vendor/d3-sankey.min.js',
+			'publictech_billboard_url'     => 'assets/vendor/billboard.min.js',
+			'publictech_billboard_css_url' => 'assets/vendor/billboard.min.css',
+			'publictech_compromise_url'    => 'assets/vendor/compromise.min.js',
+		];
+		foreach ( $vendor as $hook => $rel ) {
+			add_filter( $hook, static fn() => PUBLICTECH_CORE_URL . $rel, 5 );
+		}
+	}
+
+	/**
+	 * Swap a theme JS/CSS URL for its `.min` sibling when one exists on disk and
+	 * SCRIPT_DEBUG is off. Covers both the parent and child theme asset trees,
+	 * preserves the version query string, and silently no-ops (returns the
+	 * source URL) when no minified build is present — so a raw git checkout
+	 * still works, it just isn't minified until `npm run build` has run.
+	 */
+	public function maybe_min( string $src, string $handle = '' ): string {
+		if ( ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) || '' === $src ) {
+			return $src;
+		}
+		if ( false !== strpos( $src, '.min.' ) ) {
+			return $src; // already minified (our build or a vendor lib)
+		}
+		[ $path, $sep, $query ] = array_pad( preg_split( '/(\?)/', $src, 2, PREG_SPLIT_DELIM_CAPTURE ), 3, '' );
+		if ( ! preg_match( '/\.(js|css)$/', $path ) ) {
+			return $src;
+		}
+		foreach ( [
+			[ get_stylesheet_directory_uri(), get_stylesheet_directory() ], // child theme
+			[ get_template_directory_uri(),   get_template_directory() ],   // parent theme
+		] as [ $uri, $dir ] ) {
+			$base = $uri . '/assets/';
+			if ( 0 === strpos( $path, $base ) ) {
+				$rel     = substr( $path, strlen( $uri ) );
+				$min_rel = (string) preg_replace( '/\.(js|css)$/', '.min.$1', $rel );
+				if ( '' !== $min_rel && is_readable( $dir . $min_rel ) ) {
+					return $uri . $min_rel . $sep . $query;
+				}
+			}
+		}
+		return $src;
 	}
 
 	/**
@@ -57,9 +112,10 @@ final class Asset_Pipeline {
 		if ( ! $this->needs_d3() ) {
 			return;
 		}
+		// Chart libraries are self-hosted (assets/vendor/), so no CDN preconnect
+		// is needed. Fonts still come from Google; preconnect to those.
 		echo '<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>' . "\n";
 		echo '<link rel="preconnect" href="https://fonts.gstatic.com"  crossorigin>' . "\n";
-		echo '<link rel="preconnect" href="https://cdn.jsdelivr.net"    crossorigin>' . "\n";
 	}
 
 	public function enqueue(): void {

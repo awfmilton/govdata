@@ -5,20 +5,28 @@
   "description": "Build-time tooling for the PublicTech audit-terminal suite.",
   "license": "GPL-2.0-or-later",
   "scripts": {
+    "build": "node tools/build-assets.mjs",
+    "vendor": "node tools/vendor.mjs",
     "lint:js": "eslint \"publictech-core/assets/js/**/*.js\" \"publictech-terminal/assets/js/**/*.js\"",
     "lint:css": "stylelint \"publictech-core/assets/css/**/*.css\" \"publictech-terminal/assets/css/**/*.css\"",
-    "lint:format": "prettier --check \"**/*.{js,css,md,json,yml,yaml}\" --ignore-path .gitignore",
-    "format": "prettier --write \"**/*.{js,css,md,json,yml,yaml}\" --ignore-path .gitignore",
+    "lint:format": "prettier --check \"**/*.{js,css,md,json,yml,yaml}\" --ignore-path .prettierignore",
+    "format": "prettier --write \"**/*.{js,css,md,json,yml,yaml}\" --ignore-path .prettierignore",
     "lint": "npm run lint:js && npm run lint:css && npm run lint:format",
     "test:nlp": "node --test tests/js/nlp-parser.test.js",
     "ci": "npm run lint && npm run test:nlp"
   },
   "devDependencies": {
-    "eslint": "^8.57.0",
     "@wordpress/eslint-plugin": "^17.13.0",
+    "billboard.js": "3.13.0",
+    "compromise": "14.14.4",
+    "d3": "7.9.0",
+    "d3-sankey": "0.12.3",
+    "esbuild": "^0.28.0",
+    "eslint": "^8.57.0",
+    "prettier": "^3.3.3",
     "stylelint": "^16.10.0",
     "stylelint-config-standard": "^36.0.1",
-    "prettier": "^3.3.3"
+    "topojson-client": "3.1.0"
   },
   "engines": {
     "node": ">=20"
