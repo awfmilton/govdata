@@ -141,23 +141,36 @@ final class Tools {
 
 	private function mp_spending( array $a ): array {
 		$mp_id = (int) ( $a['mp_id'] ?? 0 );
-		if ( $mp_id <= 0 ) {
+		if ( $mp_id <= 0 || 'member-parliament' !== get_post_type( $mp_id ) ) {
 			throw new \RuntimeException( 'mp_id is required', -32602 );
 		}
-		$ext = (int) get_post_meta( $mp_id, 'external_mp_id', true );
-		if ( ! $ext ) {
+		// external_mp_id is a string key (may be non-numeric); the legacy (int)
+		// cast silently zeroed valid ids.
+		$ext = (string) get_post_meta( $mp_id, 'external_mp_id', true );
+		if ( '' === $ext ) {
 			throw new \RuntimeException( 'mp_id is not linked to a finance row', -32004 );
 		}
-		$from = (int) ( $a['from_year'] ?? 2018 );
-		$to   = (int) ( $a['to_year']   ?? (int) gmdate( 'Y' ) );
-		return publictech_db( 'pt-finance-01' )->select(
-			'SELECT fiscal_year, category, SUM(amount_cad) AS total
-			   FROM expenditures
-			  WHERE mp_id = ? AND fiscal_year BETWEEN ? AND ?
-			  GROUP BY fiscal_year, category
-			  ORDER BY fiscal_year, category',
-			[ $ext, $from, $to ]
+		// Served from the precomputed cache DB (mp_expenditure_periods, already
+		// aggregated), mirroring REST_API::mp_spend. The old pt-finance-01.
+		// expenditures table is no longer populated — see MP-FINANCE-DATA.md.
+		$rows = publictech_db( \PublicTech\Core\MP_Finance_Warmer::cache_alias() )->select(
+			'SELECT `fiscal_year`, `category`, `total`
+			   FROM `mp_expenditure_periods`
+			  WHERE `mp_id` = ?
+			  ORDER BY `fiscal_year` ASC, `category` ASC',
+			[ $ext ]
 		);
+		// Optional year narrowing. fiscal_year may be "2022" or "2022-2023", so
+		// compare on the leading year in PHP rather than in SQL.
+		$from = isset( $a['from_year'] ) ? (int) $a['from_year'] : 0;
+		$to   = isset( $a['to_year'] )   ? (int) $a['to_year']   : 0;
+		if ( $from || $to ) {
+			$rows = array_values( array_filter( $rows, static function ( $r ) use ( $from, $to ) {
+				$yr = (int) substr( (string) ( $r['fiscal_year'] ?? '' ), 0, 4 );
+				return ( ! $from || $yr >= $from ) && ( ! $to || $yr <= $to );
+			} ) );
+		}
+		return $rows;
 	}
 
 	private function stream( array $a, int $cap, array $quota ): array {
