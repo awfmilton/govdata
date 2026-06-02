@@ -50,6 +50,7 @@ $pt_initial = $pt_user && $pt_user->ID ? strtoupper( substr( $pt_user->display_n
 					'profile'   => __( 'Profile',    'publictech-terminal' ),
 					'stream'    => __( 'Stream',     'publictech-terminal' ),
 					'ai'        => __( 'AI Console', 'publictech-terminal' ),
+					'data'      => __( 'Data Store', 'publictech-terminal' ),
 					'forum'     => __( 'Forum',      'publictech-terminal' ),
 				];
 				$i = 0;

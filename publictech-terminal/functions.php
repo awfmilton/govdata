@@ -213,6 +213,7 @@ add_filter( 'theme_page_templates', static function ( array $tpls ): array {
 		'page-templates/template-entity-report.php'  => __( 'PT — Entity Funding Report', 'publictech-terminal' ),
 		'page-templates/template-query-builder.php'  => __( 'PT — Query Builder',         'publictech-terminal' ),
 		'page-templates/template-data-explorer.php'  => __( 'PT — Data Explorer',         'publictech-terminal' ),
+		'page-templates/template-data-store.php'     => __( 'PT — Data Store',            'publictech-terminal' ),
 	];
 } );
 
