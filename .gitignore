@@ -17,3 +17,12 @@ coverage/
 package-lock.json
 composer.lock
 wp-content/
+
+# Local secrets — never commit. Export PT_DB_PASSWORD or keep creds in an
+# untracked env file outside the repo / web root.
+.env
+.env.*
+*.local.php
+secrets.php
+__pycache__/
+*.pyc

@@ -35,11 +35,19 @@ if hasattr(sys.stdout, 'reconfigure'):
 
 DIR_CLEANED = Path(r'C:\Users\user\Documents\GrantsConts\cleaned')
 
+DB_PASSWORD = os.environ.get("PT_DB_PASSWORD")
+if not DB_PASSWORD:
+    raise SystemExit(
+        "PT_DB_PASSWORD is not set. The database password is no longer "
+        "stored in the repo — export it before running:\n"
+        "    export PT_DB_PASSWORD='...'"
+    )
+
 DB_HOST = '35.230.186.163'
 DB_PORT = 3306
 DB_NAME = 'grantconts'
 DB_USER = os.environ.get('SRC_USER', 'pt_read')
-DB_PASS = os.environ.get('SRC_PASS', '123456789!!!!!!!!!')
+DB_PASS = DB_PASSWORD
 
 BATCH_SIZE = 500
 

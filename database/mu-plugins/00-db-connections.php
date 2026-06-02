@@ -11,14 +11,17 @@
  *                       the precomputed per-riding JSON the MP pages read.
  *
  * ─────────────────────────────────────────────────────────────────────────
- *  ⚠  DEVELOPMENT CREDENTIALS — ROTATE BEFORE PRODUCTION.  ⚠
+ *  ⚠  DATABASE PASSWORD IS NOT STORED IN THIS FILE.  ⚠
  *
- *  Per the project owner, every database currently shares one development
- *  password. It is committed here so the feature works with zero setup during
- *  development. Before going live:
- *    1. Give each database its own strong password.
- *    2. Move these definitions into wp-config.php (outside the web root / repo)
- *       or a secrets manager, and delete the credentials from this file.
+ *  The shared password is read from the PT_DB_PASSWORD environment variable
+ *  (or a PT_DEV_DB_PASSWORD / PUBLICTECH_DB_CONNECTIONS definition in
+ *  wp-config.php, which wins). If neither is set the aliases resolve with an
+ *  empty password and DB auth fails by design — so a secret is never committed.
+ *
+ *  Production hardening checklist:
+ *    1. Give each database its own strong password (set PT_DB_PASSWORD, or
+ *       define per-alias creds in wp-config.php / a secrets manager).
+ *    2. Keep credentials outside the web root and out of version control.
  *    3. Restrict the grantconts SQL user to SELECT-only and lock the host
  *       allow-list to the WordPress server IPs.
  * ─────────────────────────────────────────────────────────────────────────
@@ -33,10 +36,12 @@
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Shared development password. CHANGE ME before production (see header).
+ * Shared password, sourced from the environment (never committed). A
+ * wp-config.php definition of PT_DEV_DB_PASSWORD, if present, wins.
  */
 if ( ! defined( 'PT_DEV_DB_PASSWORD' ) ) {
-	define( 'PT_DEV_DB_PASSWORD', '123456789!!!!!!!!!' );
+	$pt_db_pass = getenv( 'PT_DB_PASSWORD' );
+	define( 'PT_DEV_DB_PASSWORD', is_string( $pt_db_pass ) ? $pt_db_pass : '' );
 }
 
 /**

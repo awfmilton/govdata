@@ -24,6 +24,7 @@ Steps (FK build order):
 """
 
 import argparse
+import os
 import sys
 from urllib.parse import quote
 import mysql.connector
@@ -31,8 +32,16 @@ import mysql.connector
 if hasattr(sys.stdout, 'reconfigure'):
     sys.stdout.reconfigure(encoding='utf-8', errors='replace')
 
+DB_PASSWORD = os.environ.get("PT_DB_PASSWORD")
+if not DB_PASSWORD:
+    raise SystemExit(
+        "PT_DB_PASSWORD is not set. The database password is no longer "
+        "stored in the repo — export it before running:\n"
+        "    export PT_DB_PASSWORD='...'"
+    )
+
 DB = dict(host='35.230.186.163', port=3306, database='grantconts',
-          user='pt_read', password='123456789!!!!!!!!!',
+          user='pt_read', password=DB_PASSWORD,
           connection_timeout=900, autocommit=True)
 
 # Dedup key expressions (consistent on both master_table and the lookup map build)

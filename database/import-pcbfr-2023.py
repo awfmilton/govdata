@@ -14,12 +14,20 @@ import os
 import sys
 import mysql.connector
 
+DB_PASSWORD = os.environ.get("PT_DB_PASSWORD")
+if not DB_PASSWORD:
+    raise SystemExit(
+        "PT_DB_PASSWORD is not set. The database password is no longer "
+        "stored in the repo — export it before running:\n"
+        "    export PT_DB_PASSWORD='...'"
+    )
+
 DB = dict(
     host=os.environ.get('DB_HOST', '35.230.186.163'),
     port=int(os.environ.get('DB_PORT', 3306)),
     database=os.environ.get('DB_NAME', 'grantconts'),
     user=os.environ.get('DB_USER', 'pt_read'),
-    password=os.environ.get('DB_PASS', '123456789!!!!!!!!!'),
+    password=DB_PASSWORD,
 )
 
 CSV_PATH = os.path.join(os.path.dirname(__file__), '..', 'PCBFR2023', 'pcbfr_2023.csv')
