@@ -11,6 +11,7 @@
   "extends": ["eslint:recommended"],
   "globals": {
     "d3": "readonly",
+    "nlp": "readonly",
     "PT_BOOT": "readonly",
     "PT_THEME_DEFAULT": "readonly",
     "PT": "writable",
