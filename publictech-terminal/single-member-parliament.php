@@ -106,13 +106,17 @@ get_header(); ?>
 					<div class="hd"><h3>◇ <?php esc_html_e( 'Audit Status', 'publictech-terminal' ); ?></h3><span class="meta">AUTO</span></div>
 					<div class="bd" style="display:flex;flex-direction:column;gap:8px">
 						<div style="display:flex;justify-content:space-between;font-size:12px">
-							<span class="dim"><?php esc_html_e( 'Integrity score', 'publictech-terminal' ); ?></span>
+							<span class="dim pt-tip-ink"
+								data-pt-tip-title="<?php esc_attr_e( 'Integrity score', 'publictech-terminal' ); ?>"
+								data-pt-tip="<?php esc_attr_e( 'A 0–100 composite of disclosure completeness, open-flag history and spending variance against peers. Higher is cleaner.', 'publictech-terminal' ); ?>"><?php esc_html_e( 'Integrity score', 'publictech-terminal' ); ?></span>
 							<span style="color:<?php echo $integrity >= 80 ? 'var(--pos)' : 'var(--warn)'; ?>;font-family:'JetBrains Mono'">
 								<?php echo esc_html( $integrity ?: '—' ); ?><?php echo $integrity ? ' / 100' : ''; ?>
 							</span>
 						</div>
 						<div style="display:flex;justify-content:space-between;font-size:12px">
-							<span class="dim"><?php esc_html_e( 'Open flags', 'publictech-terminal' ); ?></span>
+							<span class="dim pt-tip-ink"
+								data-pt-tip-title="<?php esc_attr_e( 'Open flags', 'publictech-terminal' ); ?>"
+								data-pt-tip="<?php esc_attr_e( 'Unresolved audit flags filed by the community against this member\'s records.', 'publictech-terminal' ); ?>"><?php esc_html_e( 'Open flags', 'publictech-terminal' ); ?></span>
 							<span style="color:<?php echo $flags ? 'var(--warn)' : 'var(--ink-2)'; ?>;font-family:'JetBrains Mono'"><?php echo esc_html( $flags ); ?></span>
 						</div>
 						<?php if ( $last_aud ) : ?>
@@ -165,25 +169,33 @@ get_header(); ?>
 
 			<div class="prof-main">
 				<div class="kpis">
-					<div class="kpi corner">
+					<div class="kpi corner pt-tip"
+						data-pt-tip-title="<?php esc_attr_e( 'Total office spend', 'publictech-terminal' ); ?>"
+						data-pt-tip="<?php esc_attr_e( 'Operating and office expenditures filed by this member, drawn from the House of Commons expenditure tables (pt-finance-01).', 'publictech-terminal' ); ?>">
 						<div class="lab"><?php esc_html_e( 'Total Office Spend', 'publictech-terminal' ); ?></div>
 						<div class="val">$<?php echo esc_html( number_format_i18n( $spend ) ); ?></div>
 						<div class="delta dim">YoY</div>
 						<svg class="spark" id="ptSpark1" aria-hidden="true"></svg>
 					</div>
-					<div class="kpi">
+					<div class="kpi pt-tip"
+						data-pt-tip-title="<?php esc_attr_e( 'Travel expenses', 'publictech-terminal' ); ?>"
+						data-pt-tip="<?php esc_attr_e( 'Travel and hospitality claims filed by this member for the current fiscal year.', 'publictech-terminal' ); ?>">
 						<div class="lab"><?php esc_html_e( 'Travel Expenses', 'publictech-terminal' ); ?></div>
 						<div class="val">$<?php echo esc_html( number_format_i18n( $travel ) ); ?></div>
 						<div class="delta dim">FY</div>
 						<svg class="spark" id="ptSpark2" aria-hidden="true"></svg>
 					</div>
-					<div class="kpi">
+					<div class="kpi pt-tip"
+						data-pt-tip-title="<?php esc_attr_e( 'Contract spend', 'publictech-terminal' ); ?>"
+						data-pt-tip="<?php esc_attr_e( 'Total value of service contracts charged to this member\'s office budget.', 'publictech-terminal' ); ?>">
 						<div class="lab"><?php esc_html_e( 'Contract Spend', 'publictech-terminal' ); ?></div>
 						<div class="val">$<?php echo esc_html( number_format_i18n( $contracts ) ); ?></div>
 						<div class="delta dim"><?php esc_html_e( 'total', 'publictech-terminal' ); ?></div>
 						<svg class="spark" id="ptSpark3" aria-hidden="true"></svg>
 					</div>
-					<div class="kpi">
+					<div class="kpi pt-tip"
+						data-pt-tip-title="<?php esc_attr_e( 'Votes cast', 'publictech-terminal' ); ?>"
+						data-pt-tip="<?php esc_attr_e( 'Number of recorded House votes this member has taken part in — a rough proxy for attendance.', 'publictech-terminal' ); ?>">
 						<div class="lab"><?php esc_html_e( 'Votes Cast', 'publictech-terminal' ); ?></div>
 						<div class="val"><?php echo esc_html( number_format_i18n( $votes ) ); ?></div>
 						<div class="delta dim"><?php esc_html_e( 'attendance', 'publictech-terminal' ); ?></div>
