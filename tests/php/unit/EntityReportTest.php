@@ -115,4 +115,11 @@ final class EntityReportTest extends TestCase {
 		// No match patterns → empty query (caller skips the entity).
 		$this->assertSame( '', Entity_Reports::source_query( [ 'legal_names' => [] ] )[0] );
 	}
+
+	public function test_source_query_neutralises_boolean_operators(): void {
+		// Embedded quotes / boolean operators in a registry name must be
+		// stripped so the value can't alter the boolean-mode query shape.
+		[ , $params ] = Entity_Reports::source_query( [ 'legal_names' => [ 'Egale +Canada* "x" -bad' ] ] );
+		$this->assertContains( '"Egale Canada x bad"', $params );
+	}
 }
