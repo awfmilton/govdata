@@ -139,15 +139,13 @@ final class Server {
 	}
 
 	private function ip(): string {
-		foreach ( [ 'HTTP_CF_CONNECTING_IP', 'HTTP_X_FORWARDED_FOR', 'REMOTE_ADDR' ] as $h ) {
-			if ( ! empty( $_SERVER[ $h ] ) ) {
-				$raw = sanitize_text_field( wp_unslash( $_SERVER[ $h ] ) );
-				$ip  = trim( explode( ',', $raw )[0] );
-				if ( filter_var( $ip, FILTER_VALIDATE_IP ) ) {
-					return $ip;
-				}
-			}
+		// Delegate to the core trusted-proxy-aware resolver so the MCP throttle
+		// can't be bypassed with a spoofed X-Forwarded-For. The parent theme is
+		// always loaded by the time a REST callback runs, but guard anyway.
+		if ( function_exists( '\\PublicTech\\Core\\client_ip' ) ) {
+			return \PublicTech\Core\client_ip();
 		}
-		return '0.0.0.0';
+		$remote = isset( $_SERVER['REMOTE_ADDR'] ) ? trim( (string) wp_unslash( $_SERVER['REMOTE_ADDR'] ) ) : '';
+		return filter_var( $remote, FILTER_VALIDATE_IP ) ? $remote : '0.0.0.0';
 	}
 }
