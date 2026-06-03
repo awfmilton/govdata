@@ -72,6 +72,16 @@ add_action( 'wp_enqueue_scripts', static function () {
 		true
 	);
 
+	// Informative hover/focus tooltips (any [data-pt-tip] element). Tiny,
+	// dependency-free, loaded site-wide so tooltips work on every template.
+	wp_enqueue_script(
+		'publictech-tooltips',
+		PUBLICTECH_TERMINAL_URL . 'assets/js/tooltips.js',
+		[],
+		PUBLICTECH_TERMINAL_VERSION,
+		true
+	);
+
 	if ( wp_script_is( 'publictech-charts', 'registered' ) ) {
 		wp_enqueue_script(
 			'publictech-chart-customizer-ui',
