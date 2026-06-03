@@ -613,9 +613,9 @@
 
 		// ── Confidence check ─────────────────────────────────────────────────
 		const definite  = [ 'agreement_type', 'recipient_type', 'value_gt', 'value_lt',
-		                     'province', 'fiscal_year', 'start_year', 'end_year',
-		                     'department', 'program', 'recipient', 'riding', 'city',
-		                     'naics', 'fulltext', 'field_name' ];
+			'province', 'fiscal_year', 'start_year', 'end_year',
+			'department', 'program', 'recipient', 'riding', 'city',
+			'naics', 'fulltext', 'field_name' ];
 		const hasMatch  = definite.some( k => params[k] != null );
 
 		if ( ! hasMatch ) {
