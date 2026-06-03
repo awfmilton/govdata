@@ -95,15 +95,8 @@ final class Throttle {
 	}
 
 	private function ip(): string {
-		foreach ( [ 'HTTP_CF_CONNECTING_IP', 'HTTP_X_FORWARDED_FOR', 'REMOTE_ADDR' ] as $h ) {
-			if ( ! empty( $_SERVER[ $h ] ) ) {
-				$raw = sanitize_text_field( wp_unslash( $_SERVER[ $h ] ) );
-				$ip  = trim( explode( ',', $raw )[0] );
-				if ( filter_var( $ip, FILTER_VALIDATE_IP ) ) {
-					return $ip;
-				}
-			}
-		}
-		return '0.0.0.0';
+		// Trusted-proxy aware: forwarded headers are only honoured when the
+		// connecting peer is a configured proxy (see helpers.php client_ip()).
+		return client_ip();
 	}
 }

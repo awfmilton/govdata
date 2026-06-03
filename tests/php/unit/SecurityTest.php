@@ -42,6 +42,9 @@ final class SecurityTest extends TestCase {
 			'block comment'  => [ "/* SELECT */ DELETE FROM x" ],
 			'line comment'   => [ "SELECT 1 -- harmless\nUPDATE x SET a=1" ],
 			'lowercase'      => [ 'insert into x values (1)' ],
+			'into outfile'   => [ "SELECT * FROM x INTO OUTFILE '/tmp/x'" ],
+			'into dumpfile'  => [ "SELECT * FROM x INTO DUMPFILE '/tmp/x'" ],
+			'load_file'      => [ "SELECT LOAD_FILE('/etc/passwd') FROM x" ],
 		];
 	}
 
@@ -57,6 +60,7 @@ final class SecurityTest extends TestCase {
 			[ 'SELECT a, b FROM x WHERE c = ? AND d IN (?,?)' ],
 			[ "SELECT 'inserted by' AS note FROM x" ],
 			[ "SELECT 'DELETE FROM' as label, 1 FROM x" ],
+			[ "SELECT 'INTO OUTFILE' AS note FROM x" ],
 			[ 'WITH t AS (SELECT 1) SELECT * FROM t' ],
 		];
 	}

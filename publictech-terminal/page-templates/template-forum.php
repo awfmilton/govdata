@@ -21,7 +21,7 @@ $pt_threads    = new WP_Query( [
 
 get_header(); ?>
 
-<main>
+<main id="pt-main" tabindex="-1">
 	<section class="view active" data-pt-view="forum">
 		<div class="forum-grid">
 			<aside class="panel corner">

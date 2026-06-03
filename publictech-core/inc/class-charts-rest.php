@@ -341,10 +341,19 @@ final class Charts_REST {
 		if ( ! $post || 'user-chart' !== $post->post_type ) {
 			return new \WP_Error( 'pt_not_found', 'Chart not found.', [ 'status' => 404 ] );
 		}
-		if ( (int) $post->post_author !== $uid && ! current_user_can( 'edit_others_posts' ) ) {
+		if ( (int) $post->post_author !== $uid && ! current_user_can( self::moderator_cap() ) ) {
 			return new \WP_Error( 'pt_forbidden', 'Not your chart.', [ 'status' => 403 ] );
 		}
 		return true;
+	}
+
+	/**
+	 * Capability that lets a non-owner moderate (read/edit/delete) someone
+	 * else's chart. Defaults to `edit_others_posts` (Editors+) for backward
+	 * compatibility; filter to a dedicated cap to narrow the blast radius.
+	 */
+	private static function moderator_cap(): string {
+		return (string) apply_filters( 'publictech_chart_moderator_cap', 'edit_others_posts' );
 	}
 
 	/* ---------- handlers ---------- */
@@ -400,12 +409,17 @@ final class Charts_REST {
 		// Private charts: only the author (or editor) can resolve.
 		if ( 'publish' !== $post->post_status ) {
 			$uid = get_current_user_id();
-			if ( ! $uid || ( (int) $post->post_author !== $uid && ! current_user_can( 'edit_others_posts' ) ) ) {
+			if ( ! $uid || ( (int) $post->post_author !== $uid && ! current_user_can( self::moderator_cap() ) ) ) {
 				return new \WP_Error( 'pt_forbidden', 'Not visible.', [ 'status' => 403 ] );
 			}
 		}
-		// Hot-counter bump for analytics, fire-and-forget.
-		update_post_meta( $id, 'pt_views', (int) get_post_meta( $id, 'pt_views', true ) + 1 );
+		// Hot-counter bump for analytics, fire-and-forget — de-duped to at most
+		// once per viewer per hour so the count can't be trivially inflated.
+		$seen_key = 'pt_cv_' . $id . '_' . md5( client_ip() );
+		if ( ! get_transient( $seen_key ) ) {
+			update_post_meta( $id, 'pt_views', (int) get_post_meta( $id, 'pt_views', true ) + 1 );
+			set_transient( $seen_key, 1, HOUR_IN_SECONDS );
+		}
 		return rest_ensure_response( $this->shape( $post ) );
 	}
 
@@ -450,6 +464,9 @@ final class Charts_REST {
 	}
 
 	public function update( \WP_REST_Request $req ): \WP_REST_Response|\WP_Error {
+		if ( ( $gate = Throttle::instance()->enforce_rest( $req ) ) instanceof \WP_Error ) {
+			return $gate;
+		}
 		$id   = absint( $req['id'] );
 		$body = (array) $req->get_json_params();
 		$post = get_post( $id );
@@ -486,9 +503,15 @@ final class Charts_REST {
 		return rest_ensure_response( $this->shape( get_post( $id ) ) );
 	}
 
-	public function delete( \WP_REST_Request $req ): \WP_REST_Response {
+	public function delete( \WP_REST_Request $req ): \WP_REST_Response|\WP_Error {
+		if ( ( $gate = Throttle::instance()->enforce_rest( $req ) ) instanceof \WP_Error ) {
+			return $gate;
+		}
 		$id = absint( $req['id'] );
-		wp_delete_post( $id, true );
+		// Trash (recoverable) rather than force-delete: an owner-scoped mistake
+		// or CSRF shouldn't be irreversible. Trashed charts drop out of the
+		// gallery (which queries post_status=publish) immediately.
+		wp_trash_post( $id );
 		return rest_ensure_response( [ 'ok' => true, 'id' => $id ] );
 	}
 

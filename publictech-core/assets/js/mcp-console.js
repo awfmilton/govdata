@@ -50,6 +50,27 @@
 		}
 	}
 
+	// The /ai/query backend returns HTTP 200 with empty rows and a notice in the
+	// SQL when no text-to-SQL model is wired (the default stub). Detect that so
+	// we can show a clear message instead of an empty chart.
+	function isNotice(data) {
+		if (!data) return true;
+		const rows = data.rows || [];
+		const sql  = String(data.sql || '');
+		return rows.length === 0 && (!!data.notice || /not configured|configure publictech_text_to_sql/i.test(sql));
+	}
+
+	function showNotice(data) {
+		const host = $('#aiResponse');
+		if (!host) return;
+		const msg = (data && data.notice) ? String(data.notice)
+			: 'AI backend not configured — showing the generated SQL only.';
+		// Reflect "SQL" as the active view so the toggle matches what's shown.
+		$$('.ai-view-switch button').forEach(function (x) { x.classList.toggle('on', x.dataset.view === 'sql'); });
+		host.innerHTML = '<div class="dim" style="padding:10px 0;font-size:12px">' + escape(msg) + '</div>' +
+			'<div class="resp-sql">' + highlightSQL((data && data.sql) || '') + '</div>';
+	}
+
 	function execute() {
 		const prompt = ($('#aiPrompt') || {}).value || '';
 		if (!prompt.trim()) return;
@@ -69,6 +90,7 @@
 			})
 			.then(function (data) {
 				lastResult = data;
+				if (isNotice(data)) { showNotice(data); return; }
 				const active = ($('.ai-view-switch .on') || {}).dataset || { view: 'chart' };
 				render(active.view);
 			})

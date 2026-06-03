@@ -6,7 +6,7 @@ defined( 'ABSPATH' ) || exit;
 
 get_header();
 ?>
-<main class="pt-shell">
+<main id="pt-main" tabindex="-1" class="pt-shell">
 	<?php
 	if ( have_posts() ) :
 		while ( have_posts() ) :

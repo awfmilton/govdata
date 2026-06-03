@@ -57,7 +57,7 @@ $pt_fmt_money = static function ( float $n ): string {
 
 get_header(); ?>
 
-<main>
+<main id="pt-main" tabindex="-1">
 	<section class="view active" data-pt-view="home">
 
 		<?php /* ── HERO ──────────────────────────────────────────────── */ ?>

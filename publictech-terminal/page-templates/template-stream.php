@@ -19,7 +19,7 @@ $pt_can_chart = \PublicTech\Core\Chart_Spec::user_can_create(
 
 get_header(); ?>
 
-<main>
+<main id="pt-main" tabindex="-1">
 	<section class="view active" data-pt-view="stream">
 		<div class="stream-bar corner">
 			<input data-stream-filter placeholder="<?php esc_attr_e( 'Filter rows · vendor, category, txn id, amount range (e.g. >5000)…', 'publictech-terminal' ); ?>" />
@@ -52,7 +52,7 @@ get_header(); ?>
 				<tr><td colspan="6"><div class="pt-loading"><?php esc_html_e( 'Streaming…', 'publictech-terminal' ); ?></div></td></tr>
 			</tbody>
 		</table>
-		<div class="stream-foot" data-stream-foot></div>
+		<div class="stream-foot" data-stream-foot role="status" aria-live="polite"></div>
 	</section>
 </main>
 

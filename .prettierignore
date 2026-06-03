@@ -1,0 +1,14 @@
+# Dependencies & build output (mirrors .gitignore)
+node_modules/
+vendor/
+build/
+dist/
+coverage/
+package-lock.json
+composer.lock
+wp-content/
+
+# Generated minified assets and vendored third-party libs — not hand-edited
+**/*.min.js
+**/*.min.css
+publictech-core/assets/vendor/

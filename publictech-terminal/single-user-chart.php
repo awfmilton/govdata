@@ -23,7 +23,7 @@ get_header(); ?>
 	$pt_views_ct = (int) get_post_meta( $pt_id, 'pt_views', true );
 	$pt_forks_ct = (int) get_post_meta( $pt_id, 'pt_forks', true );
 ?>
-<main>
+<main id="pt-main" tabindex="-1">
 	<section class="view active" data-pt-view="chart-single">
 
 		<header class="hero corner" style="margin-bottom:24px">

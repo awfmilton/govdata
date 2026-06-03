@@ -47,9 +47,11 @@ final class Captcha {
 		] );
 
 		if ( is_wp_error( $response ) ) {
-			// Network failure — don't block user, log quietly.
+			// Network failure. Default to fail-OPEN to avoid locking users out
+			// on a transient Google outage, but make it an explicit, filterable
+			// decision so operators can fail closed on sensitive actions.
 			error_log( '[PublicTech] reCAPTCHA verify failed: ' . $response->get_error_message() );
-			return true;
+			return (bool) apply_filters( 'publictech_captcha_fail_open', true, $action, 'network_error' );
 		}
 
 		$data = json_decode( wp_remote_retrieve_body( $response ), true );
@@ -65,9 +67,10 @@ final class Captcha {
 		$threshold = (float) get_option( self::OPT_THRESHOLD, 0.5 );
 		$score     = (float) ( $data['score'] ?? 0.0 );
 
-		// Test mode: log but never block.
+		// Test mode: log score/action but never block. The raw grecaptcha token
+		// is a secret and is deliberately NOT logged.
 		if ( get_option( self::OPT_TEST_MODE, false ) ) {
-			error_log( sprintf( '[PublicTech] reCAPTCHA score=%0.2f action=%s token=%s', $score, $action, $token ) );
+			error_log( sprintf( '[PublicTech] reCAPTCHA score=%0.2f action=%s (test mode — not blocking)', $score, $action ) );
 			return true;
 		}
 
@@ -80,10 +83,9 @@ final class Captcha {
 	}
 
 	private static function client_ip(): string {
-		foreach ( [ 'HTTP_CF_CONNECTING_IP', 'HTTP_X_FORWARDED_FOR', 'REMOTE_ADDR' ] as $h ) {
-			$val = $_SERVER[ $h ] ?? '';
-			if ( $val ) return trim( explode( ',', $val )[0] );
-		}
-		return '';
+		// Trusted-proxy aware (see helpers.php). Google's siteverify treats an
+		// absent remoteip as fine, so don't send the 0.0.0.0 placeholder.
+		$ip = client_ip();
+		return '0.0.0.0' === $ip ? '' : $ip;
 	}
 }

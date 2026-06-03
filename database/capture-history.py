@@ -21,6 +21,7 @@ Usage:
 """
 
 import argparse
+import os
 import sys
 from decimal import Decimal, InvalidOperation
 import mysql.connector
@@ -28,8 +29,16 @@ import mysql.connector
 if hasattr(sys.stdout, 'reconfigure'):
     sys.stdout.reconfigure(encoding='utf-8', errors='replace')
 
+DB_PASSWORD = os.environ.get("PT_DB_PASSWORD")
+if not DB_PASSWORD:
+    raise SystemExit(
+        "PT_DB_PASSWORD is not set. The database password is no longer "
+        "stored in the repo — export it before running:\n"
+        "    export PT_DB_PASSWORD='...'"
+    )
+
 DB = dict(host='35.230.186.163', port=3306, database='grantconts',
-          user='pt_read', password='REDACTED_DB_PASSWORD',
+          user='pt_read', password=DB_PASSWORD,
           connection_timeout=600, autocommit=False)
 
 BATCH = 1000

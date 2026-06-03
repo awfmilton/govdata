@@ -14,7 +14,7 @@ defined( 'ABSPATH' ) || exit;
 
 get_header(); ?>
 
-<main>
+<main id="pt-main" tabindex="-1">
 	<section class="view active" data-pt-view="forum">
 		<?php
 		do_action( 'bbp_before_main_content' );

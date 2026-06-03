@@ -190,8 +190,16 @@ final class Connection {
 			}
 		}
 
+		// Select only the allowlisted columns (by their qualified `tbl`.`col`
+		// expressions, which are operator-defined — not user input). This keeps
+		// the row keys identical to the old SELECT * for exposed columns while
+		// no longer shipping or exposing non-allowlisted columns, and trims the
+		// row width over the wire on million-row streams.
+		$select = $columns ? implode( ', ', array_values( $columns ) ) : '*';
+
 		$sql = sprintf(
-			'SELECT * FROM %s %s %s LIMIT %d OFFSET %d',
+			'SELECT %s FROM %s %s %s LIMIT %d OFFSET %d',
+			$select,
 			safe_ident( $table ),
 			$where,
 			$order,

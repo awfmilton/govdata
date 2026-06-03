@@ -24,7 +24,7 @@ $pt_edit_of     = isset( $_GET['edit'] )        ? absint( $_GET['edit'] )       
 
 get_header(); ?>
 
-<main>
+<main id="pt-main" tabindex="-1">
 	<section class="view active" data-pt-view="chart-builder">
 
 		<?php if ( ! $pt_can ) : ?>

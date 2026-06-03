@@ -50,7 +50,7 @@ if ( '' === $pt_riding_name ) {
 /* ─── Empty state — cache miss or warmer hasn't run yet ────────────────────── */
 if ( ! is_array( $pt_payload ) || empty( $pt_payload['totals'] ) ) {
 	get_header(); ?>
-	<main>
+	<main id="pt-main" tabindex="-1">
 	<section class="view active" data-pt-view="riding-report">
 		<div class="hero corner" style="margin-bottom:18px">
 			<div style="position:relative;z-index:1">
@@ -150,7 +150,7 @@ $pt_rec_grand = array_sum( array_column( $pt_rec_types, 1 ) );
 
 get_header(); ?>
 
-<main>
+<main id="pt-main" tabindex="-1">
 <section class="view active" data-pt-view="riding-report">
 
 	<!-- ═══ HERO ══════════════════════════════════════════════════════════ -->

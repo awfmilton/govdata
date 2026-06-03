@@ -62,7 +62,7 @@ $pt_initial = strtoupper( substr( $pt_user->display_name, 0, 2 ) );
 
 get_header(); ?>
 
-<main>
+<main id="pt-main" tabindex="-1">
 	<section class="view active" data-pt-view="user">
 		<div class="user-grid">
 			<aside style="display:flex;flex-direction:column;gap:14px">

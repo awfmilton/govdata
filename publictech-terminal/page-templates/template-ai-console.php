@@ -16,7 +16,7 @@ $pt_can_chart = \PublicTech\Core\Chart_Spec::user_can_create( $pt_quota );
 
 get_header(); ?>
 
-<main>
+<main id="pt-main" tabindex="-1">
 	<section class="view active" data-pt-view="ai">
 		<div class="ai-grid">
 			<div>
@@ -49,7 +49,7 @@ get_header(); ?>
 						</div>
 					</div>
 					<div class="bd">
-						<div id="aiResponse"><div class="dim"><?php esc_html_e( 'Run a query to see results.', 'publictech-terminal' ); ?></div></div>
+						<div id="aiResponse" aria-live="polite"><div class="dim"><?php esc_html_e( 'Run a query to see results.', 'publictech-terminal' ); ?></div></div>
 					</div>
 				</div>
 			</div>
