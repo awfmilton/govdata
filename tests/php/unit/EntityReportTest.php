@@ -103,11 +103,15 @@ final class EntityReportTest extends TestCase {
 		$this->assertSame( '', $snap['agreements'][ array_search( 'A3', array_column( $snap['agreements'], 'ref_number' ), true ) ]['start_date'], 'Invalid dates normalise to empty.' );
 	}
 
-	public function test_source_query_builds_like_clauses(): void {
+	public function test_source_query_builds_fulltext_match(): void {
 		[ $sql, $params ] = Entity_Reports::source_query( [ 'legal_names' => [ 'Egale Canada' ] ] );
-		$this->assertStringContainsString( '`recipient_legal_name` LIKE ?', $sql );
-		$this->assertStringContainsString( '`recipient_operating_name` LIKE ?', $sql );
-		$this->assertContains( '%Egale Canada%', $params );
+		// Recipient names are matched through the ft_recipient FULLTEXT index
+		// (MATCH … AGAINST in BOOLEAN MODE), not leading-wildcard LIKE.
+		$this->assertStringContainsString( 'MATCH(`recipient_legal_name`, `recipient_operating_name`)', $sql );
+		$this->assertStringContainsString( 'AGAINST (? IN BOOLEAN MODE)', $sql );
+		// The bound param is the registry name as a quoted boolean-mode phrase,
+		// with no SQL wildcards.
+		$this->assertContains( '"Egale Canada"', $params );
 		// No match patterns → empty query (caller skips the entity).
 		$this->assertSame( '', Entity_Reports::source_query( [ 'legal_names' => [] ] )[0] );
 	}
