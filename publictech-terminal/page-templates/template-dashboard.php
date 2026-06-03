@@ -78,8 +78,12 @@ get_header(); ?>
 				</div>
 				<div class="hero-stats">
 					<div class="hero-stat"><div class="lab"><?php esc_html_e( 'Members', 'publictech-terminal' ); ?></div><div class="val"><?php echo esc_html( number_format_i18n( $pt_total ) ); ?></div></div>
-					<div class="hero-stat"><div class="lab"><?php esc_html_e( 'Open Flags', 'publictech-terminal' ); ?></div><div class="val"><?php echo esc_html( number_format_i18n( $pt_flags ) ); ?></div></div>
-					<div class="hero-stat"><div class="lab"><?php esc_html_e( 'Schemas', 'publictech-terminal' ); ?></div><div class="val"><?php echo esc_html( count( $pt_health ) ); ?></div></div>
+					<div class="hero-stat pt-tip"
+						data-pt-tip-title="<?php esc_attr_e( 'Open flags', 'publictech-terminal' ); ?>"
+						data-pt-tip="<?php esc_attr_e( 'Audit flags raised by the community on specific transactions that are still open for review.', 'publictech-terminal' ); ?>"><div class="lab"><?php esc_html_e( 'Open Flags', 'publictech-terminal' ); ?></div><div class="val"><?php echo esc_html( number_format_i18n( $pt_flags ) ); ?></div></div>
+					<div class="hero-stat pt-tip"
+						data-pt-tip-title="<?php esc_attr_e( 'Data schemas', 'publictech-terminal' ); ?>"
+						data-pt-tip="<?php esc_attr_e( 'Connected audit-data clusters you can query at your current tier — finance, grants, contracts and registry.', 'publictech-terminal' ); ?>"><div class="lab"><?php esc_html_e( 'Schemas', 'publictech-terminal' ); ?></div><div class="val"><?php echo esc_html( count( $pt_health ) ); ?></div></div>
 					<div class="hero-stat"><div class="lab"><?php esc_html_e( 'Tier', 'publictech-terminal' ); ?></div><div class="val"><?php echo esc_html( ucfirst( \PublicTech\Core\Access_Tiers::instance()->user_tier( get_current_user_id() ?: null ) ) ); ?></div></div>
 				</div>
 			</div>
@@ -114,7 +118,9 @@ get_header(); ?>
 
 		<?php /* ── KPI ROW ─────────────────────────────────────────── */ ?>
 		<div class="dash-kpis">
-			<div class="dash-kpi corner">
+			<div class="dash-kpi corner pt-tip"
+				data-pt-tip-title="<?php esc_attr_e( 'Total disbursed', 'publictech-terminal' ); ?>"
+				data-pt-tip="<?php esc_attr_e( 'Sum of every federal grant and contribution agreement in the database, across all fiscal years and provinces.', 'publictech-terminal' ); ?>">
 				<div class="dk-val"
 					data-count-target="<?php echo esc_attr( $pt_dash['total_spend'] ); ?>"
 					data-count-prefix="$"
@@ -122,14 +128,18 @@ get_header(); ?>
 				<div class="dk-lab"><?php esc_html_e( 'Total Disbursed', 'publictech-terminal' ); ?></div>
 				<div class="dk-sub"><?php esc_html_e( 'Grants &amp; Contributions', 'publictech-terminal' ); ?></div>
 			</div>
-			<div class="dash-kpi corner">
+			<div class="dash-kpi corner pt-tip"
+				data-pt-tip-title="<?php esc_attr_e( 'Total agreements', 'publictech-terminal' ); ?>"
+				data-pt-tip="<?php esc_attr_e( 'Count of individual grant and contribution agreements on record across every connected schema.', 'publictech-terminal' ); ?>">
 				<div class="dk-val"
 					data-count-target="<?php echo esc_attr( $pt_dash['total_agreements'] ); ?>"
 					data-count-unit="count"><?php echo esc_html( number_format_i18n( (int) $pt_dash['total_agreements'] ) ); ?></div>
 				<div class="dk-lab"><?php esc_html_e( 'Total Agreements', 'publictech-terminal' ); ?></div>
 				<div class="dk-sub"><?php esc_html_e( 'In the database', 'publictech-terminal' ); ?></div>
 			</div>
-			<div class="dash-kpi corner">
+			<div class="dash-kpi corner pt-tip"
+				data-pt-tip-title="<?php esc_attr_e( 'Average award', 'publictech-terminal' ); ?>"
+				data-pt-tip="<?php esc_attr_e( 'Total disbursed divided by the number of agreements — the mean value of a single award.', 'publictech-terminal' ); ?>">
 				<div class="dk-val"
 					data-count-target="<?php echo esc_attr( $pt_dash['avg_value'] ); ?>"
 					data-count-prefix="$"
