@@ -36,6 +36,51 @@ one-time-shown API keys.
 
 ---
 
+## 0.5 Implementation status (PR #10)
+
+This branch implements the well-defined fixes from the audit. Large product
+features that need external services or product decisions are intentionally
+deferred (listed at the end) rather than blind-built.
+
+**Implemented & verified (92 unit tests pass, all PHP lints, JS parses):**
+
+- **Security:** S1 secrets removed from the working tree + sourced from env
+  (operator still rotates the password & purges history) · S2 trusted-proxy IP
+  resolution across all four limiters · S3 CSV formula-injection neutralisation
+  · S4 reCAPTCHA token no longer logged + filterable fail-open · S5 `INTO
+  OUTFILE`/`DUMPFILE`/`LOAD_FILE` blocked · S6 chart soft-delete + throttle +
+  view-count de-dupe · S7 filterable moderator capability · S8 analytics IP
+  anonymised + retention cron · S9 `safe_ident` message.
+- **Performance:** P1 minify build (`npm run build`, ~230→140 KB) · P3
+  `mp_search` N+1 removed · P5 Query-Builder inline columns · P6 `report_by_slug`
+  cached · P8 `SELECT` only allowlisted columns · F4/P7 self-hosted D3/Billboard/
+  topojson/d3-sankey/compromise (drops the jsDelivr dependency).
+- **UI / accessibility:** U1 skip link + `#pt-main` · U2 global `:focus-visible`
+  · U3 MP photo exposed · U4 `aria-live` result/status regions · U7 AI-console
+  empty-state · U12 `aria-busy` fix · U16 reduced-motion (ticker/count-up) · U21
+  accessible names on icon buttons.
+- **Features / correctness:** F1 MCP `mp.spending` schema drift fixed, fabricated
+  `Math.random()` MP-profile network removed, "Votes Cast" honest empty state ·
+  F5 i18n plumbing (child text domain loaded + `languages/` + POT catalogs) ·
+  F6 (partial) dev/test toolchain unbroken, stale test fixed, CSV/file-access
+  tests added.
+
+**Deferred — recommended next (need decisions / services / larger effort):**
+
+- **Operator:** rotate the exposed DB password and purge it from git history.
+- **Features:** alerts create-path + RSS/webhook (F2), surface the anomaly engine,
+  methodology/"last updated" page, per-row source citations, comparison/YoY,
+  embeddable charts, bulk download, schema.org/Open Graph/sitemaps; billing +
+  `/pricing` and self-serve API keys (F7); text-to-SQL wiring (F3, needs an LLM
+  service); French translation **content** (plumbing is done).
+- **A11y (need interactive testing):** ARIA tabs (U10), modal focus-trap (U6),
+  `<div>`→`<button>` conversions (U5/U9), light-theme contrast tuning (U14/U15),
+  chart data-table alternatives (U17).
+- **Performance:** promote sort/filter meta to indexed columns (P4), keyset
+  pagination (P8b), split `terminal.css` into core+app.
+
+---
+
 ## S. Security
 
 ### S1 — CRITICAL: Live DB credentials committed to the repo (11 files)
