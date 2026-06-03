@@ -477,6 +477,27 @@ final class REST_API {
 			return new \WP_Error( 'pt_not_found', 'Member not found.', [ 'status' => 404 ] );
 		}
 		$ext_id = (string) get_post_meta( $mp_id, 'external_mp_id', true );
+
+		// Fallback for new MPs whose external_mp_id wasn't set until the next warm.
+		if ( '' === $ext_id ) {
+			$op_pol_id = (int) get_post_meta( $mp_id, 'op_politician_id', true );
+			if ( $op_pol_id > 0 ) {
+				try {
+					$row = publictech_db( MP_Finance_Warmer::source_alias() )->select_row(
+						"SELECT m.mp_id
+						   FROM mp_persons p
+						   JOIN mps m ON m.mp_persons_id = p.id
+						  WHERE p.op_politician_id = ? AND m.mp_id LIKE 'MP%'
+						  LIMIT 1",
+						[ $op_pol_id ]
+					);
+					$ext_id = $row['mp_id'] ?? '';
+				} catch ( \Throwable $e ) {
+					// Non-fatal — fall through to the 404 below.
+				}
+			}
+		}
+
 		if ( '' === $ext_id ) {
 			return new \WP_Error( 'pt_not_found', 'Member not linked to finance schema.', [ 'status' => 404 ] );
 		}

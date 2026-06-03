@@ -30,7 +30,9 @@ $postals  = (string) ( get_post_meta( $mp_id, 'pt_mp_postal_code', true ) ?: get
 $role     = (string) get_post_meta( $mp_id, 'caucus_role',    true );
 $elected  = (string) get_post_meta( $mp_id, 'first_elected',  true );
 $tenure   = (string) get_post_meta( $mp_id, 'tenure',         true );
-$ext_id   = (int)    get_post_meta( $mp_id, 'external_mp_id', true );
+$ext_id        = (int)    get_post_meta( $mp_id, 'external_mp_id',   true );
+$finance_from  = (string) get_post_meta( $mp_id, 'finance_data_from', true );
+$finance_to    = (string) get_post_meta( $mp_id, 'finance_data_to',   true );
 $spend    = (int)    get_post_meta( $mp_id, 'total_spend',    true );
 $travel   = (int)    get_post_meta( $mp_id, 'travel_spend',   true );
 $contracts= (int)    get_post_meta( $mp_id, 'contracts_n',    true );
@@ -85,6 +87,19 @@ get_header(); ?>
 					<div class="hd"><h3>◇ <?php esc_html_e( 'Record', 'publictech-terminal' ); ?></h3><span class="meta">REGISTRY/04</span></div>
 					<div class="kvs">
 						<?php
+						// Build a human-readable office-spend coverage label.
+						$is_historical    = 'draft' === get_post_status( $mp_id );
+						if ( $finance_from && $finance_to ) {
+							$finance_period_label = $finance_from . ' – ' . $finance_to;
+							if ( $is_historical ) {
+								$finance_period_label .= ' ' . __( '(while in office)', 'publictech-terminal' );
+							}
+						} elseif ( $is_historical ) {
+							$finance_period_label = __( 'Left office before expense records begin (July 2020)', 'publictech-terminal' );
+						} else {
+							$finance_period_label = __( 'Pending — data not yet published by HoC', 'publictech-terminal' );
+						}
+
 						$rows = [
 							[ __( 'Riding',        'publictech-terminal' ), $riding ],
 							[ __( 'Region',        'publictech-terminal' ), $region_n ],
@@ -93,6 +108,7 @@ get_header(); ?>
 							[ __( 'Committees',    'publictech-terminal' ), implode( ' · ', wp_list_pluck( $comm, 'name' ) ) ],
 							[ __( 'First Elected', 'publictech-terminal' ), $elected ],
 							[ __( 'Tenure',        'publictech-terminal' ), $tenure ],
+							[ __( 'Office Spend Data', 'publictech-terminal' ), $finance_period_label ],
 						];
 						foreach ( $rows as $r ) :
 							if ( '' === trim( (string) $r[1] ) ) { continue; }
@@ -195,7 +211,11 @@ get_header(); ?>
 					<div class="panel corner">
 						<div class="hd">
 							<h3>◇ <?php esc_html_e( 'Spending Breakdown · Fiscal Years', 'publictech-terminal' ); ?></h3>
-							<span class="meta">SCHEMA: pt-finance-01.expenditures</span>
+							<span class="meta">SCHEMA: pt-finance-01.expenditures<?php
+								if ( $finance_from && $finance_to ) {
+									echo ' · ' . esc_html( $finance_from ) . ' – ' . esc_html( $finance_to );
+								}
+							?></span>
 						</div>
 						<div class="bd">
 							<div class="chart-host lg" id="ptLineChart" style="height:340px"></div>

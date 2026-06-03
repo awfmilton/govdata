@@ -111,9 +111,15 @@ final class MP_Finance_Warmer {
 		$this->write_kpis( $kpi_rows );
 		$this->log( sprintf( 'KPI rows written for %d MPs.', count( $kpi_rows ) ) );
 
+		$op_pol_to_mp_id = $this->load_op_pol_to_mp_id();
+		$this->log( sprintf( 'Built op_politician_id map for %d MPs.', count( $op_pol_to_mp_id ) ) );
+
 		$kpi_map    = array_column( $kpi_rows, null, 'mp_id' );
-		$wp_updated = $this->sync_post_meta( $kpi_map );
+		$wp_updated = $this->sync_post_meta( $kpi_map, $op_pol_to_mp_id );
 		$this->log( sprintf( 'Post meta updated for %d WP posts.', $wp_updated ), 'success' );
+
+		$this->write_global_meta( $kpi_rows );
+		$this->log( 'Global data-period meta written.' );
 
 		$elapsed = round( microtime( true ) - $t0, 2 );
 		$this->log( sprintf( 'Warm complete in %ss.', $elapsed ), 'success' );
@@ -160,16 +166,60 @@ final class MP_Finance_Warmer {
 	 * @return array<int,array<string,mixed>>
 	 */
 	private function load_kpis(): array {
+		// MAX(period_id) = numerically highest id = oldest data (id ordering is inverted).
+		// MIN(period_id) = numerically lowest  id = newest data.
 		$stmt = $this->source->query(
 			'SELECT
 			     mp_id,
 			     SUM(salaries + travel + hospitality + contracts) AS total_spend,
 			     SUM(travel)    AS travel_spend,
-			     SUM(contracts) AS contracts_spend
+			     SUM(contracts) AS contracts_spend,
+			     MAX(period_id) AS oldest_period_id,
+			     MIN(period_id) AS newest_period_id
 			   FROM hoc_member_expenditures
 			  GROUP BY mp_id'
 		);
-		return $stmt->fetchAll( \PDO::FETCH_ASSOC );
+		$rows = $stmt->fetchAll( \PDO::FETCH_ASSOC );
+
+		// Resolve period ids → human-readable labels in one query.
+		$all_ids = array_unique( array_merge(
+			array_column( $rows, 'oldest_period_id' ),
+			array_column( $rows, 'newest_period_id' )
+		) );
+		$labels = $this->load_period_labels( $all_ids );
+
+		foreach ( $rows as &$row ) {
+			$row['data_from'] = $labels[ (int) $row['oldest_period_id'] ]['start'] ?? '';
+			$row['data_to']   = $labels[ (int) $row['newest_period_id'] ]['end']   ?? '';
+		}
+		unset( $row );
+
+		return $rows;
+	}
+
+	/**
+	 * Map period ids → [ 'start' => 'July 2020', 'end' => 'September 2020' ] labels.
+	 *
+	 * @param  int[] $ids
+	 * @return array<int,array{start:string,end:string}>
+	 */
+	private function load_period_labels( array $ids ): array {
+		if ( empty( $ids ) ) {
+			return [];
+		}
+		$placeholders = implode( ',', array_fill( 0, count( $ids ), '?' ) );
+		$stmt = $this->source->prepare(
+			"SELECT period_id, fiscal_year, quarter_name
+			   FROM hoc_reporting_periods
+			  WHERE period_id IN ({$placeholders})"
+		);
+		$stmt->execute( array_values( $ids ) );
+		$out = [];
+		foreach ( $stmt->fetchAll( \PDO::FETCH_ASSOC ) as $p ) {
+			$label = pt_finance_quarter_label( (string) $p['fiscal_year'], (string) $p['quarter_name'] );
+			$out[ (int) $p['period_id'] ] = $label;
+		}
+		return $out;
 	}
 
 	/* ─────────────────────────── cache writes ─────────────────────────── */
@@ -229,8 +279,9 @@ final class MP_Finance_Warmer {
 
 		$stmt = $this->cache->prepare(
 			'REPLACE INTO `mp_kpi_cache`
-			     (`mp_id`, `total_spend`, `travel_spend`, `contracts_spend`, `updated_at`)
-			 VALUES (?, ?, ?, ?, UTC_TIMESTAMP())'
+			     (`mp_id`, `total_spend`, `travel_spend`, `contracts_spend`,
+			      `data_from`, `data_to`, `updated_at`)
+			 VALUES (?, ?, ?, ?, ?, ?, UTC_TIMESTAMP())'
 		);
 
 		$this->cache->beginTransaction();
@@ -238,9 +289,11 @@ final class MP_Finance_Warmer {
 		foreach ( $rows as $row ) {
 			$stmt->execute( [
 				$row['mp_id'],
-				$row['total_spend']    ?? '0',
-				$row['travel_spend']   ?? '0',
+				$row['total_spend']     ?? '0',
+				$row['travel_spend']    ?? '0',
 				$row['contracts_spend'] ?? '0',
+				$row['data_from']       ?? '',
+				$row['data_to']         ?? '',
 			] );
 			if ( ++$batch % 500 === 0 ) {
 				$this->cache->commit();
@@ -253,19 +306,27 @@ final class MP_Finance_Warmer {
 	/* ─────────────────────────── post meta ─────────────────────────── */
 
 	/**
-	 * Update WP post meta for every member-parliament post whose external_mp_id
-	 * has a matching row in the KPI cache. Returns the count of updated posts.
+	 * Update WP post meta for every member-parliament post.
 	 *
-	 * @param array<string,array<string,mixed>> $kpi_map Keyed by mp_id.
+	 * Primary lookup: external_mp_id post meta → kpi_map key.
+	 * Fallback:       op_politician_id post meta → op_pol_to_mp_id → kpi_map key.
+	 *                 When fallback succeeds, also writes external_mp_id so the
+	 *                 REST /mp/{id}/spend endpoint can resolve future requests.
+	 *
+	 * Also writes finance_data_from and finance_data_to post meta so the template
+	 * can display the coverage period without an extra DB query.
+	 *
+	 * @param array<string,array<string,mixed>> $kpi_map         Keyed by mp_id.
+	 * @param array<int,string>                 $op_pol_to_mp_id op_politician_id → mp_id.
 	 */
-	private function sync_post_meta( array $kpi_map ): int {
+	private function sync_post_meta( array $kpi_map, array $op_pol_to_mp_id = [] ): int {
 		if ( empty( $kpi_map ) ) {
 			return 0;
 		}
 
 		$posts = get_posts( [
 			'post_type'      => 'member-parliament',
-			'post_status'    => 'publish',
+			'post_status'    => [ 'publish', 'draft' ],
 			'posts_per_page' => -1,
 			'fields'         => 'ids',
 		] );
@@ -273,17 +334,116 @@ final class MP_Finance_Warmer {
 		$updated = 0;
 		foreach ( $posts as $post_id ) {
 			$ext_id = (string) get_post_meta( $post_id, 'external_mp_id', true );
+
+			// Fallback: resolve via op_politician_id for new MPs without external_mp_id.
+			if ( '' === $ext_id && ! empty( $op_pol_to_mp_id ) ) {
+				$op_pol_id = (int) get_post_meta( $post_id, 'op_politician_id', true );
+				if ( $op_pol_id > 0 && isset( $op_pol_to_mp_id[ $op_pol_id ] ) ) {
+					$ext_id = $op_pol_to_mp_id[ $op_pol_id ];
+					// Persist so the REST endpoint can resolve this post in future.
+					update_post_meta( $post_id, 'external_mp_id', $ext_id );
+				}
+			}
+
 			if ( '' === $ext_id || ! isset( $kpi_map[ $ext_id ] ) ) {
 				continue;
 			}
+
 			$kpi = $kpi_map[ $ext_id ];
-			update_post_meta( $post_id, 'total_spend',  (int) $kpi['total_spend'] );
-			update_post_meta( $post_id, 'travel_spend', (int) $kpi['travel_spend'] );
-			update_post_meta( $post_id, 'contracts_n',  (int) $kpi['contracts_spend'] );
+			update_post_meta( $post_id, 'total_spend',       (int) $kpi['total_spend'] );
+			update_post_meta( $post_id, 'travel_spend',      (int) $kpi['travel_spend'] );
+			update_post_meta( $post_id, 'contracts_n',       (int) $kpi['contracts_spend'] );
+			update_post_meta( $post_id, 'finance_data_from', (string) ( $kpi['data_from'] ?? '' ) );
+			update_post_meta( $post_id, 'finance_data_to',   (string) ( $kpi['data_to']   ?? '' ) );
 			$updated++;
 		}
 
 		return $updated;
+	}
+
+	/**
+	 * Build op_politician_id → mps.mp_id map from the source DB.
+	 * Requires mp_persons_id FK to be populated on the mps table (Task 1).
+	 *
+	 * @return array<int,string>
+	 */
+	private function load_op_pol_to_mp_id(): array {
+		try {
+			$stmt = $this->source->query(
+				"SELECT p.op_politician_id, m.mp_id
+				   FROM mp_persons p
+				   JOIN mps m ON m.mp_persons_id = p.id
+				  WHERE p.op_politician_id IS NOT NULL
+				    AND m.mp_id LIKE 'MP%'"
+			);
+			$out = [];
+			foreach ( $stmt->fetchAll( \PDO::FETCH_ASSOC ) as $row ) {
+				$out[ (int) $row['op_politician_id'] ] = (string) $row['mp_id'];
+			}
+			return $out;
+		} catch ( \Throwable $e ) {
+			$this->log( 'load_op_pol_to_mp_id failed: ' . $e->getMessage(), 'warn' );
+			return [];
+		}
+	}
+
+	/**
+	 * Write global data-period metadata to the cache DB so templates can surface
+	 * the HoC dataset coverage without touching the source DB.
+	 *
+	 * Keys written to cache_meta:
+	 *   finance_data_from   — human-readable start of the dataset (e.g. "July 2020")
+	 *   finance_data_to     — human-readable end   of the dataset (e.g. "December 2025")
+	 *   finance_last_warm   — UTC timestamp of this warm run
+	 */
+	/**
+	 * @param array<int,array<string,mixed>> $kpi_rows Already-fetched KPI rows (avoids a
+	 *   second unbuffered source query after the PDO cursor may still be open).
+	 */
+	private function write_global_meta( array $kpi_rows ): void {
+		$from       = '';
+		$to         = '';
+		$oldest_pid = null; // numerically largest period_id = oldest in time
+		$newest_pid = null; // numerically smallest period_id = newest in time
+
+		foreach ( $kpi_rows as $row ) {
+			$opid = (int) $row['oldest_period_id'];
+			$npid = (int) $row['newest_period_id'];
+			if ( $oldest_pid === null || $opid > $oldest_pid ) {
+				$oldest_pid = $opid;
+				$from       = (string) ( $row['data_from'] ?? '' );
+			}
+			if ( $newest_pid === null || $npid < $newest_pid ) {
+				$newest_pid = $npid;
+				$to         = (string) ( $row['data_to'] ?? '' );
+			}
+		}
+
+		$this->put_cache_meta( 'finance_data_from', $from );
+		$this->put_cache_meta( 'finance_data_to',   $to );
+		$this->put_cache_meta( 'finance_last_warm',  gmdate( 'Y-m-d H:i:s' ) );
+	}
+
+	private function put_cache_meta( string $key, string $value ): void {
+		$stmt = $this->cache->prepare(
+			'INSERT INTO `cache_meta` (`meta_key`, `meta_value`, `updated_at`)
+			     VALUES (?, ?, UTC_TIMESTAMP())
+			     ON DUPLICATE KEY UPDATE `meta_value` = VALUES(`meta_value`), `updated_at` = VALUES(`updated_at`)'
+		);
+		$stmt->execute( [ $key, $value ] );
+	}
+
+	/** Add a column to a cache table only if it doesn't already exist. */
+	private function maybe_add_column( string $table, string $column, string $definition ): void {
+		$exists = $this->cache->query(
+			"SELECT COUNT(*) FROM information_schema.COLUMNS
+			  WHERE TABLE_SCHEMA = DATABASE()
+			    AND TABLE_NAME   = '{$table}'
+			    AND COLUMN_NAME  = '{$column}'"
+		)->fetchColumn();
+		if ( ! $exists ) {
+			$this->cache->exec( "ALTER TABLE `{$table}` ADD COLUMN `{$column}` {$definition}" );
+		}
 	}
 
 	/* ─────────────────────────── schema ─────────────────────────── */
@@ -308,10 +468,24 @@ final class MP_Finance_Warmer {
 				`total_spend`     DECIMAL(15,2) NOT NULL DEFAULT 0.00,
 				`travel_spend`    DECIMAL(15,2) NOT NULL DEFAULT 0.00,
 				`contracts_spend` DECIMAL(15,2) NOT NULL DEFAULT 0.00,
+				`data_from`       VARCHAR(40)   NOT NULL DEFAULT \'\',
+				`data_to`         VARCHAR(40)   NOT NULL DEFAULT \'\',
 				`updated_at`      DATETIME      NOT NULL,
 				PRIMARY KEY (`mp_id`)
 			) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci'
 		);
+		// Shared meta table (also used by Riding_Cache_Warmer).
+		$this->cache->exec(
+			'CREATE TABLE IF NOT EXISTS `cache_meta` (
+				`meta_key`   VARCHAR(64) NOT NULL,
+				`meta_value` LONGTEXT    NULL,
+				`updated_at` DATETIME    NOT NULL,
+				PRIMARY KEY (`meta_key`)
+			) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4'
+		);
+		// Add data_from / data_to to existing tables that predate this schema change.
+		$this->maybe_add_column( 'mp_kpi_cache', 'data_from', "VARCHAR(40) NOT NULL DEFAULT ''" );
+		$this->maybe_add_column( 'mp_kpi_cache', 'data_to',   "VARCHAR(40) NOT NULL DEFAULT ''" );
 	}
 
 	/* ─────────────────────────── connections ─────────────────────────── */
