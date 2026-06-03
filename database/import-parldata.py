@@ -51,7 +51,7 @@ DEFAULT_USER = 'pt_write'
 DEFAULT_PORT = 3306
 TABLE_PREFIX = 'op_'
 BATCH_SIZE        = 500   # default for small/medium tables
-BATCH_SIZE_LARGE  = 100   # for tables with LONGTEXT columns
+BATCH_SIZE_LARGE  = 500   # for tables with LONGTEXT columns
 
 # Tables with large text blobs — use smaller batches to avoid SSL packet limits
 LARGE_TEXT_TABLES = {

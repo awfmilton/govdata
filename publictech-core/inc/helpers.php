@@ -98,3 +98,27 @@ function stream_csv_rows( \PDOStatement $stmt, ?string $filename = null ): void 
 function bucket_key( ?int $user_id, string $ip, string $tier ): string {
 	return hash( 'sha256', ( $user_id ?? 0 ) . '|' . $ip . '|' . $tier . '|' . wp_salt( 'auth' ) );
 }
+
+/**
+ * Map a HoC fiscal-year string + quarter name to calendar start/end month labels.
+ *
+ * The HoC fiscal year runs April–March.  Quarter names as stored in the DB:
+ *   first-quarter  = April–June     (start year of FY)
+ *   second-quarter = July–September (start year of FY)
+ *   third-quarter  = October–December (start year of FY)
+ *   fourth-quarter = January–March  (end year of FY)
+ *
+ * @param  string $fiscal_year  e.g. '2025-2026'
+ * @param  string $quarter_name e.g. 'third-quarter'
+ * @return array{start:string, end:string} e.g. ['start'=>'October 2025','end'=>'December 2025']
+ */
+function pt_finance_quarter_label( string $fiscal_year, string $quarter_name ): array {
+	$fy_start = (int) substr( $fiscal_year, 0, 4 );
+	switch ( $quarter_name ) {
+		case 'first-quarter':  return [ 'start' => "April {$fy_start}",              'end' => "June {$fy_start}" ];
+		case 'second-quarter': return [ 'start' => "July {$fy_start}",               'end' => "September {$fy_start}" ];
+		case 'third-quarter':  return [ 'start' => "October {$fy_start}",            'end' => "December {$fy_start}" ];
+		case 'fourth-quarter': return [ 'start' => 'January ' . ( $fy_start + 1 ),   'end' => 'March ' . ( $fy_start + 1 ) ];
+		default:               return [ 'start' => '', 'end' => '' ];
+	}
+}

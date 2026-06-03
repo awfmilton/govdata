@@ -32,14 +32,16 @@ final class Riding_Cache_Warmer {
 	private const SOURCE_TABLE = 'master_table';
 
 	/**
-	 * Representation-order ID used for the postal→riding mapping.
-	 * 1 = 2013 RO (338 ridings, in effect 2015-2025).
+	 * Representation-order IDs used for the postal→riding mapping.
+	 * 1 = 2013 RO (338 ridings, in effect 2015-2024).
 	 * 2 = 2023 RO (343 ridings, in effect 2025-present).
 	 *
-	 * Phase 2: fixed to the current RO so postal codes are unambiguous.
-	 * Phase 4: replace with a per-agreement era join keyed on agreement_start_date.
+	 * Phase 4: the join is era-aware — each agreement picks its RO by year.
+	 * Agreements with year >= 2025 use ro_id=2; all earlier years use ro_id=1.
+	 * (2003 RO data was never loaded into pcbfr, so ro_id=1 is the best
+	 * available for all pre-2025 agreements.)
 	 */
-	private const PCFRF_RO_ID = 2;
+	private const PCFRF_RO_IDS = [ 1, 2 ];
 
 	/** @var callable(string,string):void Progress logger: (message, level). */
 	private $logger;
@@ -220,13 +222,22 @@ final class Riding_Cache_Warmer {
 	 * @return array<string,array{name_en:string,name_fr:string,postal_code_count:int}>
 	 */
 	private function load_directory(): array {
+		// Prefer 2023 RO (ro_id=2) names where available; fall back to 2013 RO.
+		// Both ROs are included so the directory covers all 343 current ridings
+		// plus any 2013 RO riding numbers that still appear in historical agreements.
 		$sql = "SELECT `riding_number` AS rn,
-					MAX(`riding_name_en`) AS name_en,
-					MAX(`riding_name_fr`) AS name_fr,
+					COALESCE(
+						MAX(CASE WHEN `ro_id` = 2 THEN `riding_name_en` END),
+						MAX(CASE WHEN `ro_id` = 1 THEN `riding_name_en` END)
+					) AS name_en,
+					COALESCE(
+						MAX(CASE WHEN `ro_id` = 2 THEN `riding_name_fr` END),
+						MAX(CASE WHEN `ro_id` = 1 THEN `riding_name_fr` END)
+					) AS name_fr,
 					COUNT(DISTINCT `postal_code`) AS pc_count
 				FROM `pcbfr`
 				WHERE `riding_number` IS NOT NULL AND `riding_number` <> ''
-				  AND `ro_id` = " . self::PCFRF_RO_ID . "
+				  AND `ro_id` IN (1, 2)
 				GROUP BY `riding_number`";
 		$out = [];
 		$stmt = $this->source->query( $sql );
@@ -269,13 +280,17 @@ final class Riding_Cache_Warmer {
 	private function pcfrf_join(): string {
 		$src_pc = $this->pc_norm( '`m`.`recipient_postal_code`' );
 		$dir_pc = $this->pc_norm( '`postal_code`' );
+		// Each agreement picks the era-appropriate RO:
+		//   year >= 2025 → ro_id=2 (2023 RO, 343 ridings)
+		//   year <  2025 → ro_id=1 (2013 RO — best available for all pre-2025)
 		return "JOIN (
-					SELECT DISTINCT {$dir_pc} AS pc, `riding_number` AS rn
+					SELECT DISTINCT {$dir_pc} AS pc, `riding_number` AS rn, `ro_id`
 					FROM `pcbfr`
 					WHERE `postal_code` IS NOT NULL AND `postal_code` <> ''
 						AND `riding_number` IS NOT NULL AND `riding_number` <> ''
-						AND `ro_id` = " . self::PCFRF_RO_ID . "
-				) p ON p.pc = {$src_pc}";
+						AND `ro_id` IN (1, 2)
+				) p ON p.pc = {$src_pc}
+				  AND p.ro_id = CASE WHEN `m`.`year` >= 2025 THEN 2 ELSE 1 END";
 	}
 
 	/** Optional single-riding filter for trial runs. */
