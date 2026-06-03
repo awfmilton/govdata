@@ -10,14 +10,23 @@ Ambiguous rows (multiple staging rows per ref+amend) are handled with a
 secondary owner_org_en match.
 """
 
+import os
 import mysql.connector, sys
 
 if hasattr(sys.stdout, 'reconfigure'):
     sys.stdout.reconfigure(encoding='utf-8', errors='replace')
 
+DB_PASSWORD = os.environ.get("PT_DB_PASSWORD")
+if not DB_PASSWORD:
+    raise SystemExit(
+        "PT_DB_PASSWORD is not set. The database password is no longer "
+        "stored in the repo — export it before running:\n"
+        "    export PT_DB_PASSWORD='...'"
+    )
+
 conn = mysql.connector.connect(
     host='35.230.186.163', port=3306, database='grantconts',
-    user='pt_read', password='***REMOVED***',
+    user='pt_read', password=DB_PASSWORD,
     connection_timeout=300, autocommit=True
 )
 cur = conn.cursor()

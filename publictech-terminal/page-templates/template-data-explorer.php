@@ -25,7 +25,7 @@ $pt_table  = 'master_table';
 
 get_header(); ?>
 
-<main>
+<main id="pt-main" tabindex="-1">
 <section class="view active" data-pt-view="data-explorer">
 
 	<!-- ── PAGE HEADER ──────────────────────────────────────────────────── -->
@@ -160,7 +160,7 @@ get_header(); ?>
 				<div class="panel corner">
 					<div class="hd" style="display:flex;align-items:center;justify-content:space-between">
 						<h3>◇ <?php esc_html_e( 'Results', 'publictech-terminal' ); ?></h3>
-						<span id="de-result-count" class="mono dim" style="font-size:10px"></span>
+						<span id="de-result-count" class="mono dim" style="font-size:10px" role="status" aria-live="polite"></span>
 					</div>
 					<div class="bd" style="overflow-x:auto" id="pt-qb-results-wrap">
 					</div>

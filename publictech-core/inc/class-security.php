@@ -74,6 +74,12 @@ final class Security {
 		if ( preg_match( '/\b(INSERT|UPDATE|DELETE|REPLACE|DROP|ALTER|CREATE|TRUNCATE|GRANT|REVOKE|RENAME|CALL|LOAD\s+DATA|HANDLER|LOCK\s+TABLES)\b/i', $stripped ) ) {
 			throw new \RuntimeException( 'Write operations are not permitted on this connection.' );
 		}
+		// File-access vectors a plain SELECT can still reach (SELECT … INTO
+		// OUTFILE/DUMPFILE, LOAD_FILE()). Blocked here as defence-in-depth on
+		// top of the SELECT-only MySQL grant (which should also lack FILE priv).
+		if ( preg_match( '/\bINTO\s+(OUTFILE|DUMPFILE)\b|\bLOAD_FILE\s*\(/i', $stripped ) ) {
+			throw new \RuntimeException( 'File access is not permitted on this connection.' );
+		}
 	}
 
 	/**

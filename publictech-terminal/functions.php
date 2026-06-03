@@ -15,6 +15,13 @@ define( 'PUBLICTECH_TERMINAL_VERSION', '1.1.0' );
 define( 'PUBLICTECH_TERMINAL_URL',     trailingslashit( get_stylesheet_directory_uri() ) );
 define( 'PUBLICTECH_TERMINAL_DIR',     trailingslashit( get_stylesheet_directory() ) );
 
+add_action( 'after_setup_theme', static function () {
+	// The child theme has its own text domain (~400 strings); load it so they
+	// can be translated. The parent theme loads 'publictech-core' separately —
+	// without this, none of the terminal UI strings could ever resolve.
+	load_theme_textdomain( 'publictech-terminal', PUBLICTECH_TERMINAL_DIR . 'languages' );
+} );
+
 add_action( 'wp_enqueue_scripts', static function () {
 	wp_enqueue_style(
 		'publictech-fonts',
@@ -202,6 +209,7 @@ add_action( 'wp_head', static function () {
 }, 1 );
 
 add_action( 'wp_body_open', static function () {
+	echo '<a class="pt-skip" href="#pt-main">' . esc_html__( 'Skip to content', 'publictech-terminal' ) . '</a>' . "\n";
 	require PUBLICTECH_TERMINAL_DIR . 'parts/header-rail.php';
 } );
 

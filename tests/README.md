@@ -2,7 +2,7 @@
 
 | Suite | Runner | What it proves |
 | --- | --- | --- |
-| `tests/php/unit/` | PHPUnit 10 + Yoast polyfills | Pure-PHP unit tests over the engine helpers (SQL safety, throttle math, theme metadata, tier catalog shape). Run without WordPress. |
+| `tests/php/unit/` | PHPUnit 10 | Pure-PHP unit tests over the engine helpers (SQL safety, throttle math, theme metadata, tier catalog shape). Run without WordPress. |
 | `.github/workflows/ci.yml:wp-integration` | wp-cli + ad-hoc PHP server | Boots a real WordPress, activates the parent + child + plugin, hits `/publictech/v1/status` and `/publictech-mcp/v1/manifest`. |
 | `.github/workflows/ci.yml:plugin-check` | `wordpress/plugin-check-action` | Runs WordPress.org's own plugin linter against the MCP plugin. |
 | `.github/workflows/ci.yml:php` (`phpcs`) | WordPress-Extra + PHPCompatibilityWP | WordPress Coding Standards + PHP 8.1+ compatibility. |

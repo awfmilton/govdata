@@ -55,12 +55,12 @@ if ( class_exists( \PublicTech\Core\Riding_Cache::class ) ) {
 
 get_header(); ?>
 
-<main>
+<main id="pt-main" tabindex="-1">
 	<section class="view active" data-pt-view="profile">
 		<div class="prof-grid">
 			<aside class="prof-side">
 				<div class="panel prof-hero corner">
-					<div class="portrait" aria-hidden="true">
+					<div class="portrait">
 						<?php
 						$pt_photo_url = (string) get_post_meta( $mp_id, 'pt_mp_photo_url', true );
 						if ( has_post_thumbnail() ) {
@@ -68,7 +68,8 @@ get_header(); ?>
 						} elseif ( $pt_photo_url ) {
 							echo '<img src="' . esc_url( $pt_photo_url ) . '" alt="' . esc_attr( get_the_title() ) . '" loading="lazy">';
 						} else {
-							echo '<span class="dim">' . esc_html__( 'portrait · placeholder', 'publictech-terminal' ) . '</span>';
+							// Decorative placeholder only — hide from the a11y tree.
+							echo '<span class="dim" aria-hidden="true">' . esc_html__( 'portrait · placeholder', 'publictech-terminal' ) . '</span>';
 						}
 						?>
 					</div>
@@ -213,9 +214,9 @@ get_header(); ?>
 						data-pt-tip-title="<?php esc_attr_e( 'Votes cast', 'publictech-terminal' ); ?>"
 						data-pt-tip="<?php esc_attr_e( 'Number of recorded House votes this member has taken part in — a rough proxy for attendance.', 'publictech-terminal' ); ?>">
 						<div class="lab"><?php esc_html_e( 'Votes Cast', 'publictech-terminal' ); ?></div>
-						<div class="val"><?php echo esc_html( number_format_i18n( $votes ) ); ?></div>
-						<div class="delta dim"><?php esc_html_e( 'attendance', 'publictech-terminal' ); ?></div>
-						<svg class="spark" id="ptSpark4" aria-hidden="true"></svg>
+						<div class="val"><?php echo $votes ? esc_html( number_format_i18n( $votes ) ) : '—'; ?></div>
+						<div class="delta dim"><?php echo $votes ? esc_html__( 'attendance', 'publictech-terminal' ) : esc_html__( 'no source connected', 'publictech-terminal' ); ?></div>
+						<?php if ( $votes ) : ?><svg class="spark" id="ptSpark4" aria-hidden="true"></svg><?php endif; ?>
 					</div>
 				</div>
 
@@ -223,7 +224,8 @@ get_header(); ?>
 					<div class="panel corner">
 						<div class="hd">
 							<h3>◇ <?php esc_html_e( 'Spending Breakdown · Fiscal Years', 'publictech-terminal' ); ?></h3>
-							<span class="meta">SCHEMA: pt-finance-01.expenditures<?php
+							<span class="meta"><?php
+								esc_html_e( 'HoC EXPENDITURES', 'publictech-terminal' );
 								if ( $finance_from && $finance_to ) {
 									echo ' · ' . esc_html( $finance_from ) . ' – ' . esc_html( $finance_to );
 								}
@@ -236,7 +238,7 @@ get_header(); ?>
 					</div>
 
 					<div class="panel corner">
-						<div class="hd"><h3>◇ <?php esc_html_e( 'Category Comparison · Peer Average', 'publictech-terminal' ); ?></h3><span class="meta">SCHEMA: pt-finance-01</span></div>
+						<div class="hd"><h3>◇ <?php esc_html_e( 'Category Comparison · Peer Average', 'publictech-terminal' ); ?></h3><span class="meta"><?php esc_html_e( 'HoC EXPENDITURES', 'publictech-terminal' ); ?></span></div>
 						<div class="bd">
 							<div class="chart-host lg" id="ptBarChart" style="height:340px"></div>
 						</div>
@@ -244,9 +246,11 @@ get_header(); ?>
 				</div>
 
 				<div class="panel corner">
-					<div class="hd"><h3>◇ <?php esc_html_e( 'Funding Flow Network · Vendors → Categories', 'publictech-terminal' ); ?></h3><span class="meta">FORCE-DIRECTED</span></div>
+					<div class="hd"><h3>◇ <?php esc_html_e( 'Vendor-Level Flow', 'publictech-terminal' ); ?></h3><span class="meta"><?php esc_html_e( 'NOT PUBLISHED', 'publictech-terminal' ); ?></span></div>
 					<div class="bd">
-						<div class="chart-host" id="ptNetChart" style="height:360px"></div>
+						<p class="dim mono" style="font-size:11px;margin:0;line-height:1.6">
+							<?php esc_html_e( 'Per-vendor flow is not published for MP office expenditures — these are reported only as category rollups. Real recipient-level grant & contribution data for this member\'s riding is shown below.', 'publictech-terminal' ); ?>
+						</p>
 					</div>
 				</div>
 
@@ -309,20 +313,10 @@ document.addEventListener('DOMContentLoaded', function () {
 				spark('ptSpark4', totals.map(function (v) { return Math.min(420, 380 + v / 30); }), PT.chartTheme.ink1);
 			}
 
-			// Force-directed network (vendors derived from raw transactions in pt-finance-01).
-			const categories = series.map(function (s) { return s.key; });
-			const nodes = categories.map(function (c) { return { id: c, type: 'cat', r: 14 }; });
-			const links = [];
-			const vendorCount = 14;
-			for (let i = 0; i < vendorCount; i++) {
-				const v = 'Vendor ' + String(i + 1).padStart(2, '0');
-				nodes.push({ id: v, type: 'ven', r: 5 + Math.random() * 5 });
-				links.push({ source: v, target: categories[i % categories.length], w: 1 + Math.random() * 2.5 });
-				if (Math.random() > 0.55 && categories.length > 1) {
-					links.push({ source: v, target: categories[(i + 2) % categories.length], w: 1 + Math.random() * 2 });
-				}
-			}
-			if (nodes.length > 1) PT.chart('#ptNetChart', 'network', { nodes: nodes, links: links });
+			// The vendor-level "funding flow network" was removed: the spend
+			// payload is categorical (no per-vendor rows), so any vendor graph
+			// here would be fabricated. The panel now renders an honest note
+			// server-side and points to the riding's real recipient data below.
 		});
 });
 </script>

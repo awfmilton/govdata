@@ -107,7 +107,19 @@ final class Riding_Cache {
 		if ( '' === $slug ) {
 			return null;
 		}
-		return $this->fetch_payload( '`riding_slug`', $slug );
+		// Mirror report_by_number()'s object cache: the riding-report template
+		// resolves by slug, so without this every render ran an uncached SELECT
+		// against the cache DB for a row that's static between weekly warms.
+		$cache_key = 'report_s_' . $slug;
+		$cached    = wp_cache_get( $cache_key, self::CACHE_GRP );
+		if ( is_array( $cached ) ) {
+			return $cached;
+		}
+		$payload = $this->fetch_payload( '`riding_slug`', $slug );
+		if ( null !== $payload ) {
+			wp_cache_set( $cache_key, $payload, self::CACHE_GRP, 5 * MINUTE_IN_SECONDS );
+		}
+		return $payload;
 	}
 
 	/**

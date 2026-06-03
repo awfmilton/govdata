@@ -1,4 +1,6 @@
-vendor/
+# Composer dependencies (anchored to repo root so it does NOT match the
+# self-hosted libraries under publictech-core/assets/vendor/).
+/vendor/
 node_modules/
 build/
 dist/
@@ -17,3 +19,12 @@ coverage/
 package-lock.json
 composer.lock
 wp-content/
+
+# Local secrets — never commit. Export PT_DB_PASSWORD or keep creds in an
+# untracked env file outside the repo / web root.
+.env
+.env.*
+*.local.php
+secrets.php
+__pycache__/
+*.pyc

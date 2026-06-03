@@ -29,7 +29,7 @@ $nlp_available = wp_script_is( 'compromise', 'enqueued' ) || wp_script_is( 'comp
 
 get_header(); ?>
 
-<main>
+<main id="pt-main" tabindex="-1">
 <section class="view active" data-pt-view="query-builder">
 
 	<!-- ── HEADER: schema / table selector ────────────────────────────────── -->
@@ -107,7 +107,7 @@ get_header(); ?>
 		<button class="btn ghost" id="pt-qb-export" disabled>
 			⤓ <?php esc_html_e( 'Export CSV', 'publictech-terminal' ); ?>
 		</button>
-		<span id="pt-qb-status" class="mono dim" style="font-size:11px;margin-left:auto"></span>
+		<span id="pt-qb-status" class="mono dim" style="font-size:11px;margin-left:auto" role="status" aria-live="polite"></span>
 	</div>
 
 	<!-- ── NL QUICK SEARCH ───────────────────────────────────────────────── -->
@@ -173,5 +173,17 @@ if ( $catalogue_url ) {
 		data-catalogue-url="<?php echo esc_attr( $catalogue_url ); ?>"
 	<?php endif; ?>
 ><?php echo wp_json_encode( $boot_data ); ?></script>
+
+<?php
+// Inline the column list so it renders instantly with no REST round-trip. The
+// /schema endpoint costs ~0.3s of WP bootstrap per call and only fires after all
+// page JS loads (~1.2s perceived). query-builder-ui.js reads window.PT_QB_COLUMNS
+// first and only falls back to the REST fetch if it's absent (e.g. table change).
+// (Data Explorer already does this; the standalone Query Builder did not.)
+$pt_inline_cols = class_exists( '\\PublicTech\\Core\\REST_API' )
+	? \PublicTech\Core\REST_API::columns_for( (string) $pt_schema, (string) $pt_table )
+	: [];
+?>
+<script>window.PT_QB_COLUMNS = <?php echo wp_json_encode( $pt_inline_cols ); ?>;</script>
 
 <?php get_footer();

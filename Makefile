@@ -1,7 +1,7 @@
 # Local-dev shortcuts. CI runs the same commands directly so anything you can
 # verify locally with `make ci` should pass on GitHub.
 
-.PHONY: install lint phpcs phpcbf phpstan test ci js-lint css-lint format clean
+.PHONY: install lint phpcs phpcbf phpstan test ci js-lint css-lint format clean build pot
 
 install:
 	composer install --no-progress
@@ -33,7 +33,16 @@ css-lint:
 	npx stylelint "publictech-core/assets/css/**/*.css" "publictech-terminal/assets/css/**/*.css"
 
 format:
-	npx prettier --write "**/*.{js,css,md,json,yml,yaml}" --ignore-path .gitignore
+	npx prettier --write "**/*.{js,css,md,json,yml,yaml}" --ignore-path .prettierignore
+
+# Minify theme JS/CSS into *.min.* (served automatically when SCRIPT_DEBUG off).
+build:
+	node tools/build-assets.mjs
+
+# Regenerate translation templates. Prefer `wp i18n make-pot <dir> <out.pot>`
+# where wp-cli is available; this Node fallback covers the common gettext calls.
+pot:
+	node tools/make-pot.mjs
 
 ci: lint phpcs phpstan test js-lint css-lint
 	@echo "All checks passed."

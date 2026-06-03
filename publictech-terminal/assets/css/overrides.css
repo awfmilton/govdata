@@ -102,8 +102,10 @@ table.stream td .pt-loading { padding: 24px 0; justify-content: center; }
 /* ----- Reduce motion respect (extends the prototype which already does some). */
 @media (prefers-reduced-motion: reduce) {
 	.brand .mark span,
-	.ai-prompt .ph .pulse { animation: none !important; }
-	.customizer { transition: none !important; }
+	.ai-prompt .ph .pulse,
+	.ticker-track { animation: none !important; }
+	.customizer,
+	.dash-hbar-fill { transition: none !important; }
 }
 
 /* ----- Visually-hidden helper for accessibility (forms, landmarks). */
@@ -181,3 +183,25 @@ a.cta.pt-price-cta { text-align: center; justify-content: center; display: inlin
 @media (max-width: 720px) {
 	.pt-method-table td.dim { display: none; }
 }
+
+/* ----- Skip link (WCAG 2.4.1) — off-screen until focused. */
+.pt-skip { position: absolute; left: -9999px; top: 0; z-index: 100000; background: var(--accent, #0072a8); color: #fff; padding: 8px 14px; border-radius: 0 0 6px 0; }
+.pt-skip:focus { left: 0; }
+#pt-main:focus { outline: none; }
+
+/* ----- Global visible focus ring (WCAG 2.4.7). The accent var is themed so
+   this covers both the dark and light palettes. outline-offset keeps the ring
+   clear of inputs/buttons so it isn't clipped by their borders. */
+*:focus-visible { outline: 2px solid var(--accent, #0072a8); outline-offset: 2px; }
+input:focus-visible,
+button:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+a:focus-visible { outline-offset: 2px; }
+
+/* ----- Search inputs that zeroed their outline without a visible replacement
+   (terminal.css .search-bar, bbpress search). Restore a visible focus cue via
+   box-shadow so the hover accent-soft glow is preserved but focus is clear. */
+.search-bar input:focus-visible,
+.bbpress-wrapper .search-bar input[type=search]:focus-visible,
+.bbpress-wrapper .search-bar input[type=text]:focus-visible { box-shadow: 0 0 0 2px var(--accent-soft); border-radius: 3px; }

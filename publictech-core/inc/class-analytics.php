@@ -21,8 +21,13 @@ final class Analytics {
 	/** Option key used to flag that the table has been created. */
 	private const INSTALLED_KEY = 'pt_analytics_installed_v1';
 
+	/** Cron hook that purges aged analytics rows. */
+	private const PURGE_HOOK = 'publictech_purge_analytics';
+
 	private function __construct() {
 		add_action( 'rest_api_init', [ $this, 'register_route' ] );
+		add_action( 'init', [ $this, 'schedule_retention' ] );
+		add_action( self::PURGE_HOOK, [ $this, 'purge_old_events' ] );
 	}
 
 	// ── REST route ────────────────────────────────────────────────────────────
@@ -64,7 +69,9 @@ final class Analytics {
 			'event_type'   => $event_type,
 			'page'         => $page,
 			'referrer'     => $referrer,
-			'ip_address'   => $ip,
+			// Store an anonymised IP (last octet / IPv6 suffix zeroed) — coarse
+			// enough for geo/abuse signal, not personally identifying (PIPEDA).
+			'ip_address'   => $this->anonymize_ip( $ip ),
 			'user_agent'   => substr( (string) ( $_SERVER['HTTP_USER_AGENT'] ?? '' ), 0, 500 ),
 			'browser_data' => $browser_data,
 			'event_data'   => $event_data,
@@ -121,14 +128,59 @@ final class Analytics {
 	// ── Helpers ───────────────────────────────────────────────────────────────
 
 	private function client_ip(): string {
-		// Prefer CDN/proxy headers when set, fall back to REMOTE_ADDR.
-		foreach ( [ 'HTTP_CF_CONNECTING_IP', 'HTTP_X_FORWARDED_FOR', 'REMOTE_ADDR' ] as $h ) {
-			$val = $_SERVER[ $h ] ?? '';
-			if ( $val ) {
-				// X-Forwarded-For may be a comma-separated list; take the first.
-				return trim( explode( ',', $val )[0] );
+		// Trusted-proxy aware (see helpers.php client_ip()); not spoofable by
+		// an anonymous caller, so the per-IP flood limiter above is meaningful.
+		return client_ip();
+	}
+
+	/**
+	 * Mask an IP for at-rest storage: zero the last octet of IPv4 and the last
+	 * 80 bits of IPv6 (keep /48). Reversible to a network, not to a person.
+	 */
+	private function anonymize_ip( string $ip ): string {
+		if ( '' === $ip || '0.0.0.0' === $ip ) {
+			return '';
+		}
+		if ( filter_var( $ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 ) ) {
+			$parts      = explode( '.', $ip );
+			$parts[3]   = '0';
+			return implode( '.', $parts );
+		}
+		if ( filter_var( $ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6 ) ) {
+			$bin = @inet_pton( $ip );
+			if ( false !== $bin ) {
+				$masked = substr( $bin, 0, 6 ) . str_repeat( "\0", 10 );
+				$out    = @inet_ntop( $masked );
+				return false !== $out ? $out : '';
 			}
 		}
 		return '';
+	}
+
+	// ── Retention ───────────────────────────────────────────────────────────────
+
+	/** Ensure the daily purge job is scheduled. */
+	public function schedule_retention(): void {
+		if ( ! wp_next_scheduled( self::PURGE_HOOK ) ) {
+			wp_schedule_event( time() + HOUR_IN_SECONDS, 'daily', self::PURGE_HOOK );
+		}
+	}
+
+	/**
+	 * Delete analytics rows older than the retention window (default 90 days,
+	 * filterable; 0 disables purging). Runs from cron.
+	 */
+	public function purge_old_events(): void {
+		if ( ! get_option( self::INSTALLED_KEY ) ) {
+			return;
+		}
+		$days = (int) apply_filters( 'publictech_analytics_retention_days', 90 );
+		if ( $days <= 0 ) {
+			return;
+		}
+		global $wpdb;
+		$table = $this->table_name();
+		// Identifier is theme-controlled (wpdb prefix); value is bound.
+		$wpdb->query( $wpdb->prepare( "DELETE FROM `{$table}` WHERE created_at < ( UTC_TIMESTAMP() - INTERVAL %d DAY )", $days ) ); // phpcs:ignore WordPress.DB
 	}
 }

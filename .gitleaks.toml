@@ -18,11 +18,7 @@ regexes = [
   '''pass'\s*=>\s*'\.\.\.''',
 ]
 
-# Shared DEVELOPMENT database password, committed intentionally (see the file
-# header) so the riding-cache feature runs with zero setup during development.
-# MUST be rotated and moved out of the repo before production.
-[[allowlists]]
-description = "PublicTech development DB credentials (rotate before production)"
-paths = [
-  '''database/mu-plugins/00-db-connections\.php$''',
-]
+# NOTE: the previous allowlist that whitelisted
+# database/mu-plugins/00-db-connections.php has been removed. That file no
+# longer contains a literal password — it reads PT_DB_PASSWORD from the
+# environment — so it must be scanned like any other file.

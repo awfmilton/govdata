@@ -17,7 +17,7 @@ $total           = (int) ( wp_count_posts( 'member-parliament' )->publish ?? 0 )
 
 get_header(); ?>
 
-<main>
+<main id="pt-main" tabindex="-1">
 	<section class="view active" data-pt-view="directory">
 		<div class="search-bar corner">
 			<div class="icon" aria-hidden="true">⌕</div>
@@ -84,7 +84,7 @@ get_header(); ?>
 
 			<div>
 				<div class="res-meta">
-					<span id="mpResultsMeta">
+					<span id="mpResultsMeta" role="status" aria-live="polite">
 						<?php
 						/* translators: %d: total number of members */
 						printf( esc_html__( 'Showing %d records', 'publictech-terminal' ), (int) $total );
@@ -99,7 +99,7 @@ get_header(); ?>
 					</div>
 				</div>
 
-				<div class="results" id="mpResults" aria-busy="true">
+				<div class="results" id="mpResults" aria-busy="false">
 					<?php
 					if ( have_posts() ) :
 						while ( have_posts() ) :

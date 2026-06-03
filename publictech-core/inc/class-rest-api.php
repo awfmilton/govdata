@@ -207,7 +207,12 @@ final class REST_API {
 			'posts_per_page' => (int) $req['per_page'],
 			'paged'          => (int) $req['page'],
 			's'              => sanitize_text_field( (string) $req['q'] ),
-			'fields'         => 'ids',
+			// Hydrate full posts so WP_Query primes the post, meta, and term
+			// caches in a few queries up front. With 'fields' => 'ids' (the
+			// previous setting) shape_mp() re-queried meta + terms + permalink
+			// per row — ~3N queries on the busiest endpoint on the site.
+			'update_post_meta_cache' => true,
+			'update_post_term_cache' => true,
 			'orderby'        => $orderby,
 			'order'          => $order,
 			'tax_query'      => array_filter( [
@@ -218,7 +223,7 @@ final class REST_API {
 		];
 
 		$q    = new \WP_Query( $args );
-		$rows = array_map( [ $this, 'shape_mp' ], $q->posts );
+		$rows = array_map( fn( \WP_Post $p ) => $this->shape_mp( $p->ID ), $q->posts );
 
 		return rest_ensure_response( [
 			'total'    => (int) $q->found_posts,

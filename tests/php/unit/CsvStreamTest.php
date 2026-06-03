@@ -70,6 +70,25 @@ final class CsvStreamTest extends TestCase {
 		$this->assertStringContainsString( "\"Line\nbreak co\"", $out );
 	}
 
+	public function test_neutralises_spreadsheet_formula_injection(): void {
+		$pdo = $this->pdo_with_rows( [
+			[ 'recipient' => '=HYPERLINK("http://evil","x")', 'amount' => '-480.00' ],
+			[ 'recipient' => '+1-555-0100',                   'amount' => '12.00' ],
+			[ 'recipient' => '@SUM(A1:A9)',                   'amount' => '0' ],
+		] );
+		$out = $this->capture( $pdo->query( 'SELECT recipient, amount FROM t ORDER BY ROWID' ) );
+
+		// Formula-leading text is prefixed with a single quote so spreadsheets
+		// render it as literal text instead of evaluating it.
+		$this->assertStringContainsString( "'=HYPERLINK", $out );
+		$this->assertStringContainsString( "'+1-555-0100", $out );
+		$this->assertStringContainsString( "'@SUM(A1:A9)", $out );
+
+		// A legitimate negative amount stays a number — NOT quoted to text.
+		$this->assertStringContainsString( '-480.00', $out );
+		$this->assertStringNotContainsString( "'-480.00", $out );
+	}
+
 	public function test_empty_result_set_still_writes_bom(): void {
 		$pdo = $this->pdo_with_rows( [] );
 		$out = $this->capture( $pdo->query( 'SELECT id FROM t' ) );

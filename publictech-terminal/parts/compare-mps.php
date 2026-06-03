@@ -24,7 +24,7 @@ get_header();
 $pt_col_count = count( $pt_compare_ids );
 ?>
 
-<main>
+<main id="pt-main" tabindex="-1">
 	<section class="view active pt-compare" data-pt-view="compare" data-pt-cols="<?php echo (int) $pt_col_count; ?>">
 		<div class="pt-compare-head">
 			<div>

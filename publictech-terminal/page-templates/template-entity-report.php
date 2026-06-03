@@ -65,7 +65,7 @@ $pt_totals = $pt_data['totals'] ?? [];
 
 get_header(); ?>
 
-<main>
+<main id="pt-main" tabindex="-1">
 <section class="view active" data-pt-view="entity-report" data-pt-slug="<?php echo esc_attr( $pt_slug ); ?>">
 
 	<!-- ═══ HERO ══════════════════════════════════════════════════════════ -->
