@@ -28,18 +28,36 @@ import json
 import mysql.connector
 
 # ── Connection parameters ─────────────────────────────────────────────────────
+# Passwords are read from the environment — never hardcoded.
+# Before running, export the three variables:
+#   export PT_DB_PASSWORD='...'       # pt_read + gdc_02 shared password
+#   export PT_WP_DB_PASSWORD='...'    # govdataca1 WordPress DB password
+
+_pt_pass = os.environ.get('PT_DB_PASSWORD')
+_wp_pass = os.environ.get('PT_WP_DB_PASSWORD')
+
+if not _pt_pass:
+    raise SystemExit(
+        "PT_DB_PASSWORD is not set.\n"
+        "    export PT_DB_PASSWORD='...'"
+    )
+if not _wp_pass:
+    raise SystemExit(
+        "PT_WP_DB_PASSWORD is not set.\n"
+        "    export PT_WP_DB_PASSWORD='...'"
+    )
 
 SOURCE_DB = dict(
     host='35.230.186.163', port=3306, database='grantconts',
-    user='pt_read', password='REDACTED_DB_PASSWORD', charset='utf8mb4',
+    user='pt_read', password=_pt_pass, charset='utf8mb4',
 )
 CACHE_DB = dict(
     host='mysql.alexmilton.ca', port=3306, database='govdata_cache_02',
-    user='gdc_02', password='REDACTED_DB_PASSWORD', charset='utf8mb4',
+    user='gdc_02', password=_pt_pass, charset='utf8mb4',
 )
 WP_DB = dict(
     host='mysql.govdata.ca', port=3306, database='govdata_ca_1',
-    user='govdataca1', password='REDACTED_DB_PASSWORD', charset='utf8mb4',
+    user='govdataca1', password=_wp_pass, charset='utf8mb4',
 )
 WP_TABLE_PREFIX = 'wp_5bifyj_'
 SITE_REST_URL   = 'https://www.govdata.ca/wp-json/publictech/v1'
