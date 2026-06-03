@@ -7,6 +7,7 @@
   "scripts": {
     "build": "node tools/build-assets.mjs",
     "vendor": "node tools/vendor.mjs",
+    "pot": "node tools/make-pot.mjs",
     "lint:js": "eslint \"publictech-core/assets/js/**/*.js\" \"publictech-terminal/assets/js/**/*.js\"",
     "lint:css": "stylelint \"publictech-core/assets/css/**/*.css\" \"publictech-terminal/assets/css/**/*.css\"",
     "lint:format": "prettier --check \"**/*.{js,css,md,json,yml,yaml}\" --ignore-path .prettierignore",
