@@ -74,9 +74,9 @@ foreach ( $pt_keywords as $row ) {
 		<div class="bd" style="font-size:12px;color:var(--ink-2);line-height:1.6">
 			<?php
 			printf(
-				/* translators: 1: postal-code count, 2: year span */
-				esc_html__( 'Grant and contribution agreements attributed to this riding via the Postal Code Federal Riding File. Covers %2$s agreement years.', 'publictech-terminal' ),
-				(int) ( $pt_riding_payload['riding']['postal_code_count'] ?? 0 ),
+				/* translators: 1: "Postal Code Federal Riding File" glossary term (linked), 2: year span */
+				esc_html__( 'Grant and contribution agreements attributed to this riding via the %1$s. Covers %2$s agreement years.', 'publictech-terminal' ),
+				'<span class="pt-tip-ink" data-pt-tip-title="' . esc_attr__( 'Postal Code Federal Riding File', 'publictech-terminal' ) . '" data-pt-tip="' . esc_attr__( "Statistics Canada's file mapping every postal code to a federal electoral district — it lets each agreement be attributed to the riding where the money actually landed.", 'publictech-terminal' ) . '">' . esc_html__( 'Postal Code Federal Riding File', 'publictech-terminal' ) . '</span>',
 				esc_html( $pt_span )
 			);
 			?>
@@ -85,23 +85,31 @@ foreach ( $pt_keywords as $row ) {
 
 	<!-- KPI strip -->
 	<div class="kpis" style="margin-bottom:14px">
-		<div class="kpi corner">
+		<div class="kpi corner pt-tip"
+			data-pt-tip-title="<?php esc_attr_e( 'Total spend', 'publictech-terminal' ); ?>"
+			data-pt-tip="<?php esc_attr_e( 'Net federal grant and contribution funding mapped to this riding across every year on record.', 'publictech-terminal' ); ?>">
 			<div class="lab"><?php esc_html_e( 'Total Spend (all years)', 'publictech-terminal' ); ?></div>
 			<div class="val" style="font-size:20px"><?php echo esc_html( \PublicTech\Core\pt_format_money_short( (float) $pt_totals['total_value'] ) ); ?></div>
 			<div class="delta dim"><?php echo esc_html( $pt_span ); ?></div>
 			<svg class="spark" id="ptRidingSparkTotal" aria-hidden="true"></svg>
 		</div>
-		<div class="kpi">
+		<div class="kpi pt-tip"
+			data-pt-tip-title="<?php esc_attr_e( 'Total agreements', 'publictech-terminal' ); ?>"
+			data-pt-tip="<?php esc_attr_e( 'Number of distinct grant and contribution agreements attributed to this riding.', 'publictech-terminal' ); ?>">
 			<div class="lab"><?php esc_html_e( 'Total Agreements', 'publictech-terminal' ); ?></div>
 			<div class="val"><?php echo esc_html( number_format_i18n( (int) $pt_totals['agreement_count'] ) ); ?></div>
 			<div class="delta dim"><?php esc_html_e( 'since data began', 'publictech-terminal' ); ?></div>
 		</div>
-		<div class="kpi">
+		<div class="kpi pt-tip"
+			data-pt-tip-title="<?php esc_attr_e( 'Peak year', 'publictech-terminal' ); ?>"
+			data-pt-tip="<?php esc_attr_e( 'The single agreement-start year with the highest total funding for this riding.', 'publictech-terminal' ); ?>">
 			<div class="lab"><?php esc_html_e( 'Peak Year', 'publictech-terminal' ); ?></div>
 			<div class="val"><?php echo esc_html( (int) ( $pt_totals['peak_year'] ?? 0 ) ?: '—' ); ?></div>
 			<div class="delta pos"><?php echo esc_html( \PublicTech\Core\pt_format_money_short( (float) ( $pt_totals['peak_year_total'] ?? 0 ) ) ); ?></div>
 		</div>
-		<div class="kpi">
+		<div class="kpi pt-tip"
+			data-pt-tip-title="<?php esc_attr_e( 'Top recipient category', 'publictech-terminal' ); ?>"
+			data-pt-tip="<?php esc_attr_e( 'The recipient type — business, non-profit, municipality, and so on — that received the largest share of funding.', 'publictech-terminal' ); ?>">
 			<div class="lab"><?php esc_html_e( 'Top Recipient Category', 'publictech-terminal' ); ?></div>
 			<div class="val" style="font-size:14px;margin-top:12px;letter-spacing:0"><?php echo esc_html( (string) ( $pt_totals['top_recipient_type'] ?: '—' ) ); ?></div>
 		</div>
@@ -145,7 +153,9 @@ foreach ( $pt_keywords as $row ) {
 	<div class="panel corner" style="margin-top:14px">
 		<div class="hd">
 			<h3>◇ <?php esc_html_e( 'Spending by Tracked Keyword', 'publictech-terminal' ); ?></h3>
-			<span class="meta"><?php esc_html_e( 'SCRUTINY KEYWORDS · recipient / title / program / description', 'publictech-terminal' ); ?></span>
+			<span class="meta pt-tip-ink"
+				data-pt-tip-title="<?php esc_attr_e( 'Scrutiny keywords', 'publictech-terminal' ); ?>"
+				data-pt-tip="<?php esc_attr_e( 'A fixed watch-list of high-scrutiny terms — consulting, travel, sole-source and the like — scanned across recipient names, titles, programs and descriptions to surface spending worth a closer look.', 'publictech-terminal' ); ?>"><?php esc_html_e( 'SCRUTINY KEYWORDS · recipient / title / program / description', 'publictech-terminal' ); ?></span>
 		</div>
 		<div class="bd">
 			<?php if ( $pt_kw_js ) : ?>

@@ -207,7 +207,7 @@
 
 		// Detect date-like columns
 		const DATE_COLS = [ 'agreement_start_date', 'agreement_end_date', 'amendment_date',
-		                    'fiscal_year', 'year', 'date', 'changed_at', 'created_at', 'generated_at' ];
+			'fiscal_year', 'year', 'date', 'changed_at', 'created_at', 'generated_at' ];
 		const hasDate   = colKeys.some( k => DATE_COLS.includes( k ) );
 		const dateCol   = colKeys.find( k => DATE_COLS.includes( k ) );
 
