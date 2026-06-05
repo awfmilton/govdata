@@ -258,6 +258,10 @@ get_header(); ?>
 				/* Federal grants & contributions for this member's riding — same
 				   templated section on every MP page, data from the cache DB. */
 				require PUBLICTECH_TERMINAL_DIR . 'parts/riding-spending.php';
+
+				/* Parliamentary activity: mandates, votes, bills, committees.
+				   Data fetched client-side from /publictech/v1/mp/{id}/parliament. */
+				require PUBLICTECH_TERMINAL_DIR . 'parts/mp-parliamentary-activity.php';
 				?>
 			</div>
 		</div>
@@ -274,7 +278,178 @@ document.addEventListener('DOMContentLoaded', function () {
 		if (el && PT.chart) PT.chart(el, 'spark', data, { color: color });
 	}
 
-	const restUrl = PT_BOOT.rest + '/mp/<?php echo (int) $mp_id; ?>/spend';
+	/* ── Parliamentary activity (mandates, votes, bills, committees) ──────── */
+	(function () {
+		var parlEl = document.getElementById('pt-parliament');
+		if (!parlEl) return;
+
+		var parlUrl = PT_BOOT.rest + '/mp/<?php echo (int) $mp_id; ?>/parliament';
+		fetch(parlUrl, { credentials: 'same-origin', headers: { 'x-wp-nonce': PT_BOOT.nonce } })
+			.then(function (r) { return r.ok ? r.json() : null; })
+			.then(function (d) {
+				if (!d) return;
+
+				/* helpers */
+				function fmt(s) { return s || '—'; }
+				function fmtDate(s) {
+					if (!s) return '—';
+					var m = String(s).match(/^(\d{4})-(\d{2})-(\d{2})/);
+					return m ? m[1] + '-' + m[2] + '-' + m[3] : s;
+				}
+				function fmtPct(v) {
+					var n = parseFloat(v);
+					return isNaN(n) ? '—' : (n * 100).toFixed(1) + '%';
+				}
+				function fmtN(v) {
+					var n = parseInt(v, 10);
+					return isNaN(n) ? '—' : n.toLocaleString();
+				}
+				function ballotLabel(b) {
+					return { Y: 'Yea', N: 'Nay', P: 'Paired', Ab: 'Abstained' }[b] || (b || '—');
+				}
+				function ballotColor(b) {
+					return b === 'Y' ? 'var(--pos)' : b === 'N' ? 'var(--warn)' : 'var(--ink-2)';
+				}
+				function tableWrap(thead, rows, emptyMsg) {
+					if (!rows.length) return '<p class="dim mono" style="font-size:11px;margin:0">' + emptyMsg + '</p>';
+					return '<div style="overflow-x:auto"><table class="pt-data-table" style="width:100%;border-collapse:collapse;font-size:11px">'
+						+ '<thead><tr>' + thead.map(function (h) { return '<th style="text-align:left;padding:4px 8px 4px 0;border-bottom:1px solid var(--ink-3);color:var(--ink-2)">' + h + '</th>'; }).join('') + '</tr></thead>'
+						+ '<tbody>' + rows.join('') + '</tbody></table></div>';
+				}
+
+				/* ── 1. Mandates ── */
+				var mandBody = document.getElementById('pt-mandates-body');
+				var mandMeta = document.getElementById('pt-mandates-meta');
+				if (mandBody) {
+					var mands = d.mandates || [];
+					mandMeta && (mandMeta.textContent = 'OP · ' + mands.length + ' TERM' + (mands.length === 1 ? '' : 'S'));
+					var rows = mands.map(function (m) {
+						var end = m.end_date ? fmtDate(m.end_date) : 'Present';
+						var parl = m.parliament ? 'Parliament ' + m.parliament : '—';
+						return '<tr>'
+							+ '<td style="padding:4px 8px 4px 0;border-bottom:1px solid var(--ink-3)">' + parl + '</td>'
+							+ '<td style="padding:4px 8px 4px 0;border-bottom:1px solid var(--ink-3)">' + fmt(m.riding_name) + '</td>'
+							+ '<td style="padding:4px 8px 4px 0;border-bottom:1px solid var(--ink-3)">' + fmt(m.party) + '</td>'
+							+ '<td style="padding:4px 8px 4px 0;border-bottom:1px solid var(--ink-3);color:var(--ink-2)">' + fmtDate(m.start_date) + ' – ' + end + '</td>'
+							+ '</tr>';
+					});
+					mandBody.innerHTML = tableWrap(['Parliament', 'Riding', 'Party', 'Dates'], rows, 'No mandate records found.');
+				}
+
+				/* ── 2. Vote record ── */
+				var votesBody = document.getElementById('pt-votes-body');
+				var votesMeta = document.getElementById('pt-votes-meta');
+				if (votesBody) {
+					var vs = d.votes;
+					var recentVotes = d.recent_votes || [];
+					if (!vs || !parseInt(vs.total_votes, 10)) {
+						votesMeta && (votesMeta.textContent = 'OP · NO DATA');
+						votesBody.innerHTML = '<p class="dim mono" style="font-size:11px;margin:0">No vote records found in the OpenParliament dataset.</p>';
+					} else {
+						var total = parseInt(vs.total_votes, 10);
+						votesMeta && (votesMeta.textContent = 'OP · ' + total.toLocaleString() + ' VOTES');
+						var yea = parseInt(vs.yea, 10) || 0;
+						var nay = parseInt(vs.nay, 10) || 0;
+						var paired = parseInt(vs.paired, 10) || 0;
+						var abstained = parseInt(vs.abstained, 10) || 0;
+						var other = total - yea - nay - paired - abstained;
+
+						var summary = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(90px,1fr));gap:8px;margin-bottom:16px">'
+							+ ['Yea|' + yea.toLocaleString() + '|var(--pos)', 'Nay|' + nay.toLocaleString() + '|var(--warn)', 'Paired|' + paired.toLocaleString() + '|var(--ink-2)', 'Other|' + (other > 0 ? other.toLocaleString() : '0') + '|var(--ink-2)']
+								.map(function (s) {
+									var p = s.split('|');
+									return '<div style="background:var(--surface-2);border-radius:4px;padding:8px 10px">'
+										+ '<div style="font-size:10px;color:var(--ink-2);margin-bottom:2px">' + p[0].toUpperCase() + '</div>'
+										+ '<div style="font-size:18px;font-family:\'JetBrains Mono\',monospace;color:' + p[2] + '">' + p[1] + '</div>'
+										+ '</div>';
+								}).join('')
+							+ '</div>';
+
+						var vrows = recentVotes.map(function (v) {
+							var desc = v.bill_number ? v.bill_number + (v.bill_name ? ' — ' + v.bill_name.substring(0, 60) + (v.bill_name.length > 60 ? '…' : '') : '') : (v.vote_description || '—').substring(0, 80);
+							return '<tr>'
+								+ '<td style="padding:4px 8px 4px 0;border-bottom:1px solid var(--ink-3)">' + fmtDate(v.vote_date) + '</td>'
+								+ '<td style="padding:4px 8px 4px 0;border-bottom:1px solid var(--ink-3);max-width:340px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="' + String(v.vote_description || '').replace(/"/g, '&quot;') + '">' + desc + '</td>'
+								+ '<td style="padding:4px 8px 4px 0;border-bottom:1px solid var(--ink-3);color:' + ballotColor(v.ballot) + ';font-family:\'JetBrains Mono\',monospace">' + ballotLabel(v.ballot) + '</td>'
+								+ '<td style="padding:4px 8px 4px 0;border-bottom:1px solid var(--ink-3);color:var(--ink-2)">' + (v.agreed ? 'Carried' : 'Defeated') + '</td>'
+								+ '</tr>';
+						});
+						votesBody.innerHTML = summary + tableWrap(['Date', 'Motion / Bill', 'Ballot', 'Result'], vrows, '');
+					}
+				}
+
+				/* ── 3. Bills introduced ── */
+				var billsBody = document.getElementById('pt-bills-body');
+				var billsMeta = document.getElementById('pt-bills-meta');
+				if (billsBody) {
+					var bills = d.bills || [];
+					billsMeta && (billsMeta.textContent = 'OP · ' + bills.length + (bills.length === 50 ? '+' : '') + ' BILL' + (bills.length === 1 ? '' : 'S'));
+					var brows = bills.map(function (b) {
+						var title = b.short_title_en || b.name || b.number;
+						if (title && title.length > 70) title = title.substring(0, 70) + '…';
+						var status = b.law ? 'Royal Assent' : (b.status || '—');
+						var session = b.parliamentnum ? b.parliamentnum + (b.sessnum ? '-' + b.sessnum : '') : '—';
+						return '<tr>'
+							+ '<td style="padding:4px 8px 4px 0;border-bottom:1px solid var(--ink-3);font-family:\'JetBrains Mono\',monospace">' + fmt(b.number) + '</td>'
+							+ '<td style="padding:4px 8px 4px 0;border-bottom:1px solid var(--ink-3);max-width:360px">' + fmt(title) + '</td>'
+							+ '<td style="padding:4px 8px 4px 0;border-bottom:1px solid var(--ink-3)">' + session + '</td>'
+							+ '<td style="padding:4px 8px 4px 0;border-bottom:1px solid var(--ink-3)">' + fmtDate(b.introduced) + '</td>'
+							+ '<td style="padding:4px 8px 4px 0;border-bottom:1px solid var(--ink-3);color:' + (b.law ? 'var(--pos)' : 'var(--ink-2)') + '">' + status + '</td>'
+							+ '</tr>';
+					});
+					billsBody.innerHTML = tableWrap(['Number', 'Title', 'Session', 'Introduced', 'Status'], brows, 'No sponsored bills found in the OpenParliament dataset.');
+				}
+
+				/* ── 4. Committees ── */
+				var commBody = document.getElementById('pt-committees-body');
+				var commMeta = document.getElementById('pt-committees-meta');
+				if (commBody) {
+					var comms = d.committees || [];
+					/* Deduplicate by committee name + role for display */
+					var seen = {}, deduped = [];
+					comms.forEach(function (c) {
+						var k = (c.committee_name || '') + '|' + (c.role || '');
+						if (!seen[k]) { seen[k] = true; deduped.push(c); }
+					});
+					commMeta && (commMeta.textContent = 'OP · ' + deduped.length + ' ROLE' + (deduped.length === 1 ? '' : 'S'));
+					var crows = deduped.map(function (c) {
+						var end = c.end_date ? fmtDate(c.end_date) : 'Present';
+						return '<tr>'
+							+ '<td style="padding:4px 8px 4px 0;border-bottom:1px solid var(--ink-3)">' + fmt(c.committee_name) + '</td>'
+							+ '<td style="padding:4px 8px 4px 0;border-bottom:1px solid var(--ink-3);color:var(--ink-2)">' + fmt(c.role) + '</td>'
+							+ '<td style="padding:4px 8px 4px 0;border-bottom:1px solid var(--ink-3);color:var(--ink-2)">' + fmtDate(c.start_date) + ' – ' + end + '</td>'
+							+ '</tr>';
+					});
+					commBody.innerHTML = tableWrap(['Committee', 'Role', 'Dates'], crows, 'No committee records found in the OpenParliament dataset.');
+				}
+
+				/* ── 5. Election results ── */
+				var electPanel = document.getElementById('pt-parl-elections');
+				var electBody  = document.getElementById('pt-elections-body');
+				var electMeta  = document.getElementById('pt-elections-meta');
+				if (electPanel && electBody && d.elections && d.elections.length) {
+					electPanel.style.display = '';
+					electMeta && (electMeta.textContent = 'EC · ' + d.elections.length + ' RESULT' + (d.elections.length === 1 ? '' : 'S'));
+					var erows = d.elections.map(function (e) {
+						return '<tr>'
+							+ '<td style="padding:4px 8px 4px 0;border-bottom:1px solid var(--ink-3)">' + fmtDate(e.election_date) + (e.byelection ? ' <span style="color:var(--ink-2)">(by-election)</span>' : '') + '</td>'
+							+ '<td style="padding:4px 8px 4px 0;border-bottom:1px solid var(--ink-3)">' + fmt(e.riding_name) + '</td>'
+							+ '<td style="padding:4px 8px 4px 0;border-bottom:1px solid var(--ink-3)">' + fmt(e.party_name) + '</td>'
+							+ '<td style="padding:4px 8px 4px 0;border-bottom:1px solid var(--ink-3);font-family:\'JetBrains Mono\',monospace">' + fmtN(e.votes) + '</td>'
+							+ '<td style="padding:4px 8px 4px 0;border-bottom:1px solid var(--ink-3)">' + fmtPct(e.fraction) + '</td>'
+							+ '<td style="padding:4px 8px 4px 0;border-bottom:1px solid var(--ink-3);color:' + (e.elected ? 'var(--pos)' : 'var(--ink-2)') + '">' + (e.elected ? 'Elected' : '—') + '</td>'
+							+ '</tr>';
+					});
+					electBody.innerHTML = tableWrap(['Date', 'Riding', 'Party', 'Votes', 'Vote Share', 'Result'], erows, '');
+				}
+			})
+			.catch(function () {
+				/* Network or parse failure — panels stay in loading state */
+			});
+	})();
+
+	/* ── Office spending charts ──────────────────────────────────────────────── */
+	var restUrl = PT_BOOT.rest + '/mp/<?php echo (int) $mp_id; ?>/spend';
 	fetch(restUrl, { credentials: 'same-origin', headers: { 'x-wp-nonce': PT_BOOT.nonce } })
 		.then(function (r) { return r.ok ? r.json() : []; })
 		.then(function (rows) {

@@ -84,6 +84,12 @@ final class REST_API {
 			'callback'            => [ $this, 'mp_spend' ],
 		] );
 
+		register_rest_route( PUBLICTECH_CORE_REST_NS, '/mp/(?P<id>\d+)/parliament', [
+			'methods'             => \WP_REST_Server::READABLE,
+			'permission_callback' => '__return_true',
+			'callback'            => [ $this, 'mp_parliament' ],
+		] );
+
 		register_rest_route( PUBLICTECH_CORE_REST_NS, '/ai/query', [
 			'methods'             => \WP_REST_Server::CREATABLE,
 			'permission_callback' => $auth,
@@ -704,6 +710,201 @@ final class REST_API {
 			wp_send_json( [ 'message' => 'Export failed.' ], 500 );
 		}
 		exit;
+	}
+
+	/**
+	 * Parliamentary activity for a single MP.
+	 *
+	 * Sources (all read from pt-grantconts-01):
+	 *   mandates    — mp_mandates + op_core_riding (confirmed tables)
+	 *   votes       — op_votes_membervote + op_votes_vote (OpenParliament import)
+	 *   bills       — op_bills_bill + op_core_session (OpenParliament import)
+	 *   committees  — op_committees_committeemembership + op_committees_committee
+	 *   elections   — op_elections_electionresult + op_elections_election
+	 *
+	 * Each data category is wrapped in its own try/catch — a missing table or
+	 * wrong column returns an empty array for that category without breaking the rest.
+	 *
+	 * The join key throughout is op_politician_id (WP post meta → op_core_politician.id).
+	 *
+	 * GET /publictech/v1/mp/{id}/parliament
+	 */
+	public function mp_parliament( \WP_REST_Request $req ): \WP_REST_Response|\WP_Error {
+		if ( ( $gate = Throttle::instance()->enforce_rest( $req ) ) instanceof \WP_Error ) {
+			return $gate;
+		}
+		$mp_id = absint( $req['id'] );
+		if ( $mp_id <= 0 || 'member-parliament' !== get_post_type( $mp_id ) ) {
+			return new \WP_Error( 'pt_not_found', 'Member not found.', [ 'status' => 404 ] );
+		}
+
+		$op_pol_id = (int) get_post_meta( $mp_id, 'op_politician_id', true );
+
+		// No OP link — return empty payload rather than 404 so the page renders cleanly.
+		if ( $op_pol_id <= 0 ) {
+			$resp = rest_ensure_response( [
+				'mandates'       => [],
+				'votes'          => null,
+				'recent_votes'   => [],
+				'bills'          => [],
+				'committees'     => [],
+				'elections'      => [],
+				'op_politician_id' => 0,
+			] );
+			$resp->header( 'Cache-Control', 'public, max-age=300' );
+			return $resp;
+		}
+
+		$db = publictech_db( 'pt-grantconts-01' );
+
+		// ── 1. Electoral mandates ──────────────────────────────────────────────
+		$mandates = [];
+		try {
+			$mandates = $db->select(
+				'SELECT
+				     mm.parliament,
+				     mm.start_date,
+				     mm.end_date,
+				     mm.party,
+				     r.name_en AS riding_name,
+				     r.province
+				 FROM mp_persons p
+				 JOIN mp_mandates mm ON mm.mp_id = p.id
+				 LEFT JOIN op_core_riding r ON r.id = mm.riding_id
+				 WHERE p.op_politician_id = ?
+				 ORDER BY COALESCE(mm.start_date, \'1900-01-01\') DESC',
+				[ $op_pol_id ]
+			);
+		} catch ( \Throwable $e ) {
+			error_log( '[PublicTech] mp_parliament mandates: ' . $e->getMessage() );
+		}
+
+		// ── 2. Vote aggregate ──────────────────────────────────────────────────
+		$vote_summary = null;
+		try {
+			$rows = $db->select(
+				'SELECT
+				     COUNT(*)                                    AS total_votes,
+				     SUM(CASE WHEN ballot = \'Y\'  THEN 1 ELSE 0 END) AS yea,
+				     SUM(CASE WHEN ballot = \'N\'  THEN 1 ELSE 0 END) AS nay,
+				     SUM(CASE WHEN ballot = \'P\'  THEN 1 ELSE 0 END) AS paired,
+				     SUM(CASE WHEN ballot = \'Ab\' THEN 1 ELSE 0 END) AS abstained
+				 FROM op_votes_membervote
+				 WHERE politician_id = ?',
+				[ $op_pol_id ]
+			);
+			if ( $rows && isset( $rows[0] ) ) {
+				$vote_summary = $rows[0];
+			}
+		} catch ( \Throwable $e ) {
+			error_log( '[PublicTech] mp_parliament vote_summary: ' . $e->getMessage() );
+		}
+
+		// ── 3. Recent individual votes ─────────────────────────────────────────
+		$recent_votes = [];
+		try {
+			$recent_votes = $db->select(
+				'SELECT
+				     v.number        AS vote_number,
+				     v.date          AS vote_date,
+				     v.description   AS vote_description,
+				     v.agreed,
+				     v.yea_total,
+				     v.nay_total,
+				     mv.ballot,
+				     b.number        AS bill_number,
+				     b.name          AS bill_name
+				 FROM op_votes_membervote mv
+				 JOIN op_votes_vote v ON v.id = mv.vote_id
+				 LEFT JOIN op_bills_bill b ON b.id = v.bill_id
+				 WHERE mv.politician_id = ?
+				 ORDER BY v.date DESC
+				 LIMIT 25',
+				[ $op_pol_id ]
+			);
+		} catch ( \Throwable $e ) {
+			error_log( '[PublicTech] mp_parliament recent_votes: ' . $e->getMessage() );
+		}
+
+		// ── 4. Bills introduced ────────────────────────────────────────────────
+		$bills = [];
+		try {
+			$bills = $db->select(
+				'SELECT
+				     b.number,
+				     b.name,
+				     b.short_title_en,
+				     b.introduced,
+				     b.status,
+				     b.law,
+				     s.parliamentnum,
+				     s.sessnum
+				 FROM op_bills_bill b
+				 LEFT JOIN op_core_session s ON s.id = b.session_id
+				 WHERE b.sponsor_politician_id = ?
+				 ORDER BY b.introduced DESC
+				 LIMIT 50',
+				[ $op_pol_id ]
+			);
+		} catch ( \Throwable $e ) {
+			error_log( '[PublicTech] mp_parliament bills: ' . $e->getMessage() );
+		}
+
+		// ── 5. Committee memberships ───────────────────────────────────────────
+		$committees = [];
+		try {
+			$committees = $db->select(
+				'SELECT
+				     cm.role,
+				     cm.start_date,
+				     cm.end_date,
+				     c.name_en  AS committee_name,
+				     c.short_name AS committee_short
+				 FROM op_committees_committeemembership cm
+				 JOIN op_committees_committee c ON c.id = cm.committee_id
+				 WHERE cm.politician_id = ?
+				 ORDER BY COALESCE(cm.start_date, \'1900-01-01\') DESC',
+				[ $op_pol_id ]
+			);
+		} catch ( \Throwable $e ) {
+			error_log( '[PublicTech] mp_parliament committees: ' . $e->getMessage() );
+		}
+
+		// ── 6. Election results (popular vote) ─────────────────────────────────
+		$elections = [];
+		try {
+			$elections = $db->select(
+				'SELECT
+				     er.votes,
+				     er.fraction,
+				     er.elected,
+				     er.candidate_name,
+				     er.party_name,
+				     e.date       AS election_date,
+				     e.byelection,
+				     r.name_en   AS riding_name
+				 FROM op_elections_electionresult er
+				 JOIN op_elections_election e ON e.id = er.election_id
+				 LEFT JOIN op_core_riding r ON r.id = e.riding_id
+				 WHERE er.politician_id = ?
+				 ORDER BY e.date DESC',
+				[ $op_pol_id ]
+			);
+		} catch ( \Throwable $e ) {
+			// Table may not exist — silent fallback.
+		}
+
+		$resp = rest_ensure_response( [
+			'op_politician_id' => $op_pol_id,
+			'mandates'         => $mandates,
+			'votes'            => $vote_summary,
+			'recent_votes'     => $recent_votes,
+			'bills'            => $bills,
+			'committees'       => $committees,
+			'elections'        => $elections,
+		] );
+		$resp->header( 'Cache-Control', 'public, max-age=3600' );
+		return $resp;
 	}
 
 	/* ---------- shaping ---------- */
