@@ -127,28 +127,32 @@
 				return 'rgba(' + ar + ',' + ag + ',' + ab + ',' + ( 0.08 + v * 0.84 ).toFixed( 3 ) + ')';
 			} );
 
-		/* Countries: log scale so the US ($19B) doesn't crush everything else.
-		   A country with $50M spend gets ~0.35 opacity; $1B gets ~0.60; $19B gets 0.90.
-		   Floor at the smallest non-zero spend value so log(0) is avoided. */
-		var minC = Math.max( 1, d3.min(
-			Object.values( countryData )
-				.map( function ( d ) { return d.spend || 0; } )
-				.filter( function ( v ) { return v > 0; } )
-		) || 1 );
-		var logCountry = d3.scaleLog().domain( [ minC, maxC ] ).range( [ 0.18, 0.90 ] ).clamp( true );
+		/* Countries: log scale from near-black → bright amber using fully opaque
+		   rgb interpolation. Avoids the rgba-over-dark-bg contrast problem.
+		   US ($19B) → #e8920a; $50M → dim brownish-amber; $0 → kept dark. */
+		var cSpendPos = Object.values( countryData )
+			.map( function ( d ) { return d.spend || 0; } )
+			.filter( function ( v ) { return v > 0; } );
+		var minC = Math.max( 1, d3.min( cSpendPos ) || 1 );
+		var logCountry = d3.scaleLog().domain( [ minC, maxC ] ).range( [ 0, 1 ] ).clamp( true );
+		var interpCountry = d3.interpolateRgb( '#1e1a08', '#e8920a' );
 		countryScale = function ( spend ) {
-			return 'rgba(255,160,20,' + logCountry( Math.max( spend, minC ) ).toFixed( 3 ) + ')';
+			return interpCountry( logCountry( Math.max( spend, minC ) ) );
 		};
 
-		ridingHeatScale  = d3.scaleSequential( d3.interpolateInferno ).domain( [ 0, maxR ] );
-		countryHeatScale = d3.scaleSequential( d3.interpolateInferno ).domain( [ 0, maxC ] );
+		/* Country heatmap also uses log scale so US doesn't crush everything */
+		var logCountryH = d3.scaleLog().domain( [ minC, maxC ] ).range( [ 0, 1 ] ).clamp( true );
+		countryHeatScale = function ( spend ) {
+			return d3.interpolateInferno( logCountryH( Math.max( spend, minC ) ) );
+		};
+		ridingHeatScale = d3.scaleSequential( d3.interpolateInferno ).domain( [ 0, maxR ] );
 	}
 
 	function countryFill( f ) {
 		var row = countryData[ String( f.id ) ];
-		if ( ! row || ! row.spend ) return 'var(--bg3, #252932)';
-		if ( mode === 'heatmap' ) return countryHeatScale ? countryHeatScale( row.spend ) : 'var(--bg3, #252932)';
-		return countryScale ? countryScale( row.spend ) : 'var(--bg3, #252932)';
+		if ( ! row || ! row.spend ) return '#1d2029';   /* no-data: near-black so funded countries pop */
+		if ( mode === 'heatmap' ) return countryHeatScale ? countryHeatScale( row.spend ) : '#1d2029';
+		return countryScale ? countryScale( row.spend ) : '#1d2029';
 	}
 
 	function ridingFill( f ) {
@@ -293,7 +297,7 @@
 				'<span>Ridings</span>' +
 				'<span class="pt-map-legend-bar" style="background:linear-gradient(to right,rgba(0,160,210,.06),' + ac + ')"></span>' +
 				'<span style="margin-left:10px">Countries</span>' +
-				'<span class="pt-map-legend-bar" style="background:linear-gradient(to right,rgba(255,160,20,.06),rgba(255,160,20,.9))"></span>';
+				'<span class="pt-map-legend-bar" style="background:linear-gradient(to right,#1e1a08,#e8920a)"></span>';
 		} else {
 			el.innerHTML =
 				'<span>Low</span>' +
