@@ -34,6 +34,7 @@ require_once GOVADS_DIR . 'inc/class-ads-rest.php';
 require_once GOVADS_DIR . 'inc/class-ads-rollup.php';
 require_once GOVADS_DIR . 'inc/class-ads-zones.php';
 require_once GOVADS_DIR . 'inc/class-ads-admin.php';
+require_once GOVADS_DIR . 'inc/class-ads-frontend-rest.php';
 
 GovAds\CPT::instance();
 GovAds\Roles::instance();
@@ -41,6 +42,7 @@ GovAds\Rollup::instance();
 GovAds\Zones::instance();
 GovAds\Admin::instance();
 GovAds\REST::instance();
+GovAds\Frontend_REST::instance();
 
 register_activation_hook(
 	__FILE__,
