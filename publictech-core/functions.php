@@ -28,6 +28,7 @@ require_once PUBLICTECH_CORE_DIR . 'inc/class-cpt.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-rest-api.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-riding-cache-warmer.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-riding-cache.php';
+require_once PUBLICTECH_CORE_DIR . 'inc/class-map-cache.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-mp-finance-warmer.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-entity-reports.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-charts-rest.php';
