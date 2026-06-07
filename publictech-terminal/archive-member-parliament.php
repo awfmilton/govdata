@@ -82,6 +82,8 @@ get_header(); ?>
 						<?php endforeach; ?>
 					</div>
 				<?php endif; ?>
+
+				<?php do_action( 'govads_zone', 'archive_sidebar' ); ?>
 			</aside>
 
 			<div>

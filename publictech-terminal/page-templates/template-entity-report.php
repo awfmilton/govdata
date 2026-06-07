@@ -227,6 +227,8 @@ get_header(); ?>
 			<!-- Right column: sidebar -->
 			<div style="display:flex;flex-direction:column;gap:14px">
 
+				<?php do_action( 'govads_zone', 'entity_report_sidebar' ); ?>
+
 				<div class="panel corner">
 					<div class="hd"><h3>◇ Summary</h3><span class="meta">ROLL-UP</span></div>
 					<div class="kvs">
