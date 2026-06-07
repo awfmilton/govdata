@@ -5,6 +5,7 @@
 defined( 'ABSPATH' ) || exit;
 ?>
 <footer class="pt-footer">
+	<?php do_action( 'govads_zone', 'global_footer' ); ?>
 	<div class="rail">
 		<div class="l">
 			<span>© <?php echo esc_html( gmdate( 'Y' ) ); ?> <?php bloginfo( 'name' ); ?></span>

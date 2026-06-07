@@ -8,7 +8,7 @@ install:
 	npm install --no-audit --no-fund
 
 lint:
-	@find publictech-core publictech-terminal publictech-mcp tests \
+	@find publictech-core publictech-terminal publictech-mcp govdata-ad-services govdata-ads-client tests \
 		-name '*.php' -print0 \
 		| xargs -0 -n1 -P4 php -l > /tmp/pt-lint.log 2>&1 \
 		|| (grep -v 'No syntax errors detected' /tmp/pt-lint.log; exit 1)
@@ -27,7 +27,7 @@ test:
 	vendor/bin/phpunit --testdox
 
 js-lint:
-	npx eslint "publictech-core/assets/js/**/*.js" "publictech-terminal/assets/js/**/*.js"
+	npx eslint "publictech-core/assets/js/**/*.js" "publictech-terminal/assets/js/**/*.js" "govdata-ad-services/assets/js/**/*.js" "govdata-ads-client/assets/js/**/*.js"
 
 css-lint:
 	npx stylelint "publictech-core/assets/css/**/*.css" "publictech-terminal/assets/css/**/*.css"

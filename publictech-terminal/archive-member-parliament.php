@@ -26,6 +26,8 @@ get_header(); ?>
 			<div class="shortcut" aria-hidden="true"><kbd>⌘</kbd><kbd>K</kbd></div>
 		</div>
 
+		<?php do_action( 'govads_zone', 'archive_after_search' ); ?>
+
 		<div class="chips" id="ptActiveChips" aria-live="polite"></div>
 
 		<div class="dir-grid">
@@ -143,6 +145,8 @@ get_header(); ?>
 						<div class="pt-error"><?php esc_html_e( 'No matching records.', 'publictech-terminal' ); ?></div>
 					<?php endif; ?>
 				</div>
+
+				<?php do_action( 'govads_zone', 'archive_before_pagination' ); ?>
 
 				<div class="stream-foot" style="margin-top:6px">
 					<span><?php
