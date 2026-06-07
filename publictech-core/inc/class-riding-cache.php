@@ -272,6 +272,58 @@ final class Riding_Cache {
 			'permission_callback' => '__return_true',
 			'callback'            => [ $this, 'rest_mp_riding' ],
 		] );
+		register_rest_route( PUBLICTECH_CORE_REST_NS, '/map/riding-totals', [
+			'methods'             => \WP_REST_Server::READABLE,
+			'permission_callback' => '__return_true',
+			'callback'            => [ $this, 'rest_map_riding_totals' ],
+		] );
+	}
+
+	/**
+	 * GET /map/riding-totals — compact totals for every cached riding, keyed by
+	 * riding number. Used by the map page to colour riding polygons without
+	 * issuing 338 individual requests.
+	 *
+	 * @return \WP_REST_Response|\WP_Error
+	 */
+	public function rest_map_riding_totals( \WP_REST_Request $req ): \WP_REST_Response|\WP_Error {
+		if ( ( $gate = Throttle::instance()->enforce_rest( $req ) ) instanceof \WP_Error ) {
+			return $gate;
+		}
+
+		$cached = wp_cache_get( 'map_riding_totals', self::CACHE_GRP );
+		if ( is_array( $cached ) ) {
+			$resp = rest_ensure_response( $cached );
+			$resp->header( 'Cache-Control', 'public, max-age=3600' );
+			return $resp;
+		}
+
+		try {
+			$rows = publictech_db( Riding_Cache_Warmer::cache_alias() )->select(
+				'SELECT `riding_number`, `payload` FROM `riding_cache`'
+			);
+		} catch ( \Throwable $e ) {
+			return new \WP_Error( 'pt_cache_error', 'Riding cache unavailable.', [ 'status' => 503 ] );
+		}
+
+		$out = [];
+		foreach ( $rows as $row ) {
+			$p = json_decode( (string) $row['payload'], true );
+			if ( ! is_array( $p ) ) {
+				continue;
+			}
+			$out[ (string) $row['riding_number'] ] = [
+				'spend'    => (float) ( $p['totals']['total_value']     ?? 0 ),
+				'count'    => (int)   ( $p['totals']['agreement_count'] ?? 0 ),
+				'name'     => (string) ( $p['riding']['name_en']        ?? '' ),
+				'province' => (string) ( $p['riding']['province']       ?? '' ),
+			];
+		}
+
+		wp_cache_set( 'map_riding_totals', $out, self::CACHE_GRP, 60 * \MINUTE_IN_SECONDS );
+		$resp = rest_ensure_response( $out );
+		$resp->header( 'Cache-Control', 'public, max-age=3600' );
+		return $resp;
 	}
 
 	/**
