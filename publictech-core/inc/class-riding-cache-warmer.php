@@ -280,17 +280,27 @@ final class Riding_Cache_Warmer {
 	private function pcfrf_join(): string {
 		$src_pc = $this->pc_norm( '`m`.`recipient_postal_code`' );
 		$dir_pc = $this->pc_norm( '`postal_code`' );
-		// Each agreement picks the era-appropriate RO:
-		//   year >= 2025 → ro_id=2 (2023 RO, 343 ridings)
-		//   year <  2025 → ro_id=1 (2013 RO — best available for all pre-2025)
+		// Always use the 2023 RO (ro_id=2) for all agreements, regardless of year.
+		//
+		// The previous era-aware approach (ro_id=1 for pre-2025, ro_id=2 for 2025+)
+		// caused a riding-number collision: riding 35108 = Toronto Centre in the
+		// 2013 RO but = Thunder Bay—Superior North in the 2023 RO. This silently
+		// attributed $15 B of Toronto Centre spending (NextStar Energy, Metrolinx,
+		// TMU, Ryerson) to "Thunder Bay—Superior North" because the warmer grouped
+		// by riding_number without distinguishing which RO assigned that number.
+		//
+		// Using ro_id=2 exclusively gives a single, stable riding namespace (343
+		// 2023-RO ridings). Pre-2025 agreements are attributed to 2023 riding
+		// boundaries rather than the historical 2013 boundaries, which is a minor
+		// methodological trade-off but far preferable to cross-province
+		// mis-attribution of billions of dollars.
 		return "JOIN (
-					SELECT DISTINCT {$dir_pc} AS pc, `riding_number` AS rn, `ro_id`
+					SELECT DISTINCT {$dir_pc} AS pc, `riding_number` AS rn
 					FROM `pcbfr`
 					WHERE `postal_code` IS NOT NULL AND `postal_code` <> ''
 						AND `riding_number` IS NOT NULL AND `riding_number` <> ''
-						AND `ro_id` IN (1, 2)
-				) p ON p.pc = {$src_pc}
-				  AND p.ro_id = CASE WHEN `m`.`year` >= 2025 THEN 2 ELSE 1 END";
+						AND `ro_id` = 2
+				) p ON p.pc = {$src_pc}";
 	}
 
 	/** Optional single-riding filter for trial runs. */
