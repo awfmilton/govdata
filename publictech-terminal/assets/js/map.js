@@ -166,7 +166,7 @@
 		gCountries.selectAll( '.pt-country' ).data( fc.features ).enter().append( 'path' )
 			.attr( 'class', 'pt-country' )
 			.attr( 'd', geoPath )
-			.attr( 'fill', countryFill )
+			.style( 'fill', countryFill )   /* inline style beats CSS class fill rule */
 			.on( 'mouseenter', function () { d3.select( this ).classed( 'hovered', true ); } )
 			.on( 'mousemove',  function ( ev, f ) {
 				var row  = countryData[ String( f.id ) ];
@@ -210,7 +210,7 @@
 
 	function applyColors() {
 		if ( featureRidings ) gRidings.selectAll( '.pt-riding' ).attr( 'fill', ridingFill );
-		gCountries.selectAll( '.pt-country' ).attr( 'fill', countryFill );
+		gCountries.selectAll( '.pt-country' ).style( 'fill', countryFill );
 	}
 
 	/* ── Heatmap contour layer ─────────────────────────────────────────────── */
