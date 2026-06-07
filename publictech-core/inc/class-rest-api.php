@@ -78,6 +78,15 @@ final class REST_API {
 			'callback'            => [ $this, 'captcha_verify' ],
 		] );
 
+		register_rest_route( PUBLICTECH_CORE_REST_NS, '/map/country/(?P<cc>[A-Za-z]{2})', [
+			'methods'             => \WP_REST_Server::READABLE,
+			'permission_callback' => '__return_true',
+			'callback'            => [ $this, 'map_country_detail' ],
+			'args'                => [
+				'cc' => [ 'type' => 'string', 'sanitize_callback' => static fn( $v ) => strtoupper( substr( preg_replace( '/[^A-Za-z]/', '', $v ), 0, 2 ) ) ],
+			],
+		] );
+
 		register_rest_route( PUBLICTECH_CORE_REST_NS, '/mp/(?P<id>\d+)/spend', [
 			'methods'             => \WP_REST_Server::READABLE,
 			'permission_callback' => '__return_true',
@@ -780,16 +789,18 @@ final class REST_API {
 		}
 
 		// ── 2. Vote aggregate ──────────────────────────────────────────────────
+		// Uses op_bills_membervote (col: vote) — the grantconts import does not
+		// include the separate op_votes_* tables from newer OpenParliament exports.
 		$vote_summary = null;
 		try {
 			$rows = $db->select(
 				'SELECT
-				     COUNT(*)                                    AS total_votes,
-				     SUM(CASE WHEN ballot = \'Y\'  THEN 1 ELSE 0 END) AS yea,
-				     SUM(CASE WHEN ballot = \'N\'  THEN 1 ELSE 0 END) AS nay,
-				     SUM(CASE WHEN ballot = \'P\'  THEN 1 ELSE 0 END) AS paired,
-				     SUM(CASE WHEN ballot = \'Ab\' THEN 1 ELSE 0 END) AS abstained
-				 FROM op_votes_membervote
+				     COUNT(*)                                   AS total_votes,
+				     SUM(CASE WHEN vote = \'Y\' THEN 1 ELSE 0 END) AS yea,
+				     SUM(CASE WHEN vote = \'N\' THEN 1 ELSE 0 END) AS nay,
+				     SUM(CASE WHEN vote = \'P\' THEN 1 ELSE 0 END) AS paired,
+				     0                                         AS abstained
+				 FROM op_bills_membervote
 				 WHERE politician_id = ?',
 				[ $op_pol_id ]
 			);
@@ -805,20 +816,20 @@ final class REST_API {
 		try {
 			$recent_votes = $db->select(
 				'SELECT
-				     v.number        AS vote_number,
-				     v.date          AS vote_date,
-				     v.description   AS vote_description,
-				     v.agreed,
-				     v.yea_total,
-				     v.nay_total,
-				     mv.ballot,
-				     b.number        AS bill_number,
-				     b.name          AS bill_name
-				 FROM op_votes_membervote mv
-				 JOIN op_votes_vote v ON v.id = mv.vote_id
-				 LEFT JOIN op_bills_bill b ON b.id = v.bill_id
+				     vq.number          AS vote_number,
+				     vq.date            AS vote_date,
+				     vq.description_en  AS vote_description,
+				     CASE WHEN vq.result = \'Y\' THEN 1 ELSE 0 END AS agreed,
+				     vq.yea_total,
+				     vq.nay_total,
+				     mv.vote            AS ballot,
+				     b.number           AS bill_number,
+				     b.short_title_en   AS bill_name
+				 FROM op_bills_membervote mv
+				 JOIN op_bills_votequestion vq ON vq.id = mv.votequestion_id
+				 LEFT JOIN op_bills_bill b ON b.id = vq.bill_id
 				 WHERE mv.politician_id = ?
-				 ORDER BY v.date DESC
+				 ORDER BY vq.date DESC
 				 LIMIT 25',
 				[ $op_pol_id ]
 			);
@@ -832,10 +843,10 @@ final class REST_API {
 			$bills = $db->select(
 				'SELECT
 				     b.number,
-				     b.name,
+				     b.name_en        AS name,
 				     b.short_title_en,
 				     b.introduced,
-				     b.status,
+				     b.status_code    AS status,
 				     b.law,
 				     s.parliamentnum,
 				     s.sessnum
@@ -851,24 +862,9 @@ final class REST_API {
 		}
 
 		// ── 5. Committee memberships ───────────────────────────────────────────
+		// op_committees_committeemembership is not present in this DB import.
+		// Return empty — the template already handles this gracefully.
 		$committees = [];
-		try {
-			$committees = $db->select(
-				'SELECT
-				     cm.role,
-				     cm.start_date,
-				     cm.end_date,
-				     c.name_en  AS committee_name,
-				     c.short_name AS committee_short
-				 FROM op_committees_committeemembership cm
-				 JOIN op_committees_committee c ON c.id = cm.committee_id
-				 WHERE cm.politician_id = ?
-				 ORDER BY COALESCE(cm.start_date, \'1900-01-01\') DESC',
-				[ $op_pol_id ]
-			);
-		} catch ( \Throwable $e ) {
-			error_log( '[PublicTech] mp_parliament committees: ' . $e->getMessage() );
-		}
 
 		// ── 6. Election results (popular vote) ─────────────────────────────────
 		$elections = [];
@@ -924,5 +920,132 @@ final class REST_API {
 			'votes'   => (int) get_post_meta( $post_id, 'votes_cast', true ),
 			'permalink' => get_permalink( $post_id ),
 		];
+	}
+
+	/* ── Map: country detail ──────────────────────────────────────────────── */
+
+	/**
+	 * GET /map/country/{cc} — spending breakdown for a recipient country.
+	 * Queries grantconts directly (read-only). Results cached 1 hour.
+	 */
+	public function map_country_detail( \WP_REST_Request $req ): \WP_REST_Response|\WP_Error {
+		if ( ( $gate = Throttle::instance()->enforce_rest( $req ) ) instanceof \WP_Error ) {
+			return $gate;
+		}
+
+		$cc       = strtoupper( trim( (string) $req['cc'] ) );
+		$cache_key = 'pt_map_ctry_' . $cc;
+		$cached    = get_transient( $cache_key );
+		if ( is_array( $cached ) ) {
+			$resp = rest_ensure_response( $cached );
+			$resp->header( 'Cache-Control', 'public, max-age=3600' );
+			return $resp;
+		}
+
+		try {
+			$db = publictech_db( \PublicTech\Core\Riding_Cache_Warmer::source_alias() );
+
+			/* Totals */
+			$totals = $db->select(
+				'SELECT SUM(GREATEST(`agreement_value`, 0)) AS total_spend,
+				        COUNT(*) AS total_count
+				 FROM `master_table`
+				 WHERE UPPER(TRIM(`recipient_country`)) = ?',
+				[ $cc ]
+			);
+			if ( empty( $totals[0]['total_count'] ) || (int) $totals[0]['total_count'] === 0 ) {
+				return new \WP_Error( 'pt_not_found', 'No data for this country.', [ 'status' => 404 ] );
+			}
+
+			/* By fiscal year */
+			$by_year = $db->select(
+				'SELECT `fiscal_year`,
+				        SUM(GREATEST(`agreement_value`, 0)) AS spend,
+				        COUNT(*) AS cnt
+				 FROM `master_table`
+				 WHERE UPPER(TRIM(`recipient_country`)) = ?
+				   AND `fiscal_year` IS NOT NULL AND `fiscal_year` != \'\'
+				 GROUP BY `fiscal_year`
+				 ORDER BY `fiscal_year` DESC
+				 LIMIT 20',
+				[ $cc ]
+			);
+
+			/* Top programs */
+			$programs = $db->select(
+				'SELECT `prog_name_en`                           AS name,
+				        MAX(`prog_purpose_en`)                   AS purpose,
+				        MAX(`owner_org_title`)                   AS department,
+				        SUM(GREATEST(`agreement_value`, 0))      AS spend,
+				        COUNT(*)                                 AS cnt
+				 FROM `master_table`
+				 WHERE UPPER(TRIM(`recipient_country`)) = ?
+				   AND `prog_name_en` IS NOT NULL AND `prog_name_en` != \'\'
+				 GROUP BY `prog_name_en`
+				 ORDER BY spend DESC
+				 LIMIT 12',
+				[ $cc ]
+			);
+
+			/* Recent large agreements */
+			$recent = $db->select(
+				'SELECT `agreement_title_en` AS title,
+				        `recipient_legal_name` AS recipient,
+				        `fiscal_year`,
+				        `agreement_value`      AS value,
+				        `prog_name_en`         AS program,
+				        `description_eng`      AS description
+				 FROM `master_table`
+				 WHERE UPPER(TRIM(`recipient_country`)) = ?
+				   AND `agreement_value` > 0
+				 ORDER BY `agreement_value` DESC
+				 LIMIT 10',
+				[ $cc ]
+			);
+
+		} catch ( \Throwable $e ) {
+			return new \WP_Error( 'pt_db_error', 'Database unavailable.', [ 'status' => 503 ] );
+		}
+
+		/* Get country name from Map_Cache ISO table */
+		$name = $cc;
+		if ( class_exists( '\\PublicTech\\Core\\Map_Cache' ) ) {
+			$iso = \PublicTech\Core\Map_Cache::alpha2_to_iso();
+			if ( isset( $iso[ $cc ] ) ) {
+				$name = $iso[ $cc ][1];
+			}
+		}
+
+		$out = [
+			'cc'              => $cc,
+			'name'            => $name,
+			'total_spend'     => (float) ( $totals[0]['total_spend'] ?? 0 ),
+			'total_count'     => (int)   ( $totals[0]['total_count'] ?? 0 ),
+			'by_fiscal_year'  => array_map( static fn( $r ) => [
+				'year'  => (string) $r['fiscal_year'],
+				'spend' => (float)  $r['spend'],
+				'count' => (int)    $r['cnt'],
+			], $by_year ),
+			'top_programs'    => array_map( static fn( $r ) => [
+				'name'       => (string) $r['name'],
+				'purpose'    => (string) ( $r['purpose'] ?? '' ),
+				'department' => (string) ( $r['department'] ?? '' ),
+				'spend'      => (float)  $r['spend'],
+				'count'      => (int)    $r['cnt'],
+			], $programs ),
+			'recent'          => array_map( static fn( $r ) => [
+				'title'       => (string) ( $r['title']       ?? '' ),
+				'recipient'   => (string) ( $r['recipient']   ?? '' ),
+				'fiscal_year' => (string) ( $r['fiscal_year'] ?? '' ),
+				'value'       => (float)  $r['value'],
+				'program'     => (string) ( $r['program']     ?? '' ),
+				'description' => (string) ( $r['description'] ?? '' ),
+			], $recent ),
+		];
+
+		set_transient( $cache_key, $out, HOUR_IN_SECONDS );
+		$resp = rest_ensure_response( $out );
+		$resp->header( 'Cache-Control', 'public, max-age=3600' );
+		return $resp;
 	}
 }

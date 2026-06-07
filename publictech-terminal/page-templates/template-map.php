@@ -196,6 +196,162 @@ get_header();
 .pt-tip-row   { display: flex; justify-content: space-between; gap: 18px; padding: 2px 0; font-size: 11px; }
 .pt-tip-row span { color: var(--ink2, #8b93a0); }
 .pt-tip-row b    { color: var(--ink1, #e0e4ec); }
+
+/* ── Selected state ────────────────────────────────────────────────────────── */
+.pt-country.selected {
+	stroke: var(--accent, #00a0d2) !important;
+	stroke-width: 2px !important;
+	filter: drop-shadow(0 0 8px rgba(0,160,210,.7)) !important;
+}
+.pt-riding.selected {
+	stroke: #fff !important;
+	stroke-width: 2px !important;
+	filter: drop-shadow(0 0 10px rgba(255,255,255,.5)) !important;
+}
+
+/* ── Detail side panel ─────────────────────────────────────────────────────── */
+#ptMapPanel {
+	position: absolute;
+	top: 0; right: 0;
+	width: 340px;
+	height: 100%;
+	background: var(--bg0, #13151a);
+	border-left: 1px solid var(--accent, #00a0d2);
+	z-index: 10;
+	display: flex;
+	flex-direction: column;
+	transform: translateX(100%);
+	transition: transform .3s cubic-bezier(.4,0,.2,1);
+	box-shadow: -6px 0 28px rgba(0,0,0,.6);
+}
+#ptMapPanel.open { transform: translateX(0); }
+.ptmp-hdr {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 12px 16px;
+	border-bottom: 1px solid var(--line, #2a2d35);
+	flex-shrink: 0;
+}
+.ptmp-hdr-label {
+	font: 500 9px/1 ui-monospace, monospace;
+	text-transform: uppercase;
+	letter-spacing: .15em;
+	color: var(--accent, #00a0d2);
+}
+.ptmp-close {
+	background: none;
+	border: 1px solid var(--line, #333);
+	color: var(--ink2, #8b93a0);
+	width: 24px; height: 24px;
+	border-radius: 3px;
+	cursor: pointer;
+	font-size: 14px;
+	line-height: 1;
+	display: flex; align-items: center; justify-content: center;
+	transition: border-color .15s, color .15s;
+}
+.ptmp-close:hover { border-color: var(--accent); color: var(--accent); }
+#ptMapPanelBody {
+	flex: 1;
+	overflow-y: auto;
+	padding: 16px;
+	font: 400 12px/1.6 ui-monospace, monospace;
+	color: var(--ink1, #e0e4ec);
+}
+/* panel content styles */
+.ptmp-title {
+	font: 700 15px/1.3 var(--font-ui, 'Montserrat', sans-serif);
+	color: var(--ink1, #e0e4ec);
+	margin-bottom: 2px;
+}
+.ptmp-sub {
+	font: 500 9px/1 ui-monospace, monospace;
+	color: var(--ink2, #8b93a0);
+	text-transform: uppercase;
+	letter-spacing: .1em;
+	margin-bottom: 12px;
+}
+.ptmp-kpis {
+	display: flex;
+	gap: 12px;
+	margin-bottom: 16px;
+}
+.ptmp-kpi {
+	flex: 1;
+	background: var(--bg2, #1c1f28);
+	border: 1px solid var(--line, #2a2d35);
+	border-radius: 3px;
+	padding: 8px 10px;
+}
+.ptmp-kv {
+	font: 700 14px/1 var(--font-ui, 'Montserrat', sans-serif);
+	color: var(--accent, #00a0d2);
+	margin-bottom: 3px;
+}
+.ptmp-kl {
+	font: 500 9px/1 ui-monospace, monospace;
+	color: var(--ink2, #8b93a0);
+	text-transform: uppercase;
+	letter-spacing: .08em;
+}
+.ptmp-section { margin-bottom: 18px; }
+.ptmp-sh {
+	font: 600 10px/1 ui-monospace, monospace;
+	text-transform: uppercase;
+	letter-spacing: .12em;
+	color: var(--accent, #00a0d2);
+	margin-bottom: 8px;
+	padding-bottom: 4px;
+	border-bottom: 1px solid var(--line, #2a2d35);
+}
+.ptmp-table {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: 11px;
+}
+.ptmp-table th {
+	text-align: left;
+	font: 500 9px/1 ui-monospace, monospace;
+	text-transform: uppercase;
+	letter-spacing: .08em;
+	color: var(--ink2, #8b93a0);
+	padding: 4px 6px 6px 0;
+	border-bottom: 1px solid var(--line, #2a2d35);
+}
+.ptmp-table td {
+	padding: 4px 6px 4px 0;
+	border-bottom: 1px solid rgba(255,255,255,.04);
+	color: var(--ink1, #e0e4ec);
+	vertical-align: top;
+}
+.ptmp-table tr:last-child td { border-bottom: none; }
+.ptmp-prog {
+	padding: 7px 0;
+	border-bottom: 1px solid rgba(255,255,255,.05);
+}
+.ptmp-prog:last-child { border-bottom: none; }
+.ptmp-pn {
+	font: 500 11px/1.4 ui-monospace, monospace;
+	color: var(--ink1, #e0e4ec);
+	margin-bottom: 3px;
+}
+.ptmp-pp {
+	font-size: 10px;
+	color: var(--ink2, #8b93a0);
+	line-height: 1.4;
+	margin-bottom: 3px;
+}
+.ptmp-pm {
+	font: 500 10px/1 ui-monospace, monospace;
+	color: var(--accent, #00a0d2);
+}
+.ptmp-loading {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 80px;
+}
 </style>
 
 <main id="pt-main" tabindex="-1">
@@ -228,6 +384,14 @@ get_header();
 			<span class="pt-loading"><?php esc_html_e( 'Loading map data…', 'publictech-terminal' ); ?></span>
 		</div>
 		<svg id="ptMapSvg" aria-label="<?php esc_attr_e( 'Federal spending map', 'publictech-terminal' ); ?>" role="img"></svg>
+
+		<aside id="ptMapPanel" aria-label="<?php esc_attr_e( 'Funding detail', 'publictech-terminal' ); ?>">
+			<div class="ptmp-hdr">
+				<span class="ptmp-hdr-label">◇ <?php esc_html_e( 'Funding Detail', 'publictech-terminal' ); ?></span>
+				<button id="ptMapPanelClose" class="ptmp-close" aria-label="<?php esc_attr_e( 'Close panel', 'publictech-terminal' ); ?>">✕</button>
+			</div>
+			<div id="ptMapPanelBody"></div>
+		</aside>
 	</div>
 
 </div>
