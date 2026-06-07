@@ -283,6 +283,8 @@ get_header(); ?>
 		<!-- Right column: sidebar panels -->
 		<div style="display:flex;flex-direction:column;gap:14px">
 
+			<?php do_action( 'govads_zone', 'riding_report_sidebar' ); ?>
+
 			<div class="panel corner">
 				<div class="hd">
 					<h3>◇ Era Comparison</h3>
