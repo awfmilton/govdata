@@ -127,15 +127,18 @@
 				return 'rgba(' + ar + ',' + ag + ',' + ab + ',' + ( 0.08 + v * 0.84 ).toFixed( 3 ) + ')';
 			} );
 
-		/* Countries: amber/gold rgba — same opacity-based approach as ridings
-		   so low-spending countries stay near-invisible on the dark theme
-		   rather than turning white (which interpolateOranges would do). */
-		countryScale = d3.scaleSequential()
-			.domain( [ 0, maxC ] )
-			.interpolator( function ( v ) {
-				/* Amber: rgb(255, 160, 20) with opacity 0.06 → 0.90 */
-				return 'rgba(255,160,20,' + ( 0.06 + v * 0.84 ).toFixed( 3 ) + ')';
-			} );
+		/* Countries: log scale so the US ($19B) doesn't crush everything else.
+		   A country with $50M spend gets ~0.35 opacity; $1B gets ~0.60; $19B gets 0.90.
+		   Floor at the smallest non-zero spend value so log(0) is avoided. */
+		var minC = Math.max( 1, d3.min(
+			Object.values( countryData )
+				.map( function ( d ) { return d.spend || 0; } )
+				.filter( function ( v ) { return v > 0; } )
+		) || 1 );
+		var logCountry = d3.scaleLog().domain( [ minC, maxC ] ).range( [ 0.18, 0.90 ] ).clamp( true );
+		countryScale = function ( spend ) {
+			return 'rgba(255,160,20,' + logCountry( Math.max( spend, minC ) ).toFixed( 3 ) + ')';
+		};
 
 		ridingHeatScale  = d3.scaleSequential( d3.interpolateInferno ).domain( [ 0, maxR ] );
 		countryHeatScale = d3.scaleSequential( d3.interpolateInferno ).domain( [ 0, maxC ] );
@@ -143,8 +146,9 @@
 
 	function countryFill( f ) {
 		var row = countryData[ String( f.id ) ];
-		if ( ! row ) return 'var(--bg3, #252932)';
-		return mode === 'heatmap' ? countryHeatScale( row.spend ) : countryScale( row.spend );
+		if ( ! row || ! row.spend ) return 'var(--bg3, #252932)';
+		if ( mode === 'heatmap' ) return countryHeatScale ? countryHeatScale( row.spend ) : 'var(--bg3, #252932)';
+		return countryScale ? countryScale( row.spend ) : 'var(--bg3, #252932)';
 	}
 
 	function ridingFill( f ) {
