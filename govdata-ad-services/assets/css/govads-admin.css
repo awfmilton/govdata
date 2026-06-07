@@ -1,0 +1,113 @@
+/* ─── GovData Ad Services — Admin Dashboard Styles ────────────────────────── */
+
+.govads-admin-wrap {
+	max-width: 1200px;
+}
+
+.govads-admin-wrap h1 {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+
+/* KPI stat cards on the dashboard */
+.govads-kpis {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+	gap: 16px;
+	margin: 20px 0;
+}
+
+.govads-kpi {
+	background: #fff;
+	border: 1px solid #ddd;
+	border-radius: 4px;
+	padding: 16px;
+	text-align: center;
+}
+
+.govads-kpi .govads-kpi-val {
+	font-size: 28px;
+	font-weight: 700;
+	color: #2271b1;
+}
+
+.govads-kpi .govads-kpi-lab {
+	font-size: 11px;
+	color: #666;
+	text-transform: uppercase;
+	letter-spacing: 0.08em;
+	margin-top: 4px;
+}
+
+/* Status badge colours */
+.govads-status {
+	display: inline-block;
+	padding: 2px 8px;
+	border-radius: 10px;
+	font-size: 11px;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+}
+.govads-status.pending  { background: #fff8e5; color: #996600; }
+.govads-status.approved { background: #edfaef; color: #1a7e31; }
+.govads-status.rejected { background: #fde8e8; color: #b22222; }
+.govads-status.paused   { background: #f0f0f0; color: #666; }
+
+/* Stats table */
+.govads-stats-table th {
+	white-space: nowrap;
+}
+
+/* Form layout */
+.govads-form-row {
+	display: flex;
+	gap: 16px;
+	flex-wrap: wrap;
+	margin-bottom: 12px;
+}
+
+.govads-form-row label {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	font-weight: 600;
+	font-size: 13px;
+	min-width: 200px;
+}
+
+.govads-form-row input,
+.govads-form-row select,
+.govads-form-row textarea {
+	font-size: 13px;
+}
+
+/* Ad preview thumbnail in lists */
+.govads-thumb {
+	width: 80px;
+	height: 40px;
+	object-fit: cover;
+	border-radius: 2px;
+	border: 1px solid #ddd;
+	vertical-align: middle;
+}
+
+/* API key display */
+.govads-key-code {
+	font-family: monospace;
+	background: #f6f7f7;
+	padding: 8px 12px;
+	border-radius: 3px;
+	border: 1px solid #ddd;
+	word-break: break-all;
+	font-size: 13px;
+}
+
+/* Notice for generated key */
+.govads-key-notice {
+	background: #edfaef;
+	border-left: 4px solid #1a7e31;
+	padding: 12px 16px;
+	margin: 16px 0;
+}

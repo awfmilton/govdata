@@ -36,16 +36,42 @@
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Shared password, sourced from the environment (never committed). A
- * wp-config.php definition of PT_DEV_DB_PASSWORD, if present, wins.
+ * Shared password, sourced from the environment (never committed).
+ *
+ * Priority order:
+ *   1. PT_DEV_DB_PASSWORD constant already defined (wp-config.php wins).
+ *   2. PT_DB_PASSWORD environment variable (recommended production approach).
+ *   3. GOVDATA_CACHE_DB2 constant from wp-config.php (legacy fallback so the
+ *      site stays operational while the env-var migration is in progress).
+ *   4. Empty string — auth will fail by design, never a silent leak.
  */
 if ( ! defined( 'PT_DEV_DB_PASSWORD' ) ) {
 	$pt_db_pass = getenv( 'PT_DB_PASSWORD' );
+	if ( false === $pt_db_pass && defined( 'GOVDATA_CACHE_DB2' ) ) {
+		$_cache_def = GOVDATA_CACHE_DB2;
+		$pt_db_pass = is_array( $_cache_def ) ? ( (string) ( $_cache_def['pass'] ?? '' ) ) : '';
+		unset( $_cache_def );
+	}
 	define( 'PT_DEV_DB_PASSWORD', is_string( $pt_db_pass ) ? $pt_db_pass : '' );
 }
 
 /**
- * The development connection map for this feature.
+ * Production cache-DB host: prefer GOVDATA_CACHE_DB2['host'] if defined in
+ * wp-config.php so dev and production resolve the right MySQL endpoint
+ * without hard-coding a hostname here.
+ */
+function pt_cache_db_host(): string {
+	if ( defined( 'GOVDATA_CACHE_DB2' ) ) {
+		$_def = GOVDATA_CACHE_DB2;
+		if ( is_array( $_def ) && ! empty( $_def['host'] ) ) {
+			return (string) $_def['host'];
+		}
+	}
+	return 'mysql.govdata.ca';
+}
+
+/**
+ * The connection map for this feature.
  *
  * @return array<string,array<string,mixed>>
  */
@@ -61,7 +87,7 @@ function pt_dev_db_connections(): array {
 		],
 		// SECONDARY — govdata_cache_02 (read/write). Holds the riding JSON.
 		'pt-cache-02' => [
-			'host' => 'mysql.alexmilton.ca',
+			'host' => pt_cache_db_host(),
 			'port' => 3306,
 			'name' => 'govdata_cache_02',
 			'user' => 'gdc_02',

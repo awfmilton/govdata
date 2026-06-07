@@ -89,6 +89,8 @@ get_header(); ?>
 			</div>
 		</div>
 
+		<?php do_action( 'govads_zone', 'dashboard_below_hero' ); ?>
+
 		<?php /* ── TRANSACTION TICKER ──────────────────────────────── */ ?>
 		<?php if ( ! empty( $pt_dash['recent_large'] ) ) : ?>
 		<div class="ticker-wrap" aria-label="<?php esc_attr_e( 'Recent large agreements', 'publictech-terminal' ); ?>" aria-hidden="true">

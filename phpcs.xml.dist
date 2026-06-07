@@ -5,6 +5,8 @@
 	<file>publictech-core</file>
 	<file>publictech-terminal</file>
 	<file>publictech-mcp</file>
+	<file>govdata-ad-services</file>
+	<file>govdata-ads-client</file>
 
 	<exclude-pattern>*/vendor/*</exclude-pattern>
 	<exclude-pattern>*/node_modules/*</exclude-pattern>
@@ -34,6 +36,8 @@
 				<element value="publictech-core"/>
 				<element value="publictech-terminal"/>
 				<element value="publictech-mcp"/>
+				<element value="govdata-ad-services"/>
+				<element value="govdata-ads-client"/>
 			</property>
 		</properties>
 	</rule>
@@ -45,6 +49,12 @@
 				<element value="PUBLICTECH"/>
 				<element value="pt"/>
 				<element value="PT"/>
+				<element value="govads"/>
+				<element value="GOVADS"/>
+				<element value="GovAds"/>
+				<element value="gac"/>
+				<element value="GAC"/>
+				<element value="GovAdsClient"/>
 			</property>
 		</properties>
 	</rule>

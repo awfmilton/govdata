@@ -182,6 +182,8 @@ get_header(); ?>
 						</div>
 					</div>
 				<?php endif; ?>
+
+				<?php do_action( 'govads_zone', 'mp_profile_sidebar' ); ?>
 			</aside>
 
 			<div class="prof-main">
@@ -219,6 +221,8 @@ get_header(); ?>
 						<?php if ( $votes ) : ?><svg class="spark" id="ptSpark4" aria-hidden="true"></svg><?php endif; ?>
 					</div>
 				</div>
+
+				<?php do_action( 'govads_zone', 'mp_profile_mid_content' ); ?>
 
 				<div class="chart-row">
 					<div class="panel corner">
