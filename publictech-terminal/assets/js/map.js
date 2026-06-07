@@ -58,8 +58,18 @@
 	var gHeat      = gRoot.append( 'g' ).attr( 'class', 'pt-layer-heatmap' ).style( 'display', 'none' );
 
 	/* ── Zoom ──────────────────────────────────────────────────────────────── */
+	var zoomTimer = null;
 	var zoom = d3.zoom().scaleExtent( [ 1, 20 ] ).on( 'zoom', function ( ev ) {
+		currentTransform = ev.transform;
 		gRoot.attr( 'transform', ev.transform );
+		/* Debounce heatmap rebuild: 250ms after zoom stops */
+		if ( mode === 'heatmap' ) {
+			clearTimeout( zoomTimer );
+			zoomTimer = setTimeout( function () {
+				heatBuilt = false;
+				buildHeatmap( true );
+			}, 250 );
+		}
 	} );
 	svg.call( zoom ).on( 'dblclick.zoom', null );
 
@@ -117,11 +127,15 @@
 				return 'rgba(' + ar + ',' + ag + ',' + ab + ',' + ( 0.08 + v * 0.84 ).toFixed( 3 ) + ')';
 			} );
 
-		/* Countries: slightly warmer hue — amber/gold — to visually separate
-		   them from ridings when both are on screen. */
+		/* Countries: amber/gold rgba — same opacity-based approach as ridings
+		   so low-spending countries stay near-invisible on the dark theme
+		   rather than turning white (which interpolateOranges would do). */
 		countryScale = d3.scaleSequential()
 			.domain( [ 0, maxC ] )
-			.interpolator( d3.interpolateOranges );
+			.interpolator( function ( v ) {
+				/* Amber: rgb(255, 160, 20) with opacity 0.06 → 0.90 */
+				return 'rgba(255,160,20,' + ( 0.06 + v * 0.84 ).toFixed( 3 ) + ')';
+			} );
 
 		ridingHeatScale  = d3.scaleSequential( d3.interpolateInferno ).domain( [ 0, maxR ] );
 		countryHeatScale = d3.scaleSequential( d3.interpolateInferno ).domain( [ 0, maxC ] );
@@ -191,26 +205,59 @@
 		gCountries.selectAll( '.pt-country' ).attr( 'fill', countryFill );
 	}
 
-	/* ── Heatmap contour layer (Canada-focused) ────────────────────────────── */
-	function buildHeatmap() {
-		if ( heatBuilt ) return;
+	/* ── Heatmap contour layer ─────────────────────────────────────────────── */
+
+	/* Current zoom transform — updated on every zoom event so heatmap rebuild
+	   knows how far the user has zoomed in. */
+	var currentTransform = d3.zoomIdentity;
+
+	function buildHeatmap( forceRebuild ) {
+		if ( heatBuilt && ! forceRebuild ) return;
 		heatBuilt = true;
+		gHeat.selectAll( 'path' ).remove();
+
+		var k   = currentTransform.k;           /* zoom scale factor        */
 		var pts = weightedCentroids.map( function ( d ) {
+			/* Apply the current zoom transform so points are in screen space */
 			var px = projection( d.lonlat );
-			return px ? { x: px[0], y: px[1], w: d.weight } : null;
+			if ( ! px ) return null;
+			var sx = currentTransform.applyX( px[0] );
+			var sy = currentTransform.applyY( px[1] );
+			return { x: sx, y: sy, w: d.weight };
 		} ).filter( Boolean );
 		if ( ! pts.length ) return;
-		var maxW    = d3.max( pts, function ( d ) { return d.w; } ) || 1;
+
+		var maxW = d3.max( pts, function ( d ) { return d.w; } ) || 1;
+
+		/* Bandwidth shrinks as you zoom in so clusters tighten naturally.
+		   Base 18px at zoom=1, scales down to ~6px at zoom=6+. */
+		var bw = Math.max( 6, 18 / Math.sqrt( k ) );
+
 		var density = d3.contourDensity()
-			.x( function ( d ) { return d.x; } ).y( function ( d ) { return d.y; } )
+			.x( function ( d ) { return d.x; } )
+			.y( function ( d ) { return d.y; } )
 			.weight( function ( d ) { return d.w / maxW; } )
-			.size( [ W(), H() ] ).bandwidth( 22 ).thresholds( 14 )( pts );
-		var maxD = d3.max( density, function ( d ) { return d.value; } ) || 1;
-		var hCol = d3.scaleSequential( d3.interpolateYlOrRd ).domain( [ 0, maxD ] );
+			.size( [ W(), H() ] )
+			.bandwidth( bw )
+			.thresholds( 16 )( pts );
+
+		if ( ! density.length ) return;
+
+		/* Log scale: prevents a single peak from swamping everything else.
+		   Adds 1 to avoid log(0). */
+		var maxD  = d3.max( density, function ( d ) { return d.value; } ) || 1;
+		var logScale = d3.scaleLog()
+			.domain( [ 1e-10, maxD ] )
+			.range( [ 0, 1 ] )
+			.clamp( true );
+		var hCol = function ( d ) {
+			return d3.interpolateYlOrRd( logScale( d.value ) );
+		};
+
 		gHeat.selectAll( 'path' ).data( density ).enter().append( 'path' )
 			.attr( 'd', d3.geoPath() )
-			.attr( 'fill', function ( d ) { return hCol( d.value ); } )
-			.attr( 'opacity', 0.7 );
+			.attr( 'fill', hCol )
+			.attr( 'opacity', 0.72 );
 	}
 
 	/* ── Mode toggle ───────────────────────────────────────────────────────── */
@@ -221,7 +268,7 @@
 		if ( bc ) { bc.classList.toggle( 'active', m === 'choropleth' ); bc.setAttribute( 'aria-pressed', String( m === 'choropleth' ) ); }
 		if ( bh ) { bh.classList.toggle( 'active', m === 'heatmap' );    bh.setAttribute( 'aria-pressed', String( m === 'heatmap' ) ); }
 		if ( m === 'heatmap' ) {
-			buildHeatmap();
+			buildHeatmap( false );
 			gHeat.style( 'display', null );
 			gRidings.attr( 'opacity', 0.3 );
 		} else {
@@ -240,9 +287,9 @@
 		if ( mode === 'choropleth' ) {
 			el.innerHTML =
 				'<span>Ridings</span>' +
-				'<span class="pt-map-legend-bar" style="background:linear-gradient(to right,rgba(0,160,210,.08),' + ac + ')"></span>' +
+				'<span class="pt-map-legend-bar" style="background:linear-gradient(to right,rgba(0,160,210,.06),' + ac + ')"></span>' +
 				'<span style="margin-left:10px">Countries</span>' +
-				'<span class="pt-map-legend-bar" style="background:linear-gradient(to right,#fff5eb,#d94701)"></span>';
+				'<span class="pt-map-legend-bar" style="background:linear-gradient(to right,rgba(255,160,20,.06),rgba(255,160,20,.9))"></span>';
 		} else {
 			el.innerHTML =
 				'<span>Low</span>' +
@@ -257,10 +304,9 @@
 		projection.translate( [ W() / 2, H() / 2 ] );
 		gCountries.selectAll( 'path' ).attr( 'd', geoPath );
 		gRidings.selectAll( 'path' ).attr( 'd', geoPath );
-		if ( heatBuilt ) {
+		if ( mode === 'heatmap' ) {
 			heatBuilt = false;
-			gHeat.selectAll( 'path' ).remove();
-			if ( mode === 'heatmap' ) buildHeatmap();
+			buildHeatmap( true );
 		}
 	}
 
