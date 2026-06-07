@@ -1,6 +1,6 @@
-/* PublicTech Spending Map — interactive D3 world + Canadian-riding map.
-   Depends on: d3, topojson-client, publictech-charts (ensures PT.chartTheme is ready).
-   Config injected by wp_localize_script as window.PT_MAP. */
+/* PublicTech Spending Map — D3 world map + Canadian riding choropleth + heatmap.
+   Depends on: d3, topojson-client, publictech-charts.
+   Config via window.PT_MAP (wp_localize_script). */
 (function () {
 	'use strict';
 
@@ -13,44 +13,21 @@
 
 	var cfg      = window.PT_MAP || {};
 	var REST_ROOT = ( cfg.rest_root || '' ).replace( /\/$/, '' );
-	var RIDINGS   = cfg.ridings_url  || '';
-	var TOTALS    = cfg.totals_url   || '';   /* static JSON file — fastest path */
+	var RIDINGS   = cfg.ridings_url || '';
+	var TOTALS    = cfg.totals_url  || '';
 	var WORLD     = 'https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json';
 
-	/* ── ISO-3166 numeric → country name ──────────────────────────────────── */
-	var ISO = {
-		4:'Afghanistan',8:'Albania',12:'Algeria',24:'Angola',32:'Argentina',
-		36:'Australia',40:'Austria',50:'Bangladesh',56:'Belgium',64:'Bhutan',
-		68:'Bolivia',76:'Brazil',100:'Bulgaria',104:'Myanmar',116:'Cambodia',
-		120:'Cameroon',144:'Sri Lanka',152:'Chile',156:'China',170:'Colombia',
-		180:'DR Congo',191:'Croatia',192:'Cuba',203:'Czechia',208:'Denmark',
-		218:'Ecuador',818:'Egypt',231:'Ethiopia',246:'Finland',250:'France',
-		266:'Gabon',276:'Germany',288:'Ghana',300:'Greece',320:'Guatemala',
-		332:'Haiti',340:'Honduras',348:'Hungary',356:'India',360:'Indonesia',
-		364:'Iran',368:'Iraq',372:'Ireland',376:'Israel',380:'Italy',
-		388:'Jamaica',392:'Japan',400:'Jordan',404:'Kenya',408:'North Korea',
-		410:'South Korea',414:'Kuwait',418:'Laos',422:'Lebanon',430:'Liberia',
-		434:'Libya',440:'Lithuania',442:'Luxembourg',458:'Malaysia',484:'Mexico',
-		504:'Morocco',508:'Mozambique',524:'Nepal',528:'Netherlands',
-		554:'New Zealand',562:'Niger',566:'Nigeria',578:'Norway',586:'Pakistan',
-		598:'Papua New Guinea',604:'Peru',608:'Philippines',616:'Poland',
-		620:'Portugal',634:'Qatar',642:'Romania',643:'Russia',682:'Saudi Arabia',
-		694:'Sierra Leone',703:'Slovakia',706:'Somalia',710:'South Africa',
-		729:'Sudan',752:'Sweden',756:'Switzerland',760:'Syria',764:'Thailand',
-		792:'Turkey',800:'Uganda',804:'Ukraine',784:'UAE',826:'United Kingdom',
-		840:'United States',858:'Uruguay',862:'Venezuela',704:'Vietnam',
-		887:'Yemen',894:'Zambia',716:'Zimbabwe'
-	};
+	/* ── Data state ────────────────────────────────────────────────────────── */
+	var ridingData   = {};   /* { "10001": {spend, count, name, province} } */
+	var countryData  = {};   /* { "840":   {spend, count, name}           } */
 
-	/* ── State ─────────────────────────────────────────────────────────────── */
-	var mode              = 'choropleth';
-	var ridingData        = {};
-	var featureRidings    = null;
+	var mode             = 'choropleth';
+	var featureRidings   = null;
 	var weightedCentroids = [];
-	var heatBuilt         = false;
-	var choroplethScale, heatmapScale;
+	var heatBuilt        = false;
+	var ridingScale, countryScale, ridingHeatScale, countryHeatScale;
 
-	/* ── DOM refs ──────────────────────────────────────────────────────────── */
+	/* ── DOM ───────────────────────────────────────────────────────────────── */
 	var wrap    = document.getElementById( 'ptMapWrap' );
 	var loading = document.getElementById( 'ptMapLoading' );
 	var tipEl   = document.getElementById( 'ptMapTip' );
@@ -71,11 +48,10 @@
 	fm.append( 'feMergeNode' ).attr( 'in', 'blur' );
 	fm.append( 'feMergeNode' ).attr( 'in', 'SourceGraphic' );
 
-	/* ── Projection ────────────────────────────────────────────────────────── */
+	/* ── Projection + layers ───────────────────────────────────────────────── */
 	var projection = d3.geoNaturalEarth1().scale( 153 ).translate( [ W() / 2, H() / 2 ] );
 	var geoPath    = d3.geoPath().projection( projection );
 
-	/* ── Layers ────────────────────────────────────────────────────────────── */
 	var gRoot      = svg.append( 'g' ).attr( 'class', 'pt-map-root' );
 	var gCountries = gRoot.append( 'g' ).attr( 'class', 'pt-layer-countries' );
 	var gRidings   = gRoot.append( 'g' ).attr( 'class', 'pt-layer-ridings' );
@@ -102,8 +78,7 @@
 		var x = ev.clientX + 14, y = ev.clientY + 14;
 		if ( x + r.width  > window.innerWidth  ) x = ev.clientX - r.width  - 14;
 		if ( y + r.height > window.innerHeight ) y = ev.clientY - r.height - 14;
-		tipEl.style.left = x + 'px';
-		tipEl.style.top  = y + 'px';
+		tipEl.style.left = x + 'px'; tipEl.style.top = y + 'px';
 	}
 	function hideTip() { tipEl.classList.remove( 'visible' ); }
 
@@ -121,29 +96,47 @@
 	}
 
 	/* ── Color scales ──────────────────────────────────────────────────────── */
-	function buildScales( maxSpend ) {
+	function buildScales() {
 		var t      = ( window.PT && PT.chartTheme ) || {};
 		var accent = t.accent || '#00a0d2';
 		var hex    = accent.replace( '#', '' );
 		var ar = parseInt( hex.slice( 0, 2 ), 16 );
 		var ag = parseInt( hex.slice( 2, 4 ), 16 );
 		var ab = parseInt( hex.slice( 4, 6 ), 16 );
-		choroplethScale = d3.scaleSequential()
-			.domain( [ 0, maxSpend || 1 ] )
+
+		/* Ridings and countries each have their own linear scale so relative
+		   differences are visible within each group. */
+		var rSpends = Object.values( ridingData ).map( function ( d ) { return d.spend || 0; } );
+		var cSpends = Object.values( countryData ).map( function ( d ) { return d.spend || 0; } );
+		var maxR = d3.max( rSpends ) || 1;
+		var maxC = d3.max( cSpends ) || 1;
+
+		ridingScale = d3.scaleSequential()
+			.domain( [ 0, maxR ] )
 			.interpolator( function ( v ) {
 				return 'rgba(' + ar + ',' + ag + ',' + ab + ',' + ( 0.08 + v * 0.84 ).toFixed( 3 ) + ')';
 			} );
-		heatmapScale = d3.scaleSequential( d3.interpolateInferno ).domain( [ 0, maxSpend || 1 ] );
+
+		/* Countries: slightly warmer hue — amber/gold — to visually separate
+		   them from ridings when both are on screen. */
+		countryScale = d3.scaleSequential()
+			.domain( [ 0, maxC ] )
+			.interpolator( d3.interpolateOranges );
+
+		ridingHeatScale  = d3.scaleSequential( d3.interpolateInferno ).domain( [ 0, maxR ] );
+		countryHeatScale = d3.scaleSequential( d3.interpolateInferno ).domain( [ 0, maxC ] );
+	}
+
+	function countryFill( f ) {
+		var row = countryData[ String( f.id ) ];
+		if ( ! row ) return 'var(--bg3, #252932)';
+		return mode === 'heatmap' ? countryHeatScale( row.spend ) : countryScale( row.spend );
 	}
 
 	function ridingFill( f ) {
 		var row = ridingData[ String( f.properties.FED_NUM ) ];
 		if ( ! row ) return 'rgba(120,130,150,0.12)';
-		return mode === 'heatmap' ? heatmapScale( row.spend ) : choroplethScale( row.spend );
-	}
-
-	function applyRidingColors() {
-		if ( featureRidings ) gRidings.selectAll( '.pt-riding' ).attr( 'fill', ridingFill );
+		return mode === 'heatmap' ? ridingHeatScale( row.spend ) : ridingScale( row.spend );
 	}
 
 	/* ── Draw world countries ──────────────────────────────────────────────── */
@@ -151,9 +144,17 @@
 		gCountries.selectAll( '.pt-country' ).data( fc.features ).enter().append( 'path' )
 			.attr( 'class', 'pt-country' )
 			.attr( 'd', geoPath )
+			.attr( 'fill', countryFill )
 			.on( 'mouseenter', function () { d3.select( this ).classed( 'hovered', true ); } )
 			.on( 'mousemove',  function ( ev, f ) {
-				showTip( '<div class="pt-tip-title">' + esc( ISO[ f.id ] || 'Region #' + f.id ) + '</div>', ev );
+				var row  = countryData[ String( f.id ) ];
+				var name = ( row && row.name ) ? row.name : ( 'Region #' + f.id );
+				var html = '<div class="pt-tip-title">' + esc( name ) + '</div>';
+				if ( row ) {
+					html += '<div class="pt-tip-row"><span>CA Federal Funding</span><b>' + fmtMoney( row.spend ) + '</b></div>';
+					html += '<div class="pt-tip-row"><span>Agreements</span><b>' + row.count.toLocaleString() + '</b></div>';
+				}
+				showTip( html, ev );
 			} )
 			.on( 'mouseleave', function () {
 				hideTip(); d3.select( this ).classed( 'hovered', false );
@@ -169,9 +170,9 @@
 			.attr( 'fill', ridingFill )
 			.on( 'mouseenter', function () { d3.select( this ).classed( 'hovered', true ).raise(); } )
 			.on( 'mousemove',  function ( ev, f ) {
-				var num   = String( f.properties.FED_NUM );
-				var name  = f.properties.ED_NAMEE || num;
-				var row   = ridingData[ num ] || {};
+				var num  = String( f.properties.FED_NUM );
+				var row  = ridingData[ num ] || {};
+				var name = f.properties.ED_NAMEE || num;
 				showTip(
 					'<div class="pt-tip-title">' + esc( name ) + '</div>' +
 					( row.province ? '<div class="pt-tip-sub">' + esc( row.province ) + '</div>' : '' ) +
@@ -185,13 +186,18 @@
 			} );
 	}
 
-	/* ── Heatmap contour layer ─────────────────────────────────────────────── */
+	function applyColors() {
+		if ( featureRidings ) gRidings.selectAll( '.pt-riding' ).attr( 'fill', ridingFill );
+		gCountries.selectAll( '.pt-country' ).attr( 'fill', countryFill );
+	}
+
+	/* ── Heatmap contour layer (Canada-focused) ────────────────────────────── */
 	function buildHeatmap() {
 		if ( heatBuilt ) return;
 		heatBuilt = true;
 		var pts = weightedCentroids.map( function ( d ) {
 			var px = projection( d.lonlat );
-			return px ? { x: px[ 0 ], y: px[ 1 ], w: d.weight } : null;
+			return px ? { x: px[0], y: px[1], w: d.weight } : null;
 		} ).filter( Boolean );
 		if ( ! pts.length ) return;
 		var maxW    = d3.max( pts, function ( d ) { return d.w; } ) || 1;
@@ -199,11 +205,11 @@
 			.x( function ( d ) { return d.x; } ).y( function ( d ) { return d.y; } )
 			.weight( function ( d ) { return d.w / maxW; } )
 			.size( [ W(), H() ] ).bandwidth( 22 ).thresholds( 14 )( pts );
-		var maxD     = d3.max( density, function ( d ) { return d.value; } ) || 1;
-		var heatColor = d3.scaleSequential( d3.interpolateYlOrRd ).domain( [ 0, maxD ] );
+		var maxD = d3.max( density, function ( d ) { return d.value; } ) || 1;
+		var hCol = d3.scaleSequential( d3.interpolateYlOrRd ).domain( [ 0, maxD ] );
 		gHeat.selectAll( 'path' ).data( density ).enter().append( 'path' )
 			.attr( 'd', d3.geoPath() )
-			.attr( 'fill', function ( d ) { return heatColor( d.value ); } )
+			.attr( 'fill', function ( d ) { return hCol( d.value ); } )
 			.attr( 'opacity', 0.7 );
 	}
 
@@ -212,8 +218,8 @@
 		mode = m;
 		var bc = document.getElementById( 'ptMapBtnChoropleth' );
 		var bh = document.getElementById( 'ptMapBtnHeatmap' );
-		if ( bc ) { bc.classList.toggle( 'active', m === 'choropleth' ); bc.setAttribute( 'aria-pressed', m === 'choropleth' ); }
-		if ( bh ) { bh.classList.toggle( 'active', m === 'heatmap' );    bh.setAttribute( 'aria-pressed', m === 'heatmap'    ); }
+		if ( bc ) { bc.classList.toggle( 'active', m === 'choropleth' ); bc.setAttribute( 'aria-pressed', String( m === 'choropleth' ) ); }
+		if ( bh ) { bh.classList.toggle( 'active', m === 'heatmap' );    bh.setAttribute( 'aria-pressed', String( m === 'heatmap' ) ); }
 		if ( m === 'heatmap' ) {
 			buildHeatmap();
 			gHeat.style( 'display', null );
@@ -222,7 +228,7 @@
 			gHeat.style( 'display', 'none' );
 			gRidings.attr( 'opacity', null );
 		}
-		applyRidingColors();
+		applyColors();
 		renderLegend();
 	}
 
@@ -231,9 +237,18 @@
 		var el = document.getElementById( 'ptMapLegend' ); if ( ! el ) return;
 		var t  = ( window.PT && PT.chartTheme ) || {};
 		var ac = t.accent || '#00a0d2';
-		el.innerHTML = mode === 'choropleth'
-			? '<span>$0</span><span class="pt-map-legend-bar" style="background:linear-gradient(to right,rgba(0,160,210,.08),' + ac + ')"></span><span>Max</span>'
-			: '<span>Low</span><span class="pt-map-legend-bar" style="background:linear-gradient(to right,#000004,#fca50a,#fcffa4)"></span><span>High</span>';
+		if ( mode === 'choropleth' ) {
+			el.innerHTML =
+				'<span>Ridings</span>' +
+				'<span class="pt-map-legend-bar" style="background:linear-gradient(to right,rgba(0,160,210,.08),' + ac + ')"></span>' +
+				'<span style="margin-left:10px">Countries</span>' +
+				'<span class="pt-map-legend-bar" style="background:linear-gradient(to right,#fff5eb,#d94701)"></span>';
+		} else {
+			el.innerHTML =
+				'<span>Low</span>' +
+				'<span class="pt-map-legend-bar" style="background:linear-gradient(to right,#000004,#fca50a,#fcffa4)"></span>' +
+				'<span>High</span>';
+		}
 	}
 
 	/* ── Resize ────────────────────────────────────────────────────────────── */
@@ -249,10 +264,9 @@
 		}
 	}
 
-	/* ── Load data and render ──────────────────────────────────────────────── */
+	/* ── Bootstrap ─────────────────────────────────────────────────────────── */
 	svg.attr( 'width', W() ).attr( 'height', H() );
 
-	/* Try the static JSON file first; fall back to the REST endpoint. */
 	var totalsUrl = TOTALS || ( REST_ROOT + '/map/riding-totals' );
 
 	Promise.all( [
@@ -260,27 +274,35 @@
 		fetch( RIDINGS ).then( function ( r ) { return r.json(); } ),
 		fetch( totalsUrl ).then( function ( r ) { return r.json(); } )
 			.catch( function () {
-				/* Static file miss — fall back to REST */
 				return fetch( REST_ROOT + '/map/riding-totals' ).then( function ( r ) { return r.json(); } );
 			} )
 	] ).then( function ( results ) {
-		var worldTopo  = results[ 0 ];
-		var ridingTopo = results[ 1 ];
-		var totals     = results[ 2 ];
+		var worldTopo  = results[0];
+		var ridingTopo = results[1];
+		var totals     = results[2];
 
-		ridingData = ( totals && typeof totals === 'object' && ! totals.code ) ? totals : {};
+		/* Support both old flat format and new {ridings, countries} format */
+		if ( totals && totals.ridings ) {
+			ridingData  = totals.ridings  || {};
+			countryData = totals.countries || {};
+		} else if ( totals && ! totals.code ) {
+			ridingData  = totals;
+			countryData = {};
+		}
 
-		var spendVals = Object.values( ridingData ).map( function ( d ) { return d.spend || 0; } );
-		buildScales( d3.max( spendVals ) || 1 );
+		buildScales();
 
-		/* Exclude Canada from the world layer — ridings cover it */
+		/* World countries — color by data where available */
 		var countries = topojson.feature( worldTopo, worldTopo.objects.countries );
+		/* Exclude Canada — riding layer covers it */
 		countries.features = countries.features.filter( function ( f ) { return f.id !== 124; } );
 		drawCountries( countries );
 
+		/* Canadian ridings */
 		var ridingsFc = topojson.feature( ridingTopo, ridingTopo.objects.ridings );
 		drawRidings( ridingsFc );
 
+		/* Weighted centroids for heatmap */
 		ridingsFc.features.forEach( function ( f ) {
 			var row = ridingData[ String( f.properties.FED_NUM ) ];
 			if ( row && row.spend ) {
@@ -298,12 +320,12 @@
 		if ( s ) { s.textContent = 'Failed to load map. Please refresh.'; s.style.color = '#ff6b6b'; s.className = ''; }
 	} );
 
-	/* ── Button handlers ───────────────────────────────────────────────────── */
+	/* ── Buttons ───────────────────────────────────────────────────────────── */
 	var bc = document.getElementById( 'ptMapBtnChoropleth' );
 	var bh = document.getElementById( 'ptMapBtnHeatmap' );
 	var br = document.getElementById( 'ptMapBtnReset' );
 	if ( bc ) bc.addEventListener( 'click', function () { setMode( 'choropleth' ); } );
-	if ( bh ) bh.addEventListener( 'click', function () { setMode( 'heatmap' );    } );
+	if ( bh ) bh.addEventListener( 'click', function () { setMode( 'heatmap' ); } );
 	if ( br ) br.addEventListener( 'click', resetView );
 
 	new ResizeObserver( onResize ).observe( wrap );
