@@ -156,6 +156,12 @@ get_header(); ?>
 	<button class="ads-nav-btn" data-ads-tab="stats" role="tab" aria-selected="false">
 		<?php esc_html_e( 'Stats', 'publictech-terminal' ); ?>
 	</button>
+	<?php if ( $pt_is_admin ) : ?>
+	<button class="ads-nav-btn" data-ads-tab="admin" role="tab" aria-selected="false" style="margin-left:auto;color:var(--warn)">
+		⚙ <?php esc_html_e( 'Admin', 'publictech-terminal' ); ?>
+		<span class="ads-nav-badge" id="navBadgePending" style="display:none"></span>
+	</button>
+	<?php endif; ?>
 </nav>
 
 <!-- ─── OVERVIEW tab ──────────────────────────────── -->
@@ -373,6 +379,55 @@ get_header(); ?>
 	</div>
 
 </div><!-- /view-stats -->
+
+<?php if ( $pt_is_admin ) : ?>
+<!-- ─── ADMIN tab ────────────────────────────────── -->
+<div class="ads-view" id="view-admin">
+
+	<!-- Platform KPI strip -->
+	<div class="kpis" style="margin-bottom:14px">
+		<div class="kpi corner">
+			<div class="lab"><?php esc_html_e( 'Total Impressions (30d)', 'publictech-terminal' ); ?></div>
+			<div class="val" id="admKpiImp">—</div>
+		</div>
+		<div class="kpi corner">
+			<div class="lab"><?php esc_html_e( 'Total Clicks (30d)', 'publictech-terminal' ); ?></div>
+			<div class="val" id="admKpiClk">—</div>
+		</div>
+		<div class="kpi corner">
+			<div class="lab"><?php esc_html_e( 'Advertisers', 'publictech-terminal' ); ?></div>
+			<div class="val" id="admKpiAdvertisers">—</div>
+		</div>
+		<div class="kpi corner">
+			<div class="lab"><?php esc_html_e( 'Pending Review', 'publictech-terminal' ); ?></div>
+			<div class="val" id="admKpiPending" style="color:var(--warn)">—</div>
+		</div>
+	</div>
+
+	<!-- Pending approval queue -->
+	<div class="panel corner" style="margin-bottom:14px">
+		<div class="hd">
+			<h3>◇ <?php esc_html_e( 'Pending Approval', 'publictech-terminal' ); ?></h3>
+			<span class="meta"><?php esc_html_e( 'AWAITING REVIEW', 'publictech-terminal' ); ?></span>
+		</div>
+		<div class="bd" id="adsAdminPendingBody">
+			<div class="ads-loading"><?php esc_html_e( 'Loading', 'publictech-terminal' ); ?></div>
+		</div>
+	</div>
+
+	<!-- Advertiser leaderboard -->
+	<div class="panel corner">
+		<div class="hd">
+			<h3>◇ <?php esc_html_e( 'Advertisers', 'publictech-terminal' ); ?></h3>
+			<span class="meta"><?php esc_html_e( 'BY 30-DAY IMPRESSIONS', 'publictech-terminal' ); ?></span>
+		</div>
+		<div class="bd" id="adsAdminAdvertisersBody">
+			<div class="ads-loading"><?php esc_html_e( 'Loading', 'publictech-terminal' ); ?></div>
+		</div>
+	</div>
+
+</div><!-- /view-admin -->
+<?php endif; ?>
 
 <?php endif; // end $pt_can_ads ?>
 

@@ -70,6 +70,40 @@ final class Frontend_REST {
 			'permission_callback' => 'is_user_logged_in',
 			'callback'            => [ $this, 'request_access' ],
 		] );
+
+		// Public self-serve registration (nonce-gated, rate-limited inside handler).
+		register_rest_route( GOVADS_REST_NS, '/register', [
+			'methods'             => \WP_REST_Server::CREATABLE,
+			'permission_callback' => '__return_true',
+			'callback'            => [ $this, 'register_advertiser' ],
+			'args'                => [
+				'email'    => [ 'type' => 'string', 'required' => true, 'sanitize_callback' => 'sanitize_email' ],
+				'name'     => [ 'type' => 'string', 'required' => true, 'sanitize_callback' => 'sanitize_text_field' ],
+				'company'  => [ 'type' => 'string', 'default' => '', 'sanitize_callback' => 'sanitize_text_field' ],
+				'password' => [ 'type' => 'string', 'required' => true ],
+			],
+		] );
+
+		// ── Admin-only portal endpoints ───────────────────────────────────────
+		$admin = static fn() => current_user_can( 'edit_others_posts' );
+
+		register_rest_route( GOVADS_REST_NS, '/admin/overview', [
+			'methods'             => \WP_REST_Server::READABLE,
+			'permission_callback' => $admin,
+			'callback'            => [ $this, 'admin_overview' ],
+		] );
+
+		register_rest_route( GOVADS_REST_NS, '/admin/advertisers', [
+			'methods'             => \WP_REST_Server::READABLE,
+			'permission_callback' => $admin,
+			'callback'            => [ $this, 'admin_advertisers' ],
+		] );
+
+		register_rest_route( GOVADS_REST_NS, '/admin/pending', [
+			'methods'             => \WP_REST_Server::READABLE,
+			'permission_callback' => $admin,
+			'callback'            => [ $this, 'admin_pending_ads' ],
+		] );
 	}
 
 	// ── Permission ────────────────────────────────────────────────────────────
@@ -278,5 +312,219 @@ final class Frontend_REST {
 		);
 
 		return new \WP_REST_Response( [ 'ok' => true ], 200 );
+	}
+
+	// ── Self-serve registration ─────────────────────────────────────────────────
+
+	public function register_advertiser( \WP_REST_Request $req ): \WP_REST_Response {
+		// Rate-limit: max 5 registration attempts per IP per hour.
+		$ip     = (string) ( $_SERVER['REMOTE_ADDR'] ?? '' ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
+		$rl_key = 'govads_reg_' . md5( $ip );
+		$hits   = (int) get_transient( $rl_key );
+		if ( $hits >= 5 ) {
+			return new \WP_REST_Response( [ 'error' => 'rate_limited', 'message' => __( 'Too many attempts. Please try again later.', 'govdata-ad-services' ) ], 429 );
+		}
+		set_transient( $rl_key, $hits + 1, HOUR_IN_SECONDS );
+
+		if ( ! get_option( 'users_can_register' ) && ! (bool) apply_filters( 'govads_allow_self_register', true ) ) {
+			return new \WP_REST_Response( [ 'error' => 'registration_closed' ], 403 );
+		}
+
+		$email    = sanitize_email( (string) $req->get_param( 'email' ) );
+		$name     = sanitize_text_field( (string) $req->get_param( 'name' ) );
+		$company  = sanitize_text_field( (string) $req->get_param( 'company' ) );
+		$password = (string) $req->get_param( 'password' );
+
+		if ( ! is_email( $email ) ) {
+			return new \WP_REST_Response( [ 'error' => 'invalid_email', 'message' => __( 'Please enter a valid email address.', 'govdata-ad-services' ) ], 400 );
+		}
+		if ( strlen( $password ) < 8 ) {
+			return new \WP_REST_Response( [ 'error' => 'weak_password', 'message' => __( 'Password must be at least 8 characters.', 'govdata-ad-services' ) ], 400 );
+		}
+		if ( email_exists( $email ) ) {
+			return new \WP_REST_Response( [ 'error' => 'email_exists', 'message' => __( 'An account with this email already exists. Please sign in instead.', 'govdata-ad-services' ) ], 409 );
+		}
+
+		// Derive a unique username from the email local-part.
+		$base     = sanitize_user( current( explode( '@', $email ) ), true );
+		$username = $base ?: 'advertiser';
+		$i        = 1;
+		while ( username_exists( $username ) ) {
+			$username = $base . $i;
+			$i++;
+		}
+
+		$uid = wp_insert_user( [
+			'user_login'   => $username,
+			'user_email'   => $email,
+			'user_pass'    => $password,
+			'display_name' => $name,
+			'first_name'   => $name,
+			'role'         => 'govdata_advertiser',
+		] );
+
+		if ( is_wp_error( $uid ) ) {
+			return new \WP_REST_Response( [ 'error' => 'create_failed', 'message' => $uid->get_error_message() ], 500 );
+		}
+
+		if ( $company ) {
+			update_user_meta( $uid, 'govads_company', $company );
+		}
+		update_user_meta( $uid, 'govads_registered_at', current_time( 'mysql' ) );
+
+		// Auto-approve self-serve advertisers by default; sites that want manual
+		// review can return false from this filter to downgrade to subscriber.
+		$auto_approve = (bool) apply_filters( 'govads_auto_approve_advertisers', true );
+		if ( ! $auto_approve ) {
+			$user = new \WP_User( $uid );
+			$user->set_role( 'subscriber' );
+			update_user_meta( $uid, 'govads_access_requested', current_time( 'mysql' ) );
+		}
+
+		// Log the user in immediately for a smooth first-run.
+		wp_set_current_user( $uid );
+		wp_set_auth_cookie( $uid, true );
+
+		// Notify admin.
+		wp_mail(
+			(string) get_option( 'admin_email' ),
+			/* translators: %s: advertiser name */
+			sprintf( __( 'New advertiser registered — %s', 'govdata-ad-services' ), $name ),
+			sprintf(
+				/* translators: 1: name 2: email 3: company 4: profile URL */
+				__( "%1\$s (%2\$s)%3\$s registered as an advertiser.\n\nProfile: %4\$s", 'govdata-ad-services' ),
+				$name,
+				$email,
+				$company ? ' from ' . $company : '',
+				admin_url( 'user-edit.php?user_id=' . $uid )
+			)
+		);
+
+		return new \WP_REST_Response( [
+			'ok'           => true,
+			'auto_approved'=> $auto_approve,
+			'redirect'     => esc_url_raw( home_url( '/ad-services/' ) ),
+		], 201 );
+	}
+
+	// ── Admin portal endpoints ──────────────────────────────────────────────────
+
+	public function admin_overview(): \WP_REST_Response {
+		global $wpdb;
+		$stats_table = DB::table( 'daily_stats' );
+		$date_from   = gmdate( 'Y-m-d', strtotime( '-30 days' ) );
+
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL
+		$agg = $wpdb->get_row(
+			$wpdb->prepare(
+				"SELECT SUM(impressions) AS imp, SUM(clicks) AS clk FROM `{$stats_table}` WHERE stat_date >= %s",
+				$date_from
+			),
+			ARRAY_A
+		);
+		// phpcs:enable
+
+		$imp = (int) ( $agg['imp'] ?? 0 );
+		$clk = (int) ( $agg['clk'] ?? 0 );
+
+		$ad_counts   = wp_count_posts( 'govads_ad' );
+		$pending     = is_object( $ad_counts ) ? (int) ( $ad_counts->pending ?? 0 ) : 0;
+		$approved    = is_object( $ad_counts ) ? (int) ( $ad_counts->publish ?? 0 ) : 0;
+
+		$advertisers = count( get_users( [ 'role' => 'govdata_advertiser', 'fields' => 'ID' ] ) );
+		$campaigns   = (int) ( wp_count_posts( 'govads_campaign' )->publish ?? 0 );
+
+		return new \WP_REST_Response( [
+			'impressions'   => $imp,
+			'clicks'        => $clk,
+			'ctr'           => $imp ? round( $clk / $imp * 100, 2 ) : 0,
+			'pending_ads'   => $pending,
+			'active_ads'    => $approved,
+			'advertisers'   => $advertisers,
+			'campaigns'     => $campaigns,
+		], 200 );
+	}
+
+	public function admin_advertisers(): \WP_REST_Response {
+		global $wpdb;
+		$users       = get_users( [ 'role' => 'govdata_advertiser', 'number' => 200 ] );
+		$stats_table = DB::table( 'daily_stats' );
+		$date_from   = gmdate( 'Y-m-d', strtotime( '-30 days' ) );
+
+		$result = [];
+		foreach ( $users as $u ) {
+			$ad_ids = get_posts( [
+				'post_type'      => 'govads_ad',
+				'post_status'    => 'any',
+				'author'         => $u->ID,
+				'posts_per_page' => -1,
+				'fields'         => 'ids',
+				'no_found_rows'  => true,
+			] );
+
+			$imp = 0;
+			$clk = 0;
+			if ( ! empty( $ad_ids ) ) {
+				$placeholders = implode( ',', array_fill( 0, count( $ad_ids ), '%d' ) );
+				// phpcs:disable WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL
+				$agg = $wpdb->get_row(
+					$wpdb->prepare(
+						"SELECT SUM(impressions) AS imp, SUM(clicks) AS clk FROM `{$stats_table}` WHERE ad_id IN ({$placeholders}) AND stat_date >= %s",
+						...array_merge( $ad_ids, [ $date_from ] )
+					),
+					ARRAY_A
+				);
+				// phpcs:enable
+				$imp = (int) ( $agg['imp'] ?? 0 );
+				$clk = (int) ( $agg['clk'] ?? 0 );
+			}
+
+			$result[] = [
+				'id'          => $u->ID,
+				'name'        => $u->display_name,
+				'email'       => $u->user_email,
+				'company'     => (string) get_user_meta( $u->ID, 'govads_company', true ),
+				'ad_count'    => count( $ad_ids ),
+				'impressions' => $imp,
+				'clicks'      => $clk,
+				'registered'  => (string) get_user_meta( $u->ID, 'govads_registered_at', true ),
+			];
+		}
+
+		// Sort by impressions desc.
+		usort( $result, static fn( $a, $b ) => $b['impressions'] <=> $a['impressions'] );
+
+		return new \WP_REST_Response( $result, 200 );
+	}
+
+	public function admin_pending_ads(): \WP_REST_Response {
+		$rows = get_posts( [
+			'post_type'      => 'govads_ad',
+			'post_status'    => [ 'pending', 'draft' ],
+			'posts_per_page' => 100,
+			'no_found_rows'  => true,
+			// phpcs:disable WordPress.DB.SlowDBQuery
+			'meta_query'     => [
+				[ 'key' => 'govads_ad_status', 'value' => 'pending', 'compare' => '=' ],
+			],
+			// phpcs:enable
+		] );
+
+		$result = [];
+		foreach ( $rows as $ad ) {
+			$author = get_user_by( 'id', (int) $ad->post_author );
+			$result[] = [
+				'id'          => $ad->ID,
+				'title'       => $ad->post_title,
+				'size'        => (string) get_post_meta( $ad->ID, 'govads_ad_size', true ),
+				'type'        => (string) get_post_meta( $ad->ID, 'govads_ad_type', true ),
+				'image_url'   => (string) get_post_meta( $ad->ID, 'govads_ad_image_url', true ),
+				'target_url'  => (string) get_post_meta( $ad->ID, 'govads_ad_target_url', true ),
+				'advertiser'  => $author ? $author->display_name : '—',
+				'created'     => $ad->post_date,
+			];
+		}
+
+		return new \WP_REST_Response( $result, 200 );
 	}
 }
