@@ -163,8 +163,9 @@
 	function countryFill( f ) {
 		var row = countryData[ normId( f.id ) ];
 		if ( ! row || ! row.spend ) return '#1d2029';
-		return mode === 'heatmap' ? ( countryHeatScale ? countryHeatScale( row.spend ) : '#1d2029' )
-		                           : ( countryScale    ? countryScale( row.spend )     : '#1d2029' );
+		return mode === 'heatmap'
+			? ( countryHeatScale ? countryHeatScale( row.spend ) : '#1d2029' )
+			: ( countryScale ? countryScale( row.spend ) : '#1d2029' );
 	}
 	function ridingFill( f ) {
 		var row = ridingData[ String( f.properties.FED_NUM ) ];
