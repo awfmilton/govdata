@@ -40,6 +40,7 @@
 	var campaigns = [];
 	var stats     = [];
 	var statsLoaded = false;
+	var adminLoaded = false;
 
 	// ── API helper ────────────────────────────────────────────────────────────
 	function apiFetch( method, path, body ) {
@@ -90,6 +91,9 @@
 		} );
 		if ( name === 'stats' && ! statsLoaded ) {
 			loadStats();
+		}
+		if ( name === 'admin' && P.isAdmin && ! adminLoaded ) {
+			loadAdmin();
 		}
 	}
 
@@ -548,6 +552,126 @@
 		return '<svg width="' + w + '" height="' + h + '" aria-hidden="true">'
 			+ '<polyline points="' + pts + '" fill="none" stroke="var(--accent)" stroke-width="1.5" stroke-linejoin="round"/>'
 			+ '</svg>';
+	}
+
+	// ── Admin tab ─────────────────────────────────────────────────────────────
+	function loadAdmin() {
+		adminLoaded = true;
+		Promise.all( [
+			apiFetch( 'GET', '/admin/overview' ),
+			apiFetch( 'GET', '/admin/pending' ),
+			apiFetch( 'GET', '/admin/advertisers' ),
+		] ).then( function ( results ) {
+			renderAdminOverview( results[0] || {} );
+			renderAdminPending( Array.isArray( results[1] ) ? results[1] : [] );
+			renderAdminAdvertisers( Array.isArray( results[2] ) ? results[2] : [] );
+		} ).catch( function ( err ) {
+			console.error( 'GovAds admin load error', err );
+		} );
+	}
+
+	function renderAdminOverview( o ) {
+		setText( 'admKpiImp',         fmtNum( parseInt( o.impressions, 10 ) || 0 ) );
+		setText( 'admKpiClk',         fmtNum( parseInt( o.clicks, 10 )      || 0 ) );
+		setText( 'admKpiAdvertisers', String( o.advertisers || 0 ) );
+		setText( 'admKpiPending',     String( o.pending_ads || 0 ) );
+
+		var badge = document.getElementById( 'navBadgePending' );
+		if ( badge ) {
+			badge.textContent   = String( o.pending_ads || 0 );
+			badge.style.display = o.pending_ads ? '' : 'none';
+		}
+	}
+
+	function renderAdminPending( pending ) {
+		var body = document.getElementById( 'adsAdminPendingBody' );
+		if ( ! body ) { return; }
+
+		if ( pending.length === 0 ) {
+			body.innerHTML = '<div class="ads-empty">No ads awaiting review. ✓</div>';
+			return;
+		}
+
+		var rows = pending.map( function ( ad ) {
+			var thumb = ad.image_url
+				? '<img class="ads-thumb" src="' + escHtml( ad.image_url ) + '" alt="" loading="lazy">'
+				: '<div class="ads-thumb-ph">' + escHtml( ad.type ) + '</div>';
+			return '<tr id="pending-row-' + ad.id + '">'
+				+ '<td>' + thumb + '</td>'
+				+ '<td><strong>' + escHtml( ad.title ) + '</strong><div class="sub mono">' + escHtml( ad.size ) + '</div></td>'
+				+ '<td>' + escHtml( ad.advertiser ) + '</td>'
+				+ '<td><a href="' + escHtml( ad.target_url ) + '" target="_blank" rel="noopener" class="mono" style="color:var(--accent);font-size:10px">link ↗</a></td>'
+				+ '<td><div style="display:flex;gap:6px">'
+				+ '<button class="ads-btn" data-adm="approve" data-id="' + ad.id + '">Approve</button>'
+				+ '<button class="ads-btn danger" data-adm="reject" data-id="' + ad.id + '">Reject</button>'
+				+ '</div></td>'
+				+ '</tr>';
+		} ).join( '' );
+
+		body.innerHTML = '<table class="ads-table">'
+			+ '<thead><tr><th>Preview</th><th>Ad</th><th>Advertiser</th><th>URL</th><th>Actions</th></tr></thead>'
+			+ '<tbody>' + rows + '</tbody>'
+			+ '</table>';
+
+		body.querySelectorAll( '[data-adm]' ).forEach( function ( btn ) {
+			btn.addEventListener( 'click', function () {
+				handleAdminAction( btn.dataset.adm, parseInt( btn.dataset.id, 10 ), btn );
+			} );
+		} );
+	}
+
+	function handleAdminAction( action, adId, btn ) {
+		if ( action === 'reject' && ! window.confirm( 'Reject this ad?' ) ) { return; }
+		btn.disabled = true;
+		btn.textContent = '…';
+
+		var path = action === 'approve' ? '/admin/approve' : '/admin/reject';
+		apiFetch( 'POST', path, { ad_id: adId } ).then( function ( res ) {
+			if ( res && res.ok ) {
+				var row = document.getElementById( 'pending-row-' + adId );
+				if ( row ) { row.parentNode.removeChild( row ); }
+				// Refresh overview counts.
+				apiFetch( 'GET', '/admin/overview' ).then( renderAdminOverview );
+				// If the pending body is now empty, show empty state.
+				var tbody = document.querySelector( '#adsAdminPendingBody tbody' );
+				if ( tbody && tbody.children.length === 0 ) {
+					document.getElementById( 'adsAdminPendingBody' ).innerHTML = '<div class="ads-empty">No ads awaiting review. ✓</div>';
+				}
+			} else {
+				btn.disabled = false;
+				btn.textContent = action === 'approve' ? 'Approve' : 'Reject';
+			}
+		} ).catch( function () {
+			btn.disabled = false;
+			btn.textContent = action === 'approve' ? 'Approve' : 'Reject';
+		} );
+	}
+
+	function renderAdminAdvertisers( list ) {
+		var body = document.getElementById( 'adsAdminAdvertisersBody' );
+		if ( ! body ) { return; }
+
+		if ( list.length === 0 ) {
+			body.innerHTML = '<div class="ads-empty">No advertisers registered yet.</div>';
+			return;
+		}
+
+		var rows = list.map( function ( a ) {
+			var ctr = a.impressions ? ( a.clicks / a.impressions * 100 ).toFixed( 2 ) + '%' : '—';
+			var company = a.company ? '<div class="sub">' + escHtml( a.company ) + '</div>' : '';
+			return '<tr>'
+				+ '<td><strong>' + escHtml( a.name ) + '</strong>' + company + '<div class="sub mono">' + escHtml( a.email ) + '</div></td>'
+				+ '<td>' + String( a.ad_count ) + '</td>'
+				+ '<td>' + fmtNum( a.impressions ) + '</td>'
+				+ '<td>' + fmtNum( a.clicks ) + '</td>'
+				+ '<td>' + ctr + '</td>'
+				+ '</tr>';
+		} ).join( '' );
+
+		body.innerHTML = '<table class="ads-table">'
+			+ '<thead><tr><th>Advertiser</th><th>Ads</th><th>Impressions</th><th>Clicks</th><th>CTR</th></tr></thead>'
+			+ '<tbody>' + rows + '</tbody>'
+			+ '</table>';
 	}
 
 	// ── DOM helpers ───────────────────────────────────────────────────────────
