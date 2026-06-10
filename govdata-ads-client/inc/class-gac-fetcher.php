@@ -2,9 +2,13 @@
 /**
  * Fetches ad payloads from the GovData Ad Services hub REST API.
  *
+ * All hub calls happen server-side so the API key never leaves this server.
  * Results are cached in a 60-second transient per zone so high-traffic sites
  * don't hammer the hub on every page load. On error, a 30-second negative-cache
  * transient prevents retry storms.
+ *
+ * Payloads are sanitised on ingest (defence in depth — even a compromised or
+ * misconfigured hub cannot inject markup into this site).
  *
  * @package GovAdsClient
  */
@@ -53,8 +57,9 @@ final class Fetcher {
 			return null;
 		}
 
-		$ad = json_decode( wp_remote_retrieve_body( $response ), true );
-		if ( ! is_array( $ad ) || empty( $ad['ad_id'] ) ) {
+		$raw = json_decode( wp_remote_retrieve_body( $response ), true );
+		$ad  = is_array( $raw ) ? $this->sanitize_payload( $raw ) : null;
+		if ( ! $ad ) {
 			set_transient( $cache_key, false, 30 );
 			return null;
 		}
@@ -67,7 +72,33 @@ final class Fetcher {
 		return (string) get_option( 'gac_hub_url', '' );
 	}
 
-	public function api_key(): string {
-		return (string) get_option( 'gac_api_key', '' );
+	/**
+	 * Whitelist and sanitise every field of the hub response before it is
+	 * cached or rendered. Returns null when the payload is unusable.
+	 *
+	 * @param array<string,mixed> $raw Decoded hub response.
+	 * @return array<string,mixed>|null
+	 */
+	private function sanitize_payload( array $raw ): array|null {
+		$ad_id = (int) ( $raw['ad_id'] ?? 0 );
+		if ( $ad_id <= 0 ) {
+			return null;
+		}
+
+		$type = in_array( $raw['type'] ?? '', [ 'image', 'html5' ], true ) ? $raw['type'] : 'image';
+
+		return [
+			'ad_id'            => $ad_id,
+			'zone_id'          => (int) ( $raw['zone_id'] ?? 0 ),
+			'campaign_id'      => (int) ( $raw['campaign_id'] ?? 0 ),
+			'size'             => sanitize_text_field( (string) ( $raw['size'] ?? '300x250' ) ),
+			'width'            => min( 2000, max( 1, (int) ( $raw['width']  ?? 300 ) ) ),
+			'height'           => min( 2000, max( 1, (int) ( $raw['height'] ?? 250 ) ) ),
+			'type'             => $type,
+			'image_url'        => esc_url_raw( (string) ( $raw['image_url'] ?? '' ) ),
+			'html'             => 'html5' === $type ? wp_kses_post( (string) ( $raw['html'] ?? '' ) ) : null,
+			'target_url'       => esc_url_raw( (string) ( $raw['target_url'] ?? '' ) ),
+			'impression_token' => sanitize_text_field( (string) ( $raw['impression_token'] ?? '' ) ),
+		];
 	}
 }

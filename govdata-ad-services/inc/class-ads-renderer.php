@@ -71,7 +71,7 @@ final class Renderer {
 			return null;
 		}
 
-		$pool = $this->get_ad_pool( $zone['id'] );
+		$pool = $this->get_ad_pool( $zone['id'], $zone['sizes'] );
 		if ( empty( $pool ) ) {
 			return null;
 		}
@@ -101,45 +101,69 @@ final class Renderer {
 				? wp_kses_post( (string) ( $meta['govads_ad_html'][0] ?? '' ) )
 				: null,
 			'target_url'       => esc_url( (string) ( $meta['govads_ad_target_url'][0] ?? '' ) ),
-			'impression_token' => $this->generate_token( $ad_id, $zone['id'] ),
+			'impression_token' => $this->generate_token( $ad_id, $zone['id'], $site_key ),
 		];
 	}
 
 	/**
 	 * Generate a time-limited HMAC impression token.
-	 * Payload: base64(ad_id:zone_id:timestamp:hmac).
+	 * Payload: base64(ad_id:zone_id:timestamp:site_key:hmac).
+	 *
+	 * The site key hash is baked into the token so /track can attribute the
+	 * event cryptographically — partner pages never see the raw API key.
 	 */
-	public function generate_token( int $ad_id, int $zone_id ): string {
+	public function generate_token( int $ad_id, int $zone_id, string $site_key = '' ): string {
 		$ts      = time();
-		$payload = "$ad_id:$zone_id:$ts";
+		$payload = "$ad_id:$zone_id:$ts:$site_key";
 		$sig     = hash_hmac( 'sha256', $payload, GOVADS_HMAC_KEY );
 		// phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode
 		return base64_encode( "$payload:$sig" );
 	}
 
 	/**
-	 * Verify an impression token. Allows a 2-minute window so slow connections
-	 * don't lose tracking.
+	 * Verify an impression token and return the site key hash it was issued
+	 * for ('' = our own site), or false when the token is invalid/expired.
+	 *
+	 * The validity window is filterable: partner sites embed the token at
+	 * page-render time, so it must survive lazy slots scrolled into view
+	 * long after load. Replay is bounded by session dedup + IP rate limits.
 	 */
-	public function verify_token( string $token, int $ad_id, int $zone_id ): bool {
+	public function verify_token( string $token, int $ad_id, int $zone_id ): string|false {
 		// phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_decode
 		$decoded = base64_decode( $token, true );
 		if ( false === $decoded ) {
 			return false;
 		}
-		$parts = explode( ':', $decoded, 4 );
-		if ( 4 !== count( $parts ) ) {
+		$parts = explode( ':', $decoded, 5 );
+		if ( 5 !== count( $parts ) ) {
 			return false;
 		}
-		[ $t_ad, $t_zone, $ts, $sig ] = $parts;
+		[ $t_ad, $t_zone, $ts, $site_key, $sig ] = $parts;
 		if ( (int) $t_ad !== $ad_id || (int) $t_zone !== $zone_id ) {
 			return false;
 		}
-		if ( abs( time() - (int) $ts ) > 120 ) {
+		$ttl = (int) apply_filters( 'govads_token_ttl', HOUR_IN_SECONDS );
+		if ( abs( time() - (int) $ts ) > $ttl ) {
 			return false;
 		}
-		$expected = hash_hmac( 'sha256', "$t_ad:$t_zone:$ts", GOVADS_HMAC_KEY );
-		return hash_equals( $expected, $sig );
+		$expected = hash_hmac( 'sha256', "$t_ad:$t_zone:$ts:$site_key", GOVADS_HMAC_KEY );
+		return hash_equals( $expected, $sig ) ? $site_key : false;
+	}
+
+	/** Delete the ad-pool transients for all published zones (status changes). */
+	public function flush_pools(): void {
+		$zone_ids = get_posts(
+			[
+				'post_type'      => 'govads_zone',
+				'post_status'    => 'publish',
+				'posts_per_page' => 100,
+				'fields'         => 'ids',
+				'no_found_rows'  => true,
+			]
+		);
+		foreach ( $zone_ids as $zid ) {
+			delete_transient( 'govads_pool_' . $zid );
+		}
 	}
 
 	// ── Private helpers ───────────────────────────────────────────────────────
@@ -186,12 +210,15 @@ final class Renderer {
 
 	/**
 	 * Build a weighted pool of ad IDs for a zone.
+	 * Only ads whose IAB size is allowed by the zone are eligible, so a
+	 * leaderboard creative can never be squeezed into a sidebar slot.
 	 * Each ad appears in the array once per unit of weight.
 	 * Cached 60 seconds so active ad sets rotate quickly but DB isn't hit every request.
 	 *
+	 * @param string[] $sizes Allowed IAB sizes for the zone, e.g. ['300x250'].
 	 * @return int[]
 	 */
-	private function get_ad_pool( int $zone_id ): array {
+	private function get_ad_pool( int $zone_id, array $sizes ): array {
 		$cache_key = 'govads_pool_' . $zone_id;
 		$cached    = get_transient( $cache_key );
 		if ( false !== $cached ) {
@@ -213,6 +240,11 @@ final class Renderer {
 						'key'     => 'govads_ad_status',
 						'value'   => 'approved',
 						'compare' => '=',
+					],
+					[
+						'key'     => 'govads_ad_size',
+						'value'   => array_values( array_filter( array_map( 'strval', $sizes ) ) ) ?: [ '300x250' ],
+						'compare' => 'IN',
 					],
 					[
 						'relation' => 'OR',

@@ -121,21 +121,29 @@ final class Admin {
 			'post_title'   => $title,
 			'post_type'    => 'govads_campaign',
 			'post_status'  => 'publish',
-			'post_author'  => get_current_user_id(),
 		];
 
 		if ( $campaign_id && 'govads_campaign' === get_post_type( $campaign_id ) ) {
+			// Ownership check — an advertiser must not be able to overwrite
+			// someone else's campaign by posting an arbitrary ID.
+			$owner = (int) get_post_field( 'post_author', $campaign_id );
+			if ( $owner !== get_current_user_id() && ! current_user_can( 'edit_others_posts' ) ) {
+				wp_die( esc_html__( 'Not allowed.', 'govdata-ad-services' ) );
+			}
 			$data['ID'] = $campaign_id;
 			wp_update_post( $data );
 		} else {
-			$campaign_id = wp_insert_post( $data );
+			$data['post_author'] = get_current_user_id();
+			$campaign_id         = wp_insert_post( $data );
+			if ( $campaign_id && ! is_wp_error( $campaign_id ) ) {
+				update_post_meta( $campaign_id, 'govads_campaign_advertiser_id', get_current_user_id() );
+			}
 		}
 
 		if ( $campaign_id && ! is_wp_error( $campaign_id ) ) {
 			update_post_meta( $campaign_id, 'govads_campaign_start_date', $start );
 			update_post_meta( $campaign_id, 'govads_campaign_end_date', $end );
 			update_post_meta( $campaign_id, 'govads_campaign_status', 'active' );
-			update_post_meta( $campaign_id, 'govads_campaign_advertiser_id', get_current_user_id() );
 		}
 
 		wp_redirect( admin_url( 'admin.php?page=govads-campaigns&saved=1' ) );
@@ -175,15 +183,21 @@ final class Admin {
 			'post_title'  => $title,
 			'post_type'   => 'govads_ad',
 			'post_status' => 'pending',
-			'post_author' => get_current_user_id(),
 		];
 
-		if ( $ad_id && 'govads_ad' === get_post_type( $ad_id )
-			&& (int) get_post_field( 'post_author', $ad_id ) === get_current_user_id() ) {
+		$is_edit = $ad_id && 'govads_ad' === get_post_type( $ad_id )
+			&& ( (int) get_post_field( 'post_author', $ad_id ) === get_current_user_id()
+				|| current_user_can( 'edit_others_posts' ) );
+
+		if ( $is_edit ) {
 			$data['ID'] = $ad_id;
 			wp_update_post( $data );
 		} else {
-			$ad_id = wp_insert_post( $data );
+			$data['post_author'] = get_current_user_id();
+			$ad_id               = wp_insert_post( $data );
+			if ( $ad_id && ! is_wp_error( $ad_id ) ) {
+				update_post_meta( $ad_id, 'govads_advertiser_id', get_current_user_id() );
+			}
 		}
 
 		if ( $ad_id && ! is_wp_error( $ad_id ) ) {
@@ -196,8 +210,13 @@ final class Admin {
 			update_post_meta( $ad_id, 'govads_ad_start_date',  $start_date );
 			update_post_meta( $ad_id, 'govads_ad_end_date',    $end_date );
 			update_post_meta( $ad_id, 'govads_ad_status',      'pending' );
-			update_post_meta( $ad_id, 'govads_advertiser_id',  get_current_user_id() );
-			update_post_meta( $ad_id, 'govads_ad_weight',      10 );
+			if ( ! get_post_meta( $ad_id, 'govads_ad_weight', true ) ) {
+				update_post_meta( $ad_id, 'govads_ad_weight', 10 );
+			}
+			// An edited ad goes back to pending — make sure it stops serving now.
+			if ( $is_edit ) {
+				Renderer::instance()->flush_pools();
+			}
 		}
 
 		wp_redirect( admin_url( 'admin.php?page=govads-submit&saved=1' ) );
