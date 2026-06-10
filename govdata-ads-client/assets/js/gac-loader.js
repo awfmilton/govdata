@@ -1,9 +1,12 @@
 /**
  * GovData Ads Client — slot loader for partner sites.
  *
- * Mirrors the hub's govads-loader.js but reads hub URL and API key from the
- * slot's data-hub and data-key attributes (server-rendered by PHP).
- * This lets a single script work for any zone without localisation.
+ * The ad payload is server-rendered into each slot's data-ad attribute, so
+ * this script makes NO cross-origin calls to fetch ads and never handles
+ * credentials. Tracking events go to the hub's public /track endpoint as
+ * query-string beacons: a plain POST with no custom headers or body, which
+ * browsers treat as a "simple request" — no CORS preflight, and the HMAC
+ * token inside the payload provides authenticity + site attribution.
  */
 (function () {
 	'use strict';
@@ -27,37 +30,39 @@
 		if ( slot.dataset.filled ) { return; }
 		slot.dataset.filled = '1';
 
-		var zone   = slot.dataset.zone;
 		var hubUrl = slot.dataset.hub;
-		var apiKey = slot.dataset.key;
+		var ad     = null;
+		try {
+			ad = JSON.parse( slot.dataset.ad || 'null' );
+		} catch ( e ) {
+			ad = null;
+		}
 
-		if ( ! zone || ! hubUrl || ! apiKey ) { return; }
+		if ( ! ad || ! ad.ad_id || ! hubUrl ) {
+			slot.style.display = 'none';
+			return;
+		}
 
-		var serveUrl = hubUrl.replace( /\/+$/, '' ) + '/wp-json/govads/v1/serve?zone=' + encodeURIComponent( zone );
+		var html = buildAdHtml( ad );
+		if ( ! html ) {
+			slot.style.display = 'none';
+			return;
+		}
+		slot.innerHTML      = html;
+		slot.dataset.adId   = ad.ad_id;
+		slot.dataset.zoneId = ad.zone_id;
 
-		fetch( serveUrl, {
-			headers: { 'X-GovAds-Site-Key': apiKey }
-		} )
-		.then( function ( r ) { return r.status === 200 ? r.json() : null; } )
-		.then( function ( ad ) {
-			if ( ! ad ) { slot.style.display = 'none'; return; }
-			slot.innerHTML = buildAdHtml( ad );
-			slot.dataset.adId   = ad.ad_id;
-			slot.dataset.zoneId = ad.zone_id;
-
-			var link = slot.querySelector( '.gac-link' );
-			if ( link ) {
-				link.addEventListener( 'click', function ( e ) {
-					e.preventDefault();
-					sendBeaconTrack( 'click', ad, hubUrl, apiKey );
-					setTimeout( function () {
-						window.open( ad.target_url, '_blank', 'noopener,noreferrer' );
-					}, 60 );
-				} );
-			}
-			observeImpression( slot, ad, hubUrl, apiKey );
-		} )
-		.catch( function () { slot.style.display = 'none'; } );
+		var link = slot.querySelector( '.gac-link' );
+		if ( link ) {
+			link.addEventListener( 'click', function ( e ) {
+				e.preventDefault();
+				sendBeaconTrack( 'click', ad, hubUrl );
+				setTimeout( function () {
+					window.open( ad.target_url, '_blank', 'noopener,noreferrer' );
+				}, 60 );
+			} );
+		}
+		observeImpression( slot, ad, hubUrl );
 	}
 
 	function buildAdHtml( ad ) {
@@ -75,9 +80,9 @@
 
 	// ── Impression tracking ───────────────────────────────────────────────────
 
-	function observeImpression( slot, ad, hubUrl, apiKey ) {
+	function observeImpression( slot, ad, hubUrl ) {
 		if ( ! window.IntersectionObserver ) {
-			sendBeaconTrack( 'impression', ad, hubUrl, apiKey );
+			sendBeaconTrack( 'impression', ad, hubUrl );
 			return;
 		}
 		var timer = null;
@@ -86,7 +91,7 @@
 				if ( entry.intersectionRatio >= 0.5 ) {
 					if ( ! timer ) {
 						timer = setTimeout( function () {
-							sendBeaconTrack( 'impression', ad, hubUrl, apiKey );
+							sendBeaconTrack( 'impression', ad, hubUrl );
 							io.disconnect();
 						}, 1000 );
 					}
@@ -98,25 +103,24 @@
 		io.observe( slot );
 	}
 
-	function sendBeaconTrack( type, ad, hubUrl, apiKey ) {
-		var url  = hubUrl.replace( /\/+$/, '' ) + '/wp-json/govads/v1/track';
-		var body = JSON.stringify( {
-			type:       type,
-			ad_id:      ad.ad_id,
-			zone_id:    ad.zone_id,
-			token:      ad.impression_token,
-			session_id: SESSION_ID,
-			page_url:   window.location.href,
-			referrer:   document.referrer
-		} );
-		var headers = {
-			'Content-Type':        'application/json',
-			'X-GovAds-Site-Key':   apiKey
-		};
+	function sendBeaconTrack( type, ad, hubUrl ) {
+		var params = [
+			'type='       + encodeURIComponent( type ),
+			'ad_id='      + encodeURIComponent( ad.ad_id ),
+			'zone_id='    + encodeURIComponent( ad.zone_id || 0 ),
+			'token='      + encodeURIComponent( ad.impression_token || '' ),
+			'session_id=' + encodeURIComponent( SESSION_ID ),
+			'page_url='   + encodeURIComponent( window.location.href ),
+			'referrer='   + encodeURIComponent( document.referrer )
+		];
+		if ( type === 'click' && ad.target_url ) {
+			params.push( 'target_url=' + encodeURIComponent( ad.target_url ) );
+		}
+		var url = hubUrl.replace( /\/+$/, '' ) + '/wp-json/govads/v1/track?' + params.join( '&' );
 		if ( navigator.sendBeacon ) {
-			navigator.sendBeacon( url, new Blob( [ body ], { type: 'application/json' } ) );
+			navigator.sendBeacon( url );
 		} else {
-			fetch( url, { method: 'POST', body: body, keepalive: true, headers: headers } );
+			fetch( url, { method: 'POST', keepalive: true, mode: 'no-cors' } );
 		}
 	}
 
