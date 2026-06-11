@@ -42,6 +42,8 @@ require_once PUBLICTECH_CORE_DIR . 'inc/class-dashboard-stats.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-analytics.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-captcha.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-captcha-admin.php';
+require_once PUBLICTECH_CORE_DIR . 'inc/class-apiflash.php';
+require_once PUBLICTECH_CORE_DIR . 'inc/class-apiflash-admin.php';
 
 add_action( 'after_setup_theme', static function () {
 	load_theme_textdomain( 'publictech-core', PUBLICTECH_CORE_DIR . 'languages' );
@@ -86,6 +88,7 @@ add_action( 'after_setup_theme', static function () {
 	\PublicTech\Core\Riding_Cache::instance();
 	\PublicTech\Core\Analytics::instance();
 	\PublicTech\Core\Captcha_Admin::instance();
+	\PublicTech\Core\ApiFlash_Admin::instance();
 }, 5 );
 
 add_action( 'init', [ \PublicTech\Core\MP_Finance_Warmer::class, 'schedule' ] );
