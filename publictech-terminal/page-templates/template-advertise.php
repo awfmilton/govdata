@@ -80,12 +80,15 @@ $pt_plans = (array) apply_filters( 'govads_rate_card', [
 ] );
 
 $pt_zones = [
-	[ 'MP Profile Sidebar',    '300×250', __( 'Beside every Member of Parliament profile.', 'publictech-terminal' ) ],
-	[ 'Riding Report Sidebar', '300×250', __( 'On every federal riding spending report.', 'publictech-terminal' ) ],
-	[ 'Entity Report Sidebar', '300×250', __( 'On every organisation funding page.', 'publictech-terminal' ) ],
-	[ 'Dashboard Leaderboard', '970×90',  __( 'Top of the homepage, below the hero.', 'publictech-terminal' ) ],
-	[ 'Directory Banner',      '728×90',  __( 'Across the MP directory search results.', 'publictech-terminal' ) ],
-	[ 'Global Footer',         '728×90',  __( 'On the footer of every page, site-wide.', 'publictech-terminal' ) ],
+	[ 'MP Profile Sidebar',      '300×250', __( 'Beside every Member of Parliament profile.', 'publictech-terminal' ) ],
+	[ 'MP Profile Mid-Content',  '728×90',  __( 'Inside the MP profile, between data panels.', 'publictech-terminal' ) ],
+	[ 'Riding Report Sidebar',   '300×250', __( 'On every federal riding spending report.', 'publictech-terminal' ) ],
+	[ 'Entity Report Sidebar',   '300×250', __( 'On every organisation funding page.', 'publictech-terminal' ) ],
+	[ 'Dashboard Leaderboard',   '970×90',  __( 'Top of the homepage, below the hero.', 'publictech-terminal' ) ],
+	[ 'Directory Banner',        '728×90',  __( 'Across the MP directory search results.', 'publictech-terminal' ) ],
+	[ 'Directory Sidebar',       '300×250', __( 'Beside the MP directory filters.', 'publictech-terminal' ) ],
+	[ 'Directory Footer Banner', '728×90',  __( 'Below the directory, before pagination.', 'publictech-terminal' ) ],
+	[ 'Global Footer',           '728×90',  __( 'On the footer of every page, site-wide.', 'publictech-terminal' ) ],
 ];
 
 get_header(); ?>

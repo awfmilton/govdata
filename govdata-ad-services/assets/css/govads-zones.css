@@ -11,6 +11,7 @@
 	position: relative;
 	box-sizing: border-box;
 	/* width/height set inline by PHP renderer — prevents CLS */
+	max-width: 100%; /* leaderboards never overflow narrow viewports */
 }
 
 /* Corner bracket decoration — exact match to .corner pattern in terminal.css */

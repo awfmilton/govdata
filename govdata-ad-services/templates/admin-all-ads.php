@@ -15,7 +15,8 @@ if ( ! current_user_can( 'edit_others_posts' ) ) {
 if ( isset( $_GET['govads_action'], $_GET['ad_id'], $_GET['_wpnonce'] ) ) { // phpcs:ignore WordPress.Security
 	$action = sanitize_key( (string) $_GET['govads_action'] ); // phpcs:ignore WordPress.Security
 	$ad_id  = (int) $_GET['ad_id']; // phpcs:ignore WordPress.Security
-	if ( wp_verify_nonce( sanitize_text_field( (string) $_GET['_wpnonce'] ), 'govads_action_' . $ad_id ) ) { // phpcs:ignore WordPress.Security
+	if ( 'govads_ad' === get_post_type( $ad_id )
+		&& wp_verify_nonce( sanitize_text_field( (string) $_GET['_wpnonce'] ), 'govads_action_' . $ad_id ) ) { // phpcs:ignore WordPress.Security
 		if ( 'approve' === $action ) {
 			update_post_meta( $ad_id, 'govads_ad_status', 'approved' );
 			wp_update_post( [ 'ID' => $ad_id, 'post_status' => 'publish' ] );
@@ -34,10 +35,7 @@ if ( isset( $_GET['govads_action'], $_GET['ad_id'], $_GET['_wpnonce'] ) ) { // p
 			update_post_meta( $ad_id, 'govads_ad_status', 'rejected' );
 			wp_update_post( [ 'ID' => $ad_id, 'post_status' => 'draft' ] );
 		}
-		// Bust pool cache.
-		foreach ( get_posts( [ 'post_type' => 'govads_zone', 'post_status' => 'publish', 'posts_per_page' => 100, 'fields' => 'ids', 'no_found_rows' => true ] ) as $zid ) {
-			delete_transient( 'govads_pool_' . $zid );
-		}
+		GovAds\Renderer::instance()->flush_pools();
 	}
 	wp_redirect( admin_url( 'admin.php?page=govads-all-ads&done=1' ) );
 	exit;

@@ -139,27 +139,32 @@ final class REST {
 			return new \WP_REST_Response( [ 'error' => 'rate_limited' ], 429 );
 		}
 
-		$body    = $req->get_json_params();
-		$type    = sanitize_key( (string) ( $body['type']    ?? '' ) );
-		$ad_id   = (int) ( $body['ad_id']   ?? 0 );
-		$zone_id = (int) ( $body['zone_id'] ?? 0 );
-		$token   = (string) ( $body['token'] ?? '' );
+		// get_param() reads the JSON body (same-origin loader) and the query
+		// string (partner-site sendBeacon, which cannot set headers or a JSON
+		// content type cross-origin without tripping CORS preflight).
+		$type    = sanitize_key( (string) $req->get_param( 'type' ) );
+		$ad_id   = (int) $req->get_param( 'ad_id' );
+		$zone_id = (int) $req->get_param( 'zone_id' );
+		$token   = (string) $req->get_param( 'token' );
 
 		if ( ! in_array( $type, [ 'impression', 'click' ], true ) || $ad_id <= 0 ) {
 			return new \WP_REST_Response( [ 'error' => 'invalid_params' ], 400 );
 		}
 
-		// Verify HMAC token — prevents fabricated tracking events.
-		if ( $token && ! Renderer::instance()->verify_token( $token, $ad_id, $zone_id ) ) {
+		// The HMAC token is mandatory: it proves /serve issued this ad+zone
+		// pair recently and carries the partner-site attribution. Without it
+		// anyone could fabricate tracking events.
+		$site_key = Renderer::instance()->verify_token( $token, $ad_id, $zone_id );
+		if ( false === $site_key ) {
 			return new \WP_REST_Response( [ 'error' => 'invalid_token' ], 403 );
 		}
 
 		$ctx = [
-			'site_key'   => $this->extract_site_key( $req ),
-			'session_id' => sanitize_text_field( (string) ( $body['session_id'] ?? '' ) ),
-			'page_url'   => esc_url_raw( (string) ( $body['page_url']   ?? '' ) ),
-			'referrer'   => esc_url_raw( (string) ( $body['referrer']   ?? '' ) ),
-			'target_url' => esc_url_raw( (string) ( $body['target_url'] ?? '' ) ),
+			'site_key'   => $site_key,
+			'session_id' => sanitize_text_field( (string) $req->get_param( 'session_id' ) ),
+			'page_url'   => esc_url_raw( (string) $req->get_param( 'page_url' ) ),
+			'referrer'   => esc_url_raw( (string) $req->get_param( 'referrer' ) ),
+			'target_url' => esc_url_raw( (string) $req->get_param( 'target_url' ) ),
 		];
 
 		$tracker = Tracker::instance();
@@ -226,7 +231,7 @@ final class REST {
 		update_post_meta( $ad_id, 'govads_ad_status', 'approved' );
 		wp_update_post( [ 'ID' => $ad_id, 'post_status' => 'publish' ] );
 		$this->notify_advertiser( $ad_id, 'approved' );
-		$this->bust_pool_cache();
+		Renderer::instance()->flush_pools();
 		return new \WP_REST_Response( [ 'ok' => true ], 200 );
 	}
 
@@ -239,6 +244,7 @@ final class REST {
 		update_post_meta( $ad_id, 'govads_ad_status', 'rejected' );
 		wp_update_post( [ 'ID' => $ad_id, 'post_status' => 'draft' ] );
 		$this->notify_advertiser( $ad_id, 'rejected', $reason );
+		Renderer::instance()->flush_pools();
 		return new \WP_REST_Response( [ 'ok' => true ], 200 );
 	}
 
@@ -296,21 +302,5 @@ final class REST {
 			$message = sprintf( __( 'Your ad "%1$s" was not approved. Reason: %2$s', 'govdata-ad-services' ), $title, $reason ?: __( 'No reason given.', 'govdata-ad-services' ) );
 		}
 		wp_mail( $owner->user_email, $subject, $message );
-	}
-
-	/** Bust the ad-pool transients for all published zones after an approval. */
-	private function bust_pool_cache(): void {
-		$zone_ids = get_posts(
-			[
-				'post_type'      => 'govads_zone',
-				'post_status'    => 'publish',
-				'posts_per_page' => 100,
-				'fields'         => 'ids',
-				'no_found_rows'  => true,
-			]
-		);
-		foreach ( $zone_ids as $zid ) {
-			delete_transient( 'govads_pool_' . $zid );
-		}
 	}
 }

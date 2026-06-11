@@ -365,11 +365,15 @@
 					return;
 				}
 				if ( editId ) {
-					// Update in local array.
+					// Update in local array; the server may send the ad back to
+					// review when the creative changed, so trust its status.
+					if ( res.status ) { body.status = res.status; }
 					ads = ads.map( function ( a ) {
 						return a.id === parseInt( editId, 10 ) ? Object.assign( {}, a, body ) : a;
 					} );
-					showMsg( 'adsFormMsg', 'ok', 'Ad updated.' );
+					showMsg( 'adsFormMsg', 'ok', res.status === 'pending'
+						? 'Ad updated — it will be re-reviewed before going live again.'
+						: 'Ad updated.' );
 					if ( submitBtn ) { submitBtn.textContent = 'Update Ad'; }
 				} else {
 					// Prepend new ad.

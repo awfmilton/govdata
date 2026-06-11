@@ -25,6 +25,8 @@ client (Claude Desktop, Cursor, custom agents) can query the data directly.
 | `publictech-core/`       | Parent theme | Multi-DB PDO layer, custom REST/JSON endpoints, D3 + Billboard.js asset pipeline, custom post types (`member-parliament`, `audit-flag`, `forum-thread`, `pt_workspace`, `user-chart`), tier-based throttling, chart-appearance customizer, security headers + site-wide hardening, plugin-compat shims. |
 | `publictech-terminal/`   | Child theme  | Cyberpunk dark/light data-terminal UI: home dashboard, MP directory, MP profile, streaming JSON table, AI console, chart builder + gallery, forum, user-settings, in-page chart customizer drawer, light/dark toggle, fully responsive at 480/720/960/1280 px breakpoints.                                |
 | `publictech-mcp/`        | Plugin       | JSON-RPC 2.0 MCP server at `/wp-json/publictech-mcp/v1/rpc`. Bearer-token authenticated, tier-throttled, strictly read-only. Exposes `mp.search`, `mp.spending`, `transactions.stream`, `grants.search`, `schemas.health` tools so any MCP client can query the data.                                       |
+| `govdata-ad-services/`   | Plugin       | The ad network **hub**: ad/zone/campaign post types, self-serve advertiser role + registration, moderation queue, HMAC-verified impression/click tracking with IAB viewability, nightly stats rollups, wp-admin pages **and** a front-end portal, plus a keyed REST API that serves ads to partner sites.   |
+| `govdata-ads-client/`    | Plugin       | The ad network **client** for any partner WordPress site. Fetches ads from the hub server-side (the API key never reaches browsers), renders them via the `[govads zone="…"]` shortcode with lazy loading and zero layout shift, and reports viewability/clicks back to the hub.                            |
 
 ---
 
@@ -108,6 +110,93 @@ it leaves the process.
 
 ---
 
+## GovData Ad Services (self-serve ad network)
+
+A first-party ad network with the site as the central management console.
+Two plugins: `govdata-ad-services/` runs the hub on this site;
+`govdata-ads-client/` is installed on partner WordPress sites that want to
+display network ads. Deployment steps live in
+[DEPLOYMENT.md §9](DEPLOYMENT.md).
+
+### For advertisers
+
+- **Self-serve registration** at `/advertiser-register/` — account creation,
+  auto-login, and (by default) immediate advertiser access. Flip
+  `govads_auto_approve_advertisers` to `false` for manual vetting.
+- **Front-end portal** at `/ad-services/` (no wp-admin needed): overview KPIs
+  (impressions, clicks, CTR, active ads), ad submission/editing, pause/resume,
+  campaign management, and per-ad stats with trend sparklines over 7–90 days.
+- **Two creative types** — image banners and `wp_kses`-sanitised HTML5 rich
+  media — in 9 standard IAB sizes (300×250, 728×90, 160×600, 300×600, 970×90,
+  320×50, 336×280, 250×250, 120×600).
+- **Campaigns** group ads and carry flight dates; per-ad start/end dates are
+  enforced at serve time.
+- **Email notifications** when an ad is approved or rejected (with reason).
+- Marketing pages: `/ad-intelligence/` (analytics-engine landing page) and
+  `/advertise/` (pricing + placements, rate card filterable via
+  `govads_rate_card`).
+
+### For ad operators / moderators
+
+- **Review queue** — every new or creative-edited ad re-enters `pending` and
+  must be approved before serving. Available in wp-admin (*GovData Ads → All
+  Ads*) and in the portal's Admin tab (overview KPIs, pending queue,
+  advertiser leaderboard ranked by 30-day impressions).
+- **Zones** are CPT entries mapped to `do_action( 'govads_zone', '…' )` calls
+  in the theme — 9 ship wired (MP profile sidebar + mid-content, directory
+  banner/sidebar/footer, riding & entity report sidebars, dashboard
+  leaderboard, global footer). Ads are matched to zones **by IAB size**, and
+  weighted-random rotation respects per-ad weights.
+- **Partner API keys** (*GovData Ads → API Keys*) — generated once, stored
+  only as SHA-256 hashes, revocable, with last-used tracking.
+- **Roles & caps** — the `govdata_advertiser` role plus
+  `govads_submit_ads` / `govads_view_own_stats` / `govads_manage_campaigns`
+  capabilities (also granted to administrators and editors).
+
+### Measurement pipeline
+
+- **IAB-standard viewability**: an impression fires only after ≥50 % of the
+  creative is visible for 1 s (IntersectionObserver).
+- **HMAC-signed events**: `/serve` issues a time-limited token binding
+  ad + zone + partner site; `/track` rejects events without a valid token, so
+  tracking cannot be fabricated. TTL is filterable (`govads_token_ttl`,
+  default 1 h).
+- **Dedup + rate limits**: one impression per ad/session/hour, a 10 s click
+  dedup window, and a 300 events/min/IP cap.
+- **Privacy**: IPs are anonymised before storage (IPv4 last octet zeroed,
+  IPv6 masked to /48 — PIPEDA-aligned), sessions are first-party cookies, and
+  no third-party trackers exist anywhere in the pipeline.
+- **Nightly rollup cron** (02:00 UTC) aggregates raw events into
+  `daily_stats` (per ad/zone/campaign/site) and prunes raw rows after 90 days
+  (`govads_raw_retention_days`).
+- Custom tables: `wp_govads_impressions`, `wp_govads_clicks`,
+  `wp_govads_daily_stats` — all dropped on uninstall.
+
+### Performance guarantees
+
+- PHP renders only a fixed-size placeholder div — **zero layout shift**, no
+  render-blocking work, ~3 KB deferred loader.
+- Slots fill lazily (200 px before entering the viewport); ad decisions are
+  served from a 60-second pool cache and 5-minute zone cache.
+- Assets enqueue only on pages that can contain zones
+  (`govads_force_assets` filter to override).
+- On partner sites the ad payload is embedded server-side (60 s transient,
+  30 s negative cache), so browsers make **no cross-origin ad calls at all** —
+  only fire-and-forget tracking beacons.
+
+### Partner network security model
+
+- The raw API key (`gads_…`) is shown once at generation; the hub stores only
+  its SHA-256 hash and compares with `hash_equals()`.
+- The key lives **server-side only** on partner sites (sent via
+  `X-GovAds-Site-Key` on the server-to-server `/serve` call). Browsers never
+  see it; per-site attribution rides inside the signed impression token.
+- Partner sites sanitise every hub payload field on ingest (URL escaping,
+  `wp_kses_post` on HTML creatives) — defence in depth against a compromised
+  hub.
+
+---
+
 ## Access tiers (defaults)
 
 Defined in `publictech-core/inc/class-access-tiers.php`. Override at runtime
@@ -143,6 +232,26 @@ expensive queries finish without queueing behind cheaper traffic.
 | DELETE | `/wp-json/publictech/v1/queries/{id}`                    | delete a saved query                     |
 | GET    | `/wp-json/publictech/v1/export/{id}`                     | CSV-stream a saved query                 |
 | GET    | `/wp-json/publictech/v1/charts` & friends                | chart create / fork / preview            |
+
+### Ad network REST (`govads/v1`)
+
+| Method | Path                                          | Auth                                | Notes                                                |
+| ------ | --------------------------------------------- | ----------------------------------- | ---------------------------------------------------- |
+| GET    | `/wp-json/govads/v1/serve?zone={slug}`        | public (+ optional partner key)     | ad payload + HMAC token; rate-limited; 204 = no fill |
+| POST   | `/wp-json/govads/v1/track`                    | HMAC token (required)               | impression/click events; JSON body or query string   |
+| GET    | `/wp-json/govads/v1/stats?days=N`             | advertiser cap / admin              | own daily stats (admin may pass `advertiser_id`)     |
+| GET    | `/wp-json/govads/v1/me/ads`                   | advertiser cap                      | list own ads (admins see all)                        |
+| POST   | `/wp-json/govads/v1/me/ads`                   | advertiser cap                      | submit an ad (always lands `pending`)                |
+| POST   | `/wp-json/govads/v1/me/ads/{id}`              | owner / admin                       | edit fields, `pause`, `resume`; creative edits re-queue review |
+| GET    | `/wp-json/govads/v1/me/campaigns`             | advertiser cap                      | list own campaigns                                   |
+| POST   | `/wp-json/govads/v1/me/campaigns`             | advertiser cap                      | create campaign                                      |
+| POST   | `/wp-json/govads/v1/me/request-access`        | logged-in                           | emails the admin an access request                   |
+| POST   | `/wp-json/govads/v1/register`                 | public (rate-limited 5/h/IP)        | self-serve advertiser signup + auto-login            |
+| GET    | `/wp-json/govads/v1/admin/overview`           | `edit_others_posts`                 | network KPIs (30 d)                                  |
+| GET    | `/wp-json/govads/v1/admin/pending`            | `edit_others_posts`                 | moderation queue                                     |
+| GET    | `/wp-json/govads/v1/admin/advertisers`        | `edit_others_posts`                 | advertiser leaderboard                               |
+| POST   | `/wp-json/govads/v1/admin/approve` / `reject` | `edit_others_posts`                 | moderate an ad (reject takes a `reason`)             |
+| POST   | `/wp-json/govads/v1/admin/keys` / `keys/revoke` | `manage_options`                  | partner API key lifecycle                            |
 
 ### MCP (Bearer token)
 
@@ -197,6 +306,13 @@ mount listens for.
 | `publictech_alert_lookback_seconds`             | Change the daily-alert window (default 86 400 s)              |
 | `publictech_category_glossary`                  | Replace the MCP glossary returned to AI clients               |
 | `publictech_force_assets` / `publictech_force_billboard` | Force-load chart bundles on a non-PT page            |
+| `govads_rate_card`                              | Replace the `/advertise` pricing plans without code edits     |
+| `govads_token_ttl`                              | Impression-token validity window (default 3600 s)             |
+| `govads_raw_retention_days`                     | Raw impression/click retention before pruning (default 90)    |
+| `govads_auto_approve_advertisers`               | `false` = new signups become subscribers pending review       |
+| `govads_allow_self_register`                    | `false` (with `users_can_register` off) closes signup         |
+| `govads_noscript_url`                           | House-ad link rendered inside `<noscript>` fallbacks          |
+| `govads_force_assets`                           | Force the ad loader onto templates the heuristics miss        |
 
 ---
 
@@ -222,6 +338,7 @@ The compat shims live in `publictech-core/inc/class-compat.php`:
 | Component        | Version                                            |
 | ---------------- | -------------------------------------------------- |
 | WordPress        | 6.4 or newer (tested up to 6.8)                    |
+| WordPress (partner sites, `govdata-ads-client`) | 6.2 or newer        |
 | PHP              | 8.1 or newer (CI matrix: 8.1, 8.2, 8.3)            |
 | MySQL / MariaDB  | 5.7+ / 10.4+ on the WP host and on every audit DB |
 | External DB user | `SELECT`-only grants on the relevant schemas       |

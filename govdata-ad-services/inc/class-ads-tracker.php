@@ -34,6 +34,10 @@ final class Tracker {
 	}
 
 	public function record_click( int $ad_id, int $zone_id, array $ctx ): bool {
+		// Short dedup window: absorbs double-clicks and beacon retries.
+		if ( ! $this->dedup_ok( 'clk', $ad_id, (string) ( $ctx['session_id'] ?? '' ), 10 ) ) {
+			return false;
+		}
 		global $wpdb;
 		$row               = $this->build_row( $ad_id, $zone_id, $ctx );
 		$row['target_url'] = esc_url_raw( substr( (string) ( $ctx['target_url'] ?? '' ), 0, 1000 ) );
@@ -76,8 +80,8 @@ final class Tracker {
 		return [ '%d', '%d', '%d', '%s', '%s', '%d', '%s', '%s', '%s', '%s' ];
 	}
 
-	/** Session-based dedup: allow one impression per ad per session per hour. */
-	private function dedup_ok( string $type, int $ad_id, string $session_id ): bool {
+	/** Session-based dedup: one event per ad per session inside the TTL window. */
+	private function dedup_ok( string $type, int $ad_id, string $session_id, int $ttl = HOUR_IN_SECONDS ): bool {
 		if ( '' === $session_id ) {
 			return true; // Can't dedup without a session.
 		}
@@ -85,7 +89,7 @@ final class Tracker {
 		if ( get_transient( $key ) ) {
 			return false;
 		}
-		set_transient( $key, 1, HOUR_IN_SECONDS );
+		set_transient( $key, 1, $ttl );
 		return true;
 	}
 

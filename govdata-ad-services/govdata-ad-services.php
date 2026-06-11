@@ -3,7 +3,7 @@
  * Plugin Name:       GovData Ad Services
  * Plugin URI:        https://govdata.ca
  * Description:       Centralized ad network hub for GovData. Manages ads, zones, campaigns, impression/click tracking, self-serve advertiser dashboard, and serves ads to partner sites via REST API. Network-ready: partner sites install the govdata-ads-client plugin and connect via API key.
- * Version:           1.0.0
+ * Version:           1.1.0
  * Requires at least: 6.4
  * Tested up to:      6.8
  * Requires PHP:      8.1
@@ -17,7 +17,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'GOVADS_VERSION',  '1.0.0' );
+define( 'GOVADS_VERSION',  '1.1.0' );
 define( 'GOVADS_DIR',      plugin_dir_path( __FILE__ ) );
 define( 'GOVADS_URL',      plugin_dir_url( __FILE__ ) );
 define( 'GOVADS_REST_NS',  'govads/v1' );
