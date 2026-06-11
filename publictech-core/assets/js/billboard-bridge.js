@@ -31,6 +31,12 @@
 		return pool.length ? pool : ['#00a0d2'];
 	}
 
+	/* The ?pt_raw_render=1 capture surface (single-user-chart-raw.php) tags
+	   <body> so charts can render screenshot-deterministically. */
+	function isRawRender() {
+		return !!(document.body && document.body.classList.contains('pt-raw-render'));
+	}
+
 	/* Convert PT spec + row payload to Billboard.js columns.
 	   Single-series column charts use {x: 'label', y: 'value'} as a default
 	   mapping; multi-series picks up every numeric column. */
@@ -114,6 +120,19 @@
 		// Background — Billboard leaves it transparent so it inherits the panel.
 		cfg.background = { color: 'transparent' };
 
+		// Snapshot capture: freeze transitions/interactivity so a headless
+		// screenshot can never race an animation frame.
+		if (isRawRender()) {
+			cfg.transition = { duration: 0 };
+			cfg.interaction = { enabled: false };
+		}
+
+		// Deterministic ready-signal for the snapshot service — flips once
+		// Billboard has painted the SVG into the mount.
+		cfg.onrendered = function () {
+			host.setAttribute('data-pt-rendered', '1');
+		};
+
 		return cfg;
 	}
 
@@ -123,6 +142,7 @@
 		render: function (target, rawSpec, data) {
 			const host = typeof target === 'string' ? document.querySelector(target) : target;
 			if (!host) return null;
+			host.removeAttribute('data-pt-rendered');
 			const normalised = spec.normalise(rawSpec);
 			const cfg = specToConfig(host, normalised, data || []);
 
@@ -171,13 +191,19 @@
 			fetch(PT.boot.rest + '/charts/' + id, { credentials: 'same-origin' })
 				.then(function (r) { return r.json(); })
 				.then(function (chart) {
-					if (!chart || !chart.spec) return;
+					if (!chart || !chart.spec) {
+						// Fail-fast signal so the snapshot service aborts
+						// instead of waiting out its full render timeout.
+						node.setAttribute('data-pt-render-error', '1');
+						return;
+					}
 					const src = chart.source || { type: 'static', rows: [] };
 					return resolveSource(src).then(function (rows) {
 						Billboard.render(node, chart.spec, rows);
 					});
 				})
 				.catch(function (err) {
+					node.setAttribute('data-pt-render-error', '1');
 					console.error('[PT] Chart hydrate failed', err);
 				});
 		},
