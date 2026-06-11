@@ -2,9 +2,15 @@
 /**
  * Builds the static HTML slot for a client-side ad zone.
  *
- * The slot is a placeholder div sized to the ad's IAB dimensions. The JS
- * loader (gac-loader.js) fills it asynchronously after the page loads,
- * so ads never block rendering. Dimensions set inline prevent layout shift.
+ * The ad payload is fetched server-side (API key never reaches the browser)
+ * and embedded in the slot as a JSON data attribute. The JS loader
+ * (gac-loader.js) builds the creative lazily as the slot nears the viewport
+ * and reports viewability/clicks to the hub's public /track endpoint using
+ * the HMAC token inside the payload — no credentials in the page, no
+ * cross-origin preflight.
+ *
+ * Dimensions set inline reserve the space up front, so ads cause zero
+ * layout shift. When no ad is available the shortcode renders nothing.
  *
  * @package GovAdsClient
  */
@@ -25,28 +31,31 @@ final class Renderer {
 	 */
 	public function render_slot( string $zone_slug ): string {
 		$ad = Fetcher::instance()->get_ad( $zone_slug );
-
-		$width  = $ad['width']  ?? 300;
-		$height = $ad['height'] ?? 250;
+		if ( ! $ad ) {
+			return '';
+		}
 
 		$hub_url = esc_url( Fetcher::instance()->hub_url() );
-		$api_key = esc_attr( Fetcher::instance()->api_key() );
+		$payload = wp_json_encode( $ad );
+		if ( false === $payload ) {
+			return '';
+		}
 
 		return sprintf(
 			'<div class="gac-slot" '
 				. 'data-zone="%s" '
 				. 'data-hub="%s" '
-				. 'data-key="%s" '
+				. 'data-ad="%s" '
 				. 'style="width:%dpx;height:%dpx;min-height:%dpx;" '
 				. 'aria-label="%s">'
 				. '%s'
 				. '</div>',
 			esc_attr( $zone_slug ),
-			$hub_url,
-			$api_key,
-			(int) $width,
-			(int) $height,
-			(int) $height,
+			esc_attr( $hub_url ),
+			esc_attr( $payload ),
+			(int) $ad['width'],
+			(int) $ad['height'],
+			(int) $ad['height'],
 			esc_attr__( 'Advertisement', 'govdata-ads-client' ),
 			$this->noscript( $ad )
 		);

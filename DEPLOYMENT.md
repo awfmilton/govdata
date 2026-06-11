@@ -741,6 +741,193 @@ Hide & Security Enhancer Pro.
 
 ---
 
+## 9. GovData Ad Services (the ad network)
+
+Two plugins make up the network. The **hub** (`govdata-ad-services/`) runs on
+this site and is the central management console; the **client**
+(`govdata-ads-client/`) is installed on each partner WordPress site that
+wants to display network ads. Everything below the partner-site subsection
+happens on the hub.
+
+### 9.1 Install + activate the hub plugin
+
+```bash
+# Option A — from the repo checkout:
+cp -r govdata-ad-services /var/www/publictech/wp-content/plugins/
+wp plugin activate govdata-ad-services
+
+# Option B — zip upload via wp-admin → Plugins → Add New → Upload.
+```
+
+Activation:
+
+- creates the `wp_govads_impressions`, `wp_govads_clicks`, and
+  `wp_govads_daily_stats` tables (via `dbDelta`),
+- registers the `govdata_advertiser` role and grants the `govads_*`
+  capabilities to administrators and editors,
+- schedules the nightly stats rollup at **02:00 UTC** — this needs working
+  cron, so make sure §8.5 (real cron) is done on production.
+
+Verify:
+
+```bash
+wp db query "SHOW TABLES LIKE '%govads%'"        # 3 tables
+wp role list | grep -i advertiser                 # govdata_advertiser
+wp cron event list | grep govads_daily_rollup     # scheduled
+```
+
+### 9.2 Seed the ad zones
+
+The child theme fires `do_action( 'govads_zone', '…' )` in nine places. Each
+slug must exist as a published `govads_zone` post with matching meta — the
+scaffold script creates all nine idempotently (safe to re-run):
+
+```bash
+wp eval-file database/create-ad-zones.php
+```
+
+| Zone slug                   | Placement                              | Size    |
+| --------------------------- | -------------------------------------- | ------- |
+| `mp_profile_sidebar`        | MP profile, right column               | 300×250 |
+| `mp_profile_mid_content`    | MP profile, between data panels        | 728×90  |
+| `archive_after_search`      | MP directory, below the search bar     | 728×90  |
+| `archive_sidebar`           | MP directory, beside the filters       | 300×250 |
+| `archive_before_pagination` | MP directory, above pagination         | 728×90  |
+| `riding_report_sidebar`     | Riding report, right column            | 300×250 |
+| `entity_report_sidebar`     | Entity funding report, right column    | 300×250 |
+| `dashboard_below_hero`      | Homepage, below the hero               | 970×90  |
+| `global_footer`             | Site-wide footer                       | 728×90  |
+
+To add a new zone later: drop a
+`<?php do_action( 'govads_zone', 'my_new_zone' ); ?>` call in a template,
+then create the matching `govads_zone` post (slug/label/placement/sizes meta,
+or extend the scaffold script). Ads are matched to zones by IAB size, so a
+zone only ever serves creatives that fit it. **If the slot's reserved
+dimensions matter to your layout, keep each zone single-size** — the
+placeholder reserves the first size in the list.
+
+### 9.3 Create the front-end ad pages
+
+Same drill as §5 — create four Pages with these exact slugs and templates:
+
+| Slug                  | Template                          | Purpose                                            |
+| --------------------- | --------------------------------- | -------------------------------------------------- |
+| `ad-intelligence`     | **PT — Ad Intelligence (Landing)** | Marketing/info page: analytics engines pitch       |
+| `advertise`           | **PT — Advertise (Pricing)**      | Rate card + placements (filter: `govads_rate_card`) |
+| `advertiser-register` | **PT — Advertiser Registration**  | Self-serve signup (creates `govdata_advertiser`)   |
+| `ad-services`         | **PT — Ad Services Portal**       | Advertiser dashboard + admin moderation tab        |
+
+```bash
+wp post create --post_type=page --post_status=publish --post_title='Ad Intelligence' \
+  --post_name=ad-intelligence
+wp post create --post_type=page --post_status=publish --post_title='Advertise' \
+  --post_name=advertise
+wp post create --post_type=page --post_status=publish --post_title='Create Advertiser Account' \
+  --post_name=advertiser-register
+wp post create --post_type=page --post_status=publish --post_title='Ad Services' \
+  --post_name=ad-services
+```
+
+Then assign each page its template in *Pages → Edit → Template* (or
+`wp post meta update <id> _wp_page_template page-templates/template-<name>.php`).
+Finally, add `/ad-intelligence/` and `/advertise/` to a nav menu
+(*Appearance → Menus* — the `utility` location renders in the footer rail) so
+visitors can find them. The portal links between the pages are already wired.
+
+### 9.4 Moderation flow & policies
+
+1. New advertisers register at `/advertiser-register/` (rate-limited
+   5 attempts/h/IP) and get the advertiser role immediately. To review every
+   signup manually instead:
+
+   ```php
+   add_filter( 'govads_auto_approve_advertisers', '__return_false' );
+   ```
+
+   Pending users then show up via email + `govads_access_requested`
+   user-meta; assign the **Advertiser** role on their user-edit screen to
+   approve.
+2. Every submitted ad lands in **pending**. Approve/reject from *GovData
+   Ads → All Ads* (wp-admin) or the portal's **Admin** tab. The advertiser is
+   emailed either way.
+3. Any edit to a live ad's creative (title, image, destination URL, HTML,
+   size, type) automatically sends it back to pending — re-approve after
+   review. Date-only changes don't re-queue.
+4. Raw tracking rows are pruned after 90 days
+   (`govads_raw_retention_days` filter); daily aggregates are kept forever.
+
+### 9.5 Connect a partner site
+
+On the **hub**:
+
+1. *GovData Ads → API Keys → Generate New Key* — label it with the partner's
+   name and URL.
+2. **Copy the `gads_…` key immediately — it is shown exactly once** (only its
+   SHA-256 hash is stored).
+3. Share the key + the zone-slug table (shown on the same admin page) with
+   the partner.
+
+On the **partner site**:
+
+1. Install + activate `govdata-ads-client` (zip upload or copy the folder).
+2. *Settings → GovData Ads Client* — enter the hub URL
+   (e.g. `https://govdata.ca`) and the API key, save, then click **Test
+   Connection** (200/204 from the hub = success).
+3. Place ads with the shortcode in any post, page, or widget:
+
+   ```
+   [govads zone="global_footer"]
+   ```
+
+Partner-site behaviour worth knowing: ads are fetched **server-side** (the
+API key never reaches visitors' browsers), cached 60 s per zone, with a 30 s
+negative cache after hub errors; tracking beacons go straight from the
+visitor's browser to the hub's public `/track` endpoint authenticated by the
+HMAC token inside the payload. If a partner key leaks, revoke it on the hub
+(*API Keys → Revoke*) and issue a new one — revocation takes effect within
+the 60-second cache window.
+
+### 9.6 Hardening notes specific to ads
+
+- **CSP**: ad images are hot-linked from advertiser URLs. If you set the §8.2
+  CSP, widen `img-src` accordingly (e.g. `img-src 'self' data: https:` on the
+  hub and on partner sites).
+- **Impression-token TTL** (default 1 h) trades replay-window size against
+  lazy slots scrolled into view long after page load:
+
+  ```php
+  add_filter( 'govads_token_ttl', fn() => 2 * HOUR_IN_SECONDS );
+  ```
+
+  Partner sites running a **full-page cache** embed the token in the cached
+  HTML, so set their page-cache TTL below the token TTL (or raise the token
+  TTL on the hub) or late impressions from cached pages will be rejected.
+
+- The nightly rollup is the only thing that populates dashboards — stats
+  appear the day **after** an ad starts serving. Run it manually once to
+  backfill after testing: `wp cron event run govads_daily_rollup`.
+- Uninstalling the hub plugin **drops the three stats tables** and removes
+  the role/caps. Export anything you need first
+  (`wp db export --tables=wp_govads_daily_stats …`).
+
+### 9.7 Verify the network end-to-end
+
+```bash
+# 1. Zone serves (204 = zone exists but no approved ad yet — also fine):
+curl -i 'https://govdata.ca/wp-json/govads/v1/serve?zone=global_footer'
+
+# 2. Tracking without a token is rejected (anti-fraud working):
+curl -s -X POST 'https://govdata.ca/wp-json/govads/v1/track' \
+  -H 'Content-Type: application/json' \
+  -d '{"type":"impression","ad_id":1,"zone_id":1}'        # → {"error":"invalid_token"}
+
+# 3. Submit a test ad via the portal, approve it in All Ads, reload a page
+#    with that zone: the slot fills lazily, an "AD" label appears, and the
+#    impression shows in Ad Stats after the next rollup.
+```
+
+---
+
 ## Troubleshooting
 
 | Symptom | Likely cause | Fix |
@@ -759,6 +946,12 @@ Hide & Security Enhancer Pro.
 | Chart builder shows "upgrade gate" for Analyst+ | Tier was reassigned in WP but the visitor still has the old session | Log out / log in once. |
 | Daily alert emails not arriving | WP-Cron not running | See §8.5. |
 | Pages render unstyled on mobile | `publictech-terminal-responsive` stylesheet not enqueued (theme update missed) | Confirm `responsive.css` is loaded — check the page source for the handle, or re-deploy the child theme. |
+| Ad slots render as empty boxes everywhere | No approved ads match the zone's IAB size, or zones were never seeded | Run `wp eval-file database/create-ad-zones.php` (§9.2); check each ad's size against the zone's. |
+| `/govads/v1/serve` returns 404 | Hub plugin inactive or permalinks stale | `wp plugin activate govdata-ad-services && wp rewrite flush`. |
+| Impressions/clicks stay at zero in dashboards | Rollup cron hasn't run yet (stats are next-day), or WP-Cron is dead | `wp cron event run govads_daily_rollup`; confirm §8.5. |
+| `/govads/v1/track` always returns `invalid_token` | Server clock skew between page render and beacon, or token older than the TTL | Sync NTP; raise `govads_token_ttl` (§9.6). |
+| Partner site shows no ads | Hub URL/API key wrong, key revoked, or zone slug typo in the shortcode | Use **Test Connection** on the partner's settings page; compare slugs against *GovData Ads → API Keys*. |
+| An admin can't see "Submit Ad" / "My Campaigns" menus | `govads_*` caps missing (pre-1.1 install) | The role upgrade runs automatically on the next page load after deploying 1.1; or `wp plugin deactivate govdata-ad-services && wp plugin activate govdata-ad-services`. |
 
 For deeper diagnostics, enable WP debug logging in `wp-config.php`:
 

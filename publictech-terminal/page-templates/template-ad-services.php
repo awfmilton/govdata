@@ -74,8 +74,8 @@ get_header(); ?>
 				printf(
 					/* translators: %s: registration link */
 					esc_html__( "Don't have an account? %s", 'publictech-terminal' ),
-					'<a href="' . esc_url( wp_registration_url() ) . '" style="color:var(--accent)">'
-					. esc_html__( 'Register', 'publictech-terminal' ) . '</a>'
+					'<a href="' . esc_url( home_url( '/advertiser-register/' ) ) . '" style="color:var(--accent)">'
+					. esc_html__( 'Create an advertiser account', 'publictech-terminal' ) . '</a>'
 				);
 				?>
 			</p>

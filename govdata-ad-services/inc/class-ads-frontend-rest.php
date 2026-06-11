@@ -250,41 +250,94 @@ final class Frontend_REST {
 		}
 
 		$action = sanitize_key( (string) ( $req->get_param( 'action' ) ?? '' ) );
+		$status = (string) get_post_meta( $ad_id, 'govads_ad_status', true );
 
+		// Pause/resume is a strict two-state toggle for *approved* ads only.
+		// Anything else (e.g. pending → pause → resume) must never end up
+		// approved without a moderator: that would bypass the review queue.
 		if ( 'pause' === $action ) {
+			if ( 'approved' !== $status ) {
+				return new \WP_REST_Response( [ 'error' => 'not_running' ], 400 );
+			}
 			update_post_meta( $ad_id, 'govads_ad_status', 'paused' );
 			wp_update_post( [ 'ID' => $ad_id, 'post_status' => 'draft' ] );
+			Renderer::instance()->flush_pools();
 			return new \WP_REST_Response( [ 'ok' => true, 'status' => 'paused' ], 200 );
 		}
 
 		if ( 'resume' === $action ) {
-			$current = (string) get_post_meta( $ad_id, 'govads_ad_status', true );
-			if ( in_array( $current, [ 'approved', 'paused' ], true ) ) {
-				update_post_meta( $ad_id, 'govads_ad_status', 'approved' );
-				wp_update_post( [ 'ID' => $ad_id, 'post_status' => 'publish' ] );
+			if ( 'paused' !== $status ) {
+				return new \WP_REST_Response( [ 'error' => 'not_paused' ], 400 );
 			}
+			update_post_meta( $ad_id, 'govads_ad_status', 'approved' );
+			wp_update_post( [ 'ID' => $ad_id, 'post_status' => 'publish' ] );
+			Renderer::instance()->flush_pools();
 			return new \WP_REST_Response( [ 'ok' => true, 'status' => 'approved' ], 200 );
 		}
 
-		// Field update.
-		$string_map = [
-			'govads_ad_image_url'  => 'image_url',
-			'govads_ad_target_url' => 'target_url',
-			'govads_ad_start_date' => 'start_date',
-			'govads_ad_end_date'   => 'end_date',
+		// Field update. URLs get esc_url_raw (kills javascript:/data: schemes);
+		// schedule dates are plain text.
+		$dirty_creative = false;
+		$field_map      = [
+			'govads_ad_image_url'  => [ 'image_url',  'esc_url_raw',         true ],
+			'govads_ad_target_url' => [ 'target_url', 'esc_url_raw',         true ],
+			'govads_ad_start_date' => [ 'start_date', 'sanitize_text_field', false ],
+			'govads_ad_end_date'   => [ 'end_date',   'sanitize_text_field', false ],
 		];
-		foreach ( $string_map as $meta_key => $param_key ) {
+		foreach ( $field_map as $meta_key => [ $param_key, $sanitizer, $is_creative ] ) {
 			$val = $req->get_param( $param_key );
-			if ( null !== $val ) {
-				update_post_meta( $ad_id, $meta_key, sanitize_text_field( (string) $val ) );
+			if ( null === $val ) {
+				continue;
 			}
+			$clean = $sanitizer( (string) $val );
+			if ( $is_creative && $clean !== (string) get_post_meta( $ad_id, $meta_key, true ) ) {
+				$dirty_creative = true;
+			}
+			update_post_meta( $ad_id, $meta_key, $clean );
 		}
 		$title = $req->get_param( 'title' );
 		if ( $title ) {
-			wp_update_post( [ 'ID' => $ad_id, 'post_title' => sanitize_text_field( (string) $title ) ] );
+			$clean_title = sanitize_text_field( (string) $title );
+			if ( $clean_title !== $ad->post_title ) {
+				$dirty_creative = true;
+			}
+			wp_update_post( [ 'ID' => $ad_id, 'post_title' => $clean_title ] );
+		}
+		$html = $req->get_param( 'html' );
+		if ( null !== $html ) {
+			$clean_html = wp_kses_post( (string) $html );
+			if ( $clean_html !== (string) get_post_meta( $ad_id, 'govads_ad_html', true ) ) {
+				$dirty_creative = true;
+			}
+			update_post_meta( $ad_id, 'govads_ad_html', $clean_html );
+		}
+		$type = $req->get_param( 'type' );
+		if ( null !== $type && in_array( $type, [ 'image', 'html5' ], true )
+			&& $type !== (string) get_post_meta( $ad_id, 'govads_ad_type', true ) ) {
+			$dirty_creative = true;
+			update_post_meta( $ad_id, 'govads_ad_type', $type );
+		}
+		$size = $req->get_param( 'size' );
+		if ( null !== $size && array_key_exists( (string) $size, Renderer::SIZES )
+			&& (string) $size !== (string) get_post_meta( $ad_id, 'govads_ad_size', true ) ) {
+			$dirty_creative = true;
+			update_post_meta( $ad_id, 'govads_ad_size', (string) $size );
+		}
+		$campaign_id = $req->get_param( 'campaign_id' );
+		if ( null !== $campaign_id ) {
+			update_post_meta( $ad_id, 'govads_ad_campaign_id', (int) $campaign_id );
 		}
 
-		return new \WP_REST_Response( [ 'ok' => true ], 200 );
+		// Changing the creative of a live ad sends it back through review —
+		// otherwise an innocuous ad could be approved and then swapped.
+		if ( $dirty_creative && in_array( $status, [ 'approved', 'paused' ], true ) ) {
+			$status = 'pending';
+			update_post_meta( $ad_id, 'govads_ad_status', 'pending' );
+			wp_update_post( [ 'ID' => $ad_id, 'post_status' => 'pending' ] );
+			Renderer::instance()->flush_pools();
+		}
+
+		return new \WP_REST_Response( [ 'ok' => true, 'status' => $status ?: 'pending' ], 200 );
 	}
 
 	// ── Access request ────────────────────────────────────────────────────────
