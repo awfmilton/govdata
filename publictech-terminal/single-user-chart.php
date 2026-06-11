@@ -62,6 +62,37 @@ get_header(); ?>
 			<div class="pt-billboard-mount" data-pt-chart-id="<?php echo (int) $pt_id; ?>" style="height:520px"></div>
 		</div>
 
+		<?php
+		// Social share targets: plain web intents around the permalink, so
+		// they work with JS disabled (target=_blank); chart-share.js upgrades
+		// them to centered popups and powers copy-link / native share.
+		$pt_share_url  = (string) get_permalink( $pt_id );
+		$pt_share_text = sprintf(
+			/* translators: 1: chart title, 2: site name */
+			__( '%1$s — %2$s', 'publictech-terminal' ),
+			get_the_title(),
+			get_bloginfo( 'name' )
+		);
+		$pt_intent_x  = 'https://x.com/intent/post?text=' . rawurlencode( $pt_share_text ) . '&url=' . rawurlencode( $pt_share_url );
+		$pt_intent_fb = 'https://www.facebook.com/sharer/sharer.php?u=' . rawurlencode( $pt_share_url );
+		?>
+		<div class="panel corner" style="margin-top:24px">
+			<div class="hd"><h3>◇ <?php esc_html_e( 'Share this chart', 'publictech-terminal' ); ?></h3></div>
+			<div class="bd">
+				<div class="ctas pt-share-actions">
+					<a class="cta" data-pt-share="popup" data-pt-popup="560x640" href="<?php echo esc_url( $pt_intent_x ); ?>" target="_blank" rel="noopener noreferrer">𝕏 <?php esc_html_e( 'Share to X', 'publictech-terminal' ); ?></a>
+					<a class="cta" data-pt-share="popup" data-pt-popup="600x680" href="<?php echo esc_url( $pt_intent_fb ); ?>" target="_blank" rel="noopener noreferrer">ƒ <?php esc_html_e( 'Share to Facebook', 'publictech-terminal' ); ?></a>
+					<button class="cta ghost" type="button" data-pt-share="copy" data-pt-share-url="<?php echo esc_attr( $pt_share_url ); ?>" data-pt-copied-text="<?php echo esc_attr__( 'Link copied to clipboard.', 'publictech-terminal' ); ?>">⧉ <?php esc_html_e( 'Copy link', 'publictech-terminal' ); ?></button>
+					<button class="cta ghost" type="button" data-pt-share="native" data-pt-share-url="<?php echo esc_attr( $pt_share_url ); ?>" data-pt-share-title="<?php echo esc_attr( $pt_share_text ); ?>" hidden>⤴ <?php esc_html_e( 'More…', 'publictech-terminal' ); ?></button>
+				</div>
+				<p class="dim pt-share-status" role="status" aria-live="polite" style="margin-top:8px">
+					<?php if ( 'publish' !== get_post_status( $pt_id ) ) : ?>
+						<?php esc_html_e( 'This chart is private — only you can open the shared link.', 'publictech-terminal' ); ?>
+					<?php endif; ?>
+				</p>
+			</div>
+		</div>
+
 		<?php if ( $pt_is_owner ) : ?>
 			<div class="panel corner" style="margin-top:24px">
 				<div class="hd"><h3>◇ <?php esc_html_e( 'Embed this chart', 'publictech-terminal' ); ?></h3></div>

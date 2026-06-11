@@ -460,6 +460,11 @@ final class Charts_REST {
 		// chart_kind taxonomy mirrors data.type so the gallery can facet on it.
 		wp_set_object_terms( $id, [ $spec['data']['type'] ], 'chart_kind', false );
 
+		// Background social-card capture — schedules a cron event and returns;
+		// the response never waits on a browser. No-op while unconfigured or
+		// for private charts.
+		Chart_Snapshots::instance()->queue( $id );
+
 		return rest_ensure_response( $this->shape( get_post( $id ) ) );
 	}
 
@@ -500,6 +505,17 @@ final class Charts_REST {
 			}
 			update_post_meta( $id, 'pt_source', wp_json_encode( $source ) );
 		}
+
+		// Social-card cache management: re-capturing mints a new rev-hashed
+		// og:image URL, so scrapers holding the old URL re-fetch on the next
+		// share. Charts that just went private get their public card retired.
+		$updated = get_post( $id );
+		if ( $updated && 'publish' === $updated->post_status ) {
+			Chart_Snapshots::instance()->queue( $id );
+		} else {
+			Chart_Snapshots::instance()->invalidate( $id );
+		}
+
 		return rest_ensure_response( $this->shape( get_post( $id ) ) );
 	}
 
