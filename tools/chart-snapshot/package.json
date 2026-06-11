@@ -1,0 +1,18 @@
+{
+  "name": "pt-chart-snapshot",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Headless Billboard.js chart capture (Puppeteer) for PublicTech social cards.",
+  "license": "GPL-2.0-or-later",
+  "scripts": {
+    "capture": "node capture.mjs",
+    "serve": "node server.mjs"
+  },
+  "dependencies": {
+    "puppeteer": "^24.0.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

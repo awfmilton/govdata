@@ -22,6 +22,31 @@ add_action( 'after_setup_theme', static function () {
 	load_theme_textdomain( 'publictech-terminal', PUBLICTECH_TERMINAL_DIR . 'languages' );
 } );
 
+/**
+ * Raw render mode: ?pt_raw_render=1 on a single saved chart serves a
+ * chrome-free 1200x630 capture surface for the snapshot service (no header
+ * rail, no footer, no admin bar) so og:image screenshots contain only the
+ * chart card. Detection lives in core next to the rest of the pipeline.
+ */
+function pt_is_raw_render(): bool {
+	return class_exists( '\PublicTech\Core\Chart_Snapshots' )
+		&& \PublicTech\Core\Chart_Snapshots::is_raw_render();
+}
+
+add_filter( 'template_include', static function ( string $template ): string {
+	if ( pt_is_raw_render() ) {
+		$raw = PUBLICTECH_TERMINAL_DIR . 'single-user-chart-raw.php';
+		if ( file_exists( $raw ) ) {
+			return $raw;
+		}
+	}
+	return $template;
+} );
+
+add_filter( 'show_admin_bar', static function ( bool $show ): bool {
+	return pt_is_raw_render() ? false : $show;
+} );
+
 add_action( 'wp_enqueue_scripts', static function () {
 	wp_enqueue_style(
 		'publictech-fonts',
@@ -107,6 +132,18 @@ add_action( 'wp_enqueue_scripts', static function () {
 			[ 'publictech-charts' ],
 			PUBLICTECH_TERMINAL_VERSION,
 			[ 'strategy' => 'defer', 'in_footer' => true ]
+		);
+	}
+
+	// Social share actions (popup intents + copy-link) on the single saved
+	// chart view. Skipped on the raw capture surface — no humans there.
+	if ( is_singular( 'user-chart' ) && ! pt_is_raw_render() ) {
+		wp_enqueue_script(
+			'publictech-chart-share',
+			PUBLICTECH_TERMINAL_URL . 'assets/js/chart-share.js',
+			[],
+			PUBLICTECH_TERMINAL_VERSION,
+			true
 		);
 	}
 
@@ -209,11 +246,17 @@ add_action( 'wp_head', static function () {
 }, 1 );
 
 add_action( 'wp_body_open', static function () {
+	if ( pt_is_raw_render() ) {
+		return; // Capture surface: no skip-link, no header rail.
+	}
 	echo '<a class="pt-skip" href="#pt-main">' . esc_html__( 'Skip to content', 'publictech-terminal' ) . '</a>' . "\n";
 	require PUBLICTECH_TERMINAL_DIR . 'parts/header-rail.php';
 } );
 
 add_action( 'wp_footer', static function () {
+	if ( pt_is_raw_render() ) {
+		return; // Capture surface: the customizer window would pollute screenshots.
+	}
 	require PUBLICTECH_TERMINAL_DIR . 'parts/customizer-window.php';
 }, 5 );
 
