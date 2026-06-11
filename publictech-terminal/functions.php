@@ -23,24 +23,25 @@ add_action( 'after_setup_theme', static function () {
 } );
 
 /**
- * Raw render mode: ?pt_raw_render=1 on a single saved chart serves a
- * chrome-free 1200x630 capture surface for the snapshot service (no header
- * rail, no footer, no admin bar) so og:image screenshots contain only the
- * chart card. Detection lives in core next to the rest of the pipeline.
+ * Raw render mode: ?pt_raw_render=1 serves a chrome-free 1200x630 capture
+ * surface (no header rail, no footer, no admin bar) so og:image screenshots
+ * contain only the card. Two surfaces use it — saved charts (single-user-chart)
+ * and MP profiles (member-parliament) — each detected by its owning core class.
  */
 function pt_is_raw_render(): bool {
-	return class_exists( '\PublicTech\Core\Chart_Snapshots' )
-		&& \PublicTech\Core\Chart_Snapshots::is_raw_render();
+	return ( class_exists( '\PublicTech\Core\Chart_Snapshots' ) && \PublicTech\Core\Chart_Snapshots::is_raw_render() )
+		|| ( class_exists( '\PublicTech\Core\MP_Social_Cards' ) && \PublicTech\Core\MP_Social_Cards::is_card_render() );
 }
 
 add_filter( 'template_include', static function ( string $template ): string {
-	if ( pt_is_raw_render() ) {
-		$raw = PUBLICTECH_TERMINAL_DIR . 'single-user-chart-raw.php';
-		if ( file_exists( $raw ) ) {
-			return $raw;
-		}
+	if ( ! pt_is_raw_render() ) {
+		return $template;
 	}
-	return $template;
+	// Pick the raw template matching the queried post type.
+	$raw = is_singular( 'member-parliament' )
+		? PUBLICTECH_TERMINAL_DIR . 'single-member-parliament-raw.php'
+		: PUBLICTECH_TERMINAL_DIR . 'single-user-chart-raw.php';
+	return file_exists( $raw ) ? $raw : $template;
 } );
 
 add_filter( 'show_admin_bar', static function ( bool $show ): bool {

@@ -33,6 +33,7 @@ require_once PUBLICTECH_CORE_DIR . 'inc/class-mp-finance-warmer.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-entity-reports.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-charts-rest.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-chart-snapshots.php';
+require_once PUBLICTECH_CORE_DIR . 'inc/class-mp-social-cards.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-asset-pipeline.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-customizer.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-compat.php';
@@ -79,6 +80,7 @@ add_action( 'after_setup_theme', static function () {
 	\PublicTech\Core\Entity_Reports::instance();
 	\PublicTech\Core\Charts_REST::instance();
 	\PublicTech\Core\Chart_Snapshots::instance();
+	\PublicTech\Core\MP_Social_Cards::instance();
 	\PublicTech\Core\Asset_Pipeline::instance();
 	\PublicTech\Core\Chart_Customizer::instance();
 	\PublicTech\Core\Compat::instance();
