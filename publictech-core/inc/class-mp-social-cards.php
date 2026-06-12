@@ -72,11 +72,11 @@ final class MP_Social_Cards {
 	}
 
 	/**
-	 * Handle /mp-social-card/{id}/ — redirect browsers to the MP profile page.
+	 * Handle /mp-social-card/{id}/.
 	 *
-	 * This endpoint exists solely so that the public card URL (used in CLI batch
-	 * output and sharing) leads to the full MP page rather than a raw PNG file.
-	 * og:image continues to point to the raw PNG for fast crawler access.
+	 * Browsers (Accept: text/html first) are redirected to the MP profile page.
+	 * Social crawlers and image fetchers receive the PNG binary directly, so
+	 * this endpoint works as the og:image URL without a redirect round-trip.
 	 */
 	public function maybe_serve_card(): void {
 		$id = (int) get_query_var( 'pt_mp_card_id' );
@@ -92,7 +92,30 @@ final class MP_Social_Cards {
 			return;
 		}
 
-		wp_redirect( (string) get_permalink( $id ), 302 );
+		// Browsers set Accept starting with "text/html"; crawlers/image fetches
+		// use "*/*" or "image/*" — serve the PNG to them directly.
+		$accept = isset( $_SERVER['HTTP_ACCEPT'] ) ? (string) $_SERVER['HTTP_ACCEPT'] : '';
+		if ( 0 === strpos( $accept, 'text/html' ) ) {
+			wp_redirect( (string) get_permalink( $id ), 302 );
+			exit;
+		}
+
+		// Non-browser: stream the PNG so social crawlers get image bytes.
+		$file = (string) get_post_meta( $id, self::META_FILE, true );
+		if ( '' === $file || ! self::is_valid_filename( $id, $file ) ) {
+			status_header( 404 );
+			exit;
+		}
+		$path = $this->dir_path() . $file;
+		if ( ! file_exists( $path ) ) {
+			status_header( 404 );
+			exit;
+		}
+		header( 'Content-Type: image/png' );
+		header( 'Cache-Control: public, max-age=604800, immutable' );
+		header( 'Content-Length: ' . filesize( $path ) );
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_readfile -- binary stream out, no WP_Filesystem equivalent.
+		readfile( $path );
 		exit;
 	}
 
@@ -365,8 +388,8 @@ final class MP_Social_Cards {
 			$bits[] = sprintf( __( '%s office spend', 'publictech-core' ), '$' . number_format_i18n( $spend ) );
 		}
 		$desc  = $bits ? implode( ' · ', $bits ) : __( 'House of Commons expenditure and parliamentary record.', 'publictech-core' );
-		$url       = (string) get_permalink( $post );
-		$image_raw = $this->card_url_raw( $post->ID ); // raw PNG for og:image (fast for crawlers)
+		$url   = (string) get_permalink( $post );
+		$image = $this->card_url( $post->ID ); // proxy endpoint: redirects browsers, streams PNG to crawlers
 
 		echo '<meta property="og:type" content="profile" />' . "\n";
 		echo '<meta property="og:title" content="' . esc_attr( $name ) . '" />' . "\n";
@@ -374,14 +397,14 @@ final class MP_Social_Cards {
 		echo '<meta property="og:url" content="' . esc_url( $url ) . '" />' . "\n";
 		echo '<meta property="og:site_name" content="' . esc_attr( get_bloginfo( 'name' ) ) . '" />' . "\n";
 
-		if ( null !== $image_raw ) {
-			echo '<meta property="og:image" content="' . esc_url( $image_raw ) . '" />' . "\n";
+		if ( null !== $image ) {
+			echo '<meta property="og:image" content="' . esc_url( $image ) . '" />' . "\n";
 			echo '<meta property="og:image:width" content="' . (int) self::WIDTH . '" />' . "\n";
 			echo '<meta property="og:image:height" content="' . (int) self::HEIGHT . '" />' . "\n";
 			echo '<meta property="og:image:type" content="image/png" />' . "\n";
 			echo '<meta property="og:image:alt" content="' . esc_attr( $name ) . '" />' . "\n";
 			echo '<meta name="twitter:card" content="summary_large_image" />' . "\n";
-			echo '<meta name="twitter:image" content="' . esc_url( $image_raw ) . '" />' . "\n";
+			echo '<meta name="twitter:image" content="' . esc_url( $image ) . '" />' . "\n";
 		} else {
 			echo '<meta name="twitter:card" content="summary" />' . "\n";
 		}
