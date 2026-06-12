@@ -1,19 +1,18 @@
 <?php
 /**
- * Social cards for Member of Parliament profile pages, rendered via ApiFlash.
+ * Social cards for Member of Parliament profile pages.
  *
- * On-host headless rendering is impossible on this hosting plan (a 25-process
- * cgroup cap), so cards are produced by the ApiFlash screenshot API: it loads
- * a chrome-free 1200x630 variant of the MP profile (?pt_raw_render=1), waits
- * for the office-spend chart to draw, and returns a PNG that we persist under
- * wp-content/uploads/pt-charts/mp/ and advertise as og:image / twitter:image.
+ * Cards are produced by the External_Screenshots orchestrator (ApiFlash SaaS
+ * primary, GCP Cloud Run fallback). The capture loads a chrome-free 1200x630
+ * variant of the MP profile (?pt_raw_render=1), waits for the office-spend
+ * chart to draw, and persists the PNG under wp-content/uploads/pt-charts/mp/.
  *
- * Quota discipline: the ApiFlash free tier allows 100 captures/month. Captures
- * therefore happen ONLY through the explicit, idempotent batch (the
- * `wp publictech mp-cards` CLI command) — never automatically on save or page
- * view — and the batch refuses to exceed either its --limit or the remaining
- * ApiFlash quota. render_social_meta() only ever reads an existing file; it
- * never triggers a capture.
+ * The public card URL (/mp-social-card/{id}/) redirects browsers to the MP
+ * profile page, so social links always land on the full page. og:image uses
+ * the raw PNG URL for fast direct serving to social crawlers.
+ *
+ * Captures happen ONLY through the explicit, idempotent batch CLI command —
+ * never automatically on save or page view.
  *
  *   wp publictech mp-cards --limit=50          # generate up to 50 missing cards
  *   wp publictech mp-cards --limit=10 --force   # re-render even if a card exists
@@ -51,10 +50,50 @@ final class MP_Social_Cards {
 	private function __construct() {
 		add_action( 'wp_head', [ $this, 'render_social_meta' ], 4 );
 		add_action( 'before_delete_post', [ $this, 'cleanup_post' ] );
+		add_action( 'init', [ $this, 'register_rewrites' ] );
+		add_action( 'template_redirect', [ $this, 'maybe_serve_card' ] );
+		add_filter( 'query_vars', [ $this, 'add_query_vars' ] );
 
 		if ( defined( 'WP_CLI' ) && WP_CLI ) {
 			\WP_CLI::add_command( 'publictech mp-cards', [ $this, 'cli_batch' ] );
 		}
+	}
+
+	/* ---------- rewrite endpoint (mp-social-card/{id}/) ---------- */
+
+	/** Register query var and rewrite rule for the social-card redirect endpoint. */
+	public function add_query_vars( array $vars ): array {
+		$vars[] = 'pt_mp_card_id';
+		return $vars;
+	}
+
+	public function register_rewrites(): void {
+		add_rewrite_rule( '^mp-social-card/(\d+)/?$', 'index.php?pt_mp_card_id=$matches[1]', 'top' );
+	}
+
+	/**
+	 * Handle /mp-social-card/{id}/ — redirect browsers to the MP profile page.
+	 *
+	 * This endpoint exists solely so that the public card URL (used in CLI batch
+	 * output and sharing) leads to the full MP page rather than a raw PNG file.
+	 * og:image continues to point to the raw PNG for fast crawler access.
+	 */
+	public function maybe_serve_card(): void {
+		$id = (int) get_query_var( 'pt_mp_card_id' );
+		if ( ! $id ) {
+			return;
+		}
+
+		$post = get_post( $id );
+		if ( ! $post || 'member-parliament' !== $post->post_type || 'publish' !== $post->post_status ) {
+			global $wp_query;
+			$wp_query->set_404();
+			status_header( 404 );
+			return;
+		}
+
+		wp_redirect( (string) get_permalink( $id ), 302 );
+		exit;
 	}
 
 	/* ---------- render-surface detection ---------- */
@@ -111,8 +150,8 @@ final class MP_Social_Cards {
 		if ( ! $post || 'member-parliament' !== $post->post_type || 'publish' !== $post->post_status ) {
 			return [ 'status' => 'invalid', 'id' => $post_id, 'message' => 'Not a published MP.' ];
 		}
-		if ( ! ApiFlash::is_configured() ) {
-			return [ 'status' => 'unconfigured', 'id' => $post_id, 'message' => 'ApiFlash key not set.' ];
+		if ( ! External_Screenshots::is_configured() ) {
+			return [ 'status' => 'unconfigured', 'id' => $post_id, 'message' => 'No screenshot provider configured.' ];
 		}
 		if ( ! $this->ensure_dir() ) {
 			return [ 'status' => 'failed', 'id' => $post_id, 'message' => 'Uploads directory unavailable.' ];
@@ -121,10 +160,10 @@ final class MP_Social_Cards {
 		$file = self::filename( $post_id, $this->seed_for( $post_id ) );
 		$dest = $this->dir_path() . $file;
 		if ( ! $force && file_exists( $dest ) ) {
-			return [ 'status' => 'skipped', 'id' => $post_id, 'file' => $file, 'url' => $this->dir_url() . $file ];
+			return [ 'status' => 'skipped', 'id' => $post_id, 'file' => $file, 'url' => $this->card_url( $post_id ) ?? ( $this->dir_url() . $file ) ];
 		}
 
-		$res = ApiFlash::capture( $this->card_render_url( $post_id ), [
+		$res = External_Screenshots::capture( $this->card_render_url( $post_id ), [
 			'format'     => 'png',
 			'width'      => self::WIDTH,
 			'height'     => self::HEIGHT,
@@ -136,7 +175,9 @@ final class MP_Social_Cards {
 			return [ 'status' => 'failed', 'id' => $post_id, 'message' => $res->get_error_message() ];
 		}
 		if ( 200 !== $res['code'] ) {
-			return [ 'status' => 'failed', 'id' => $post_id, 'message' => sprintf( 'HTTP %d: %s', $res['code'], ApiFlash::error_message( $res['body'] ) ) ];
+			$provider = $res['provider'] ?? 'screenshot API';
+			$detail   = 'apiflash' === $provider ? ApiFlash::error_message( $res['body'] ) : GCP_Screenshot::error_message( $res['body'] );
+			return [ 'status' => 'failed', 'id' => $post_id, 'message' => sprintf( 'HTTP %d (%s): %s', $res['code'], $provider, $detail ) ];
 		}
 
 		$png = (string) $res['body'];
@@ -166,7 +207,7 @@ final class MP_Social_Cards {
 		@chmod( $dest, defined( 'FS_CHMOD_FILE' ) ? FS_CHMOD_FILE : 0644 );
 
 		update_post_meta( $post_id, self::META_FILE, $file );
-		return [ 'status' => 'captured', 'id' => $post_id, 'file' => $file, 'url' => $this->dir_url() . $file ];
+		return [ 'status' => 'captured', 'id' => $post_id, 'file' => $file, 'url' => $this->card_url( $post_id ) ?? ( $this->dir_url() . $file ) ];
 	}
 
 	/**
@@ -178,8 +219,11 @@ final class MP_Social_Cards {
 		$limit = max( 0, $limit );
 		$out   = [ 'captured' => 0, 'skipped' => 0, 'failed' => 0, 'quota_remaining' => null, 'details' => [] ];
 
-		$quota     = ApiFlash::quota();
-		$remaining = is_array( $quota ) ? (int) $quota['remaining'] : null;
+		// Track ApiFlash quota only when ApiFlash is part of the active provider chain.
+		$mode            = External_Screenshots::provider_mode();
+		$track_af_quota  = 'gcp_only' !== $mode && ApiFlash::is_configured();
+		$quota           = $track_af_quota ? ApiFlash::quota() : null;
+		$remaining       = is_array( $quota ) ? (int) $quota['remaining'] : null;
 		$out['quota_remaining'] = $remaining;
 
 		$ids = get_posts( [
@@ -223,8 +267,10 @@ final class MP_Social_Cards {
 			}
 		}
 
-		$fresh = ApiFlash::quota( true );
-		$out['quota_remaining'] = is_array( $fresh ) ? (int) $fresh['remaining'] : $remaining;
+		if ( $track_af_quota ) {
+			$fresh = ApiFlash::quota( true );
+			$out['quota_remaining'] = is_array( $fresh ) ? (int) $fresh['remaining'] : $remaining;
+		}
 		return $out;
 	}
 
@@ -249,17 +295,32 @@ final class MP_Social_Cards {
 				\WP_CLI::log( $line );
 			}
 		}
-		\WP_CLI::success( sprintf(
-			'Captured %d, skipped %d, failed %d. ApiFlash quota remaining: %s',
-			$r['captured'], $r['skipped'], $r['failed'],
-			null === $r['quota_remaining'] ? 'unknown' : (string) $r['quota_remaining']
-		) );
+		$quota_note = null === $r['quota_remaining'] ? '' : sprintf( ' ApiFlash quota remaining: %d.', $r['quota_remaining'] );
+		\WP_CLI::success( sprintf( 'Captured %d, skipped %d, failed %d.%s', $r['captured'], $r['skipped'], $r['failed'], $quota_note ) );
 	}
 
 	/* ---------- public lookup ---------- */
 
-	/** Public URL of an MP's card, or null if none exists on disk. */
+	/**
+	 * Human-facing URL for the MP's card.
+	 *
+	 * Returns /mp-social-card/{id}/ — a WordPress endpoint that redirects
+	 * browsers to the full MP profile page. Use this for sharing links and
+	 * CLI output so that clicking the URL always lands on the page.
+	 */
 	public function card_url( int $post_id ): ?string {
+		$file = (string) get_post_meta( $post_id, self::META_FILE, true );
+		if ( '' === $file || ! self::is_valid_filename( $post_id, $file ) ) {
+			return null;
+		}
+		return file_exists( $this->dir_path() . $file ) ? home_url( '/mp-social-card/' . $post_id . '/' ) : null;
+	}
+
+	/**
+	 * Raw PNG URL for the MP's card — used in og:image so social crawlers get
+	 * the image bytes directly without an extra redirect hop.
+	 */
+	public function card_url_raw( int $post_id ): ?string {
 		$file = (string) get_post_meta( $post_id, self::META_FILE, true );
 		if ( '' === $file || ! self::is_valid_filename( $post_id, $file ) ) {
 			return null;
@@ -304,8 +365,8 @@ final class MP_Social_Cards {
 			$bits[] = sprintf( __( '%s office spend', 'publictech-core' ), '$' . number_format_i18n( $spend ) );
 		}
 		$desc  = $bits ? implode( ' · ', $bits ) : __( 'House of Commons expenditure and parliamentary record.', 'publictech-core' );
-		$url   = (string) get_permalink( $post );
-		$image = $this->card_url( $post->ID );
+		$url       = (string) get_permalink( $post );
+		$image_raw = $this->card_url_raw( $post->ID ); // raw PNG for og:image (fast for crawlers)
 
 		echo '<meta property="og:type" content="profile" />' . "\n";
 		echo '<meta property="og:title" content="' . esc_attr( $name ) . '" />' . "\n";
@@ -313,14 +374,14 @@ final class MP_Social_Cards {
 		echo '<meta property="og:url" content="' . esc_url( $url ) . '" />' . "\n";
 		echo '<meta property="og:site_name" content="' . esc_attr( get_bloginfo( 'name' ) ) . '" />' . "\n";
 
-		if ( null !== $image ) {
-			echo '<meta property="og:image" content="' . esc_url( $image ) . '" />' . "\n";
+		if ( null !== $image_raw ) {
+			echo '<meta property="og:image" content="' . esc_url( $image_raw ) . '" />' . "\n";
 			echo '<meta property="og:image:width" content="' . (int) self::WIDTH . '" />' . "\n";
 			echo '<meta property="og:image:height" content="' . (int) self::HEIGHT . '" />' . "\n";
 			echo '<meta property="og:image:type" content="image/png" />' . "\n";
 			echo '<meta property="og:image:alt" content="' . esc_attr( $name ) . '" />' . "\n";
 			echo '<meta name="twitter:card" content="summary_large_image" />' . "\n";
-			echo '<meta name="twitter:image" content="' . esc_url( $image ) . '" />' . "\n";
+			echo '<meta name="twitter:image" content="' . esc_url( $image_raw ) . '" />' . "\n";
 		} else {
 			echo '<meta name="twitter:card" content="summary" />' . "\n";
 		}

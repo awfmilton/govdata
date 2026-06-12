@@ -44,7 +44,9 @@ require_once PUBLICTECH_CORE_DIR . 'inc/class-analytics.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-captcha.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-captcha-admin.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-apiflash.php';
-require_once PUBLICTECH_CORE_DIR . 'inc/class-apiflash-admin.php';
+require_once PUBLICTECH_CORE_DIR . 'inc/class-gcp-screenshot.php';
+require_once PUBLICTECH_CORE_DIR . 'inc/class-external-screenshots.php';
+require_once PUBLICTECH_CORE_DIR . 'inc/class-external-screenshots-admin.php';
 
 add_action( 'after_setup_theme', static function () {
 	load_theme_textdomain( 'publictech-core', PUBLICTECH_CORE_DIR . 'languages' );
@@ -90,8 +92,16 @@ add_action( 'after_setup_theme', static function () {
 	\PublicTech\Core\Riding_Cache::instance();
 	\PublicTech\Core\Analytics::instance();
 	\PublicTech\Core\Captcha_Admin::instance();
-	\PublicTech\Core\ApiFlash_Admin::instance();
+	\PublicTech\Core\External_Screenshots_Admin::instance();
 }, 5 );
+
+// Flush rewrite rules once when the mp-social-card endpoint is first registered.
+add_action( 'init', static function () {
+	if ( '3' !== get_option( 'pt_rewrite_v' ) ) {
+		flush_rewrite_rules( false );
+		update_option( 'pt_rewrite_v', '3', true );
+	}
+}, 20 );
 
 add_action( 'init', [ \PublicTech\Core\MP_Finance_Warmer::class, 'schedule' ] );
 add_action( \PublicTech\Core\MP_Finance_Warmer::HOOK, [ \PublicTech\Core\MP_Finance_Warmer::class, 'run_warm' ] );
