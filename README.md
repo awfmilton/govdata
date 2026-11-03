@@ -365,6 +365,17 @@ WordPress expects them via *Appearance → Themes* / *Plugins*.
 
 ---
 
+## Roadmap
+
+See **[ROADMAP.md](ROADMAP.md)** for the full upcoming engineering plan (~74 hours), including:
+1. **DigitalOcean Infrastructure & Database Remigration** (restoring the August 2025 snapshot, reapplying all incremental migrations, and era-aware riding cache warming)
+2. **Subscriptions, Supporter Donations & Stripe Billing Integration** (`/pricing`, `/upgrade`, `/donate`, and tier webhook provisioning)
+3. **Wiring Inert Audit Features** (`class-alerts.php` daily email alerts, `class-anomalies.php` Benford's Law flags, and forum filters)
+4. **Bilingual (`en_CA` / `fr_CA`) & Multilingual Support**
+5. **Security & PIPEDA Privacy Review, Infrastructure Review, and GitHub Actions / Automated Testing Expansion**
+
+---
+
 ## License
 
 Mozilla Public License 2.0 (MPL-2.0). Copyright (c) Alexander Milton. See [LICENSE](LICENSE).
