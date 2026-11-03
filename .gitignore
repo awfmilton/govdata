@@ -28,3 +28,5 @@ wp-content/
 secrets.php
 __pycache__/
 *.pyc
+.claude/
+screenshotAPI/

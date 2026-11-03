@@ -367,4 +367,4 @@ WordPress expects them via *Appearance → Themes* / *Plugins*.
 
 ## License
 
-GPL-2.0-or-later. See individual file headers.
+Mozilla Public License 2.0 (MPL-2.0). Copyright (c) Alexander Milton. See [LICENSE](LICENSE).

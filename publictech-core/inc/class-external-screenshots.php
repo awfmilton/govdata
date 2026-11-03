@@ -137,6 +137,11 @@ final class External_Screenshots {
 			$gcp['type'] = (string) $params['format'];
 		}
 
+		// scale_factor → scaleFactor (device pixel ratio / retina).
+		if ( isset( $params['scale_factor'] ) ) {
+			$gcp['scaleFactor'] = (float) $params['scale_factor'];
+		}
+
 		// wait_until=network_idle → delay (default 3 s); otherwise pass delay directly.
 		if ( isset( $params['wait_until'] ) && 'network_idle' === $params['wait_until'] ) {
 			$gcp['delay'] = isset( $params['delay'] ) ? (int) $params['delay'] : 3;

@@ -2,7 +2,7 @@
   "name": "publictech/govdata",
   "description": "PublicTech audit-terminal WordPress suite: parent theme, child theme, MCP server plugin.",
   "type": "project",
-  "license": "GPL-2.0-or-later",
+  "license": "MPL-2.0",
   "require": {
     "php": ">=8.1"
   },

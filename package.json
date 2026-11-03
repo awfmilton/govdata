@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "description": "Build-time tooling for the PublicTech audit-terminal suite.",
-  "license": "GPL-2.0-or-later",
+  "license": "MPL-2.0",
   "scripts": {
     "build": "node tools/build-assets.mjs",
     "vendor": "node tools/vendor.mjs",

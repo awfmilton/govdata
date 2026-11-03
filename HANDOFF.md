@@ -17,26 +17,26 @@ The full implementation plan is in `MP-RIDINGS-OVER-TIME-PLAN.md`. This file is 
 
 | What | Value |
 |---|---|
-| SSH/SFTP host | `REDACTED_SSH_HOST` |
-| Username | `REDACTED_SSH_USER` |
-| Password | `REDACTED_SSH_PASSWORD` |
-| WordPress root | `/home/REDACTED_SSH_USER/govdata.ca` |
-| Theme/plugin root | `/home/REDACTED_SSH_USER/govdata.ca/wp-content/themes/govdata` |
-| WP-CLI | `wp --path=/home/REDACTED_SSH_USER/govdata.ca` |
+| SSH/SFTP host | `<SSH_HOST>` |
+| Username | `<SSH_USER>` |
+| Password | `<SSH_PASSWORD>` (from environment / secrets manager) |
+| WordPress root | `/home/<SSH_USER>/govdata.ca` |
+| Theme/plugin root | `/home/<SSH_USER>/govdata.ca/wp-content/themes/govdata` |
+| WP-CLI | `wp --path=/home/<SSH_USER>/govdata.ca` |
 
 **SSH tip**: password contains `!` which bash history-expands. Use plink (PuTTY):
 ```
-& "C:\Program Files\PuTTY\plink.exe" -ssh -pw "REDACTED_SSH_PASSWORD" -batch REDACTED_SSH_USER@REDACTED_SSH_HOST "command"
-& "C:\Program Files\PuTTY\pscp.exe" -pw "REDACTED_SSH_PASSWORD" -batch local_file REDACTED_SSH_USER@REDACTED_SSH_HOST:/remote/path
+& "C:\Program Files\PuTTY\plink.exe" -ssh -pw "<SSH_PASSWORD>" -batch <SSH_USER>@<SSH_HOST> "command"
+& "C:\Program Files\PuTTY\pscp.exe" -pw "<SSH_PASSWORD>" -batch local_file <SSH_USER>@<SSH_HOST>:/remote/path
 ```
 
 For MySQL queries upload a `.sql` or `.sh` file first (the `!` in the password breaks inline
 quoting). Use a MySQL credentials file at `/tmp/my_pt.cnf` on the server:
 ```
 [client]
-host=35.230.186.163
+host=<DB_HOST>
 user=pt_read
-password=REDACTED_DB_PASSWORD
+password=<PT_DB_PASSWORD>
 database=grantconts
 ```
 Then: `mysql --defaults-file=/tmp/my_pt.cnf < /tmp/query.sql`
@@ -47,10 +47,10 @@ Then: `mysql --defaults-file=/tmp/my_pt.cnf < /tmp/query.sql`
 
 | Alias | Host | DB | User | Password |
 |---|---|---|---|---|
-| `pt-grantconts-01` | `35.230.186.163` | `grantconts` | `pt_read` | `REDACTED_DB_PASSWORD` |
-| `pt-cache-02` | `mysql.alexmilton.ca` | `govdata_cache_02` | `gdc_02` | `REDACTED_DB_PASSWORD` |
+| `pt-grantconts-01` | `<DB_HOST>` | `grantconts` | `pt_read` | `PT_DB_PASSWORD` (env) |
+| `pt-cache-02` | `<CACHE_DB_HOST>` | `govdata_cache_02` | `gdc_02` | `PT_DB_PASSWORD` (env) |
 
-The `PT_DEV_DB_PASSWORD` constant (`REDACTED_DB_PASSWORD`) is defined in
+The `PT_DEV_DB_PASSWORD` constant is sourced from `PT_DB_PASSWORD` in
 `database/mu-plugins/00-db-connections.php` and loaded by WordPress, so WP-CLI
 scripts can use `defined('PT_DEV_DB_PASSWORD') ? PT_DEV_DB_PASSWORD : ''`.
 
@@ -189,7 +189,7 @@ re-import 2003 RO data with a new `ro_id=3` before the CASE logic above works.
 
 **After changing the warmer**: run the warm via WP-CLI:
 ```
-wp eval-file database/warm-riding-cache.php --path=/home/REDACTED_SSH_USER/govdata.ca
+wp eval-file database/warm-riding-cache.php --path=/home/<SSH_USER>/govdata.ca
 ```
 Expect ~300-400s and ~1M agreements. The `load_directory()` call also needs
 updating to return ridings across ALL active ROs (union), not just one.
@@ -201,7 +201,7 @@ updating to return ridings across ALL active ROs (union), not just one.
 **Why**: 113 new 2025 MPs show $0 office spend in the directory. The HoC publishes
 quarterly expense reports; once Q1 2026 data is out, run:
 ```
-wp eval-file database/warm-mp-finance-cache.php --path=/home/REDACTED_SSH_USER/govdata.ca
+wp eval-file database/warm-mp-finance-cache.php --path=/home/<SSH_USER>/govdata.ca
 ```
 
 The warmer matches on `external_mp_id` post meta. The new 113 MP posts don't
@@ -259,7 +259,7 @@ This is new UI work — design first, then build.
 - **MySQL `only_full_group_by` mode** is enabled on Cloud SQL. Any GROUP BY query
   must aggregate or use `ANY_VALUE()` for non-grouped columns.
 - **Object cache** — after any WP data change run:
-  `wp cache flush --path=/home/REDACTED_SSH_USER/govdata.ca`
+  `wp cache flush --path=/home/<SSH_USER>/govdata.ca`
 - **The `mps` table still has 219 HIST- rows** (61 unique people imported
   multiple times by a buggy run). They are harmless but should be cleaned up as
   part of Task 1.

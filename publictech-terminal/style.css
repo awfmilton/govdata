@@ -2,15 +2,15 @@
 Theme Name: PublicTech Terminal
 Theme URI: https://publictech.audit/themes/terminal
 Template: publictech-core
-Author: PublicTech
-Author URI: https://publictech.audit
+Author: Alexander Milton
+Author URI: https://github.com/awfmilton
 Description: Cyberpunk / data-terminal child theme for PublicTech Core. Provides the full audit-terminal UI — home dashboard, MP directory, profile, streaming table, AI console, forum, user-settings page — plus light/dark theme toggle and an in-page chart-appearance customizer.
 Version: 1.1.0
 Requires at least: 6.4
 Tested up to: 6.8
 Requires PHP: 8.1
-License: GPL-2.0-or-later
-License URI: https://www.gnu.org/licenses/gpl-2.0.html
+License: MPL-2.0
+License URI: https://mozilla.org/MPL/2.0/
 Text Domain: publictech-terminal
 Tags: dark-mode, light-mode, custom-colors, two-columns, three-columns, full-width-template
 */

@@ -28,6 +28,7 @@ final class MP_Social_Cards {
 
 	public const WIDTH  = 1200;
 	public const HEIGHT = 630;
+	public const SCALE  = 2;    // device pixel ratio — output PNG is WIDTH*SCALE × HEIGHT*SCALE
 
 	/** Uploads subdirectory for MP cards. */
 	public const DIR = 'pt-charts/mp';
@@ -135,6 +136,7 @@ final class MP_Social_Cards {
 			(string) get_post_meta( $post_id, 'travel_spend', true ),
 			(string) get_post_meta( $post_id, 'contracts_n', true ),
 			(string) get_post_meta( $post_id, 'votes_cast', true ),
+			'x' . self::SCALE,
 		] );
 	}
 
@@ -166,12 +168,13 @@ final class MP_Social_Cards {
 		}
 
 		$res = External_Screenshots::capture( $this->card_render_url( $post_id ), [
-			'format'     => 'png',
-			'width'      => self::WIDTH,
-			'height'     => self::HEIGHT,
-			'wait_until' => 'network_idle',
-			'delay'      => 3,
-			'fresh'      => 'true',
+			'format'       => 'png',
+			'width'        => self::WIDTH,
+			'height'       => self::HEIGHT,
+			'scale_factor' => self::SCALE,
+			'wait_until'   => 'network_idle',
+			'delay'        => 3,
+			'fresh'        => 'true',
 		] );
 		if ( is_wp_error( $res ) ) {
 			return [ 'status' => 'failed', 'id' => $post_id, 'message' => $res->get_error_message() ];
@@ -241,8 +244,9 @@ final class MP_Social_Cards {
 		foreach ( $ids as $id ) {
 			$id = (int) $id;
 
-			// Stop spending once quota is at/below the floor (a known-good number).
-			if ( null !== $remaining && ! $force ) {
+			// Stop only when ApiFlash quota is gone AND no GCP fallback exists.
+			// When GCP is configured, capture() falls back automatically — let it run.
+			if ( null !== $remaining && ! $force && ! GCP_Screenshot::is_configured() ) {
 				$file_exists = file_exists( $this->dir_path() . self::filename( $id, $this->seed_for( $id ) ) );
 				if ( ! $file_exists && $remaining <= self::QUOTA_FLOOR - 1 ) {
 					$out['details'][] = [ 'status' => 'quota_exhausted', 'id' => $id ];
@@ -378,14 +382,21 @@ final class MP_Social_Cards {
 
 		if ( null !== $image_raw ) {
 			echo '<meta property="og:image" content="' . esc_url( $image_raw ) . '" />' . "\n";
-			echo '<meta property="og:image:width" content="' . (int) self::WIDTH . '" />' . "\n";
-			echo '<meta property="og:image:height" content="' . (int) self::HEIGHT . '" />' . "\n";
+			echo '<meta property="og:image:width" content="' . (int) ( self::WIDTH * self::SCALE ) . '" />' . "\n";
+			echo '<meta property="og:image:height" content="' . (int) ( self::HEIGHT * self::SCALE ) . '" />' . "\n";
 			echo '<meta property="og:image:type" content="image/png" />' . "\n";
 			echo '<meta property="og:image:alt" content="' . esc_attr( $name ) . '" />' . "\n";
 			echo '<meta name="twitter:card" content="summary_large_image" />' . "\n";
+			echo '<meta name="twitter:site" content="@govdata_ca" />' . "\n";
+			echo '<meta name="twitter:title" content="' . esc_attr( $name ) . '" />' . "\n";
+			echo '<meta name="twitter:description" content="' . esc_attr( $desc ) . '" />' . "\n";
 			echo '<meta name="twitter:image" content="' . esc_url( $image_raw ) . '" />' . "\n";
+			echo '<meta name="twitter:image:alt" content="' . esc_attr( $name ) . '" />' . "\n";
 		} else {
 			echo '<meta name="twitter:card" content="summary" />' . "\n";
+			echo '<meta name="twitter:site" content="@govdata_ca" />' . "\n";
+			echo '<meta name="twitter:title" content="' . esc_attr( $name ) . '" />' . "\n";
+			echo '<meta name="twitter:description" content="' . esc_attr( $desc ) . '" />' . "\n";
 		}
 	}
 

@@ -7,9 +7,9 @@
  * Requires at least: 6.4
  * Tested up to:      6.8
  * Requires PHP:      8.1
- * Author:            PublicTech
- * License:           GPL-2.0-or-later
- * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
+ * Author:            Alexander Milton
+ * License:           MPL-2.0
+ * License URI:       https://mozilla.org/MPL/2.0/
  * Text Domain:       publictech-mcp
  *
  * The MCP transport here is JSON-RPC 2.0 over HTTP (single endpoint that

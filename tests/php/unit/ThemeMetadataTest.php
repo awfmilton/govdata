@@ -21,7 +21,7 @@ final class ThemeMetadataTest extends TestCase {
 		$this->assertMatchesRegularExpression( '/Version:\s+\d+\.\d+\.\d+/',              $header );
 		$this->assertMatchesRegularExpression( '/Requires PHP:\s+8\.\d+/',                $header );
 		$this->assertMatchesRegularExpression( '/Requires at least:\s+6\.\d+/',           $header );
-		$this->assertMatchesRegularExpression( '/License:\s+GPL-2\.0-or-later/',          $header );
+		$this->assertMatchesRegularExpression( '/License:\s+MPL-2\.0/',                    $header );
 		$this->assertMatchesRegularExpression( '/Text Domain:\s+publictech-core/i',       $header );
 	}
 

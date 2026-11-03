@@ -1,15 +1,15 @@
 /*
 Theme Name: PublicTech Core
 Theme URI: https://publictech.audit/themes/core
-Author: PublicTech
-Author URI: https://publictech.audit
+Author: Alexander Milton
+Author URI: https://github.com/awfmilton
 Description: Core engine for the PublicTech Audit Terminal — multi-database PDO layer, custom REST/JSON endpoints, conditional D3 asset pipeline, member-parliament CPT, tiered access throttling and chart-appearance customizer. Intended to be paired with the PublicTech Terminal child theme.
 Version: 1.1.0
 Requires at least: 6.4
 Tested up to: 6.8
 Requires PHP: 8.1
-License: GPL-2.0-or-later
-License URI: https://www.gnu.org/licenses/gpl-2.0.html
+License: MPL-2.0
+License URI: https://mozilla.org/MPL/2.0/
 Text Domain: publictech-core
 Tags: custom-colors, custom-menu, translation-ready
 */
