@@ -379,3 +379,12 @@ See **[ROADMAP.md](ROADMAP.md)** for the full upcoming engineering plan (~74 hou
 ## License
 
 Mozilla Public License 2.0 (MPL-2.0). Copyright (c) Alexander Milton. See [LICENSE](LICENSE).
+## Optional Longplay Analyst grant
+
+Set `LONGPLAY_ANALYST_FEATURE_ID` (access Feature UUID), server-only `LONGPLAY_SECRET_KEY`, `LONGPLAY_BASE_URL` (HTTPS origin), `LONGPLAY_APP_ID` and explicit `LONGPLAY_ENVIRONMENT` (`sandbox` or `live`) to opt in. Without the Feature the existing WordPress tier lookup makes no billing calls. The adapter uses the Longplay 0.10 HTTP contract through WordPress HTTP APIs; no PHP SDK or new dependency is required.
+
+The existing authenticated WordPress user ID maps to `publictech:user:<id>`. Only that reference and the configured Feature go to billing, never query text, MCP bearer tokens or civic data. A valid access grant can raise a free user to Analyst in the existing tier/throttle/MCP checks. The observation is reused only inside the current PHP request; the next request checks again. Malformed configuration, wrong protocol/scope, denial and provider failure cannot grant access. Existing administrator-issued tiers remain independent, and editing one's own profile is no longer authority to grant a paid tier (`manage_options` is required).
+
+This is the access-grant slice of #16. Checkout, donation receipts, renewals, self-service billing and higher-tier product mapping remain unimplemented. It does not persist paid status, invent subscription dates or treat a balance check as a usage reservation. Confirm service/SDK usage terms and the merchant setup before enabling commercial billing.
+
+Offline protocol and profile-privilege regression checks: `php tests/php/longplay-access-smoke.php`. These use transport/WordPress shims and make no network or database calls.

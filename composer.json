@@ -35,7 +35,7 @@
     "phpcs": "phpcs",
     "phpcbf": "phpcbf",
     "phpstan": "phpstan analyse --memory-limit=512M",
-    "test": "phpunit",
+    "test": ["phpunit", "@php tests/php/longplay-access-smoke.php"],
     "ci": [
       "@lint",
       "@phpcs",
