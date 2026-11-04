@@ -22,6 +22,7 @@ require_once PUBLICTECH_CORE_DIR . 'inc/class-security.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-hardening.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-multi-db.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-cache-db.php';
+require_once PUBLICTECH_CORE_DIR . 'inc/class-longplay-access.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-access-tiers.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-throttle.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-cpt.php';

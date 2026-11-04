@@ -93,7 +93,11 @@ final class Access_Tiers {
 			return 'anonymous';
 		}
 		$slug = (string) get_user_meta( $user_id, self::META_TIER, true );
-		return isset( $this->tiers()[ $slug ] ) ? $slug : 'free';
+		$tier = isset( $this->tiers()[ $slug ] ) ? $slug : 'free';
+		if ( 'free' === $tier && getenv( 'LONGPLAY_ANALYST_FEATURE_ID' ) && Longplay_Access::allows( $user_id ) ) {
+			return 'analyst';
+		}
+		return $tier;
 	}
 
 	public function quota( ?int $user_id ): array {
@@ -176,7 +180,8 @@ final class Access_Tiers {
 		}
 		check_admin_referer( 'pt_token_' . $user_id, '_pt_token_nonce' );
 
-		if ( isset( $_POST['pt_tier'] ) ) {
+		// Editing one's profile is not authority to grant oneself paid access.
+		if ( isset( $_POST['pt_tier'] ) && current_user_can( 'manage_options' ) ) {
 			$tier = sanitize_key( wp_unslash( $_POST['pt_tier'] ) );
 			if ( isset( $this->tiers()[ $tier ] ) ) {
 				update_user_meta( $user_id, self::META_TIER, $tier );
