@@ -4,8 +4,9 @@
  *
  * "Votes cast" = House of Commons recorded divisions in which the member voted Yea or Nay
  * (OpenParliament op_bills_membervote.vote IN ('Y','N'); absent 'A' and paired 'P' are not votes cast).
- * Link chain: post meta external_mp_id → grantconts.mps.mp_id → mps.mp_persons_id →
- * mp_persons.op_politician_id → op_bills_membervote.politician_id.
+ * Link: post meta op_politician_id → op_bills_membervote.politician_id (every post synced by
+ * sync-current-mps.php has it). Fallback for older posts: external_mp_id → grantconts.mps.mp_id →
+ * mps.mp_persons_id → mp_persons.op_politician_id.
  * Members with no linked OpenParliament politician get 0 and are listed so they can be fixed.
  *
  * Usage:  wp eval-file database/sync-mp-votes.php            (writes)
@@ -41,13 +42,17 @@ $by_mp = [];
 foreach ( $rows as $r ) {
 	$by_mp[ (string) $r['mp_id'] ] = [ 'votes' => (int) $r['votes'], 'linked' => null !== $r['op_politician_id'] ];
 }
+// Votes cast per OpenParliament politician id.
+$by_pol = $db->query( "SELECT politician_id, COUNT(*) FROM op_bills_membervote WHERE vote IN ('Y','N') GROUP BY politician_id" )
+	->fetchAll( PDO::FETCH_KEY_PAIR );
 
 $posts    = get_posts( [ 'post_type' => 'member-parliament', 'post_status' => 'any', 'numberposts' => -1, 'fields' => 'ids' ] );
 $set      = 0;
 $unlinked = [];
 foreach ( $posts as $pid ) {
 	$ext = (string) get_post_meta( $pid, 'external_mp_id', true );
-	$hit = $by_mp[ $ext ] ?? null;
+	$pol = (int) get_post_meta( $pid, 'op_politician_id', true );
+	$hit = $pol ? [ 'votes' => (int) ( $by_pol[ $pol ] ?? 0 ), 'linked' => true ] : ( $by_mp[ $ext ] ?? null );
 	if ( ! $hit || ! $hit['linked'] ) {
 		$unlinked[] = $pid . ' ' . get_the_title( $pid ) . ' (' . ( $ext ?: 'no external_mp_id' ) . ')';
 	}

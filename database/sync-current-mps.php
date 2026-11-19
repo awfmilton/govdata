@@ -1,230 +1,202 @@
 <?php
 /**
- * Sync WordPress member-parliament posts to the authoritative 45th-Parliament
- * roster from op_core_electedmember (end_date IS NULL = currently serving).
+ * WP-CLI: sync member-parliament posts with the sitting House of Commons.
  *
- * What this script does:
- *   1. Loads 343 current MPs from the OP database.
- *   2. Matches each to an existing WP post by normalised full name.
- *   3. Updates matched posts: riding, party, province, photo, op_member_id meta.
- *   4. Creates new WP posts for current MPs with no existing post.
- *   5. Sets to DRAFT any published WP posts not matched by a current OP MP
- *      (i.e. former MPs who lost their seat or retired).
+ * Authoritative roster: the House of Commons member list (https://www.ourcommons.ca/members/en/search/xml),
+ * cross-checked with op_core_electedmember (end_date IS NULL) in grantconts. The two must agree on the count;
+ * the script stops otherwise.
  *
- * Run via WP-CLI (dry-run first):
- *   wp eval-file /home/REDACTED_SSH_USER/sync-current-mps.php --path=/home/REDACTED_SSH_USER/govdata.ca
+ * Matching is by openparliament politician id (post meta op_politician_id), never by name.
+ *   - Sitting MP with a published post: refresh riding, party, region and IDs. The photo is NOT touched
+ *     (portraits are self-hosted by sync-mp-photos.php).
+ *   - Sitting MP with no post: create it, with the official House of Commons photo URL as pt_mp_photo_url
+ *     (run sync-mp-photos.php afterwards to self-host it).
+ *   - Published post for someone no longer sitting: set to draft (the site's "former MP" state, see
+ *     single-member-parliament.php) and record mp_term_end. Nothing is deleted.
+ * Every change is written to the post's pt_mp_sync_log meta so it can be audited.
  *
- * Set PT_SYNC_DRY_RUN = false below to commit changes.
+ * Usage (WP-CLI, from the WordPress root):
+ *   wp eval-file database/sync-current-mps.php            dry run (default)
+ *   wp eval-file database/sync-current-mps.php apply      write changes
+ * DB connection: GRANTCONTS_HOST / _USER / _PASS environment variables, else the pt-grantconts-01 entry of
+ * PUBLICTECH_DB_CONNECTIONS in wp-config.php.
  *
- * @package PublicTech\Core
+ * @package PublicTech
  */
 
 defined( 'ABSPATH' ) || die( "Run via: wp eval-file sync-current-mps.php\n" );
 
-define( 'PT_SYNC_DRY_RUN', false );  // ← flip to false to commit
+$apply = in_array( 'apply', (array) ( $args ?? [] ), true );
+WP_CLI::log( $apply ? 'APPLY: posts will be created / updated / drafted.' : 'DRY RUN: no changes are written (pass "apply" to write).' );
 
-if ( PT_SYNC_DRY_RUN ) {
-	WP_CLI::log( '🔍  DRY RUN — no changes will be written.' );
-} else {
-	WP_CLI::log( '⚠   LIVE RUN — WordPress posts will be created / updated / drafted.' );
-}
-
-// ── Connect to grantconts ─────────────────────────────────────────────────────
-
-$pt_pass = defined( 'PT_DEV_DB_PASSWORD' ) ? PT_DEV_DB_PASSWORD : '';
-if ( ! $pt_pass ) {
-	WP_CLI::error( 'PT_DEV_DB_PASSWORD not defined. Is 00-db-connections.php loaded?' );
-}
-
+// ── grantconts ────────────────────────────────────────────────────────────────
+$cfg = defined( 'PUBLICTECH_DB_CONNECTIONS' ) ? ( PUBLICTECH_DB_CONNECTIONS['pt-grantconts-01'] ?? [] ) : [];
+$dsn = sprintf( 'mysql:host=%s;port=%d;dbname=%s;charset=utf8mb4',
+	getenv( 'GRANTCONTS_HOST' ) ?: ( $cfg['host'] ?? '127.0.0.1' ), (int) ( $cfg['port'] ?? 3306 ), $cfg['name'] ?? 'grantconts' );
 try {
-	$pdo = new PDO(
-		'mysql:host=35.230.186.163;port=3306;dbname=grantconts;charset=utf8mb4',
-		'pt_read',
-		$pt_pass,
-		[ PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC ]
-	);
+	$pdo = new PDO( $dsn, getenv( 'GRANTCONTS_USER' ) ?: ( $cfg['user'] ?? 'pt_read' ), getenv( 'GRANTCONTS_PASS' ) ?: ( $cfg['pass'] ?? '' ),
+		[ PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC ] );
 } catch ( PDOException $e ) {
 	WP_CLI::error( 'grantconts connect failed: ' . $e->getMessage() );
 }
 
-// ── Load 343 current MPs from OP ──────────────────────────────────────────────
-
 $op_rows = $pdo->query( "
-	SELECT
-		em.id            AS op_member_id,
-		p.id             AS op_politician_id,
-		p.name_given     AS first_name,
-		p.name_family    AS last_name,
-		p.headshot,
-		r.name_en        AS riding,
-		r.province,
-		pa.name_en       AS party,
-		em.start_date
-	FROM op_core_electedmember em
-	JOIN op_core_politician p  ON p.id  = em.politician_id
-	JOIN op_core_riding     r  ON r.id  = em.riding_id
-	JOIN op_core_party      pa ON pa.id = em.party_id
-	WHERE em.end_date IS NULL
-	ORDER BY p.name_family, p.name_given
-" )->fetchAll();
+	SELECT em.politician_id AS pol, em.id AS op_member_id, p.name_given AS first_name, p.name_family AS last_name,
+	       r.name_en AS riding, r.province, pa.name_en AS party, em.start_date
+	  FROM op_core_electedmember em
+	  JOIN op_core_politician p  ON p.id  = em.politician_id
+	  JOIN op_core_riding     r  ON r.id  = em.riding_id
+	  JOIN op_core_party      pa ON pa.id = em.party_id
+	 WHERE em.end_date IS NULL" )->fetchAll();
+$current = array_column( $op_rows, null, 'pol' );
 
-WP_CLI::log( sprintf( 'Loaded %d current MPs from op_core_electedmember.', count( $op_rows ) ) );
+// ── House of Commons member list (official) ────────────────────────────────────
+$res = wp_remote_get( 'https://www.ourcommons.ca/members/en/search/xml', [ 'timeout' => 60 ] );
+if ( is_wp_error( $res ) || 200 !== wp_remote_retrieve_response_code( $res ) ) {
+	WP_CLI::error( 'Could not fetch the House of Commons member list.' );
+}
+$xml = simplexml_load_string( wp_remote_retrieve_body( $res ) );
+$hoc = [];
+foreach ( $xml->MemberOfParliament as $m ) {
+	$hoc[] = [
+		'person_id' => (string) $m->PersonId,
+		'first'     => (string) $m->PersonOfficialFirstName,
+		'last'      => (string) $m->PersonOfficialLastName,
+		'riding'    => (string) $m->ConstituencyName,
+	];
+}
+if ( count( $hoc ) !== count( $current ) ) {
+	WP_CLI::error( sprintf( 'Roster mismatch: House of Commons lists %d sitting MPs, op_core_electedmember %d. Refresh the parliament data first.', count( $hoc ), count( $current ) ) );
+}
+WP_CLI::log( sprintf( 'Sitting MPs: %d (House of Commons and openparliament agree).', count( $hoc ) ) );
 
-// Build normalised-name → OP row map.
-function pt_norm( string $s ): string {
-	return mb_strtolower( html_entity_decode( trim( $s ), ENT_QUOTES | ENT_HTML5, 'UTF-8' ), 'UTF-8' );
+$norm = static fn( string $s ): string => strtolower( remove_accents( preg_replace( [ '/[\s\x{2014}\x{2013}-]+/u', '/[\x{2018}\x{2019}]/u' ], [ ' ', "'" ], html_entity_decode( $s, ENT_QUOTES, 'UTF-8' ) ) ) );
+$hoc_by_riding = [];
+foreach ( $hoc as $h ) {
+	$hoc_by_riding[ $norm( $h['riding'] ) ] = $h;
 }
 
-$op_by_name = [];
-foreach ( $op_rows as $row ) {
-	$key = pt_norm( $row['first_name'] . ' ' . $row['last_name'] );
-	$op_by_name[ $key ] = $row;
-}
+/** Official portrait URL from the member's House of Commons profile page. */
+$hoc_photo = static function ( string $person_id ): string {
+	$r = wp_remote_get( 'https://www.ourcommons.ca/members/en/' . rawurlencode( $person_id ), [ 'timeout' => 30 ] );
+	if ( is_wp_error( $r ) || ! preg_match( '#/Content/Parliamentarians/Images/OfficialMPPhotos/[^"\']+\.(?:jpg|jpeg|png)#i', wp_remote_retrieve_body( $r ), $m ) ) {
+		return '';
+	}
+	return 'https://www.ourcommons.ca' . $m[0];
+};
 
-// ── Load all published WP member-parliament posts ─────────────────────────────
+$log = static function ( int $post_id, string $what ) use ( $apply ): void {
+	if ( $apply ) {
+		add_post_meta( $post_id, 'pt_mp_sync_log', gmdate( 'Y-m-d' ) . ' sync-current-mps: ' . $what );
+	}
+};
 
-$wp_posts = get_posts( [
-	'post_type'      => 'member-parliament',
-	'post_status'    => 'publish',
-	'posts_per_page' => -1,
-	'fields'         => 'ids',
-] );
-
-WP_CLI::log( sprintf( 'Found %d published WP member-parliament posts.', count( $wp_posts ) ) );
-
-$matched   = [];   // op_name_key → wp post ID (matched current MP)
-$to_draft  = [];   // WP post IDs of former MPs
-$updated   = 0;
-$created   = 0;
-$drafted   = 0;
-
-// ── Pass 1: match existing posts to current MPs ───────────────────────────────
-
-foreach ( $wp_posts as $post_id ) {
-	$raw_title = get_post_field( 'post_title', $post_id );
-	$key       = pt_norm( $raw_title );
-
-	if ( isset( $op_by_name[ $key ] ) ) {
-		$matched[ $key ] = $post_id;
-		$op = $op_by_name[ $key ];
-
-		WP_CLI::log( sprintf( '  ✓ match: "%s" → post %d  (%s, %s)',
-			$raw_title, $post_id, $op['riding'], $op['party'] ) );
-
-		if ( ! PT_SYNC_DRY_RUN ) {
-			// Update post title to canonical OP name.
-			wp_update_post( [
-				'ID'           => $post_id,
-				'post_title'   => trim( $op['first_name'] . ' ' . $op['last_name'] ),
-				'post_excerpt' => $op['riding'],
-			] );
-			// Update / add meta.
-			update_post_meta( $post_id, 'pt_mp_district',     $op['riding'] );
-			update_post_meta( $post_id, 'op_member_id',       $op['op_member_id'] );
-			update_post_meta( $post_id, 'op_politician_id',   $op['op_politician_id'] );
-			if ( $op['headshot'] ) {
-				update_post_meta( $post_id, 'pt_mp_photo_url',
-					'https://cdn.openparliament.ca/thumbnails/' . $op['headshot'] );
-			}
-			// Taxonomy: party + region.
-			$party_term = get_term_by( 'name', $op['party'], 'mp_party' )
-				?: wp_insert_term( $op['party'], 'mp_party' );
-			if ( ! is_wp_error( $party_term ) ) {
-				wp_set_object_terms( $post_id,
-					[ is_array( $party_term ) ? $party_term['term_id'] : $party_term->term_id ],
-					'mp_party' );
-			}
-			$region_term = get_term_by( 'name', $op['province'], 'mp_region' )
-				?: wp_insert_term( $op['province'], 'mp_region' );
-			if ( ! is_wp_error( $region_term ) ) {
-				wp_set_object_terms( $post_id,
-					[ is_array( $region_term ) ? $region_term['term_id'] : $region_term->term_id ],
-					'mp_region' );
-			}
+$set_terms = static function ( int $post_id, array $op ): void {
+	foreach ( [ 'mp_party' => $op['party'], 'mp_region' => $op['province'] ] as $tax => $name ) {
+		$term = get_term_by( 'name', $name, $tax ) ?: wp_insert_term( $name, $tax );
+		if ( ! is_wp_error( $term ) ) {
+			wp_set_object_terms( $post_id, [ (int) ( is_array( $term ) ? $term['term_id'] : $term->term_id ) ], $tax );
 		}
-		$updated++;
-	} else {
-		$to_draft[] = $post_id;
+	}
+};
+
+// ── Existing posts by politician id ───────────────────────────────────────────
+$posts = get_posts( [ 'post_type' => 'member-parliament', 'post_status' => [ 'publish', 'draft' ], 'numberposts' => -1, 'fields' => 'ids' ] );
+$by_pol = [];
+foreach ( $posts as $id ) {
+	$pol = (int) get_post_meta( $id, 'op_politician_id', true );
+	if ( $pol ) {
+		$by_pol[ $pol ][] = $id;
 	}
 }
 
-// ── Pass 2: create posts for current MPs with no existing post ────────────────
+$updated = $created = $drafted = 0;
 
-$new_keys = array_diff( array_keys( $op_by_name ), array_keys( $matched ) );
-WP_CLI::log( '' );
-WP_CLI::log( sprintf( '%d current MPs need a new WP post.', count( $new_keys ) ) );
-
-foreach ( $new_keys as $key ) {
-	$op    = $op_by_name[ $key ];
+// Sitting MPs: refresh or create.
+foreach ( $current as $pol => $op ) {
+	$hoc_m = $hoc_by_riding[ $norm( $op['riding'] ) ] ?? null;
+	if ( ! $hoc_m ) {
+		WP_CLI::warning( sprintf( 'No House of Commons member for riding "%s" (%s %s); skipped.', $op['riding'], $op['first_name'], $op['last_name'] ) );
+		continue;
+	}
+	$ids = $by_pol[ $pol ] ?? [];
+	if ( count( $ids ) > 1 ) {
+		WP_CLI::warning( sprintf( 'Politician %d has %d posts (%s); using the published one.', $pol, count( $ids ), implode( ',', $ids ) ) );
+	}
+	$pub = array_values( array_filter( $ids, static fn( $i ) => 'publish' === get_post_status( $i ) ) );
+	$id  = $pub[0] ?? ( $ids[0] ?? 0 );
 	$title = trim( $op['first_name'] . ' ' . $op['last_name'] );
 
-	WP_CLI::log( sprintf( '  + create: "%s"  (%s, %s)', $title, $op['riding'], $op['party'] ) );
+	if ( $id ) {
+		$changes = [];
+		if ( get_post_meta( $id, 'pt_mp_district', true ) !== $op['riding'] ) {
+			$changes[] = 'riding ' . get_post_meta( $id, 'pt_mp_district', true ) . ' -> ' . $op['riding'];
+		}
+		if ( 'publish' !== get_post_status( $id ) ) {
+			$changes[] = 'republished (sitting again)';
+		}
+		if ( $apply ) {
+			if ( 'publish' !== get_post_status( $id ) ) {
+				wp_update_post( [ 'ID' => $id, 'post_status' => 'publish' ] );
+			}
+			update_post_meta( $id, 'pt_mp_district', $op['riding'] );
+			update_post_meta( $id, 'op_member_id', $op['op_member_id'] );
+			update_post_meta( $id, 'pt_hoc_person_id', $hoc_m['person_id'] );
+			delete_post_meta( $id, 'mp_term_end' );
+			$set_terms( $id, $op );
+		}
+		if ( $changes ) {
+			WP_CLI::log( sprintf( '  ~ %s (post %d): %s', $title, $id, implode( '; ', $changes ) ) );
+			$log( $id, implode( '; ', $changes ) );
+		}
+		$updated++;
+		continue;
+	}
 
-	if ( ! PT_SYNC_DRY_RUN ) {
-		$post_id = wp_insert_post( [
-			'post_type'    => 'member-parliament',
-			'post_status'  => 'publish',
-			'post_title'   => $title,
-			'post_excerpt' => $op['riding'],
-		], true );
-
-		if ( is_wp_error( $post_id ) ) {
-			WP_CLI::warning( "  Failed to create post for {$title}: " . $post_id->get_error_message() );
+	$photo = $hoc_photo( $hoc_m['person_id'] );
+	WP_CLI::log( sprintf( '  + create: %s (%s, %s, since %s) photo: %s', $title, $op['riding'], $op['party'], $op['start_date'], $photo ?: 'none found' ) );
+	if ( $apply ) {
+		$id = wp_insert_post( [ 'post_type' => 'member-parliament', 'post_status' => 'publish', 'post_title' => $title, 'post_excerpt' => $op['riding'] ], true );
+		if ( is_wp_error( $id ) ) {
+			WP_CLI::warning( "  Failed to create {$title}: " . $id->get_error_message() );
 			continue;
 		}
-
-		update_post_meta( $post_id, 'pt_mp_district',   $op['riding'] );
-		update_post_meta( $post_id, 'op_member_id',     $op['op_member_id'] );
-		update_post_meta( $post_id, 'op_politician_id', $op['op_politician_id'] );
-		if ( $op['headshot'] ) {
-			update_post_meta( $post_id, 'pt_mp_photo_url',
-				'https://cdn.openparliament.ca/thumbnails/' . $op['headshot'] );
+		update_post_meta( $id, 'pt_mp_district', $op['riding'] );
+		update_post_meta( $id, 'op_member_id', $op['op_member_id'] );
+		update_post_meta( $id, 'op_politician_id', $pol );
+		update_post_meta( $id, 'pt_hoc_person_id', $hoc_m['person_id'] );
+		update_post_meta( $id, 'mp_term_start', $op['start_date'] );
+		update_post_meta( $id, 'mp_term_start_year', substr( (string) $op['start_date'], 0, 4 ) );
+		update_post_meta( $id, 'votes_cast', 0 );
+		if ( $photo ) {
+			update_post_meta( $id, 'pt_mp_photo_url', $photo );
 		}
-		$party_term = get_term_by( 'name', $op['party'], 'mp_party' )
-			?: wp_insert_term( $op['party'], 'mp_party' );
-		if ( ! is_wp_error( $party_term ) ) {
-			wp_set_object_terms( $post_id,
-				[ is_array( $party_term ) ? $party_term['term_id'] : $party_term->term_id ],
-				'mp_party' );
-		}
-		$region_term = get_term_by( 'name', $op['province'], 'mp_region' )
-			?: wp_insert_term( $op['province'], 'mp_region' );
-		if ( ! is_wp_error( $region_term ) ) {
-			wp_set_object_terms( $post_id,
-				[ is_array( $region_term ) ? $region_term['term_id'] : $region_term->term_id ],
-				'mp_region' );
-		}
+		$set_terms( $id, $op );
+		$log( $id, 'created (sitting since ' . $op['start_date'] . ')' );
 	}
 	$created++;
 }
 
-// ── Pass 3: draft former MPs ──────────────────────────────────────────────────
-
-WP_CLI::log( '' );
-WP_CLI::log( sprintf( '%d WP posts are for former MPs and will be set to draft.', count( $to_draft ) ) );
-
-foreach ( $to_draft as $post_id ) {
-	$title = get_post_field( 'post_title', $post_id );
-	WP_CLI::log( sprintf( '  → draft: "%s" (post %d)', $title, $post_id ) );
-
-	if ( ! PT_SYNC_DRY_RUN ) {
-		wp_update_post( [ 'ID' => $post_id, 'post_status' => 'draft' ] );
+// Published posts for people no longer sitting: draft (former MP), record the end date.
+foreach ( $posts as $id ) {
+	if ( 'publish' !== get_post_status( $id ) ) {
+		continue;
+	}
+	$pol = (int) get_post_meta( $id, 'op_politician_id', true );
+	if ( $pol && isset( $current[ $pol ] ) ) {
+		continue;
+	}
+	$end = $pol ? (string) $pdo->query( 'SELECT MAX(end_date) FROM op_core_electedmember WHERE politician_id = ' . $pol )->fetchColumn() : '';
+	WP_CLI::log( sprintf( '  -> former: %s (post %d), seat ended %s', get_the_title( $id ), $id, $end ?: 'unknown' ) );
+	if ( $apply ) {
+		wp_update_post( [ 'ID' => $id, 'post_status' => 'draft' ] );
+		if ( $end ) {
+			update_post_meta( $id, 'mp_term_end', $end );
+		}
+		$log( $id, 'no longer sitting (seat ended ' . ( $end ?: 'unknown' ) . '); set to former' );
 	}
 	$drafted++;
 }
 
-// ── Summary ───────────────────────────────────────────────────────────────────
-
-WP_CLI::log( '' );
-WP_CLI::success( sprintf(
-	'%s  Updated: %d  |  Created: %d  |  Drafted (former MPs): %d  |  Expected live total: %d',
-	PT_SYNC_DRY_RUN ? '[DRY RUN]' : '[DONE]',
-	$updated,
-	$created,
-	$drafted,
-	$updated + $created
-) );
-
-if ( PT_SYNC_DRY_RUN ) {
-	WP_CLI::log( 'Set PT_SYNC_DRY_RUN = false at the top of the script and re-run to apply.' );
-}
+WP_CLI::success( sprintf( '%s refreshed %d | created %d | former %d | sitting MPs %d',
+	$apply ? '[APPLIED]' : '[DRY RUN]', $updated, $created, $drafted, count( $current ) ) );
