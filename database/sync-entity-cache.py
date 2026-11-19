@@ -162,8 +162,9 @@ def source_query(entity: dict, limit: int = 50000):
     limit = max(1, min(200000, limit))
     cols = ', '.join(f'`{c}`' for c in SOURCE_COLS)
     sql = (
-        f'SELECT {cols} FROM `master_table` WHERE '
-        + ' OR '.join(frags)
+        # Current version of each agreement only: master_table keeps every amendment version (2026-11).
+        f'SELECT {cols} FROM `master_table` WHERE `amendment_number` IS NULL AND ('
+        + ' OR '.join(frags) + ')'
         + f' ORDER BY `agreement_value` DESC LIMIT {limit}'
     )
     return sql, params

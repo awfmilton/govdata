@@ -91,9 +91,11 @@ CREATE TABLE IF NOT EXISTS `entity_snapshots` (
 CREATE TABLE IF NOT EXISTS `entity_agreements` (
 	`id`                       BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
 	`slug`                     VARCHAR(80)   NOT NULL,
-	`ref_number`               VARCHAR(50)   DEFAULT NULL,
-	`recipient_legal_name`     VARCHAR(350)  DEFAULT NULL,
-	`recipient_operating_name` VARCHAR(350)  DEFAULT NULL,
+	`ref_number`               VARCHAR(100)  DEFAULT NULL,
+	`record_id`                VARCHAR(255)  DEFAULT NULL,
+	`record_url`               VARCHAR(1000) DEFAULT NULL,
+	`recipient_legal_name`     VARCHAR(600)  DEFAULT NULL,
+	`recipient_operating_name` VARCHAR(600)  DEFAULT NULL,
 	`agreement_title`          VARCHAR(800)  DEFAULT NULL,
 	`description`              TEXT          DEFAULT NULL,
 	`prog_name`                VARCHAR(255)  DEFAULT NULL,
@@ -169,12 +171,14 @@ BEGIN
 	DELETE FROM `entity_agreements` WHERE `slug` = p_slug;
 
 	INSERT INTO `entity_agreements`
-		(`slug`, `ref_number`, `recipient_legal_name`, `recipient_operating_name`,
+		(`slug`, `ref_number`, `record_id`, `record_url`, `recipient_legal_name`, `recipient_operating_name`,
 		 `agreement_title`, `description`, `prog_name`, `owner_org`,
 		 `agreement_value`, `fiscal_year`, `year`, `agreement_start_date`)
 	SELECT
 		p_slug,
 		jt.ref_number,
+		jt.record_id,
+		jt.record_url,
 		jt.legal_name,
 		jt.op_name,
 		jt.title,
@@ -188,9 +192,11 @@ BEGIN
 	FROM JSON_TABLE(
 		CAST(p_snapshot AS JSON),
 		'$.agreements[*]' COLUMNS (
-			ref_number VARCHAR(50)   PATH '$.ref_number',
-			legal_name VARCHAR(350)  PATH '$.recipient_legal_name',
-			op_name    VARCHAR(350)  PATH '$.recipient_operating_name',
+			ref_number VARCHAR(100)  PATH '$.ref_number',
+			record_id  VARCHAR(255)  PATH '$.record_id',
+			record_url VARCHAR(1000) PATH '$.record_url',
+			legal_name VARCHAR(600)  PATH '$.recipient_legal_name',
+			op_name    VARCHAR(600)  PATH '$.recipient_operating_name',
 			title      VARCHAR(800)  PATH '$.title',
 			descr      TEXT          PATH '$.description',
 			prog       VARCHAR(255)  PATH '$.program',
@@ -237,7 +243,7 @@ BEGIN
 	SET v_limit = LEAST(GREATEST(COALESCE(p_limit, 50), 1), 500);
 
 	SELECT
-		`ref_number`, `recipient_legal_name`, `recipient_operating_name`,
+		`ref_number`, `record_id`, `record_url`, `recipient_legal_name`, `recipient_operating_name`,
 		`agreement_title`, `prog_name`, `owner_org`, `agreement_value`,
 		`fiscal_year`, `year`, `agreement_start_date`
 	FROM `entity_agreements`

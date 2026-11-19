@@ -26,7 +26,7 @@ DB = dict(
     host=os.environ.get('DB_HOST', '35.230.186.163'),
     port=int(os.environ.get('DB_PORT', 3306)),
     database=os.environ.get('DB_NAME', 'grantconts'),
-    user=os.environ.get('DB_USER', 'pt_read'),
+    user=os.environ.get('WRITE_USER', os.environ.get('DB_USER', 'pt_write')),
     password=os.environ.get('DB_PASS', 'REDACTED_DB_PASSWORD'),
     charset='utf8mb4',
 )

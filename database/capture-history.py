@@ -37,8 +37,8 @@ if not DB_PASSWORD:
         "    export PT_DB_PASSWORD='...'"
     )
 
-DB = dict(host='35.230.186.163', port=3306, database='grantconts',
-          user='pt_read', password=DB_PASSWORD,
+DB = dict(host=os.environ.get('WRITE_HOST', '35.230.186.163'), port=3306, database='grantconts',
+          user=os.environ.get('WRITE_USER', 'pt_write'), password=os.environ.get('WRITE_PASS', DB_PASSWORD),  # writes: never the read-only site user
           connection_timeout=600, autocommit=False)
 
 BATCH = 1000

@@ -40,10 +40,11 @@ if not DB_PASSWORD:
         "    export PT_DB_PASSWORD='...'"
     )
 
-DB = dict(host='35.230.186.163', port=3306, database='grantconts',
-          user='pt_read', password=DB_PASSWORD,
+DB = dict(host=os.environ.get('WRITE_HOST', '35.230.186.163'), port=3306, database='grantconts',
+          user=os.environ.get('WRITE_USER', 'pt_write'), password=os.environ.get('WRITE_PASS', DB_PASSWORD),  # writes: never the read-only site user
           connection_timeout=900, autocommit=True)
 
+# Map key widths match the widened source columns (2026-11 rebuild) so no key is truncated.
 # Dedup key expressions (consistent on both master_table and the lookup map build)
 DKEY_RECIP = "COALESCE(NULLIF(TRIM(recipient_business_number),''), recipient_legal_name)"
 DKEY_PROG  = "prog_name_en"
@@ -132,14 +133,14 @@ def build_maps(conn):
     print('Building surrogate-key maps ...', flush=True)
 
     cur.execute('DROP TABLE IF EXISTS _map_recip')
-    cur.execute(f'''CREATE TABLE _map_recip (dkey VARCHAR(350) NOT NULL, recipient_id INT UNSIGNED,
-                    INDEX(dkey)) AS
+    cur.execute(f'''CREATE TABLE _map_recip (dkey VARCHAR(700) NOT NULL, recipient_id INT UNSIGNED,
+                    INDEX(dkey(255))) AS
                     SELECT {DKEY_RECIP} AS dkey, recipient_id FROM recipients''')
     cur.execute('DROP TABLE IF EXISTS _map_prog')
-    cur.execute('''CREATE TABLE _map_prog (dkey VARCHAR(255) NOT NULL, program_id INT UNSIGNED,
-                   INDEX(dkey)) AS SELECT prog_name_en AS dkey, program_id FROM programs''')
+    cur.execute('''CREATE TABLE _map_prog (dkey VARCHAR(700) NOT NULL, program_id INT UNSIGNED,
+                   INDEX(dkey(255))) AS SELECT prog_name_en AS dkey, program_id FROM programs''')
     cur.execute('DROP TABLE IF EXISTS _map_loc')
-    cur.execute(f'''CREATE TABLE _map_loc (dkey VARCHAR(600) NOT NULL, location_id INT UNSIGNED,
+    cur.execute(f'''CREATE TABLE _map_loc (dkey VARCHAR(2000) NOT NULL, location_id INT UNSIGNED,
                     INDEX(dkey(255))) AS
                     SELECT {DKEY_LOC.replace("recipient_country","recipient_country").replace("federal_riding","federal_riding")} AS dkey, location_id FROM locations''')
     cur.execute('DROP TABLE IF EXISTS _map_naics')

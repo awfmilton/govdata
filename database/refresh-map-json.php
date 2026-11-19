@@ -23,9 +23,10 @@ define( 'PT_MAP_REFRESH_CLI', true );
 
 /* ── Bootstrap WordPress ─────────────────────────────────────────────────── */
 // Walk up from this file's location until we find wp-load.php.
-$wp_load = null;
+// Already inside WordPress (wp eval-file) → skip the bootstrap.
+$wp_load = defined( 'ABSPATH' ) ? 'loaded' : null;
 $dir     = __DIR__;
-for ( $i = 0; $i < 8; $i++ ) {
+for ( $i = 0; ! $wp_load && $i < 8; $i++ ) {
 	$candidate = $dir . '/wp-load.php';
 	if ( file_exists( $candidate ) ) { $wp_load = $candidate; break; }
 	$dir = dirname( $dir );
@@ -34,7 +35,9 @@ if ( ! $wp_load ) {
 	fwrite( STDERR, "[map-refresh] ERROR: could not find wp-load.php\n" );
 	exit( 1 );
 }
-require_once $wp_load;
+if ( 'loaded' !== $wp_load ) {
+	require_once $wp_load;
+}
 
 if ( ! function_exists( 'publictech_db' ) ) {
 	fwrite( STDERR, "[map-refresh] ERROR: publictech_db() not available — is PublicTech Core active?\n" );
@@ -51,7 +54,7 @@ try {
 		foreach ( $statements as $stmt ) {
 			if ( $stmt && ! str_starts_with( ltrim( $stmt ), '--' ) ) {
 				try {
-					publictech_db( $alias )->query( $stmt );
+					publictech_db( $alias )->pdo()->exec( $stmt );
 				} catch ( \Throwable $ignored ) {
 					// Idempotent — CREATE IF NOT EXISTS, DROP+CREATE ok
 				}
@@ -72,8 +75,9 @@ if ( null === $result ) {
 }
 
 printf(
-	"[map-refresh] Done: %d ridings, %s bytes, %.3fs\n",
-	$result['written'],
+	"[map-refresh] Done: %d ridings, %d countries, %s bytes, %.3fs\n",
+	$result['written_ridings'],
+	$result['written_countries'],
 	number_format( $result['bytes'] ),
 	$result['elapsed']
 );

@@ -378,7 +378,11 @@ def clean_row(row: list, row_num: int, stats: Stats) -> list:
     # --- Agreement Type → char(1) ---
     if len(out) > C_AGREEMENT_TYPE:
         v = out[C_AGREEMENT_TYPE].strip()
-        mapped = AGREEMENT_TYPE_MAP.get(v, '' if v in NULL_SENTINELS else None)
+        # Newer exports (2025-26 onward) already carry the one-letter code; accept it as-is.
+        if v in AGREEMENT_TYPE_MAP.values():
+            mapped = v
+        else:
+            mapped = AGREEMENT_TYPE_MAP.get(v, '' if v in NULL_SENTINELS else None)
         if mapped is None:
             # Unknown value — log and nullify
             stats.record('agreement_type [UNKNOWN]', row_num, v, '')
@@ -388,7 +392,10 @@ def clean_row(row: list, row_num: int, stats: Stats) -> list:
     # --- Recipient Type → char(1) ---
     if len(out) > C_RECIPIENT_TYPE:
         v = out[C_RECIPIENT_TYPE].strip()
-        mapped = RECIPIENT_TYPE_MAP.get(v, '' if v in NULL_SENTINELS else None)
+        if v in RECIPIENT_TYPE_MAP.values():
+            mapped = v
+        else:
+            mapped = RECIPIENT_TYPE_MAP.get(v, '' if v in NULL_SENTINELS else None)
         if mapped is None:
             stats.record('recipient_type [UNKNOWN]', row_num, v, '')
             mapped = ''

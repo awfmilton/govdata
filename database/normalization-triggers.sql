@@ -39,7 +39,7 @@ DROP PROCEDURE IF EXISTS sp_backfill_normalization$$
 CREATE TRIGGER after_master_table_insert
 AFTER INSERT ON master_table
 FOR EACH ROW
-BEGIN
+trg_body: BEGIN
     DECLARE v_recipient_id  INT UNSIGNED DEFAULT NULL;
     DECLARE v_program_id    INT UNSIGNED DEFAULT NULL;
     DECLARE v_location_id   INT UNSIGNED DEFAULT NULL;
@@ -48,7 +48,7 @@ BEGIN
 
     -- Skip rows with no ref_number (corrupt/empty rows).
     IF NEW.ref_number IS NULL OR NEW.ref_number = '' THEN
-        LEAVE after_master_table_insert;
+        LEAVE trg_body;
     END IF;
 
     -- -----------------------------------------------------------------
