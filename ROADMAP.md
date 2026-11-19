@@ -77,3 +77,27 @@ As a Canadian federal government data platform, full bilingual parity (`en_CA` /
   - Add Composer and npm dependency caching, automated `govdata-ad-services` + `govdata-ads-client` zip packaging in `release.yml`, and DigitalOcean deployment smoke checks.
 - [ ] **Automated PHPUnit & End-to-End Integration Suite:**
   - Expand PHPUnit coverage to test `Billing` Stripe webhook signature verification, `Alerts` diff generation, `Anomalies` Benford calculations, and era-aware `Riding_Cache_Warmer` SQL queries against a seeded MySQL service container in GitHub Actions.
+
+---
+
+## Phase 8: Investigations Subsite — "Cairo 1994 to Present" Timeline (deferred; planned 2026-11-18)
+
+A static research timeline (`cairo-timeline.zip`, ~220 KB; data in JSON, built to `dist/` by `npm run build`) hosted **separately from the main WordPress site** at `investigations.data.govdata.ca`. No database, no WordPress content types, no menu link or embed on govdata.ca. The package's own rules (`AGENTS.md`, `docs/DEPLOY.md`, `docs/EDITORIAL_RULES.md`) bind every step: facts enter `data/` only through research result files, records are not reworded, and only the editor (Alexander Milton) makes anything public.
+
+Owner decisions (2026-11-18):
+- Production: `investigations.data.govdata.ca`; staging: `staging.investigations.data.govdata.ca` (separate DreamHost site, own password, own folder — chosen over a staging folder so a mis-aimed upload cannot expose or overwrite the other build). Hosting and DNS on DreamHost (account `dh_kf9eyv`).
+- Banner on every page: "This is an active investigation. Findings may change as we get more information."
+- Operator statement (`data/site.json` → `operator_note`): "Independent research by Alexander Milton. Not affiliated with the Government of Canada or any NGO."
+- Staging behind HTTP basic auth; credentials in the Kôdex vault. No advertising for now; if enabled later it uses the main site's ad system (`govdata-ad-services` serving via its `govads` REST API, rendered by `govdata-ads-client`) — no second ad stack.
+
+- [ ] **Receive the package** from the remote session over the one-time, upload-only SFTP drop on the build droplet (key installed for the transfer, removed after); verify sha256.
+- [ ] **Verify** on the build droplet: `npm run validate`, `npm test` (16 passing expected), `npm run build` (119 records, research) and `npm run build:public` + `npm run check:public` (85 records).
+- [ ] **Banner + operator note**: `operator_note` in `data/site.json`; banner via a documented template setting (no record text edited).
+- [ ] **DreamHost sites**: owner creates both sites in the panel (or provides a DreamHost API key in the vault), each with Let's Encrypt.
+- [ ] **Staging**: protect the empty docroot first (`.htaccess` + `.htpasswd` stored outside the docroot), confirm `401`, upload the research `dist/` with rsync scoped to that docroot (`--delete --exclude .htaccess --exclude .htpasswd`), then `SMOKE_AUTH=… npm run smoke -- <staging url> --expect research`.
+- [ ] **Production placeholder**: a "coming soon" page with `noindex` until release.
+- [ ] **GAC cross-check (audit overlap)**: compare the timeline's Global Affairs Canada sexual & reproductive health and rights disbursement series against `grantconts.master_table` (owner_org `dfatd-maecd`, official 2026-11-17 edition) by year and program; report matches and differences with record ids and `search.open.canada.ca/grants/record/…` links, delivered as a **research result file** for the editor. Re-run against each new grants edition; `corrections_history` flags any later alteration/removal of the underlying records.
+- [ ] **Editor review**: decide each of the 8 person-naming records held out of public builds; confirm unverified-record handling.
+- [ ] **Public release (editor only)**: build public, check, upload, smoke `--expect public`; editor removes the password and `noindex`.
+- [ ] **Updates**: only via `data/` → rebuild → checks → upload → smoke → line in `docs/DEPLOY_LOG.md`.
+- [ ] **Backups**: include both DreamHost docroots in the weekly backup job.
