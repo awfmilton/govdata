@@ -145,13 +145,13 @@
 			.attr('x', function (d) { return x(d.label); })
 			.attr('width', x.bandwidth())
 			.attr('y', t.anim ? H - m.b : function (d) { return y(d.value); })
-			.attr('height', t.anim ? 0 : function (d) { return H - m.b - y(d.value); })
+			.attr('height', t.anim ? 0 : function (d) { return Math.max(0, H - m.b - y(d.value)); })
 			.attr('fill', fill).attr('stroke', stroke).attr('stroke-width', 1.5)
 			.on('mousemove', function (e, d) { tipShow('<div class="t-k">' + d.label + '</div><div class="t-row"><span>Value</span><b>' + d.value + '</b></div>', e); })
 			.on('mouseleave', tipHide)
 			.transition().duration(t.anim ? 500 : 0)
 				.attr('y', function (d) { return y(d.value); })
-				.attr('height', function (d) { return H - m.b - y(d.value); });
+				.attr('height', function (d) { return Math.max(0, H - m.b - y(d.value)); });
 	}
 
 	function drawNetwork(host, rec) {

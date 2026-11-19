@@ -23,6 +23,13 @@ final class Access_Tiers {
 	public const META_TIER  = 'pt_tier';
 	public const META_TOKEN = 'pt_mcp_token';
 
+	/* Free trial of a paid tier: once per account, no card, reverts automatically when it ends. */
+	public const META_TRIAL_TIER    = 'pt_trial_tier';
+	public const META_TRIAL_EXPIRES = 'pt_trial_expires';
+	public const META_TRIAL_USED    = 'pt_trial_used';
+	public const TRIAL_DAYS         = 14;
+	public const TRIAL_TIERS        = [ 'analyst', 'newsroom' ];
+
 	public static function instance(): self {
 		return self::$instance ??= new self();
 	}
@@ -93,7 +100,47 @@ final class Access_Tiers {
 			return 'anonymous';
 		}
 		$slug = (string) get_user_meta( $user_id, self::META_TIER, true );
-		return isset( $this->tiers()[ $slug ] ) ? $slug : 'free';
+		$slug = isset( $this->tiers()[ $slug ] ) ? $slug : 'free';
+		if ( 'free' === $slug ) {
+			$trial = $this->active_trial( $user_id );
+			if ( $trial ) {
+				return $trial['tier'];
+			}
+		}
+		return $slug;
+	}
+
+	/** The user's running trial as [tier, expires], or null. Expired trials simply stop applying. */
+	public function active_trial( int $user_id ): ?array {
+		$tier = (string) get_user_meta( $user_id, self::META_TRIAL_TIER, true );
+		$exp  = (int) get_user_meta( $user_id, self::META_TRIAL_EXPIRES, true );
+		if ( $tier && $exp > time() && isset( $this->tiers()[ $tier ] ) ) {
+			return [ 'tier' => $tier, 'expires' => $exp ];
+		}
+		return null;
+	}
+
+	/**
+	 * Start a free trial of a paid tier. One trial per account (whichever tier), no payment details.
+	 *
+	 * @return array|\WP_Error [tier, expires] on success.
+	 */
+	public function start_trial( int $user_id, string $tier ): array|\WP_Error {
+		if ( ! in_array( $tier, self::TRIAL_TIERS, true ) ) {
+			return new \WP_Error( 'pt_trial_tier', __( 'That tier has no free trial.', 'publictech-core' ), [ 'status' => 400 ] );
+		}
+		if ( get_user_meta( $user_id, self::META_TRIAL_USED, true ) ) {
+			return new \WP_Error( 'pt_trial_used', __( 'This account has already used its free trial.', 'publictech-core' ), [ 'status' => 409 ] );
+		}
+		$paid = (string) get_user_meta( $user_id, self::META_TIER, true );
+		if ( $paid && 'free' !== $paid && isset( $this->tiers()[ $paid ] ) ) {
+			return new \WP_Error( 'pt_trial_paid', __( 'This account already has a paid tier.', 'publictech-core' ), [ 'status' => 409 ] );
+		}
+		$exp = time() + self::TRIAL_DAYS * DAY_IN_SECONDS;
+		update_user_meta( $user_id, self::META_TRIAL_TIER, $tier );
+		update_user_meta( $user_id, self::META_TRIAL_EXPIRES, $exp );
+		update_user_meta( $user_id, self::META_TRIAL_USED, gmdate( 'c' ) . ' ' . $tier );
+		return [ 'tier' => $tier, 'expires' => $exp ];
 	}
 
 	public function quota( ?int $user_id ): array {

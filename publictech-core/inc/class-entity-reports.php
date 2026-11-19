@@ -212,15 +212,18 @@ final class Entity_Reports {
 		$against = implode( ' ', $terms );
 		$params  = [ $against ];
 		$limit   = max( 1, min( 200000, $limit ) );
-		$sql     = 'SELECT `ref_number`, `agreement_number`, `agreement_value`, '
+		// Current version of each agreement only (totals must not count amended agreements twice), plus the
+		// record id and its Government of Canada record URL (agreement_urls) for per-entry links.
+		$sql     = 'SELECT m.`id` AS `record_id`, u.`url` AS `record_url`, m.`ref_number`, m.`agreement_number`, m.`agreement_value`, '
 			. '`agreement_start_date`, `year`, `fiscal_year`, `agreement_title_en`, '
 			. '`description_eng`, `prog_name_en`, `prog_purpose_en`, `owner_org_en`, '
 			. '`recipient_legal_name`, `recipient_operating_name`, `recipient_city`, '
 			. '`recipient_province` '
-			. 'FROM `master_table` '
-			. 'WHERE MATCH(`recipient_legal_name`, `recipient_operating_name`) '
+			. 'FROM `master_table` m '
+			. 'LEFT JOIN `agreement_urls` u ON u.`record_id` = m.`id` AND u.`url_type` = "detail" '
+			. 'WHERE m.`amendment_number` IS NULL AND MATCH(m.`recipient_legal_name`, m.`recipient_operating_name`) '
 			. 'AGAINST (? IN BOOLEAN MODE) '
-			. 'ORDER BY `agreement_value` DESC LIMIT ' . $limit;
+			. 'ORDER BY m.`agreement_value` DESC LIMIT ' . $limit;
 		return [ $sql, $params ];
 	}
 
@@ -385,6 +388,7 @@ final class Entity_Reports {
 		foreach ( array_slice( $sorted, 0, 25 ) as $r ) {
 			$top[] = [
 				'ref_number'  => (string) ( $r['ref_number'] ?? '' ),
+				'record_url'  => (string) ( $r['record_url'] ?? '' ),
 				'value'       => round( (float) ( $r['agreement_value'] ?? 0 ), 2 ),
 				'year'        => (int) ( $r['year'] ?? 0 ),
 				'fiscal_year' => (string) ( $r['fiscal_year'] ?? '' ),
@@ -400,6 +404,8 @@ final class Entity_Reports {
 		foreach ( array_slice( $sorted, 0, 2500 ) as $r ) {
 			$agreements[] = [
 				'ref_number'               => (string) ( $r['ref_number'] ?? '' ),
+				'record_id'                => (string) ( $r['record_id'] ?? '' ),
+				'record_url'               => (string) ( $r['record_url'] ?? '' ),
 				'recipient_legal_name'     => (string) ( $r['recipient_legal_name'] ?? '' ),
 				'recipient_operating_name' => (string) ( $r['recipient_operating_name'] ?? '' ),
 				'title'                    => self::clip( (string) ( $r['agreement_title_en'] ?? '' ), 800 ),

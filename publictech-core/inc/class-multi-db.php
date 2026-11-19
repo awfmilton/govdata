@@ -108,7 +108,7 @@ final class Connection {
 	private ?\PDO $pdo = null;
 
 	/**
-	 * @param array{host:string,port?:int,name:string,user:string,pass:string,charset?:string} $cfg
+	 * @param array{host:string,port?:int,name:string,user:string,pass:string,charset?:string,ssl_ca?:string} $cfg
 	 */
 	public function __construct( private readonly string $alias, private readonly array $cfg ) {}
 
@@ -129,14 +129,21 @@ final class Connection {
 		);
 		$connect_timeout = (int) ( $this->cfg['connect_timeout'] ?? 5 );
 		$query_timeout   = (int) ( $this->cfg['query_timeout']   ?? 8000 ); // milliseconds for MAX_EXECUTION_TIME
-		$this->pdo = new \PDO( $dsn, $this->cfg['user'], $this->cfg['pass'], [
+		$options = [
 			\PDO::ATTR_ERRMODE            => \PDO::ERRMODE_EXCEPTION,
 			\PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC,
 			\PDO::ATTR_EMULATE_PREPARES   => false,
 			\PDO::ATTR_PERSISTENT         => true,
 			\PDO::ATTR_TIMEOUT            => $connect_timeout,
 			\PDO::MYSQL_ATTR_INIT_COMMAND => "SET time_zone='+00:00', SESSION MAX_EXECUTION_TIME={$query_timeout}",
-		] );
+		];
+		// Opt-in TLS for a database reached over the public internet: 'ssl_ca' is the path to the
+		// CA that signed the server certificate, and the server certificate is always verified.
+		if ( ! empty( $this->cfg['ssl_ca'] ) ) {
+			$options[ \PDO::MYSQL_ATTR_SSL_CA ]                 = (string) $this->cfg['ssl_ca'];
+			$options[ \PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT ] = true;
+		}
+		$this->pdo = new \PDO( $dsn, $this->cfg['user'], $this->cfg['pass'], $options );
 		return $this->pdo;
 	}
 

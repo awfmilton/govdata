@@ -134,6 +134,15 @@ final class Riding_Cache_Warmer {
 
 		$this->write_meta( $directory, $generated_at, $written );
 
+		// Refresh the map's per-riding totals from the cache just written. Nothing else called this, so
+		// map_riding_totals shipped stale figures after every warm (database/setup-map-cache.sql).
+		try {
+			$this->cache->exec( 'CALL sp_refresh_map_totals()' );
+			$this->log( 'Map riding totals refreshed (sp_refresh_map_totals).', 'success' );
+		} catch ( \Throwable $e ) {
+			$this->log( 'Map riding totals NOT refreshed: ' . $e->getMessage(), 'warning' );
+		}
+
 		$elapsed = round( microtime( true ) - $t0, 2 );
 		$this->log( sprintf( 'Warm complete: %d ridings written in %ss.', $written, $elapsed ), 'success' );
 
@@ -335,7 +344,7 @@ final class Riding_Cache_Warmer {
 					MAX(ABS(`m`.`agreement_value`)) AS max_value
 				FROM `" . self::SOURCE_TABLE . "` m
 				{$join}
-				WHERE `m`.`recipient_postal_code` IS NOT NULL AND `m`.`recipient_postal_code` <> ''{$only}
+				WHERE `m`.`recipient_postal_code` IS NOT NULL AND `m`.`recipient_postal_code` <> '' AND `m`.`amendment_number` IS NULL{$only}
 				GROUP BY p.rn";
 
 		$out = [];
@@ -380,7 +389,7 @@ final class Riding_Cache_Warmer {
 						COUNT(*) AS kw_count
 					FROM `" . self::SOURCE_TABLE . "` m
 					{$join}
-					WHERE `m`.`recipient_postal_code` IS NOT NULL AND `m`.`recipient_postal_code` <> ''{$only}
+					WHERE `m`.`recipient_postal_code` IS NOT NULL AND `m`.`recipient_postal_code` <> '' AND `m`.`amendment_number` IS NULL{$only}
 						AND {$ft_cols} AGAINST ({$ft_against} IN BOOLEAN MODE)
 						AND {$like}
 					GROUP BY p.rn";
@@ -434,7 +443,7 @@ final class Riding_Cache_Warmer {
 					SUM(CASE WHEN `m`.`agreement_value` < 0 THEN 1 ELSE 0 END) AS negative_agreements
 				FROM `" . self::SOURCE_TABLE . "` m
 				{$join}
-				WHERE `m`.`year` IS NOT NULL AND `m`.`year` <> 0{$only}
+				WHERE `m`.`year` IS NOT NULL AND `m`.`year` <> 0 AND `m`.`amendment_number` IS NULL{$only}
 				GROUP BY p.rn, `m`.`year`";
 
 		$out  = [];
@@ -467,7 +476,7 @@ final class Riding_Cache_Warmer {
 					COUNT(*) AS agreements
 				FROM `" . self::SOURCE_TABLE . "` m
 				{$join}
-				WHERE 1=1{$only}
+				WHERE 1=1 AND `m`.`amendment_number` IS NULL{$only}
 				GROUP BY p.rn, `m`.`recipient_type`";
 
 		$out  = [];
@@ -498,7 +507,7 @@ final class Riding_Cache_Warmer {
 					COUNT(*) AS agreements
 				FROM `" . self::SOURCE_TABLE . "` m
 				{$join}
-				WHERE {$recipient} IS NOT NULL{$only}
+				WHERE {$recipient} IS NOT NULL AND `m`.`amendment_number` IS NULL{$only}
 				GROUP BY p.rn, recipient
 				ORDER BY p.rn, total DESC";
 
@@ -507,7 +516,7 @@ final class Riding_Cache_Warmer {
 			foreach ( $stmt as $row ) {
 				yield [
 					'rn'         => (string) $row['rn'],
-					'name'       => (string) $row['recipient'],
+					'name'       => one_language( (string) $row['recipient'] ),
 					'total'      => (float) $row['total'],
 					'agreements' => (int) $row['agreements'],
 				];
@@ -530,7 +539,7 @@ final class Riding_Cache_Warmer {
 					SUM(`m`.`agreement_value`) AS total
 				FROM `" . self::SOURCE_TABLE . "` m
 				{$join}
-				WHERE `m`.`prog_name_en` IS NOT NULL AND `m`.`prog_name_en` <> ''{$only}
+				WHERE `m`.`prog_name_en` IS NOT NULL AND `m`.`prog_name_en` <> '' AND `m`.`amendment_number` IS NULL{$only}
 				GROUP BY p.rn, `m`.`prog_name_en`
 				ORDER BY p.rn, agreements DESC";
 

@@ -73,6 +73,21 @@ get_header(); ?>
 						}
 						?>
 					</div>
+					<?php
+					// Photo credit (database/sync-mp-photos.php stores the source; HoC photos carry their credit in image_meta).
+					if ( has_post_thumbnail() ) {
+						$pt_att    = (int) get_post_thumbnail_id();
+						$pt_meta   = (array) wp_get_attachment_metadata( $pt_att );
+						$pt_credit = trim( (string) ( $pt_meta['image_meta']['credit'] ?? '' ) );
+						$pt_source = (string) get_post_meta( $pt_att, 'pt_photo_source', true );
+						if ( $pt_credit || $pt_source ) {
+							echo '<div class="dim" style="font-size:10px;margin-top:4px">' . esc_html(
+								/* translators: %s: photographer and/or source */
+								sprintf( __( 'Photo: %s', 'publictech-terminal' ), implode( ', ', array_filter( [ $pt_credit, $pt_source ] ) ) )
+							) . '</div>';
+						}
+					}
+					?>
 					<h2><?php the_title(); ?></h2>
 					<div class="ttl"><?php
 						/* translators: 1: riding name */

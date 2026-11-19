@@ -12,7 +12,7 @@ do_action( 'bbp_template_before_forums_loop' ); ?>
 <div class="panel corner pt-forum-cats">
 	<div class="hd">
 		<h3>◇ <?php esc_html_e( 'Forums', 'publictech-terminal' ); ?></h3>
-		<span class="meta"><?php echo esc_html( number_format_i18n( bbp_get_forum_count() ) ); ?></span>
+		<span class="meta"><?php echo esc_html( number_format_i18n( (int) ( bbpress()->forum_query->post_count ?? 0 ) ) ); ?></span>
 	</div>
 	<div class="cat-list">
 		<?php while ( bbp_forums() ) :

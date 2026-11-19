@@ -88,7 +88,9 @@ final class Security {
 	 */
 	public static function verify_request( \WP_REST_Request $req ): bool {
 		$nonce = $req->get_header( 'x-wp-nonce' );
-		if ( $nonce && wp_verify_nonce( $nonce, 'wp_rest' ) ) {
+		// Anonymous visitors also receive a wp_rest nonce, so it only authenticates a signed-in user:
+		// the data API (stream, export, query, AI) requires an account or an API token.
+		if ( $nonce && is_user_logged_in() && wp_verify_nonce( $nonce, 'wp_rest' ) ) {
 			return true;
 		}
 		$auth = $req->get_header( 'authorization' );

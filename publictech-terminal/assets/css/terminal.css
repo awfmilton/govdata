@@ -185,6 +185,10 @@
     transition:border-color .15s, background .15s, transform .15s;position:relative;
   }
   .mp-card:hover{border-color:var(--accent);background:var(--bg-2)}
+  /* The card is an <a>: keep its text undecorated (browser link underline was leaking onto names, party and riding). */
+  a.mp-card,a.mp-card:hover,a.mp-card:visited{text-decoration:none;color:inherit}
+  a.mp-card *{text-decoration:none}
+  a.mp-card .mp-votes-link{text-decoration:underline dotted}
   .mp-card.sel{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent-glow), inset 3px 0 0 var(--accent)}
   .mp-portrait{
     width:46px;height:46px;border-radius:4px;background:var(--bg-3);border:1px solid var(--line-2);
@@ -290,6 +294,14 @@
   .pager{display:flex;gap:4px}
   .pager button{background:var(--bg-2);border:1px solid var(--line);color:var(--ink-1);width:28px;height:28px;border-radius:3px;cursor:pointer;font:inherit}
   .pager button.on{background:var(--accent-soft);color:var(--accent);border-color:rgba(0,160,210,0.35)}
+  /* paginate_links( type => 'list' ) renders <ul class="page-numbers"><li><a|span class="page-numbers">;
+     style that markup like the .pager buttons (it previously fell back to an unstyled bulleted list). */
+  .pager ul.page-numbers{display:flex;flex-wrap:wrap;gap:4px;list-style:none;margin:0;padding:0}
+  .pager ul.page-numbers li{margin:0;padding:0}
+  .pager .page-numbers a,.pager .page-numbers span{display:inline-flex;align-items:center;justify-content:center;min-width:28px;height:28px;padding:0 6px;box-sizing:border-box;background:var(--bg-2);border:1px solid var(--line);color:var(--ink-1);border-radius:3px;font:inherit;text-decoration:none}
+  .pager .page-numbers a:hover{border-color:var(--accent);color:var(--accent)}
+  .pager .page-numbers span.current{background:var(--accent-soft);color:var(--accent);border-color:rgba(0,160,210,0.35)}
+  .pager .page-numbers span.dots{background:none;border-color:transparent}
 
   /* ===== AI Console ===== */
   .ai-grid{display:grid;grid-template-columns:1fr 280px;gap:18px}

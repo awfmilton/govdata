@@ -121,7 +121,8 @@ get_header(); ?>
 							$pclass   = $party_n ? sanitize_html_class( strtolower( $party_n ) ) : 'unknown';
 							?>
 							<a class="mp-card" href="<?php echo esc_url( get_permalink() ); ?>" data-id="<?php echo (int) $mp_id; ?>">
-								<div class="mp-portrait" aria-hidden="true"><?php echo esc_html( $initials ); ?></div>
+								<?php $photo = (string) ( get_the_post_thumbnail_url( $mp_id, 'pt-mp-card' ) ?: get_post_meta( $mp_id, 'pt_mp_photo_url', true ) ); ?>
+								<div class="mp-portrait" aria-hidden="true"><?php if ( $photo ) : ?><img src="<?php echo esc_url( $photo ); ?>" alt="" loading="lazy" width="44" height="44" style="width:100%;height:100%;object-fit:cover;border-radius:inherit" onerror="this.remove()"><?php endif; ?><?php echo $photo ? '' : esc_html( $initials ); ?></div>
 								<div class="mp-info">
 									<div class="name"><?php the_title(); ?></div>
 									<div class="meta">
@@ -134,7 +135,8 @@ get_header(); ?>
 								</div>
 								<div class="mp-stats">
 									<b>$<?php echo esc_html( number_format_i18n( $spend ) ); ?></b>
-									<span><?php echo esc_html( number_format_i18n( $votes ) ); ?> <?php esc_html_e( 'votes', 'publictech-terminal' ); ?></span><br>
+									<?php /* Votes cast in the House of Commons (database/sync-mp-votes.php); links to the profile's Votes panel. The card is itself a link, so this uses a keyboard-accessible role=link instead of a nested <a>. */ ?>
+									<span class="mp-votes-link" role="link" tabindex="0" data-href="<?php echo esc_url( get_permalink() . '#pt-parl-votes' ); ?>" title="<?php esc_attr_e( 'House of Commons votes cast — see the voting record', 'publictech-terminal' ); ?>" style="text-decoration:underline dotted;cursor:pointer"><?php echo esc_html( number_format_i18n( $votes ) ); ?> <?php esc_html_e( 'votes', 'publictech-terminal' ); ?></span><br>
 									<span style="color:<?php echo $flags > 2 ? 'var(--warn)' : 'var(--ink-3)'; ?>">
 										<?php echo esc_html( number_format_i18n( $flags ) ); ?> <?php echo esc_html( _n( 'flag', 'flags', $flags, 'publictech-terminal' ) ); ?>
 									</span>
@@ -172,4 +174,8 @@ get_header(); ?>
 	</section>
 </main>
 
+<script>
+document.addEventListener('click', function (e) { var el = e.target.closest && e.target.closest('.mp-votes-link'); if (!el) return; e.preventDefault(); e.stopPropagation(); window.location.href = el.getAttribute('data-href'); }, true);
+document.addEventListener('keydown', function (e) { if (e.key !== 'Enter' && e.key !== ' ') return; var el = e.target.closest && e.target.closest('.mp-votes-link'); if (!el) return; e.preventDefault(); window.location.href = el.getAttribute('data-href'); });
+</script>
 <?php get_footer();

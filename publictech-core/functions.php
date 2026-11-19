@@ -24,6 +24,7 @@ require_once PUBLICTECH_CORE_DIR . 'inc/class-multi-db.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-cache-db.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-access-tiers.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-throttle.php';
+require_once PUBLICTECH_CORE_DIR . 'inc/class-access-gate.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-cpt.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-rest-api.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-riding-cache-warmer.php';
@@ -31,6 +32,7 @@ require_once PUBLICTECH_CORE_DIR . 'inc/class-riding-cache.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-map-cache.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-mp-finance-warmer.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-entity-reports.php';
+require_once PUBLICTECH_CORE_DIR . 'inc/class-deleted-records.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-charts-rest.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-chart-snapshots.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-mp-social-cards.php';
@@ -77,6 +79,7 @@ add_action( 'after_setup_theme', static function () {
 	\PublicTech\Core\Multi_DB::instance();
 	\PublicTech\Core\Access_Tiers::instance();
 	\PublicTech\Core\Throttle::instance();
+	\PublicTech\Core\Access_Gate::instance();
 	\PublicTech\Core\CPT::instance();
 	\PublicTech\Core\REST_API::instance();
 	\PublicTech\Core\Entity_Reports::instance();
@@ -152,3 +155,47 @@ add_filter( 'archive_template', static function ( string $template ): string {
 function publictech_db( string $alias ): \PublicTech\Core\Connection {
 	return \PublicTech\Core\Multi_DB::instance()->connection( $alias );
 }
+
+/* Self-hosted MP portraits (database/sync-mp-photos.php): WebP output and the two portrait sizes. */
+add_action( 'after_setup_theme', static function () {
+	add_image_size( 'pt-mp-card', 96, 96, true );
+	add_image_size( 'pt-mp-portrait', 400, 400, true );
+} );
+add_filter( 'image_editor_output_format', static function ( $formats ) {
+	$formats = (array) $formats;
+	$formats['image/jpeg'] = 'image/webp';
+	$formats['image/png']  = 'image/webp';
+	return $formats;
+} );
+
+/*
+ * Re-encode generated WebP files without metadata. House of Commons portraits carry large EXIF/IPTC/XMP
+ * blocks (camera, keywords, captions): a 96x96 card was ~22 KB with them and ~1.5 KB without. The credit
+ * and copyright are already stored in the attachment's image_meta, which is where the site reads them.
+ */
+add_filter( 'wp_generate_attachment_metadata', static function ( $meta, $attachment_id ) {
+	if ( ! class_exists( 'Imagick' ) || empty( $meta['file'] ) ) {
+		return $meta;
+	}
+	$dir   = trailingslashit( dirname( get_attached_file( $attachment_id ) ) );
+	$files = [ basename( (string) $meta['file'] ) ];
+	foreach ( (array) ( $meta['sizes'] ?? [] ) as $size ) {
+		$files[] = (string) ( $size['file'] ?? '' );
+	}
+	foreach ( array_unique( array_filter( $files ) ) as $name ) {
+		$path = $dir . $name;
+		if ( 'webp' !== strtolower( pathinfo( $path, PATHINFO_EXTENSION ) ) || ! is_file( $path ) ) {
+			continue;
+		}
+		try {
+			$im = new Imagick( $path );
+			$im->stripImage();
+			$im->setImageCompressionQuality( 80 );
+			$im->writeImage( $path );
+			$im->clear();
+		} catch ( \Throwable $e ) {
+			// Leave the WordPress-generated file in place.
+		}
+	}
+	return $meta;
+}, 20, 2 );

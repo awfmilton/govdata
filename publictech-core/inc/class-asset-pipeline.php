@@ -218,7 +218,9 @@ final class Asset_Pipeline {
 		$tiers   = Access_Tiers::instance();
 		$saved   = $uid ? json_decode( (string) get_user_meta( $uid, 'pt_chart_theme', true ), true ) : null;
 
-		wp_localize_script( 'publictech-charts', 'PT_BOOT', [
+		// Attach PT_BOOT to chart-theme, the FIRST PublicTech script: chart-theme.js captures window.PT_BOOT into
+		// PT.boot at load, and charts depends on it, so localizing on charts printed PT_BOOT too late (matrix D3).
+		wp_localize_script( 'publictech-chart-theme', 'PT_BOOT', [
 			'rest'       => esc_url_raw( rest_url( PUBLICTECH_CORE_REST_NS ) ),
 			'nonce'      => wp_create_nonce( 'wp_rest' ),
 			'tier'       => $tiers->user_tier( $uid ),

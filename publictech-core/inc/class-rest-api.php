@@ -89,13 +89,13 @@ final class REST_API {
 
 		register_rest_route( PUBLICTECH_CORE_REST_NS, '/mp/(?P<id>\d+)/spend', [
 			'methods'             => \WP_REST_Server::READABLE,
-			'permission_callback' => '__return_true',
+			'permission_callback' => [ Access_Gate::class, 'widget_permission' ],
 			'callback'            => [ $this, 'mp_spend' ],
 		] );
 
 		register_rest_route( PUBLICTECH_CORE_REST_NS, '/mp/(?P<id>\d+)/parliament', [
 			'methods'             => \WP_REST_Server::READABLE,
-			'permission_callback' => '__return_true',
+			'permission_callback' => [ Access_Gate::class, 'widget_permission' ],
 			'callback'            => [ $this, 'mp_parliament' ],
 		] );
 
@@ -105,6 +105,12 @@ final class REST_API {
 			'callback'            => [ $this, 'ai_query' ],
 		] );
 
+		register_rest_route( PUBLICTECH_CORE_REST_NS, '/trial/start', [
+			'methods'             => \WP_REST_Server::CREATABLE,
+			'permission_callback' => static fn( \WP_REST_Request $r ) => is_user_logged_in() && Security::verify_request( $r ),
+			'callback'            => [ $this, 'trial_start' ],
+			'args'                => [ 'tier' => [ 'type' => 'string', 'required' => true, 'enum' => Access_Tiers::TRIAL_TIERS ] ],
+		] );
 		register_rest_route( PUBLICTECH_CORE_REST_NS, '/customizer/save', [
 			'methods'             => \WP_REST_Server::CREATABLE,
 			'permission_callback' => static fn() => is_user_logged_in(),
@@ -919,6 +925,7 @@ final class REST_API {
 			'flags'   => (int) get_post_meta( $post_id, 'open_flags', true ),
 			'votes'   => (int) get_post_meta( $post_id, 'votes_cast', true ),
 			'permalink' => get_permalink( $post_id ),
+			'photo'     => (string) ( get_the_post_thumbnail_url( $post_id, 'pt-mp-card' ) ?: get_post_meta( $post_id, 'pt_mp_photo_url', true ) ),
 		];
 	}
 
@@ -950,7 +957,7 @@ final class REST_API {
 				'SELECT SUM(GREATEST(`agreement_value`, 0)) AS total_spend,
 				        COUNT(*) AS total_count
 				 FROM `master_table`
-				 WHERE UPPER(TRIM(`recipient_country`)) = ?',
+				 WHERE `amendment_number` IS NULL AND UPPER(TRIM(`recipient_country`)) = ?',
 				[ $cc ]
 			);
 			if ( empty( $totals[0]['total_count'] ) || (int) $totals[0]['total_count'] === 0 ) {
@@ -963,7 +970,7 @@ final class REST_API {
 				        SUM(GREATEST(`agreement_value`, 0)) AS spend,
 				        COUNT(*) AS cnt
 				 FROM `master_table`
-				 WHERE UPPER(TRIM(`recipient_country`)) = ?
+				 WHERE `amendment_number` IS NULL AND UPPER(TRIM(`recipient_country`)) = ?
 				   AND `fiscal_year` IS NOT NULL AND `fiscal_year` != \'\'
 				 GROUP BY `fiscal_year`
 				 ORDER BY `fiscal_year` DESC
@@ -979,7 +986,7 @@ final class REST_API {
 				        SUM(GREATEST(`agreement_value`, 0))      AS spend,
 				        COUNT(*)                                 AS cnt
 				 FROM `master_table`
-				 WHERE UPPER(TRIM(`recipient_country`)) = ?
+				 WHERE `amendment_number` IS NULL AND UPPER(TRIM(`recipient_country`)) = ?
 				   AND `prog_name_en` IS NOT NULL AND `prog_name_en` != \'\'
 				 GROUP BY `prog_name_en`
 				 ORDER BY spend DESC
@@ -996,7 +1003,7 @@ final class REST_API {
 				        `prog_name_en`         AS program,
 				        `description_eng`      AS description
 				 FROM `master_table`
-				 WHERE UPPER(TRIM(`recipient_country`)) = ?
+				 WHERE `amendment_number` IS NULL AND UPPER(TRIM(`recipient_country`)) = ?
 				   AND `agreement_value` > 0
 				 ORDER BY `agreement_value` DESC
 				 LIMIT 10',
@@ -1035,7 +1042,7 @@ final class REST_API {
 			], $programs ),
 			'recent'          => array_map( static fn( $r ) => [
 				'title'       => (string) ( $r['title']       ?? '' ),
-				'recipient'   => (string) ( $r['recipient']   ?? '' ),
+				'recipient'   => one_language( (string) ( $r['recipient']   ?? '' ) ),
 				'fiscal_year' => (string) ( $r['fiscal_year'] ?? '' ),
 				'value'       => (float)  $r['value'],
 				'program'     => (string) ( $r['program']     ?? '' ),
@@ -1047,5 +1054,11 @@ final class REST_API {
 		$resp = rest_ensure_response( $out );
 		$resp->header( 'Cache-Control', 'public, max-age=3600' );
 		return $resp;
+	}
+
+	/** Start the account's one free trial of a paid tier (see Access_Tiers::start_trial). */
+	public function trial_start( \WP_REST_Request $req ): \WP_REST_Response|\WP_Error {
+		$res = Access_Tiers::instance()->start_trial( get_current_user_id(), (string) $req['tier'] );
+		return is_wp_error( $res ) ? $res : rest_ensure_response( [ 'ok' => true, 'tier' => $res['tier'], 'expires' => gmdate( 'c', $res['expires'] ) ] );
 	}
 }

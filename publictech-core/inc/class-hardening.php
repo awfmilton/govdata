@@ -43,7 +43,8 @@ final class Hardening {
 		} );
 
 		// --- Block author enumeration via ?author=N and the users REST API.
-		add_action( 'template_redirect',  [ $this, 'block_author_enumeration' ] );
+		// Priority 1: WordPress's redirect_canonical (priority 10) otherwise turns ?author=N into /author/<login>/ first (SITE-006).
+		add_action( 'template_redirect',  [ $this, 'block_author_enumeration' ], 1 );
 		add_filter( 'rest_endpoints',     [ $this, 'restrict_users_endpoint' ] );
 		add_filter( 'rest_authentication_errors', [ $this, 'gate_anonymous_rest' ] );
 
@@ -89,7 +90,7 @@ final class Hardening {
 		if ( is_admin() || is_user_logged_in() ) {
 			return;
 		}
-		if ( isset( $_GET['author'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		if ( isset( $_GET['author'] ) || is_author() ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			wp_safe_redirect( home_url( '/' ), 301 );
 			exit;
 		}

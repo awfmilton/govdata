@@ -139,13 +139,13 @@ final class Dashboard_Stats {
 			    COUNT(*)                          AS total_agreements,
 			    COALESCE(AVG(agreement_value), 0) AS avg_value
 			 FROM master_table
-			 WHERE agreement_value > 0'
+			 WHERE amendment_number IS NULL AND agreement_value > 0'
 		);
 
 		$by_year = $db->select(
 			'SELECT CAST(year AS UNSIGNED) AS x, COALESCE(SUM(agreement_value), 0) AS y
 			 FROM master_table
-			 WHERE agreement_value > 0 AND year IS NOT NULL AND year >= 2010
+			 WHERE amendment_number IS NULL AND agreement_value > 0 AND year IS NOT NULL AND year >= 2010 AND year <= YEAR(CURDATE())
 			 GROUP BY year
 			 ORDER BY year ASC'
 		);
@@ -156,7 +156,7 @@ final class Dashboard_Stats {
 			    COALESCE(SUM(agreement_value), 0) AS value,
 			    COUNT(*)                          AS count
 			 FROM master_table
-			 WHERE recipient_province IS NOT NULL
+			 WHERE amendment_number IS NULL AND recipient_province IS NOT NULL
 			   AND recipient_province != ''
 			   AND agreement_value > 0
 			 GROUP BY recipient_province
@@ -174,7 +174,7 @@ final class Dashboard_Stats {
 			    COALESCE(SUM(agreement_value), 0) AS value,
 			    COUNT(*)                          AS count
 			 FROM master_table
-			 WHERE agreement_value > 0
+			 WHERE amendment_number IS NULL AND agreement_value > 0
 			   AND recipient_legal_name IS NOT NULL
 			   AND recipient_legal_name != ''
 			 GROUP BY recipient_legal_name
@@ -190,7 +190,7 @@ final class Dashboard_Stats {
 			    COALESCE(fiscal_year, '')                                                        AS fiscal_year,
 			    COALESCE(prog_name_en, '')                                                       AS program
 			 FROM master_table
-			 WHERE agreement_value > 0
+			 WHERE amendment_number IS NULL AND agreement_value > 0
 			   AND recipient_legal_name IS NOT NULL
 			   AND TRIM(recipient_legal_name) != ''
 			 ORDER BY agreement_value DESC
@@ -217,7 +217,7 @@ final class Dashboard_Stats {
 			),
 			'top_recipients'   => array_map(
 				fn( $r ) => [
-					'label' => (string) $r['label'],
+					'label' => one_language( (string) $r['label'] ),
 					'value' => (float)  $r['value'],
 					'count' => (int)    $r['count'],
 				],
@@ -225,7 +225,7 @@ final class Dashboard_Stats {
 			),
 			'recent_large'     => array_map(
 				fn( $r ) => [
-					'name'        => (string) $r['name'],
+					'name'        => one_language( (string) $r['name'] ),
 					'value'       => (float)  $r['value'],
 					'province'    => (string) $r['province'],
 					'fiscal_year' => (string) $r['fiscal_year'],

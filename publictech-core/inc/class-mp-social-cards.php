@@ -110,7 +110,7 @@ final class MP_Social_Cards {
 
 	/** URL ApiFlash should screenshot for a given MP. */
 	public function card_render_url( int $post_id ): string {
-		return add_query_arg( self::RAW_QUERY, '1', (string) get_permalink( $post_id ) );
+		return Access_Gate::instance()->sign_capture_url( add_query_arg( self::RAW_QUERY, '1', (string) get_permalink( $post_id ) ) );
 	}
 
 	/* ---------- filenames ---------- */

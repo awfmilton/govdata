@@ -40,7 +40,8 @@ $pt_blurb = $pt_entity['blurb'] ?? ( $pt_snap['payload']['blurb'] ?? '' );
 $pt_data  = is_array( $pt_snap['payload'] ?? null ) ? $pt_snap['payload'] : [];
 $pt_has   = ! empty( $pt_data['totals'] );
 
-$pt_official = 'https://search.open.canada.ca/grants/?search_text=' . rawurlencode( $pt_name );
+// Quoted phrase search: the unquoted word search matched ~1.1M records.
+$pt_official = 'https://search.open.canada.ca/grants/?search_text=' . rawurlencode( '"' . $pt_name . '"' );
 $pt_updated  = $pt_snap['updated_at'] ?? '';
 
 /* ─── Local money formatter (guarded against the riding-report twin) ───────── */
@@ -332,7 +333,7 @@ get_header(); ?>
 			<div class="hd"><h3>◇ Largest Agreements</h3><span class="meta">TOP 25 BY VALUE</span></div>
 			<div style="overflow-x:auto">
 				<table class="stream" style="min-width:720px">
-					<thead><tr><th>Year</th><th class="num">Value</th><th>Department</th><th>Program</th><th>Title</th></tr></thead>
+					<thead><tr><th>Year</th><th class="num">Value</th><th>Department</th><th>Program</th><th>Title</th><th><?php esc_html_e( 'Record', 'publictech-terminal' ); ?></th></tr></thead>
 					<tbody>
 					<?php foreach ( (array) $pt_data['top_agreements'] as $a ) : ?>
 						<tr>
@@ -341,6 +342,7 @@ get_header(); ?>
 							<td style="font-size:11px"><?php echo esc_html( $a['department'] ); ?></td>
 							<td style="font-size:11px"><?php echo esc_html( $a['program'] ); ?></td>
 							<td style="font-size:11px;color:var(--ink-1)"><?php echo esc_html( $a['title'] ); ?></td>
+							<td style="font-size:11px;white-space:nowrap"><?php if ( ! empty( $a['record_url'] ) ) : ?><a href="<?php echo esc_url( $a['record_url'] ); ?>" target="_blank" rel="noopener nofollow" title="<?php esc_attr_e( 'This agreement on the Government of Canada search portal', 'publictech-terminal' ); ?>">GC ↗</a><?php else : ?>—<?php endif; ?></td>
 						</tr>
 					<?php endforeach; ?>
 					</tbody>
@@ -349,6 +351,16 @@ get_header(); ?>
 		</div>
 
 	<?php endif; /* $pt_has */ ?>
+
+	<?php
+	// Records for this recipient that the Government of Canada deleted (not in any total above).
+	if ( $pt_entity && class_exists( \PublicTech\Core\Deleted_Records::class ) ) {
+		$pt_deleted_rows  = \PublicTech\Core\Deleted_Records::for_entity( $pt_entity );
+		$pt_deleted_title = __( 'Records deleted by the Government of Canada', 'publictech-terminal' );
+		$pt_deleted_intro = '';
+		require PUBLICTECH_TERMINAL_DIR . 'parts/deleted-records.php';
+	}
+	?>
 
 </section>
 </main>
@@ -450,7 +462,7 @@ get_header(); ?>
 		var render = function (rows) {
 			if (!rows.length) { results.innerHTML = '<p style="color:var(--ink-3);font-size:12px;padding:8px 0">No matching agreements.</p>'; return; }
 			var html = '<table class="stream" style="min-width:680px"><thead><tr>' +
-				'<th>Year</th><th class="num">Value</th><th>Department</th><th>Program</th><th>Title</th></tr></thead><tbody>';
+				'<th>Year</th><th class="num">Value</th><th>Department</th><th>Program</th><th>Title</th><th>Record</th></tr></thead><tbody>';
 			rows.forEach(function (r) {
 				html += '<tr>' +
 					'<td class="mono" style="color:var(--accent)">' + esc(r.year || '—') + '</td>' +
@@ -458,6 +470,7 @@ get_header(); ?>
 					'<td style="font-size:11px">' + esc(r.owner_org || '') + '</td>' +
 					'<td style="font-size:11px">' + esc(r.prog_name || '') + '</td>' +
 					'<td style="font-size:11px;color:var(--ink-1)">' + esc(r.agreement_title || '') + '</td>' +
+					'<td style="font-size:11px;white-space:nowrap">' + (/^https:\/\/search\.open\.canada\.ca\//.test(r.record_url || '') ? '<a href="' + esc(r.record_url) + '" target="_blank" rel="noopener nofollow">GC ↗</a>' : '—') + '</td>' +
 					'</tr>';
 			});
 			html += '</tbody></table>';

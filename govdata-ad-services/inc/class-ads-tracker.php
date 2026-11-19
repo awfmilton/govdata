@@ -51,7 +51,7 @@ final class Tracker {
 	public function rate_limit_ok( string $ip ): bool {
 		$key  = 'govads_rl_' . md5( $ip );
 		$hits = (int) get_transient( $key );
-		if ( $hits >= 300 ) {
+		if ( $hits >= (int) apply_filters( 'govads_rate_limit_per_minute', 300, $ip ) ) {
 			return false;
 		}
 		set_transient( $key, $hits + 1, MINUTE_IN_SECONDS );

@@ -404,6 +404,16 @@ get_header(); ?>
 		</div>
 	</div>
 
+	<?php
+	// Grant records in this riding that the Government of Canada deleted (not in any total on this page).
+	if ( class_exists( \PublicTech\Core\Deleted_Records::class ) ) {
+		$pt_deleted_rows  = \PublicTech\Core\Deleted_Records::for_riding( (string) ( $pt_number ?: ( $pt_riding['number'] ?? '' ) ) );
+		$pt_deleted_title = __( 'Records in this riding deleted by the Government of Canada', 'publictech-terminal' );
+		$pt_deleted_intro = '';
+		require PUBLICTECH_TERMINAL_DIR . 'parts/deleted-records.php';
+	}
+	?>
+
 	<!-- ═══ ANNUAL TABLE ════════════════════════════════════════════════════ -->
 	<div class="panel corner" style="margin-top:14px;margin-bottom:14px">
 		<div class="hd">
@@ -452,7 +462,8 @@ get_header(); ?>
 </main>
 
 <script>
-(function () {
+// Run after load: d3-charts (PT.chart) is enqueued in the footer, after this inline block (SITE-002).
+window.addEventListener('load', function () {
 	'use strict';
 	if (!window.PT || !PT.chart) { return; }
 
@@ -518,7 +529,7 @@ get_header(); ?>
 		PT.chart(document.getElementById('ptSparkAgreements'), 'spark', countTrend, { color: pos });
 		PT.chart(document.getElementById('ptSparkPeak'),       'spark', totalTrend, { color: pos });
 	}
-})();
+});
 </script>
 
 <?php get_footer();

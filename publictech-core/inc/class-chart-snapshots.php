@@ -175,7 +175,7 @@ final class Chart_Snapshots {
 
 	/** Absolute URL the headless browser should screenshot for a chart. */
 	public function render_url( int $post_id ): string {
-		return add_query_arg( self::RAW_QUERY, '1', (string) get_permalink( $post_id ) );
+		return Access_Gate::instance()->sign_capture_url( add_query_arg( self::RAW_QUERY, '1', (string) get_permalink( $post_id ) ) );
 	}
 
 	/* ---------- queueing ---------- */

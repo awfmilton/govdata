@@ -178,6 +178,15 @@ final class Map_Cache {
 	public static function refresh(): ?array {
 		$t0 = microtime( true );
 
+		/* ── Refresh map_riding_totals from riding_cache first (nothing else did; the map shipped stale
+		 *    totals — matrix D1/DATA-025). ─── */
+		try {
+			publictech_db( Riding_Cache_Warmer::cache_alias() )->pdo()->exec( 'CALL `sp_refresh_map_totals`()' );
+		} catch ( \Throwable $e ) {
+			error_log( '[PublicTech] map-cache: sp_refresh_map_totals failed: ' . $e->getMessage() );
+			return null;
+		}
+
 		/* ── Riding data (pt-cache-02) ─── */
 		try {
 			$riding_rows = publictech_db( Riding_Cache_Warmer::cache_alias() )->select(
@@ -210,12 +219,15 @@ final class Map_Cache {
 		/* ── Country data (grantconts — read-only aggregate) ─── */
 		$countries = [];
 		try {
+			// A full scan of master_table: lift the 8 s request statement cap for this background job, or the
+			// query times out and the file is written with no countries (matrix D1).
+			publictech_db( Riding_Cache_Warmer::source_alias() )->pdo()->exec( 'SET SESSION max_execution_time = 0' );
 			$country_rows = publictech_db( Riding_Cache_Warmer::source_alias() )->select(
 				"SELECT UPPER(TRIM(`recipient_country`))    AS cc,
 				        SUM(GREATEST(`agreement_value`, 0)) AS spend,
 				        COUNT(*)                            AS cnt
 				 FROM `master_table`
-				 WHERE `recipient_country` IS NOT NULL
+				 WHERE `amendment_number` IS NULL AND `recipient_country` IS NOT NULL
 				   AND LENGTH(TRIM(`recipient_country`)) = 2
 				   AND UPPER(TRIM(`recipient_country`)) != 'CA'
 				 GROUP BY cc"
@@ -232,10 +244,26 @@ final class Map_Cache {
 				];
 			}
 		} catch ( \Throwable $e ) {
-			error_log( '[PublicTech] map-cache: country query skipped: ' . $e->getMessage() );
+			error_log( '[PublicTech] map-cache: country query failed: ' . $e->getMessage() );
+			return null;
 		}
 
-		if ( empty( $ridings ) && empty( $countries ) ) return null;
+		/* ── Refuse to publish an incomplete map (matrix D1): every riding in riding_cache, at least one
+		 *    country, and the same total as riding_cache. ─── */
+		try {
+			$check = publictech_db( Riding_Cache_Warmer::cache_alias() )->select(
+				'SELECT COUNT(*) AS n, COALESCE(SUM(`total_value`), 0) AS total FROM `riding_cache`'
+			)[0] ?? [ 'n' => 0, 'total' => 0 ];
+		} catch ( \Throwable $e ) {
+			error_log( '[PublicTech] map-cache: riding_cache check failed: ' . $e->getMessage() );
+			return null;
+		}
+		$sum = array_sum( array_column( $ridings, 'spend' ) );
+		if ( count( $ridings ) !== (int) $check['n'] || ! $countries || abs( $sum - (float) $check['total'] ) > 1.0 ) {
+			error_log( sprintf( '[PublicTech] map-cache: refusing to write: ridings %d/%d, countries %d, sum %.2f vs %.2f',
+				count( $ridings ), (int) $check['n'], count( $countries ), $sum, (float) $check['total'] ) );
+			return null;
+		}
 
 		/* ── Write JSON file ─── */
 		$out  = [ 'ridings' => $ridings, 'countries' => $countries ];

@@ -64,6 +64,10 @@ final class Throttle {
 	 * unions are 8.2+).
 	 */
 	public function enforce_rest( \WP_REST_Request $req ): bool|\WP_Error {
+		// A page's own widget requests carry its page pass; the page view was already counted by Access_Gate.
+		if ( Access_Gate::instance()->has_valid_pass( $req ) || Access_Gate::instance()->is_verified_crawler() ) {
+			return true;
+		}
 		$state = $this->check( get_current_user_id() ?: null, $this->ip() );
 		if ( $state['allowed'] ) {
 			return true;

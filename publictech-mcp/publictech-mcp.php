@@ -3,7 +3,7 @@
  * Plugin Name:       PublicTech MCP Server
  * Plugin URI:        https://publictech.audit/mcp
  * Description:       Model Context Protocol server for PublicTech. Lets remote AI clients (Claude Desktop, Cursor, custom agents) discover and call tools that read from the audit-terminal database via the PublicTech Core multi-DB layer. Bearer-token authenticated, tier-throttled, strictly read-only.
- * Version:           1.0.0
+ * Version:           1.0.1
  * Requires at least: 6.4
  * Tested up to:      6.8
  * Requires PHP:      8.1
@@ -24,7 +24,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'PUBLICTECH_MCP_VERSION', '1.0.0' );
+define( 'PUBLICTECH_MCP_VERSION', '1.0.1' );
 define( 'PUBLICTECH_MCP_DIR',     plugin_dir_path( __FILE__ ) );
 define( 'PUBLICTECH_MCP_NS',      'publictech-mcp/v1' );
 

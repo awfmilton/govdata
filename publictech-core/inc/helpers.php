@@ -254,3 +254,24 @@ function client_ip(): string {
 
 	return $remote;
 }
+
+/**
+ * One language of a bilingual "English | Français" value from the Government of Canada grants data.
+ *
+ * Recipient names, department titles and some program names arrive as "EN|FR" or "EN | FR" pairs.
+ * Pages show one language: the English part by default, the French part when $lang is 'fr'.
+ * Values without a separator are returned trimmed and unchanged.
+ */
+function one_language( ?string $value, string $lang = 'en' ): string {
+	$value = trim( (string) $value );
+	// Separators seen in the data: ASCII '|' and U+2502 '│' (e.g. "batch report│rapport en lots").
+	$value = str_replace( '│', '|', $value );
+	if ( '' === $value || ! str_contains( $value, '|' ) ) {
+		return $value;
+	}
+	$parts = array_values( array_filter( array_map( 'trim', explode( '|', $value, 2 ) ), 'strlen' ) );
+	if ( ! $parts ) {
+		return $value;
+	}
+	return ( 'fr' === $lang && isset( $parts[1] ) ) ? $parts[1] : $parts[0];
+}
