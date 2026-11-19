@@ -12,7 +12,7 @@
 	var REST_ROOT = ( cfg.rest_root || '' ).replace( /\/$/, '' );
 	var RIDINGS   = cfg.ridings_url || '';
 	var TOTALS    = cfg.totals_url  || '';
-	var WORLD     = 'https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json';
+	var WORLD     = cfg.world_url || '';
 
 	/* ── State ─────────────────────────────────────────────────────────────── */
 	var ridingData        = {};

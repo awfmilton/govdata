@@ -10,7 +10,7 @@
  *
  * Data sources:
  *   - Canadian riding polygons: assets/topojson/ridings-2023.topo.json
- *   - World countries:          cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json
+ *   - World countries:          assets/topojson/countries-110m.json (world-atlas 2.0.2)
  *   - Riding spending totals:   wp-content/uploads/pt-map/riding-totals.json (static file)
  *                               Falls back to REST /publictech/v1/map/riding-totals
  *
@@ -25,11 +25,11 @@ $pt_rest_root   = esc_url_raw( get_rest_url( null, PUBLICTECH_CORE_REST_NS ) );
 $pt_totals_url  = class_exists( '\\PublicTech\\Core\\Map_Cache' )
 	? esc_url_raw( \PublicTech\Core\Map_Cache::file_url() )
 	: '';
-$pt_world_url   = 'https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json';
+$pt_world_url   = esc_url_raw( PUBLICTECH_TERMINAL_URL . 'assets/topojson/countries-110m.json' ); // world-atlas 2.0.2, self-hosted (SITE-064)
 
 /* ── Enqueue map script with proper dep chain ───────────────────────────── */
 /* This runs before get_header() so wp_enqueue_scripts fires in time.       */
-add_action( 'wp_enqueue_scripts', static function () use ( $pt_ridings_url, $pt_rest_root, $pt_totals_url ) {
+add_action( 'wp_enqueue_scripts', static function () use ( $pt_ridings_url, $pt_rest_root, $pt_totals_url, $pt_world_url ) {
 	wp_enqueue_script(
 		'publictech-map',
 		PUBLICTECH_TERMINAL_URL . 'assets/js/map.js',
@@ -41,6 +41,7 @@ add_action( 'wp_enqueue_scripts', static function () use ( $pt_ridings_url, $pt_
 		'rest_root'   => $pt_rest_root,
 		'ridings_url' => $pt_ridings_url,
 		'totals_url'  => $pt_totals_url,
+		'world_url'   => $pt_world_url,
 	] );
 } );
 
