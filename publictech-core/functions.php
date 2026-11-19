@@ -33,6 +33,7 @@ require_once PUBLICTECH_CORE_DIR . 'inc/class-map-cache.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-mp-finance-warmer.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-entity-reports.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-deleted-records.php';
+require_once PUBLICTECH_CORE_DIR . 'inc/class-postal-review.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-charts-rest.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-chart-snapshots.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-mp-social-cards.php';

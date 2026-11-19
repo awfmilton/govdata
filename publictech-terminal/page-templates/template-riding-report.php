@@ -412,6 +412,9 @@ get_header(); ?>
 		$pt_deleted_intro = '';
 		require PUBLICTECH_TERMINAL_DIR . 'parts/deleted-records.php';
 	}
+	// Postal codes whose riding could not be confirmed, if any are in or near this riding.
+	$pt_review_riding = (string) ( $pt_number ?: ( $pt_riding['number'] ?? '' ) );
+	require PUBLICTECH_TERMINAL_DIR . 'parts/postal-review-notice.php';
 	?>
 
 	<!-- ═══ ANNUAL TABLE ════════════════════════════════════════════════════ -->

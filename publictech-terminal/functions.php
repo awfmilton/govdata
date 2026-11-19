@@ -277,6 +277,8 @@ add_filter( 'theme_page_templates', static function ( array $tpls ): array {
 		'page-templates/template-data-explorer.php'  => __( 'PT — Data Explorer',         'publictech-terminal' ),
 		'page-templates/template-data-store.php'     => __( 'PT — Data Store',            'publictech-terminal' ),
 		'page-templates/template-about.php'          => __( 'PT — About the Project',     'publictech-terminal' ),
+		'page-templates/template-deleted-records.php' => __( 'PT — Deleted Records',       'publictech-terminal' ),
+		'page-templates/template-postal-review.php'  => __( 'PT — Postal Code Review',   'publictech-terminal' ),
 	];
 } );
 

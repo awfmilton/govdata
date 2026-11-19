@@ -278,6 +278,10 @@ get_header(); ?>
 				   templated section on every MP page, data from the cache DB. */
 				require PUBLICTECH_TERMINAL_DIR . 'parts/riding-spending.php';
 
+				/* Postal codes whose riding could not be confirmed, if any are in or near this riding. */
+				$pt_review_riding = (string) ( $pt_riding_payload['riding']['number'] ?? '' );
+				require PUBLICTECH_TERMINAL_DIR . 'parts/postal-review-notice.php';
+
 				/* Parliamentary activity: mandates, votes, bills, committees.
 				   Data fetched client-side from /publictech/v1/mp/{id}/parliament. */
 				require PUBLICTECH_TERMINAL_DIR . 'parts/mp-parliamentary-activity.php';
