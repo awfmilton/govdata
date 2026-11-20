@@ -47,6 +47,13 @@ final class Security {
 				$params[] = $val[1];
 			} elseif ( 'IS NULL' === $op || 'IS NOT NULL' === $op ) {
 				$frags[] = "{$sql_col} {$op}";
+			} elseif ( 'LIKE' === $op && self::is_fulltext_column( $sql_col ) && is_string( $val )
+				&& preg_match( '/^%([\p{L}\p{N}]{3,40})%$/u', $val, $w ) ) {
+				// A one-word "%word%" search on a column with its own FULLTEXT index uses the index (milliseconds)
+				// instead of scanning every row (about 7 s on master_table, over the 8 s query limit). Matches whole
+				// words and word beginnings rather than any substring.
+				$frags[]  = "MATCH({$sql_col}) AGAINST (? IN BOOLEAN MODE)";
+				$params[] = '+' . $w[1] . '*';
 			} else {
 				$frags[]  = "{$sql_col} {$op} ?";
 				$params[] = $val;
@@ -55,6 +62,22 @@ final class Security {
 
 		$sql = $frags ? ( 'WHERE ' . implode( ' AND ', $frags ) ) : '';
 		return [ $sql, $params ];
+	}
+
+	/**
+	 * master_table columns that each have their own single-column FULLTEXT index (grantconts; see SHOW INDEX).
+	 * Filterable: `publictech_fulltext_columns` receives bare column names.
+	 */
+	private static function is_fulltext_column( string $sql_col ): bool {
+		$cols = (array) apply_filters( 'publictech_fulltext_columns', [
+			'description_eng', 'description_fr', 'expected_results_en', 'expected_results_fr',
+			'additional_information_en', 'additional_information_fr', 'coverage',
+		] );
+		// Only master_table carries these indexes; agreements and the views have the same column names without them.
+		if ( ! preg_match( '/^`?master_table`?\.`?([a-z_]+)`?$/', $sql_col, $m ) ) {
+			return false;
+		}
+		return in_array( $m[1], $cols, true );
 	}
 
 	/**

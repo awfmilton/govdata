@@ -220,12 +220,16 @@ final class Access_Gate {
 	 * Pass for the current page. Scope:
 	 *   "<id>"        MP profile: that member only.
 	 *   "c<id>-<id>"  dashboard compare view (?compare=): only the compared members (max 4) — D4.
+	 *   "x<id>"       Data Explorer / Query Builder page: may run the stream query endpoint within the visitor's tier
+	 *                 (anonymous: 100 rows a query, 10 a minute, 200 a day), never an MP's data.
 	 *   "p<id>"       any other data page: the page itself, never an MP's data.
 	 * There is deliberately NO wildcard scope: a pass from one page must not unlock every member (matrix D4).
 	 */
 	public function current_pass(): string {
 		$scope = 'p' . (int) get_queried_object_id();
-		if ( is_singular( 'member-parliament' ) ) {
+		if ( is_page() && ( is_page_template( 'page-templates/template-data-explorer.php' ) || is_page_template( 'page-templates/template-query-builder.php' ) ) ) {
+			$scope = 'x' . (int) get_queried_object_id();
+		} elseif ( is_singular( 'member-parliament' ) ) {
 			$scope = (string) (int) get_queried_object_id();
 		} elseif ( isset( $_GET['compare'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only scope
 			$ids = array_slice( array_values( array_filter( array_map( 'absint', explode( ',', (string) wp_unslash( $_GET['compare'] ) ) ),
@@ -243,7 +247,7 @@ final class Access_Gate {
 	/** Valid pass presented by this visitor; when $id >= 0 it must cover that member post id. */
 	public function has_valid_pass( \WP_REST_Request $req, int $id = -1 ): bool {
 		$pass = (string) $req->get_header( self::PASS_HEADER );
-		if ( ! preg_match( '/^(\d+|c\d+(?:-\d+){0,3}|p\d+)\.(\d+)\.([a-f0-9]{32})$/', $pass, $m ) ) {
+		if ( ! preg_match( '/^(\d+|c\d+(?:-\d+){0,3}|[px]\d+)\.(\d+)\.([a-f0-9]{32})$/', $pass, $m ) ) {
 			return false;
 		}
 		[ , $p_scope, $p_exp, $p_mac ] = $m;
@@ -278,6 +282,25 @@ final class Access_Gate {
 		}
 		return new \WP_Error( 'pt_page_pass_required',
 			__( 'This data loads with its page. Open the page on govdata.ca, or sign in to use the data API.', 'publictech-core' ),
+			[ 'status' => 401 ] );
+	}
+
+	/**
+	 * Permission for the stream query endpoint: signed in (the data API follows the tier), or an anonymous visitor
+	 * running queries from the Data Explorer / Query Builder page itself (an "x" page pass). The page view already
+	 * counted toward the anonymous allowance; Throttle still applies the anonymous tier limits per request.
+	 * Crawlers get no exemption here: they never need to run queries.
+	 */
+	public static function stream_permission( \WP_REST_Request $req ): bool|\WP_Error {
+		if ( Security::verify_request( $req ) ) {
+			return true;
+		}
+		$gate = self::instance();
+		if ( preg_match( '/^x\d+\./', (string) $req->get_header( self::PASS_HEADER ) ) && $gate->has_valid_pass( $req ) ) {
+			return true;
+		}
+		return new \WP_Error( 'pt_sign_in_required',
+			__( 'Open the Data Explorer on govdata.ca to run queries, or sign in (free) to use the data API.', 'publictech-core' ),
 			[ 'status' => 401 ] );
 	}
 

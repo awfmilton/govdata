@@ -54,19 +54,19 @@ final class Access_Tiers {
 	 */
 	public function tiers(): array {
 		$defaults = [
-			// Unauthenticated visitors. Intentionally tight to discourage
-			// drive-by scraping; signed-in free-tier users get the next bucket.
+			// Unauthenticated visitors. Intentionally tight to discourage drive-by scraping (100 rows a query, 10 a minute,
+			// 200 a day); grantconts is included so the Data Explorer works for visitors. Signed-in free users get the next bucket.
 			'anonymous' => [
 				'label' => 'Anonymous', 'price_monthly' => 0,
 				'rpm' => 10, 'rpd' => 200, 'max_rows' => 100,
-				'schemas' => [ 'pt-finance-01' ],
+				'schemas' => [ 'pt-grantconts-01', 'pt-finance-01' ],
 				'mcp' => false, 'concurrent' => 1,
 				'charts.create' => false,
 			],
 			'free' => [
 				'label' => 'Free', 'price_monthly' => 0,
 				'rpm' => 20, 'rpd' => 500, 'max_rows' => 500,
-				'schemas' => [ 'pt-finance-01', 'pt-grants-02' ],
+				'schemas' => [ 'pt-grantconts-01', 'pt-finance-01', 'pt-grants-02' ],
 				'mcp' => false, 'concurrent' => 1,
 				'charts.create' => false,
 			],

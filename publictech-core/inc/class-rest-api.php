@@ -53,7 +53,7 @@ final class REST_API {
 
 		register_rest_route( PUBLICTECH_CORE_REST_NS, '/stream/(?P<schema>[a-z0-9\-]+)/(?P<table>[a-z0-9_]+)', [
 			'methods'             => \WP_REST_Server::READABLE,
-			'permission_callback' => $auth,
+			'permission_callback' => [ Access_Gate::class, 'stream_permission' ],
 			'callback'            => [ $this, 'stream_rows' ],
 		] );
 

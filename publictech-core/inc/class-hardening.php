@@ -79,6 +79,16 @@ final class Hardening {
 		if ( str_contains( $src, 'ver=' ) ) {
 			$src = remove_query_arg( 'ver', $src );
 		}
+		// Cache-bust our own theme assets with a hash of the file's modification time (reveals no version). Without
+		// it, a deploy was invisible to browsers for the 30 days static files are cached.
+		$base = trailingslashit( content_url( 'themes' ) );
+		if ( 0 === strpos( $src, $base ) ) {
+			$file = trailingslashit( WP_CONTENT_DIR ) . 'themes/' . strtok( substr( $src, strlen( $base ) ), '?' );
+			$mt   = is_readable( $file ) ? (int) filemtime( $file ) : 0;
+			if ( $mt ) {
+				$src = add_query_arg( 'v', substr( md5( (string) $mt ), 0, 8 ), $src );
+			}
+		}
 		return $src;
 	}
 
@@ -145,6 +155,13 @@ final class Hardening {
 			if ( '' !== $v ) {
 				header( "$k: $v" );
 			}
+		}
+		// Front-end HTML embeds per-visitor tokens (REST nonce, page pass). The host's default
+		// "Cache-Control: max-age=600" let a browser reuse a signed-out copy after the visitor signed in, so every
+		// query from it failed with 403 (stale nonce). Pages must be revalidated; static assets keep their caching.
+		if ( ! is_admin() && ! ( defined( 'REST_REQUEST' ) && REST_REQUEST ) ) {
+			header( 'Cache-Control: private, no-cache, must-revalidate', true );
+			header_remove( 'Expires' );
 		}
 	}
 

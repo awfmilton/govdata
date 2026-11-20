@@ -1137,10 +1137,18 @@
 			headers: { 'x-wp-nonce': boot.nonce },
 		} )
 			.then( r => {
+				if ( r.ok ) return r.json();
 				if ( r.status === 429 ) throw new Error( ( boot.i18n && boot.i18n.rateLimit ) || 'Rate limit reached.' );
-				if ( r.status === 403 ) throw new Error( ( boot.i18n && boot.i18n.tierLocked ) || 'Access denied.' );
-				if ( ! r.ok ) throw new Error( `Query failed (${r.status}).` );
-				return r.json();
+				// Explain the refusal instead of a bare status: a stale page token (the visitor signed in or out since
+				// this page loaded) needs a reload; a missing sign-in gets the server's own message.
+				return r.json().catch( () => ( {} ) ).then( body => {
+					if ( body && body.code === 'rest_cookie_invalid_nonce' ) {
+						throw new Error( 'Your session changed since this page loaded. Reload the page and run the query again.' );
+					}
+					if ( body && body.message ) throw new Error( String( body.message ) );
+					if ( r.status === 403 ) throw new Error( ( boot.i18n && boot.i18n.tierLocked ) || 'Access denied.' );
+					throw new Error( `Query failed (${r.status}).` );
+				} );
 			} )
 			.then( rows => {
 				if ( elRun ) elRun.disabled = false;
