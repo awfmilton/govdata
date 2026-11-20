@@ -188,7 +188,88 @@
 		'isc'   : 'Indigenous Services Canada',
 		'rcaanc': 'Crown-Indigenous Relations and Northern Affairs Canada',
 		'canada heritage': 'Canadian Heritage',
+		// Informal / former names people type (D18): map to the official owner_org_en.
+		'agriculture canada'        : 'Agriculture and Agri-Food Canada',
+		'industry canada'           : 'Innovation, Science and Economic Development Canada',
+		'environment canada'        : 'Environment and Climate Change Canada',
+		'immigration canada'        : 'Immigration, Refugees and Citizenship Canada',
+		'citizenship and immigration': 'Immigration, Refugees and Citizenship Canada',
+		'heritage canada'           : 'Canadian Heritage',
+		'service canada'            : 'Employment and Social Development Canada',
+		'hrsdc'                     : 'Employment and Social Development Canada',
+		'indian affairs'            : 'Indigenous Services Canada',
+		'indigenous services'       : 'Indigenous Services Canada',
+		'fisheries canada'          : 'Fisheries and Oceans Canada',
+		'defence'                   : 'National Defence',
+		'global affairs'            : 'Global Affairs Canada',
+		'foreign affairs'           : 'Global Affairs Canada',
+		'veterans affairs'          : 'Veterans Affairs Canada',
+		'infrastructure canada'     : 'Department of Housing, Infrastructure and Communities',
+		'western economic diversification': 'Prairies Economic Development Canada',
 	};
+	// Official department names (DISTINCT owner_org_en, 2026-11-20). Recognised anywhere in a query (D18), so
+	// "Health Canada contributions to Manitoba nonprofits" keeps its department without "from".
+	const DEPT_NAMES = [
+		'Accessibility Standards Canada',
+		'Agriculture and Agri-Food Canada',
+		'Atlantic Canada Opportunities Agency',
+		'Canada Economic Development for Quebec Regions',
+		'Canada Energy Regulator',
+		'Canada Revenue Agency',
+		'Canada Water Agency',
+		'Canadian Food Inspection Agency',
+		'Canadian Heritage',
+		'Canadian Institutes of Health Research',
+		'Canadian Northern Economic Development Agency',
+		'Canadian Nuclear Safety Commission',
+		'Canadian Space Agency',
+		'Correctional Service of Canada',
+		'Crown-Indigenous Relations and Northern Affairs Canada',
+		'Department of Finance Canada',
+		'Department of Housing, Infrastructure and Communities',
+		'Department of Justice Canada',
+		'Employment and Social Development Canada',
+		'Environment and Climate Change Canada',
+		'Federal Economic Development Agency for Northern Ontario',
+		'Federal Economic Development Agency for Southern Ontario',
+		'Fisheries and Oceans Canada',
+		'Global Affairs Canada',
+		'Health Canada',
+		'Immigration, Refugees and Citizenship Canada',
+		'Impact Assessment Agency of Canada',
+		'Indigenous Services Canada',
+		'Innovation, Science and Economic Development Canada',
+		'Library and Archives Canada',
+		'National Defence',
+		'National Research Council Canada',
+		'Natural Resources Canada',
+		'Natural Sciences and Engineering Research Council of Canada',
+		'Office of the Privacy Commissioner of Canada',
+		'Pacific Economic Development Canada',
+		'Parks Canada',
+		'Polar Knowledge Canada',
+		'Prairies Economic Development Canada',
+		'Privy Council Office',
+		'Public Health Agency of Canada',
+		'Public Safety Canada',
+		'Royal Canadian Mounted Police',
+		'Social Sciences and Humanities Research Council of Canada',
+		'Statistics Canada',
+		'Status of Women Canada',
+		'Transport Canada',
+		'Treasury Board of Canada Secretariat',
+		'Veterans Affairs Canada',
+		'Western Economic Diversification Canada',
+		'Women and Gender Equality Canada',
+	];
+	/** Official department name for what a user typed (alias, abbreviation or the name itself). */
+	function canonicalDept( name ) {
+		const key = String( name || '' ).toLowerCase().replace( /\s+/g, ' ' ).trim();
+		return DEPT_ABBR[ key ] || name;
+	}
+	/** Words not worth matching on their own in a free-text topic. */
+	const FT_STOP = new Set( [ 'and', 'or', 'the', 'of', 'for', 'to', 'in', 'on', 'a', 'an', 'related', 'with', 'about',
+		'grants', 'grant', 'contributions', 'contribution', 'funding' ] );
 
 	// Operator catalogue — must exactly match Security::ALLOWED_OPS in class-security.php
 	const OPERATORS = [
@@ -457,12 +538,21 @@
 		}
 
 		// ── 8. Department / funding organization ─────────────────────────────
-		// Check known abbreviations first (ISED, PHAC, etc.)
+		// An official department name anywhere in the query first, then known abbreviations and informal names
+		// (ISED, PHAC, "Agriculture Canada", etc.).
 		{
-			const abbrMatch = Object.keys( DEPT_ABBR ).find( abbr =>
+			const lc       = consumed.toLowerCase();
+			const official = DEPT_NAMES.slice().sort( ( x, y ) => y.length - x.length )
+				.find( n => lc.includes( n.toLowerCase() ) );
+			// Longest key first, so "agriculture canada" wins over shorter keys it contains.
+			const abbrMatch = official ? null : Object.keys( DEPT_ABBR ).sort( ( x, y ) => y.length - x.length ).find( abbr =>
 				new RegExp( `\\b${abbr}\\b`, 'i' ).test( consumed )
 			);
-			if ( abbrMatch ) {
+			if ( official ) {
+				params.department = official;
+				const at = lc.indexOf( official.toLowerCase() );
+				consume( consumed.slice( at, at + official.length ) );
+			} else if ( abbrMatch ) {
 				params.department = DEPT_ABBR[ abbrMatch ];
 				consume( consumed.match( new RegExp( `\\b${abbrMatch}\\b`, 'i' ) )?.[0] );
 			} else {
@@ -470,7 +560,7 @@
 				const deptRe = /(?:funded\s+by|from|through|via|distributed\s+by|administered\s+by|allocated\s+by|issued\s+by|awarded\s+by|department\s+of|ministry\s+of|agency\s+of)\s+([A-Z][A-Za-z\s&',.\-]{3,70}?)(?=\s+(?:grants?|contributions?|for|in|to|over|under|since|before|that|which|and|$))/i;
 				const dm = deptRe.exec( consumed );
 				if ( dm && dm[1] && dm[1].trim().length > 2 ) {
-					params.department = dm[1].trim().replace( /[,.]$/, '' );
+					params.department = canonicalDept( dm[1].trim().replace( /[,.]$/, '' ) );
 					consume( dm[0] );
 				} else if ( doc ) {
 					// Compromise.js org() as soft hint
@@ -709,7 +799,17 @@
 
 		// Fulltext → description_eng LIKE
 		// (fulltext: true per metadata, but stream uses LIKE; full-text index is future work)
-		if ( params.fulltext ) push( 'description_eng', 'LIKE', `%${params.fulltext}%` );
+		// A multi-word topic matches each meaningful word (D18): "housing and infrastructure" means both words
+		// appear, not that exact phrase.
+		if ( params.fulltext ) {
+			const words = String( params.fulltext ).toLowerCase().split( /[^a-z0-9À-ſ'-]+/ )
+				.filter( w => w.length > 2 && ! FT_STOP.has( w ) );
+			if ( words.length > 1 ) {
+				words.slice( 0, 4 ).forEach( w => push( 'description_eng', 'LIKE', `%${w}%` ) );
+			} else {
+				push( 'description_eng', 'LIKE', `%${words[0] || params.fulltext}%` );
+			}
+		}
 
 		return filters;
 	}
