@@ -79,7 +79,7 @@ function pt_dev_db_connections(): array {
 	return [
 		// PRIMARY — grantconts (read-only). Source of truth for the warmer.
 		'pt-grantconts-01' => [
-			'host' => '35.230.186.163',
+			'host' => getenv( 'PT_GRANTCONTS_HOST' ) ?: '137.184.210.20', // govdata-serving (was the lost Cloud SQL 35.230.186.163)
 			'port' => 3306,
 			'name' => 'grantconts',
 			'user' => 'pt_read',

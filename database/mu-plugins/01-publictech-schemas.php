@@ -9,7 +9,7 @@
  *
  *   define( 'PUBLICTECH_DB_CONNECTIONS', [
  *       'pt-grantconts-01' => [
- *           'host' => '35.230.186.163',
+ *           'host' => '137.184.210.20',
  *           'port' => 3306,
  *           'name' => 'grantconts',
  *           'user' => 'pt_read',
