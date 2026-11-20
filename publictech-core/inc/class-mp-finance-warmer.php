@@ -380,6 +380,10 @@ final class MP_Finance_Warmer {
 			foreach ( $stmt->fetchAll( \PDO::FETCH_ASSOC ) as $row ) {
 				$out[ (int) $row['op_politician_id'] ] = (string) $row['mp_id'];
 			}
+			// MPs with no mps row: hoc_member_expenditures keys them as 'OP<op_politician_id>'.
+			foreach ( $this->source->query( 'SELECT op_politician_id FROM mp_persons WHERE op_politician_id IS NOT NULL' )->fetchAll( \PDO::FETCH_COLUMN ) as $pol ) {
+				$out[ (int) $pol ] = $out[ (int) $pol ] ?? 'OP' . (int) $pol;
+			}
 			return $out;
 		} catch ( \Throwable $e ) {
 			$this->log( 'load_op_pol_to_mp_id failed: ' . $e->getMessage(), 'warn' );
