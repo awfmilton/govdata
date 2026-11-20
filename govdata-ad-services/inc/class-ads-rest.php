@@ -161,6 +161,7 @@ final class REST {
 
 		$ctx = [
 			'site_key'   => $site_key,
+			'token'      => $token,
 			'session_id' => sanitize_text_field( (string) $req->get_param( 'session_id' ) ),
 			'page_url'   => esc_url_raw( (string) $req->get_param( 'page_url' ) ),
 			'referrer'   => esc_url_raw( (string) $req->get_param( 'referrer' ) ),

@@ -2,8 +2,10 @@
 /**
  * Impression and click event recording.
  *
- * Each event type has a per-session deduplication guard (transient, 1 hour)
- * and a per-IP rate limit (300 events/minute) to prevent log flooding.
+ * A token served to our own site counts at most one impression and one click (tokens are HMAC-signed by
+ * /serve and expire after govads_token_ttl; partner-site tokens may be shared by cached pages, so they are not
+ * single-use). Events are also deduplicated per session (impressions 1 hour, clicks
+ * 10 seconds) and rate-limited per IP (300 events/minute) to prevent log flooding.
  * IPs are anonymised before storage (PIPEDA-compliant).
  *
  * @package GovAds
@@ -21,8 +23,10 @@ final class Tracker {
 	private function __construct() {}
 
 	public function record_impression( int $ad_id, int $zone_id, array $ctx ): bool {
-		// Deduplicate: one impression per ad per session per hour.
-		if ( ! $this->dedup_ok( 'imp', $ad_id, (string) ( $ctx['session_id'] ?? '' ) ) ) {
+		// Deduplicate: one impression per own-site token (D20: a token replayed with new session ids no longer
+		// counts again), and one per ad per session per hour.
+		if ( ! $this->dedup_ok( 'imptok', $ad_id, $this->single_use_key( $ctx ), (int) apply_filters( 'govads_token_ttl', HOUR_IN_SECONDS ) + 60 )
+			|| ! $this->dedup_ok( 'imp', $ad_id, (string) ( $ctx['session_id'] ?? '' ) ) ) {
 			return false;
 		}
 		global $wpdb;
@@ -34,8 +38,9 @@ final class Tracker {
 	}
 
 	public function record_click( int $ad_id, int $zone_id, array $ctx ): bool {
-		// Short dedup window: absorbs double-clicks and beacon retries.
-		if ( ! $this->dedup_ok( 'clk', $ad_id, (string) ( $ctx['session_id'] ?? '' ), 10 ) ) {
+		// One click per own-site token (D20), plus a short per-session window for double-clicks and beacon retries.
+		if ( ! $this->dedup_ok( 'clktok', $ad_id, $this->single_use_key( $ctx ), (int) apply_filters( 'govads_token_ttl', HOUR_IN_SECONDS ) + 60 )
+			|| ! $this->dedup_ok( 'clk', $ad_id, (string) ( $ctx['session_id'] ?? '' ), 10 ) ) {
 			return false;
 		}
 		global $wpdb;
@@ -81,6 +86,15 @@ final class Tracker {
 	}
 
 	/** Session-based dedup: one event per ad per session inside the TTL window. */
+	/**
+	 * Dedup key that makes a token single-use, for tokens our own loader fetched from /serve (site_key '').
+	 * Partner-site tokens are embedded in page HTML that may be cached and shared by many visitors, so they
+	 * are not single-use ('' = no token dedup); they stay bounded by session dedup and the IP rate limit.
+	 */
+	private function single_use_key( array $ctx ): string {
+		return '' === (string) ( $ctx['site_key'] ?? '' ) ? (string) ( $ctx['token'] ?? '' ) : '';
+	}
+
 	private function dedup_ok( string $type, int $ad_id, string $session_id, int $ttl = HOUR_IN_SECONDS ): bool {
 		if ( '' === $session_id ) {
 			return true; // Can't dedup without a session.

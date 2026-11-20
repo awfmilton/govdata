@@ -126,7 +126,8 @@ final class Renderer {
 	 *
 	 * The validity window is filterable: partner sites embed the token at
 	 * page-render time, so it must survive lazy slots scrolled into view
-	 * long after load. Replay is bounded by session dedup + IP rate limits.
+	 * long after load. Own-site tokens are single-use per event type (Tracker::single_use_key); partner
+	 * tokens are bounded by session dedup + IP rate limits.
 	 */
 	public function verify_token( string $token, int $ad_id, int $zone_id ): string|false {
 		// phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_decode
