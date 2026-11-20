@@ -21,7 +21,7 @@ Usage:
     python3 database/import-parldata.py --tables core_politician,core_electedmember,core_riding
 
     # Override DB connection:
-    export WRITE_HOST=35.230.186.163 WRITE_DB=grantconts WRITE_USER=pt_write WRITE_PASS=...
+    export WRITE_HOST=DB_HOST WRITE_DB=grantconts WRITE_USER=pt_write WRITE_PASS=...
 
 Dependencies:
     pip install mysql-connector-python
@@ -45,7 +45,7 @@ except ImportError:
     sys.exit("ERROR: pip install mysql-connector-python")
 
 DUMP_PATH    = r"C:\Users\user\Downloads\openparliament.public.sql.bz2"
-DEFAULT_HOST = '35.230.186.163'
+DEFAULT_HOST = '127.0.0.1'
 DEFAULT_DB   = 'grantconts'
 DEFAULT_USER = 'pt_write'
 DEFAULT_PORT = 3306

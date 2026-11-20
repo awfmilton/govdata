@@ -15,7 +15,7 @@ if hasattr(sys.stdout, 'reconfigure'):
     sys.stdout.reconfigure(encoding='utf-8', errors='replace')
 
 SOURCE  = r"C:\Users\user\Downloads\openparliament.public.sql"
-HOST    = '35.230.186.163'
+HOST    = '127.0.0.1'
 DB      = 'grantconts'
 USER    = os.environ.get('WRITE_USER', 'pt_read')
 PORT    = 3306

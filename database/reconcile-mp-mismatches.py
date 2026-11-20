@@ -23,7 +23,7 @@ import mysql.connector
 from datetime import date
 
 DB = dict(
-    host=os.environ.get('DB_HOST', '35.230.186.163'),
+    host=os.environ.get('DB_HOST', '127.0.0.1'),
     port=int(os.environ.get('DB_PORT', 3306)),
     database=os.environ.get('DB_NAME', 'grantconts'),
     user=os.environ.get('WRITE_USER', os.environ.get('DB_USER', 'pt_write')),

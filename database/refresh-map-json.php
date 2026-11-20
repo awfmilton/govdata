@@ -19,6 +19,12 @@
  *   3 — JSON file write failed
  */
 
+// Command line only (php CLI or wp eval-file): over HTTP any visitor could trigger this heavy refresh.
+if ( PHP_SAPI !== 'cli' ) {
+	http_response_code( 404 );
+	exit;
+}
+
 define( 'PT_MAP_REFRESH_CLI', true );
 
 /* ── Bootstrap WordPress ─────────────────────────────────────────────────── */

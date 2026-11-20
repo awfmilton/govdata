@@ -43,7 +43,7 @@ if not DB_PASSWORD:
         "    export PT_DB_PASSWORD='...'"
     )
 
-DB_HOST = '35.230.186.163'
+DB_HOST = '127.0.0.1'
 DB_PORT = 3306
 DB_NAME = 'grantconts'
 DB_USER = os.environ.get('SRC_USER', 'pt_read')

@@ -48,7 +48,7 @@ if not _wp_pass:
     )
 
 SOURCE_DB = dict(
-    host='35.230.186.163', port=3306, database='grantconts',
+    host='127.0.0.1', port=3306, database='grantconts',
     user='pt_read', password=_pt_pass, charset='utf8mb4',
 )
 CACHE_DB = dict(

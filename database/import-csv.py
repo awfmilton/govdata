@@ -25,7 +25,7 @@ Usage:
   python3 database/import-csv.py cleaned.csv --dry-run
 
   # Override connection details:
-  export WRITE_HOST=35.230.186.163 WRITE_DB=grantconts WRITE_USER=pt_write WRITE_PASS=...
+  export WRITE_HOST=DB_HOST WRITE_DB=grantconts WRITE_USER=pt_write WRITE_PASS=...
 
 Dependencies:
   pip install mysql-connector-python
@@ -43,7 +43,7 @@ if hasattr(sys.stdout, 'reconfigure'):
 if hasattr(sys.stderr, 'reconfigure'):
     sys.stderr.reconfigure(encoding='utf-8', errors='replace')
 
-DEFAULT_HOST = '35.230.186.163'
+DEFAULT_HOST = '127.0.0.1'
 DEFAULT_DB   = 'grantconts'
 DEFAULT_USER = 'pt_write'
 DEFAULT_PORT = 3306

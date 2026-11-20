@@ -1,0 +1,13 @@
+# Droplet desk 2026-11-20: this folder is the govdata repo's DATABASE TOOLING (CLI scripts and SQL) shipped inside
+# the theme. Nothing here may be executed or downloaded over HTTP (refresh-map-json.php had no CLI guard, so any
+# visitor could trigger the heavy map refresh). Cron runs these with the php CLI, which this does not affect.
+# Data files the site fetches (e.g. nlp-schema-metadata.json) stay readable. Remove only with the govdata owner.
+<FilesMatch "\.(php|phtml|php[0-9]|phar|inc|sql|sh|bash|py|env|ini|conf|log|bak|dist)$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+</FilesMatch>

@@ -26,7 +26,11 @@ function get_arg( string $key, string $default = '' ): string {
 	return $default;
 }
 
-$db_host = get_arg( 'host',   '35.230.186.163' );
+// No default host: the old default (35.230.186.163, the lost Cloud SQL IP) could send credentials to a stranger.
+$db_host = get_arg( 'host',   '' );
+if ( '' === $db_host ) {
+	WP_CLI::error( 'Pass the database host via --host=HOST' );
+}
 $db_name = get_arg( 'dbname', 'grantconts' );
 $db_user = get_arg( 'user',   'pt_read' );
 $db_pass = get_arg( 'pass',   defined( 'PT_DEV_DB_PASSWORD' ) ? PT_DEV_DB_PASSWORD : '' );

@@ -20,7 +20,7 @@ Usage:
   python3 database/sync-entity-cache.py
 
   # Or set all creds explicitly:
-  export SRC_HOST=35.230.186.163 SRC_DB=grantconts SRC_USER=pt_read SRC_PASS=...
+  export SRC_HOST=DB_HOST SRC_DB=grantconts SRC_USER=pt_read SRC_PASS=...
   export DST_HOST=mysql.govdata.ca DST_DB=govdata_cache_01 DST_USER=gdc_01 DST_PASS=...
   python3 database/sync-entity-cache.py
 
@@ -473,7 +473,7 @@ def main():
     args = parser.parse_args()
 
     src_creds = resolve_creds('SRC', {
-        'host': '35.230.186.163',
+        'host': '127.0.0.1',
         'db':   'grantconts',
         'user': 'pt_read',
     })

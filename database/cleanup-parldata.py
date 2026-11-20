@@ -35,7 +35,7 @@ try:
 except ImportError:
     sys.exit("ERROR: pip install mysql-connector-python")
 
-DEFAULT_HOST = '35.230.186.163'
+DEFAULT_HOST = '127.0.0.1'
 DEFAULT_DB   = 'grantconts'
 DEFAULT_USER = 'pt_write'
 DEFAULT_PORT = 3306

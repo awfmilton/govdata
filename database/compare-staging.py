@@ -25,7 +25,7 @@ if not DB_PASSWORD:
     )
 
 conn = mysql.connector.connect(
-    host='35.230.186.163', port=3306, database='grantconts',
+    host='127.0.0.1', port=3306, database='grantconts',
     user='pt_read', password=DB_PASSWORD,
     connection_timeout=300, autocommit=True
 )

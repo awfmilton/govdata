@@ -56,7 +56,7 @@ if hasattr(sys.stderr, 'reconfigure'):
 # ---------------------------------------------------------------------------
 # DB defaults (override with env vars)
 # ---------------------------------------------------------------------------
-DEFAULT_SRC_HOST = '35.230.186.163'
+DEFAULT_SRC_HOST = '127.0.0.1'
 DEFAULT_SRC_DB   = 'grantconts'
 DEFAULT_SRC_USER = 'pt_read'
 DEFAULT_SRC_PORT = 3306
