@@ -8,14 +8,14 @@
 --    for the MP finance pages and flags.
 -- 3. mp_expenditure_supplier_totals: per MP, per supplier, contract + hospitality totals (aggregate).
 
-CREATE OR REPLACE VIEW hoc_reporting_periods AS
+CREATE OR REPLACE SQL SECURITY INVOKER VIEW hoc_reporting_periods AS
 SELECT 1000 - p.period_id AS period_id, p.fiscal_year, CONCAT('Q', p.quarter) AS quarter,
        ELT(p.quarter, 'first-quarter', 'second-quarter', 'third-quarter', 'fourth-quarter') AS quarter_name,
        CONCAT('Members expenditures report, ', p.start_date, ' to ', p.end_date) AS reporting_period_desc,
        p.start_date, p.end_date
   FROM hoc_exp_periods p;
 
-CREATE OR REPLACE VIEW hoc_member_expenditures AS
+CREATE OR REPLACE SQL SECURITY INVOKER VIEW hoc_member_expenditures AS
 SELECT s.id AS expenditure_id,
        COALESCE((SELECT m.mp_id FROM mps m WHERE m.mp_persons_id = s.mp_person_id AND m.mp_id LIKE 'MP%' LIMIT 1),
                 CONCAT('OP', pp.op_politician_id), CONCAT('PP', s.mp_person_id)) AS mp_id,
@@ -24,7 +24,7 @@ SELECT s.id AS expenditure_id,
   FROM hoc_exp_summary s
   JOIN mp_persons pp ON pp.id = s.mp_person_id;
 
-CREATE OR REPLACE VIEW mp_expenditure_transactions AS
+CREATE OR REPLACE SQL SECURITY INVOKER VIEW mp_expenditure_transactions AS
 SELECT 'contract' AS category, c.id AS line_id, c.period_id, c.mp_person_id, c.expense_date AS line_date,
        c.supplier, c.description AS detail, NULL AS location, c.total AS amount, c.source_file
   FROM hoc_exp_contracts c

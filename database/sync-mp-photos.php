@@ -42,7 +42,8 @@ $cfg = PUBLICTECH_DB_CONNECTIONS['pt-grantconts-01'] ?? null;
 if ( $cfg ) {
 	try {
 		$db = new PDO( sprintf( 'mysql:host=%s;port=%d;dbname=%s;charset=utf8mb4', $cfg['host'], $cfg['port'] ?? 3306, $cfg['name'] ),
-			$cfg['user'], $cfg['pass'], [ PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION ] );
+			$cfg['user'], $cfg['pass'], [ PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION ] + ( empty( $cfg['ssl_ca'] ) ? [] : [
+				PDO::MYSQL_ATTR_SSL_CA => $cfg['ssl_ca'], PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => true ] ) );
 		foreach ( $db->query( "SELECT mp_id, photo_url FROM mps WHERE photo_url LIKE 'https://www.ourcommons.ca/%'" ) as $r ) {
 			$official[ (string) $r['mp_id'] ] = (string) $r['photo_url'];
 		}
@@ -58,6 +59,17 @@ foreach ( $posts as $pid ) {
 	$ext  = (string) get_post_meta( $pid, 'external_mp_id', true );
 	$url  = $official[ $ext ] ?? (string) get_post_meta( $pid, 'pt_mp_photo_url', true );
 	$host = strtolower( (string) wp_parse_url( $url, PHP_URL_HOST ) );
+	// Fallback: the official portrait on the member's House of Commons profile (pt_hoc_person_id, set by
+	// sync-current-mps.php) when the stored URL is missing or on a host that no longer serves (cdn.openparliament.ca).
+	$hoc_id = (string) get_post_meta( $pid, 'pt_hoc_person_id', true );
+	if ( ( ! $url || ! in_array( $host, $allow, true ) ) && $hoc_id ) {
+		$page = wp_remote_get( 'https://www.ourcommons.ca/members/en/' . rawurlencode( $hoc_id ), [ 'timeout' => 30 ] );
+		if ( ! is_wp_error( $page ) && preg_match( '#/Content/Parliamentarians/Images/OfficialMPPhotos/[^"\']+\.(?:jpg|jpeg|png)#i', wp_remote_retrieve_body( $page ), $m ) ) {
+			// Encode each path segment: file names carry accents ("DeschênesAlexis_BQ.jpg").
+			$url  = 'https://www.ourcommons.ca' . implode( '/', array_map( 'rawurlencode', explode( '/', html_entity_decode( $m[0] ) ) ) );
+			$host = 'www.ourcommons.ca';
+		}
+	}
 	if ( ! $url || ! in_array( $host, $allow, true ) ) { ++$skip; continue; }
 	$source = str_contains( $host, 'ourcommons' ) ? 'House of Commons' : 'openparliament.ca';
 	if ( $dry ) { WP_CLI::log( "would fetch {$pid} {$source} {$url}" ); ++$done; continue; }

@@ -517,6 +517,11 @@ final class MP_Finance_Warmer {
 		if ( ! $writable ) {
 			$options[ \PDO::MYSQL_ATTR_USE_BUFFERED_QUERY ] = false;
 		}
+		// A remote serving database (wp-config 'ssl_ca'): TLS with a verified server certificate.
+		if ( ! empty( $cfg['ssl_ca'] ) ) {
+			$options[ \PDO::MYSQL_ATTR_SSL_CA ]                 = (string) $cfg['ssl_ca'];
+			$options[ \PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT ] = true;
+		}
 		$pdo = new \PDO( $dsn, $cfg['user'], $cfg['pass'], $options );
 		$pdo->exec( "SET SESSION time_zone = '+00:00'" );
 		$pdo->exec( 'SET SESSION MAX_EXECUTION_TIME = 0' );

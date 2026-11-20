@@ -181,6 +181,11 @@ final class Riding_Cache_Warmer {
 		if ( ! $writable ) {
 			$options[ \PDO::MYSQL_ATTR_USE_BUFFERED_QUERY ] = false;
 		}
+		// A remote serving database (wp-config 'ssl_ca'): TLS with a verified server certificate.
+		if ( ! empty( $cfg['ssl_ca'] ) ) {
+			$options[ \PDO::MYSQL_ATTR_SSL_CA ]                 = (string) $cfg['ssl_ca'];
+			$options[ \PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT ] = true;
+		}
 		$pdo = new \PDO( $dsn, $cfg['user'], $cfg['pass'], $options );
 		// Generous batch execution budget; this is not a request-path query.
 		$pdo->exec( "SET SESSION time_zone = '+00:00'" );

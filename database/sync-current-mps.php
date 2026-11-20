@@ -33,9 +33,13 @@ WP_CLI::log( $apply ? 'APPLY: posts will be created / updated / drafted.' : 'DRY
 $cfg = defined( 'PUBLICTECH_DB_CONNECTIONS' ) ? ( PUBLICTECH_DB_CONNECTIONS['pt-grantconts-01'] ?? [] ) : [];
 $dsn = sprintf( 'mysql:host=%s;port=%d;dbname=%s;charset=utf8mb4',
 	getenv( 'GRANTCONTS_HOST' ) ?: ( $cfg['host'] ?? '127.0.0.1' ), (int) ( $cfg['port'] ?? 3306 ), $cfg['name'] ?? 'grantconts' );
+$opts = [ PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC ];
+if ( ! empty( $cfg['ssl_ca'] ) ) {          // remote serving database: TLS with a verified server certificate
+	$opts[ PDO::MYSQL_ATTR_SSL_CA ]                 = $cfg['ssl_ca'];
+	$opts[ PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT ] = true;
+}
 try {
-	$pdo = new PDO( $dsn, getenv( 'GRANTCONTS_USER' ) ?: ( $cfg['user'] ?? 'pt_read' ), getenv( 'GRANTCONTS_PASS' ) ?: ( $cfg['pass'] ?? '' ),
-		[ PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC ] );
+	$pdo = new PDO( $dsn, getenv( 'GRANTCONTS_USER' ) ?: ( $cfg['user'] ?? 'pt_read' ), getenv( 'GRANTCONTS_PASS' ) ?: ( $cfg['pass'] ?? '' ), $opts );
 } catch ( PDOException $e ) {
 	WP_CLI::error( 'grantconts connect failed: ' . $e->getMessage() );
 }
