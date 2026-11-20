@@ -93,5 +93,12 @@
 		return PT.chartTheme.grid === 'solid' ? 'none' : '2,3';
 	};
 
-	document.addEventListener('DOMContentLoaded', PT.refreshCSSVars);
+	document.addEventListener('DOMContentLoaded', function () {
+		// A signed-in user's saved theme (PT_BOOT.chartTheme) also drives the page's CSS: accent and font (SITE-005).
+		if (boot.chartTheme) {
+			if (PT.chartTheme.accent && PT.chartTheme.accent !== defaults.accent) PT.applyAccent(PT.chartTheme.accent);
+			if (PT.chartTheme.font) document.documentElement.style.setProperty('--chart-font', PT.chartTheme.font);
+		}
+		PT.refreshCSSVars();
+	});
 })(window);

@@ -73,7 +73,31 @@
 		});
 	}
 
+	/** Show the current PT.chartTheme in the controls (saved settings on load, defaults after Reset). SITE-005. */
+	function syncControls() {
+		const t = PT.chartTheme || {};
+		$$('#pt-customizer .pt-swatch').forEach(function (sw) {
+			sw.classList.toggle('on', (sw.dataset.color || '').toLowerCase() === String(t.accent || '').toLowerCase());
+		});
+		const av = $('#pt-cust-accent-val'); if (av && t.accent) av.textContent = t.accent;
+		$$('#pt-customizer .pt-seg').forEach(function (group) {
+			const key = group.dataset.knob;
+			const cur = key === 'anim' ? (t.anim ? 'on' : 'off') : String(t[key]);
+			group.querySelectorAll('button').forEach(function (b) { b.classList.toggle('on', b.dataset.val === cur); });
+		});
+		[['pt-cust-stroke', 'stroke', 'pt-cust-stroke-val', function (v) { return v.toFixed(1) + ' px'; }, 1],
+		 ['pt-cust-marker', 'marker', 'pt-cust-marker-val', function (v) { return v + ' px'; }, 1],
+		 ['pt-cust-area',   'area',   'pt-cust-area-val',   function (v) { return v + '%'; }, 100]].forEach(function (r) {
+			const el = document.getElementById(r[0]);
+			if (!el || t[r[1]] === undefined) return;
+			const v = Math.round(t[r[1]] * r[4] * 10) / 10;
+			el.value = v;
+			const lab = document.getElementById(r[2]); if (lab) lab.textContent = r[3](+v);
+		});
+	}
+
 	document.addEventListener('DOMContentLoaded', function () {
+		syncControls();
 		const btn = $('#pt-customizer-btn');
 		if (btn) btn.addEventListener('click', openDrawer);
 		const close = $('#pt-customizer-close');
@@ -88,7 +112,7 @@
 		bindRange('pt-cust-area',   'area',   'pt-cust-area-val',   function (v) { return v + '%'; });
 
 		const reset = $('#pt-customizer-reset');
-		if (reset) reset.addEventListener('click', function () { PT.reset(); drawPreview(); });
+		if (reset) reset.addEventListener('click', function () { PT.reset(); syncControls(); drawPreview(); });
 
 		const save = $('#pt-customizer-save');
 		if (save) save.addEventListener('click', function () {
