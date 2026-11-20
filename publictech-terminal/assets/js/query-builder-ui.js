@@ -1204,9 +1204,15 @@
 			isNum[k] = rows.every( r => r[k] == null || ( r[k] !== '' && isFinite( Number( r[k] ) ) ) );
 		} );
 
+		// The table scrolls inside its own box (both ways), so 100 rows of long text never stretch the page; long text
+		// cells show one line with the full value on hover. Numbers like "2,020" for a year are shown as plain years.
+		const scroller = document.createElement( 'div' );
+		scroller.className    = 'pt-qb-scroll';
+		scroller.style.cssText = 'max-height:560px;overflow:auto;width:100%;max-width:100%;contain:inline-size;border:1px solid var(--line, #263042)';
 		const table  = document.createElement( 'table' );
 		table.className = 'stream';
-		table.style.cssText = 'width:100%';
+		table.style.cssText = 'width:max-content;min-width:100%;border-collapse:collapse';
+		const PLAIN = /(^|_)(year|id|number|key|identifier|code)$|^primary_key$/i;
 
 		const thead = document.createElement( 'thead' );
 		const htr   = document.createElement( 'tr' );
@@ -1227,16 +1233,20 @@
 				if ( isNum[k] ) {
 					td.className   = 'num';
 					const n        = Number( row[k] );
-					td.textContent = isNaN( n ) ? '' : n.toLocaleString( undefined, { maximumFractionDigits: 2 } );
+					td.textContent = isNaN( n ) ? '' : ( PLAIN.test( k ) ? String( row[k] ) : n.toLocaleString( undefined, { maximumFractionDigits: 2 } ) );
 				} else {
-					td.textContent = row[k] == null ? '' : String( row[k] );
+					const t = row[k] == null ? '' : String( row[k] );
+					td.textContent = t;
+					td.style.cssText = 'max-width:320px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis';
+					if ( t.length > 40 ) td.title = t;
 				}
 				tr.appendChild( td );
 			} );
 			tbody.appendChild( tr );
 		} );
 		table.appendChild( tbody );
-		elResultsWrap.appendChild( table );
+		scroller.appendChild( table );
+		elResultsWrap.appendChild( scroller );
 
 		const foot = document.createElement( 'div' );
 		foot.className = 'stream-foot';

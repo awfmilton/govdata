@@ -199,49 +199,83 @@
 	 *   - Numeric columns → Y series
 	 *   - If no date and only text + numbers → bar chart (category X)
 	 */
+	/*
+	 * One readable summary chart for a result set (not every numeric column: IDs, riding numbers and NAICS codes
+	 * are numbers but not measures, and plotting them made a 36,000 px chart of meaningless bars).
+	 *   measure  the money column: agreement_value, else the first column named like value/amount/total/spend.
+	 *   by year  when rows have a start date, fiscal year or year: total per year (bar).
+	 *   by group otherwise: top 10 recipients (or department, province, program, riding) by total (bar).
+	 * The host gets a fixed height and the panel's width, so the chart can never grow with the page.
+	 */
+	const CHART_HEIGHT = 320;
+
+	function chartPlan( rows ) {
+		const keys    = Object.keys( rows[0] || {} );
+		const num     = v => v !== null && v !== '' && isFinite( Number( v ) );
+		const measure = [ 'agreement_value' ].concat( keys.filter( k => /value|amount|total|spend/i.test( k ) ) )
+			.find( k => keys.includes( k ) && rows.some( r => num( r[k] ) ) );
+		if ( ! measure ) return null;
+		const yearOf = r => {
+			for ( const k of [ 'agreement_start_date', 'fiscal_year', 'year', 'amendment_date' ] ) {
+				const m = r[k] ? String( r[k] ).match( /^(\d{4})/ ) : null;
+				if ( m ) return m[1];
+			}
+			return null;
+		};
+		const groupKey = [ 'recipient_legal_name', 'owner_org_en', 'recipient_province', 'prog_name_en',
+			'federal_riding_name_en', 'recipient_operating_name' ].find( k => keys.includes( k ) && rows.some( r => r[k] ) );
+		const years = new Set( rows.map( yearOf ).filter( Boolean ) );
+		const totals = new Map();
+		let by;
+		if ( years.size > 1 ) {
+			by = 'year';
+			rows.forEach( r => { const y = yearOf( r ); if ( y ) totals.set( y, ( totals.get( y ) || 0 ) + Number( r[measure] || 0 ) ); } );
+		} else if ( groupKey ) {
+			by = groupKey;
+			rows.forEach( r => {
+				const g = String( r[groupKey] || '—' ).split( '|' )[0].trim().slice( 0, 40 );
+				totals.set( g, ( totals.get( g ) || 0 ) + Number( r[measure] || 0 ) );
+			} );
+		} else {
+			return null;
+		}
+		let entries = [ ...totals.entries() ];
+		entries = 'year' === by ? entries.sort( ( a, b ) => a[0].localeCompare( b[0] ) )
+			: entries.sort( ( a, b ) => b[1] - a[1] ).slice( 0, 10 );
+		const label = measure.replace( /_/g, ' ' );
+		return {
+			by, label,
+			data: entries.map( ( [ k, v ] ) => ( { label: k, total: Math.round( v / 1e4 ) / 100 } ) ),   // $ millions
+		};
+	}
+
 	function renderChart( rows, chartType ) {
-		if ( ! rows.length || ! PT.billboard ) return;
-		if ( ! elChartHost ) return;
-
-		const colKeys = Object.keys( rows[0] );
-
-		// Detect date-like columns
-		const DATE_COLS = [ 'agreement_start_date', 'agreement_end_date', 'amendment_date',
-			'fiscal_year', 'year', 'date', 'changed_at', 'created_at', 'generated_at' ];
-		const hasDate   = colKeys.some( k => DATE_COLS.includes( k ) );
-		const dateCol   = colKeys.find( k => DATE_COLS.includes( k ) );
-
-		// Detect numeric columns
-		const numericCols = colKeys.filter( k => {
-			if ( k === dateCol ) return false;
-			return rows.some( r => r[k] !== null && isFinite( Number( r[k] ) ) && r[k] !== '' );
-		} );
-
-		if ( ! numericCols.length ) {
+		if ( ! rows.length || ! PT.billboard || ! elChartHost ) return;
+		const plan = chartPlan( rows );
+		if ( ! plan || ! plan.data.length ) {
 			if ( elChartPanel ) elChartPanel.style.display = 'none';
 			return;
 		}
-
-		const axisXType  = hasDate && ( dateCol === 'agreement_start_date' || dateCol === 'amendment_date' )
-			? 'timeseries'
-			: 'category';
-		const resolvedType = chartType || ( axisXType === 'timeseries' ? 'line' : 'bar' );
+		elChartHost.style.width    = '100%';
+		elChartHost.style.maxWidth = '100%';
+		elChartHost.style.height   = CHART_HEIGHT + 'px';
+		if ( elChartPanel ) elChartPanel.style.maxWidth = '100%';
 
 		const spec = {
-			data : { type: resolvedType },
+			data : { type: chartType || 'bar' },
 			axis : {
-				x: { type: axisXType, label: dateCol ? dateCol.replace( /_/g, ' ' ) : '' },
-				y: { type: 'indexed', label: numericCols[0] ? numericCols[0].replace( /_/g, ' ' ) : 'Value' },
+				x: { type: 'category', label: '' },
+				y: { type: 'indexed', label: '$ millions' },
 			},
 			grid   : { x: { show: false }, y: { show: true } },
-			legend : { show: numericCols.length > 1 },
-			point  : { show: rows.length <= 50 },
+			legend : { show: false },
+			point  : { show: false },
 		};
 
 		try {
-			PT.billboard.render( elChartHost, spec, rows );
+			PT.billboard.render( elChartHost, spec, plan.data );
 			if ( elChartPanel ) elChartPanel.style.display = '';
-			track( 'chart_render', { type: resolvedType, rows: rows.length, numeric_cols: numericCols.length } );
+			track( 'chart_render', { type: spec.data.type, rows: rows.length, by: plan.by, bars: plan.data.length } );
 		} catch ( err ) {
 			if ( elChartPanel ) elChartPanel.style.display = 'none';
 		}
