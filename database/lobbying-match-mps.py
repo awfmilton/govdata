@@ -98,6 +98,13 @@ def main():
         if ' ' in ln:                                   # compound surnames: index each part too
             for part in ln.split():
                 by_last[part].add(pid)
+    # Other surnames of merged people (mp_persons_merges, e.g. Rachael Harder -> Rachael Thomas).
+    cur.execute("SHOW TABLES LIKE 'mp_persons_merges'")
+    if cur.fetchall():
+        cur.execute("SELECT kept_id, JSON_UNQUOTE(JSON_EXTRACT(dup_row, '$.last_name')) FROM mp_persons_merges")
+        for pid, ln in cur.fetchall():
+            if pid in names and norm(ln) and norm(ln) != names[pid][1]:
+                by_last[norm(ln)].add(pid)
 
     def in_office(pid, d):
         return d is not None and any((sd is None or sd <= d) and (ed is None or d <= ed) for sd, ed in periods[pid])
