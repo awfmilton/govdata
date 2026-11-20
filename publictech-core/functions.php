@@ -113,6 +113,27 @@ add_action( \PublicTech\Core\MP_Finance_Warmer::HOOK, [ \PublicTech\Core\MP_Fina
 add_action( 'init', [ \PublicTech\Core\Dashboard_Stats::class, 'schedule' ] );
 add_action( \PublicTech\Core\Dashboard_Stats::CRON_HOOK, [ \PublicTech\Core\Dashboard_Stats::class, 'run_warm' ] );
 
+/**
+ * Heavy cache jobs on the server's own cron instead of WP-Cron (owner decision 2026-11-20: heavy refreshes run at
+ * night). WP-Cron fires inside a visitor's request at whatever hour; the riding warm once ran the remote database
+ * out of memory. With PT_SYSTEM_CRON true in wp-config.php, these hooks are never scheduled in WP-Cron (the class
+ * schedule() calls are refused before any database write), and the server crontab runs them at night instead.
+ */
+function pt_system_cron_hooks(): array {
+	return [
+		\PublicTech\Core\Riding_Cache::HOOK,
+		\PublicTech\Core\MP_Finance_Warmer::HOOK,
+		\PublicTech\Core\Map_Cache::HOOK,
+		\PublicTech\Core\Entity_Reports::CRON_HOOK,
+		\PublicTech\Core\Dashboard_Stats::CRON_HOOK,
+	];
+}
+if ( defined( 'PT_SYSTEM_CRON' ) && PT_SYSTEM_CRON ) {
+	add_filter( 'pre_schedule_event', static function ( $pre, $event ) {
+		return in_array( $event->hook, pt_system_cron_hooks(), true ) ? false : $pre;
+	}, 10, 2 );
+}
+
 // Clean up the cron schedules on theme switch.
 add_action( 'switch_theme', [ \PublicTech\Core\Alerts::class, 'unschedule' ] );
 add_action( 'switch_theme', [ \PublicTech\Core\Riding_Cache::class, 'unschedule' ] );
