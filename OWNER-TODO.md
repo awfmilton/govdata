@@ -21,8 +21,14 @@ droplet desk (mcp-manager) writes the new values into `wp-config.php` without di
 - [ ] **Memory headroom.** The 4 GB droplet (s-2vcpu-4gb-amd, $28/mo) was out-of-memory killed once, during a
       riding-cache warm on 2026-11-20. It was tuned (see the README / commit history) and is stable, with about 1 GB
       free. If it runs out again, the fix is the 8 GB size (higher monthly cost, owner's call).
-- [ ] **Turn on weekly backups to Google Drive** (rclone), once the owner sets up the Drive credential.
-      Backups of the machines and the database, portable to any provider.
+- [x] **Weekly encrypted backups of govdata-serving to Google Drive** (2026-11-21). Sundays 08:30 UTC:
+      a consistent dump of grantconts (about 370 MB zstd) and the server config, via rclone crypt to
+      `kodexcrypt:servers/govdata-serving/{current,history}` (history kept 60 days). Restore test passed (cryptcheck).
+      DigitalOcean weekly droplet backups are also on. Watch: `/var/lib/kodex-backup/last-ok` on the droplet.
+- [ ] **Back up the DreamHost side too** (WordPress database `govdata_ca_1`, the two cache databases, and
+      `wp-content/uploads`). The serving backup above covers only grantconts and the droplet.
+- [ ] **Take a DigitalOcean snapshot** of govdata-serving as a "day one of production" restore point (manual;
+      about $2/month while kept). Weekly backups keep only the last 4.
 - [ ] **Decide when to retire the build droplet** `govdata-build-r1` (s-4vcpu-16gb). It still holds the full build,
       the Hansard text and the raw source files that production leaves out. Archive first.
 
