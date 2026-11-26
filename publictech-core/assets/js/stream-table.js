@@ -52,6 +52,13 @@
 				.then(function (r) {
 					if (r.status === 429) throw new Error(boot.i18n.rateLimit);
 					if (r.status === 403) throw new Error(boot.i18n.tierLocked);
+					// Any other refusal (401 sign-in, 404 unknown table, 500) carries a message: show it,
+					// rather than parsing the error object as zero rows and rendering an empty table.
+					if (!r.ok) {
+						return r.json().catch(function () { return {}; }).then(function (b) {
+							throw new Error((b && b.message) || ('Stream failed (HTTP ' + r.status + ').'));
+						});
+					}
 					return r.json();
 				})
 				.then((rows) => {
@@ -81,15 +88,17 @@
 			if (f) {
 				const gt = f.match(/^>\s*([\d.]+)/);
 				const lt = f.match(/^<\s*([\d.]+)/);
-				if (gt) view = view.filter(function (r) { return +(r.amount_cad || r.amount || 0) > +gt[1]; });
-				else if (lt) view = view.filter(function (r) { return +(r.amount_cad || r.amount || 0) < +lt[1]; });
+				if (gt) view = view.filter(function (r) { return amountOf(r) > +gt[1]; });
+				else if (lt) view = view.filter(function (r) { return amountOf(r) < +lt[1]; });
 				else view = view.filter(function (r) { return Object.values(r).some(function (v) { return String(v).toLowerCase().includes(f); }); });
 			}
 			if (this.sortKey) {
 				const k = this.sortKey, d = this.sortDir;
 				view.sort(function (a, b) {
 					const av = a[k], bv = b[k];
-					if (typeof av === 'number' && typeof bv === 'number') return (av - bv) * d;
+					// MySQL DECIMAL columns arrive as strings ("478593.00"): compare those numerically too.
+					const an = numeric(av), bn = numeric(bv);
+					if (an !== null && bn !== null) return (an - bn) * d;
 					return String(av || '').localeCompare(String(bv || '')) * d;
 				});
 			}
@@ -105,7 +114,7 @@
 				const sourceLabel = row.atip_ref ? 'ATIP: ' + row.atip_ref : 'Source document';
 				const cells = cols.map(function (k) {
 					const v = row[k];
-					if (k === 'amount_cad' || k === 'amount') {
+					if (MONEY.indexOf(k) !== -1) {
 						return '<td class="num">$' + escape(Number(v || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })) + '</td>';
 					}
 					if ((k === 'source_url' || k === 'atip_ref') && sourceHref !== '#') {
@@ -120,6 +129,13 @@
 				this.foot.innerHTML = 'Streamed <b>' + this.rows.length + '</b> rows · viewing <b>' + view.length + '</b> · page ' + this.page;
 			}
 		}
+	}
+
+	const MONEY = ['amount_cad', 'amount', 'agreement_value'];
+	function amountOf(r) { return +(r.amount_cad || r.amount || r.agreement_value || 0); }
+	function numeric(v) {
+		if (typeof v === 'number') return v;
+		return typeof v === 'string' && /^-?\d+(\.\d+)?$/.test(v.trim()) ? +v : null;
 	}
 
 	function safeHref(url) {

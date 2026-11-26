@@ -25,7 +25,10 @@ final class Dashboard_Stats {
 	public  const CRON_HOOK  = 'publictech_refresh_dashboard_stats';
 	private const CACHE_KEY   = 'pt_dash_stats_v2';
 	private const CACHE_GROUP = 'publictech';
-	private const CACHE_TTL   = 90000; // 25 hours
+	// 120 days. The grants data changes quarterly and the server crontab re-warms nightly (PT_SYSTEM_CRON), so the TTL
+	// is only a backstop: it must outlive any run of failed or skipped warms. At 25 hours, one missed night (and the
+	// crontab's log redirect failed every night from 2026-11-20 to 11-24) blanked the homepage to $0 / 0 agreements.
+	private const CACHE_TTL   = 120 * DAY_IN_SECONDS;
 
 	public static function instance(): self {
 		return self::$instance ??= new self();

@@ -11,15 +11,21 @@
 	function $(sel, root) { return (root || document).querySelector(sel); }
 	function $$(sel, root) { return Array.from((root || document).querySelectorAll(sel)); }
 
-	const state = { q: '', party: [], region: [], postal: '', spend_gt: 0, page: 1, sort: 'spend DESC' };
+	const state = { q: '', party: [], region: [], postal: '', spend_gt: 0, spend_lt: 0, page: 1, sort: 'spend DESC' };
 
 	function hydrateFromURL() {
 		const sp = new URLSearchParams(location.search);
 		state.q       = sp.get('q')        || '';
 		state.party   = sp.getAll('party');
 		state.region  = sp.getAll('region');
+		// A party / region archive page is already filtered to its term (archive-member-parliament.php sets this);
+		// keep that filter unless the URL names its own.
+		const preset = global.PT_DIRECTORY_PRESET || {};
+		if (!state.party.length && Array.isArray(preset.party)) state.party = preset.party.slice();
+		if (!state.region.length && Array.isArray(preset.region)) state.region = preset.region.slice();
 		state.postal  = sp.get('postal')   || '';
 		state.spend_gt= +sp.get('spend_gt')|| 0;
+		state.spend_lt= +sp.get('spend_lt')|| 0;
 		// WordPress paginates the archive as /directory/page/N/; honour that as well as ?page=N, or the
 		// first client-side search re-renders page 1 over the server-rendered page N (SITE-020).
 		const pm = location.pathname.match(/\/page\/(\d+)\/?$/);
@@ -33,6 +39,7 @@
 		state.region.forEach(function (v) { sp.append('region', v); });
 		if (state.postal)   sp.set('postal', state.postal);
 		if (state.spend_gt) sp.set('spend_gt', state.spend_gt);
+		if (state.spend_lt) sp.set('spend_lt', state.spend_lt);
 		if (state.page > 1) sp.set('page', state.page);
 		if (state.sort !== 'spend DESC') sp.set('sort', state.sort);
 		const base = location.pathname.replace(/\/page\/\d+\/?$/, '/');
