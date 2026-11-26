@@ -55,7 +55,10 @@ CREATE TABLE IF NOT EXISTS parl_division_votes (
   session       TINYINT UNSIGNED NOT NULL,
   division_no   SMALLINT UNSIGNED NOT NULL,
   person_id     INT UNSIGNED NOT NULL,
-  vote          ENUM('Yea','Nay','Paired') NOT NULL,
+  vote          VARCHAR(16) NOT NULL,                  -- as published: Yea | Nay | Paired (and rare errata, e.g. 'Yea/Nay')
+  is_yea        TINYINT(1)  NOT NULL DEFAULT 0,
+  is_nay        TINYINT(1)  NOT NULL DEFAULT 0,
+  is_paired     TINYINT(1)  NOT NULL DEFAULT 0,
   caucus        VARCHAR(80)  NULL,
   constituency  VARCHAR(200) NULL,
   province      VARCHAR(60)  NULL,

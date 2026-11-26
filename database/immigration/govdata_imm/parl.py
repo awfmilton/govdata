@@ -6,10 +6,10 @@ re-reads the current session costs nothing when nothing moved.
 """
 
 import hashlib
+import http.client
 import json
 import re
 import time
-import urllib.error
 import urllib.request
 import xml.etree.ElementTree as ET
 from datetime import datetime, timezone
@@ -40,7 +40,7 @@ def get(url: str, ua: str, timeout: int = 120, tries: int = 4) -> bytes:
             req = urllib.request.Request(url, headers={'User-Agent': ua, 'Accept': '*/*'})
             with urllib.request.urlopen(req, timeout=timeout) as r:
                 return r.read()
-        except (urllib.error.URLError, TimeoutError) as e:
+        except (OSError, http.client.HTTPException):   # URLError, timeouts, and RemoteDisconnected (Justice Laws)
             if attempt == tries - 1:
                 raise
             time.sleep(3 * (attempt + 1))
@@ -152,18 +152,19 @@ def load_divisions(conn, ua: str, which: list[tuple[int, int]], refetch_last: in
             for vp in vroot.findall('VoteParticipant'):
                 if _int(_txt(vp, 'DecisionDivisionNumber')) != d:
                     continue
-                val = _txt(vp, 'VoteValueName')
-                if val not in ('Yea', 'Nay', 'Paired'):
-                    raise ValueError(f'{p}-{s} #{d}: unexpected vote value {val!r}')
-                rows.append((p, s, d, _int(_txt(vp, 'PersonId')), val, _txt(vp, 'CaucusShortName'),
+                # Kept exactly as published. The record is not always clean: 39-1 #166 (2007) lists one member as
+                # 'Yea/Nay' with IsVoteYea and IsVoteNay both true. The flags say what the House recorded.
+                val = _txt(vp, 'VoteValueName') or ''
+                flags = [1 if (_txt(vp, f) or '').lower() == 'true' else 0 for f in ('IsVoteYea', 'IsVoteNay', 'IsVotePaired')]
+                rows.append((p, s, d, _int(_txt(vp, 'PersonId')), val, *flags, _txt(vp, 'CaucusShortName'),
                              _txt(vp, 'ConstituencyName'), _txt(vp, 'ConstituencyProvinceTerritoryName'),
                              _txt(vp, 'PersonOfficialFirstName'), _txt(vp, 'PersonOfficialLastName')))
             with conn.cursor() as cur:
                 cur.execute('DELETE FROM parl_division_votes WHERE parliament=%s AND session=%s AND division_no=%s', (p, s, d))
                 if rows:
                     cur.executemany('INSERT INTO parl_division_votes (parliament, session, division_no, person_id, vote, '
-                                    'caucus, constituency, province, first_name, last_name) '
-                                    'VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)', rows)
+                                    'is_yea, is_nay, is_paired, caucus, constituency, province, first_name, last_name) '
+                                    'VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)', rows)
                 cur.execute('UPDATE parl_divisions SET ballots=%s WHERE parliament=%s AND session=%s AND division_no=%s',
                             (len(rows), p, s, d))
             conn.commit()
