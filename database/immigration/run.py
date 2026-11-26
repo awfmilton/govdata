@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """govdata.ca immigration loader.
 
-  run.py init                         create reviewed country aliases and register sources
+  run.py init                         create reviewed country aliases, register sources, then relink
+  run.py relink                       re-resolve rows whose country spelling had no match (after editing aliases)
   run.py refresh [--source KEY ...]   load every source whose publication changed (default: all enabled)
                  [--force]            download and compare even when the publisher signal is unchanged
   run.py status                       latest edition and coverage per source
@@ -136,9 +137,24 @@ def refresh_one(conn, cfg, src, rid, force):
         return 'failed', repr(e)
 
 
+def relink(cur, resolver, sources) -> int:
+    """Resolve rows loaded while their spelling had no match. Values are untouched, so this is not a revision."""
+    n = 0
+    for src in sources:
+        may_create = {'ircc_odp': 'all', 'statcan_csv': 'groups'}.get(src['parser'], 'none')
+        cur.execute('SELECT DISTINCT country_raw FROM imm_fact WHERE source_key = %s AND country_raw IS NOT NULL '
+                    'AND country_id IS NULL', (src['key'],))
+        for (raw,) in cur.fetchall():
+            cid = resolver.resolve(raw, src['key'], may_create)
+            if cid:
+                n += cur.execute('UPDATE imm_fact SET country_id = %s WHERE source_key = %s AND country_raw = %s '
+                                 'AND country_id IS NULL', (cid, src['key'], raw))
+    return n
+
+
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument('command', choices=['init', 'refresh', 'status'])
+    ap.add_argument('command', choices=['init', 'relink', 'refresh', 'status'])
     ap.add_argument('--source', action='append')
     ap.add_argument('--force', action='store_true')
     a = ap.parse_args()
@@ -151,12 +167,16 @@ def main():
         sources = [s for s in sources if s['key'] in a.source]
     conn = connect(cfg)
 
-    if a.command == 'init':
+    if a.command in ('init', 'relink'):
         with conn.cursor() as cur:
-            register_sources(cur, load_sources())
-            CountryResolver(cur).apply_reviewed_aliases()
+            resolver = CountryResolver(cur)
+            if a.command == 'init':
+                register_sources(cur, load_sources())
+                resolver.apply_reviewed_aliases()
+            linked = relink(cur, resolver, sources)
         conn.commit()
-        print('sources registered; reviewed country aliases applied')
+        print(('sources registered; reviewed country aliases applied; ' if a.command == 'init' else '') +
+              f'relinked {linked} rows; still unmatched: {resolver.unmatched or "none"}')
         return 0
 
     if a.command == 'status':
