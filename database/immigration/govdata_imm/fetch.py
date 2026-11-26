@@ -35,7 +35,16 @@ _ckan_cache: dict[str, str | None] = {}
 
 
 def publisher_signal(src: dict, ua: str) -> str | None:
-    """The publisher's own 'last changed' marker, or None when it has none (then sha256 decides)."""
+    """The publisher's own 'last changed' marker, or None when it has none or does not answer (then the download and
+    its sha256 decide). A slow metadata service must never fail a load: StatCan WDS took over 60 s on 2026-11-26."""
+    try:
+        return _publisher_signal(src, ua)
+    except Exception as e:  # noqa: BLE001 -- the signal is an optimisation, the sha256 comparison is the authority
+        print(f"{src['key']}: publisher signal unavailable ({e!r}); comparing the download instead", flush=True)
+        return None
+
+
+def _publisher_signal(src: dict, ua: str) -> str | None:
     method, ref = src.get('detect'), src.get('detect_ref')
     if method == 'ckan' and ref:
         if ref not in _ckan_cache:
@@ -45,7 +54,7 @@ def publisher_signal(src: dict, ua: str) -> str | None:
     if method == 'statcan_wds' and ref:
         body = json.dumps([{'productId': int(ref)}]).encode()
         with _request('https://www150.statcan.gc.ca/t1/wds/rest/getCubeMetadata', ua, 'POST', body,
-                      {'Content-Type': 'application/json'}, timeout=60) as r:
+                      {'Content-Type': 'application/json'}, timeout=120) as r:
             obj = json.load(r)[0].get('object') or {}
         return obj.get('releaseTime')
     return None
