@@ -200,7 +200,7 @@ MP22_PROVINCES = {
     'nfld.': 'Newfoundland and Labrador', 'p.e.i.': 'Prince Edward Island', 'n.s.': 'Nova Scotia',
     'n.b.': 'New Brunswick', 'que.': 'Quebec', 'ont.': 'Ontario', 'man.': 'Manitoba', 'sask.': 'Saskatchewan',
     'alta.': 'Alberta', 'b.c.': 'British Columbia', 'n.w.t. yukon': 'Northwest Territories and Yukon',
-    'yukon': 'Yukon', 'n.w.t.': 'Northwest Territories',
+    'yukon': 'Yukon', 'n.w.t.': 'Northwest Territories', 'not stated': 'Not stated',
 }
 MP22_BASIS = {'residence': 'last_permanent_residence', 'citizenship': 'citizenship', 'birth': 'birth'}
 
@@ -213,10 +213,16 @@ def parse_mp22_csv(data: bytes, src: dict) -> list[dict]:
     rows, seen = [], set()
     for block in data.decode('utf-8').split('#FILE ')[1:]:
         name, _, body = block.partition('\n')
-        for rec in csv.DictReader(io.StringIO(body)):
+        recs = list(csv.DictReader(io.StringIO(body)))
+        # In a period table (columns 1946-1955 ... 1970) the 'Canada' column is the WHOLE-PERIOD total, not the
+        # report year: reading it as the year put Australia's 1946-1970 total (35,340) into 1970 (really 2,916).
+        period_table = any(re.fullmatch(r'\d{4}(\s*-\s*\d{4})?', r['column'].strip()) for r in recs)
+        for rec in recs:
             if rec['row_kind'] == 'subtotal':
                 continue
             col = rec['column'].strip()
+            if period_table and col == 'Canada':
+                continue
             year, province = int(rec['year']), None
             if re.fullmatch(r'\d{4}', col):
                 year = int(col)
