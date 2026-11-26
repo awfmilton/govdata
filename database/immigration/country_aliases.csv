@@ -1,0 +1,25 @@
+alias,canonical,kind,notes
+United Kingdom and Colonies,United Kingdom and Overseas Territories,country,IRCC 1980-2015 file spelling
+Hong Kong,Hong Kong SAR,country,
+Macau,Macau SAR,country,
+"Benin, Peoples Republic of","Benin, Republic of",country,
+Soloman Islands,Solomon Islands,country,misspelling in IRCC_PRadmiss_0004
+"Solomons, The",Solomon Islands,country,
+Commonwealth of the Northern Mariana Islands,"Northern Mariana Islands, Commonwealth of the",country,
+Country of citizenship not stated,Country not stated,other,
+Other countries of citizenship,Other,other,
+Union of Soviet Socialist Republics,Union of Soviet Socialist Republics,country,former state; NOT merged into successor states
+Czechoslovakia,Czechoslovakia,country,former state; NOT merged into successor states
+Yugoslavia,Yugoslavia,country,former state; NOT merged into successor states
+Democratic Republic of Germany,German Democratic Republic,country,former state (East Germany)
+Serbia and Montenegro,Serbia and Montenegro,country,former state 2003-2006
+Panama Canal Zone,Panama Canal Zone,country,former territory
+Pitcairn Island,Pitcairn Island,country,
+Africa NES,Africa NES,group,not elsewhere specified
+Asia NES,Asia NES,group,not elsewhere specified
+Central America NES,Central America NES,group,not elsewhere specified
+Europe NES,Europe NES,group,not elsewhere specified
+Ocean NES,Ocean NES,group,not elsewhere specified
+South America NES,South America NES,group,not elsewhere specified
+West Indies NES,West Indies NES,group,not elsewhere specified
+Great Britain,United Kingdom and Overseas Territories,country,StatCan last-permanent-residence label

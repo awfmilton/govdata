@@ -1,0 +1,196 @@
+{
+  "_doc": "Catalogue of immigration sources loaded by run.py. detect: ckan = CKAN package metadata_modified, statcan_wds = StatCan WDS releaseTime, http = ETag/Last-Modified. Every download is also compared by sha256, so a source that republishes identical bytes is logged 'unchanged'.",
+  "sources": [
+    {
+      "key": "ircc_pr_citz", "parser": "ircc_odp", "grain": "month",
+      "publisher": "Immigration, Refugees and Citizenship Canada",
+      "title": "Canada - Permanent Residents by Country of Citizenship (monthly, 2015+)",
+      "url": "https://www.ircc.canada.ca/opendata-donneesouvertes/data/ODP-PR-Citz.csv",
+      "landing": "https://open.canada.ca/data/en/dataset/f7e5498e-0ad8-4417-85c9-9b8aff9b9eda",
+      "detect": "ckan", "detect_ref": "f7e5498e-0ad8-4417-85c9-9b8aff9b9eda",
+      "population": "permanent_residents", "country_basis": "citizenship"
+    },
+    {
+      "key": "ircc_pr_citz_immcat", "parser": "ircc_odp", "grain": "month",
+      "publisher": "Immigration, Refugees and Citizenship Canada",
+      "title": "Canada - Permanent Residents by Country of Citizenship and Immigration Category (monthly, 2015+)",
+      "url": "https://www.ircc.canada.ca/opendata-donneesouvertes/data/ODP-PR-Citz_immcat.csv",
+      "landing": "https://open.canada.ca/data/en/dataset/f7e5498e-0ad8-4417-85c9-9b8aff9b9eda",
+      "detect": "ckan", "detect_ref": "f7e5498e-0ad8-4417-85c9-9b8aff9b9eda",
+      "population": "permanent_residents", "country_basis": "citizenship",
+      "coverage_note": "IRCC publishes French labels in this file's English component column; they are translated to IRCC's own English labels on load (govdata_imm/parsers.py COMPONENT_FR_EN)."
+    },
+    {
+      "key": "ircc_pr_pt_immcat", "parser": "ircc_odp", "grain": "month",
+      "publisher": "Immigration, Refugees and Citizenship Canada",
+      "title": "Canada - Permanent Residents by Province/Territory and Immigration Category (monthly, 2015+)",
+      "url": "https://www.ircc.canada.ca/opendata-donneesouvertes/data/ODP-PR-PT_IMMCAT.csv",
+      "landing": "https://open.canada.ca/data/en/dataset/f7e5498e-0ad8-4417-85c9-9b8aff9b9eda",
+      "detect": "ckan", "detect_ref": "f7e5498e-0ad8-4417-85c9-9b8aff9b9eda",
+      "population": "permanent_residents"
+    },
+    {
+      "key": "ircc_pr_pt_cma", "parser": "ircc_odp", "grain": "month",
+      "publisher": "Immigration, Refugees and Citizenship Canada",
+      "title": "Canada - Permanent Residents by Province/Territory and Census Metropolitan Area (monthly, 2015+)",
+      "url": "https://www.ircc.canada.ca/opendata-donneesouvertes/data/ODP-PR-PT_CMA.csv",
+      "landing": "https://open.canada.ca/data/en/dataset/f7e5498e-0ad8-4417-85c9-9b8aff9b9eda",
+      "detect": "ckan", "detect_ref": "f7e5498e-0ad8-4417-85c9-9b8aff9b9eda",
+      "population": "permanent_residents"
+    },
+    {
+      "key": "ircc_pr_csd", "parser": "ircc_odp", "grain": "month",
+      "publisher": "Immigration, Refugees and Citizenship Canada",
+      "title": "Canada - Permanent Residents by Province/Territory, Census Division and Census Subdivision (monthly, 2015+)",
+      "url": "https://www.ircc.canada.ca/opendata-donneesouvertes/data/ODP-PR-CSD.csv",
+      "landing": "https://open.canada.ca/data/en/dataset/f7e5498e-0ad8-4417-85c9-9b8aff9b9eda",
+      "detect": "ckan", "detect_ref": "f7e5498e-0ad8-4417-85c9-9b8aff9b9eda",
+      "population": "permanent_residents"
+    },
+    {
+      "key": "ircc_pr_pt_noc4", "parser": "ircc_odp", "grain": "month",
+      "publisher": "Immigration, Refugees and Citizenship Canada",
+      "title": "Canada - Permanent Residents by Province/Territory and Intended Occupation (NOC 4-digit, monthly, 2015+)",
+      "url": "https://www.ircc.canada.ca/opendata-donneesouvertes/data/ODP-PR-PT_NOC4.csv",
+      "landing": "https://open.canada.ca/data/en/dataset/f7e5498e-0ad8-4417-85c9-9b8aff9b9eda",
+      "detect": "ckan", "detect_ref": "f7e5498e-0ad8-4417-85c9-9b8aff9b9eda",
+      "population": "permanent_residents"
+    },
+    {
+      "key": "ircc_pr_gender", "parser": "ircc_odp", "grain": "month",
+      "publisher": "Immigration, Refugees and Citizenship Canada",
+      "title": "Canada - Permanent Residents by Province/Territory and Gender (monthly, 2015+)",
+      "url": "https://www.ircc.canada.ca/opendata-donneesouvertes/data/ODP-PR-Gender.csv",
+      "landing": "https://open.canada.ca/data/en/dataset/f7e5498e-0ad8-4417-85c9-9b8aff9b9eda",
+      "detect": "ckan", "detect_ref": "f7e5498e-0ad8-4417-85c9-9b8aff9b9eda",
+      "population": "permanent_residents"
+    },
+    {
+      "key": "ircc_pr_agegroup", "parser": "ircc_odp", "grain": "month",
+      "publisher": "Immigration, Refugees and Citizenship Canada",
+      "title": "Canada - Permanent Residents by Province/Territory and Age Group (monthly, 2015+)",
+      "url": "https://www.ircc.canada.ca/opendata-donneesouvertes/data/ODP-PR-AgeGroup.csv",
+      "landing": "https://open.canada.ca/data/en/dataset/f7e5498e-0ad8-4417-85c9-9b8aff9b9eda",
+      "detect": "ckan", "detect_ref": "f7e5498e-0ad8-4417-85c9-9b8aff9b9eda",
+      "population": "permanent_residents"
+    },
+    {
+      "key": "ircc_pr_cob_adoptions", "parser": "ircc_odp", "grain": "month",
+      "publisher": "Immigration, Refugees and Citizenship Canada",
+      "title": "Canada - Adoptions via Permanent Residence by Country of Birth and Gender (monthly, 2015+)",
+      "url": "https://www.ircc.canada.ca/opendata-donneesouvertes/data/ODP-PR-COB_adoptions.csv",
+      "landing": "https://open.canada.ca/data/en/dataset/f7e5498e-0ad8-4417-85c9-9b8aff9b9eda",
+      "detect": "ckan", "detect_ref": "f7e5498e-0ad8-4417-85c9-9b8aff9b9eda",
+      "population": "adoptions", "country_basis": "birth"
+    },
+    {
+      "key": "ircc_pr_eng_sp_immcat", "parser": "ircc_odp", "grain": "month",
+      "publisher": "Immigration, Refugees and Citizenship Canada",
+      "title": "Quebec - English-Speaking Permanent Residents by Immigration Category (monthly)",
+      "url": "https://www.ircc.canada.ca/opendata-donneesouvertes/data/ODP-PR-ENG_SP_IMMCAT.csv",
+      "landing": "https://open.canada.ca/data/en/dataset/f7e5498e-0ad8-4417-85c9-9b8aff9b9eda",
+      "detect": "ckan", "detect_ref": "f7e5498e-0ad8-4417-85c9-9b8aff9b9eda",
+      "population": "english_speaking_qc"
+    },
+    {
+      "key": "ircc_pr_fre_sp_immcat", "parser": "ircc_odp", "grain": "month",
+      "publisher": "Immigration, Refugees and Citizenship Canada",
+      "title": "Canada ex-QC - French-Speaking Permanent Residents by Immigration Category (monthly)",
+      "url": "https://www.ircc.canada.ca/opendata-donneesouvertes/data/ODP-PR-FRE_SP_IMMCAT.csv",
+      "landing": "https://open.canada.ca/data/en/dataset/f7e5498e-0ad8-4417-85c9-9b8aff9b9eda",
+      "detect": "ckan", "detect_ref": "f7e5498e-0ad8-4417-85c9-9b8aff9b9eda",
+      "population": "french_speaking_ex_qc",
+      "_header_note": "This file is published WITHOUT a header row; the columns below were read from its data (2026-11-26).",
+      "header": ["EN_YEAR", "EN_QUARTER", "EN_MONTH", "FR_ANNEE", "FR_TRIMESTRE", "FR_MOIS",
+                 "EN_IMMIGRATION_CATEGORY-MAIN_CATEGORY", "FR_CATEGORIE", "EN_PROVINCE_TERRITORY", "FR_PROVINCE", "TOTAL"]
+    },
+    {
+      "key": "ircc_pr_fre_sp_agegroup", "parser": "ircc_odp", "grain": "month",
+      "publisher": "Immigration, Refugees and Citizenship Canada",
+      "title": "Canada ex-QC - French-Speaking Permanent Residents by Province/Territory and Age Group (monthly)",
+      "url": "https://www.ircc.canada.ca/opendata-donneesouvertes/data/ODP-French-speaking-PR-AgeGroup.csv",
+      "landing": "https://open.canada.ca/data/en/dataset/f7e5498e-0ad8-4417-85c9-9b8aff9b9eda",
+      "detect": "ckan", "detect_ref": "f7e5498e-0ad8-4417-85c9-9b8aff9b9eda",
+      "population": "french_speaking_ex_qc"
+    },
+    {
+      "key": "ircc_pr_fre_sp_citz", "parser": "ircc_odp", "grain": "month",
+      "publisher": "Immigration, Refugees and Citizenship Canada",
+      "title": "Canada ex-QC - French-Speaking Permanent Residents by Country of Citizenship (monthly)",
+      "url": "https://www.ircc.canada.ca/opendata-donneesouvertes/data/ODP-French-speaking-PR-Citz.csv",
+      "landing": "https://open.canada.ca/data/en/dataset/f7e5498e-0ad8-4417-85c9-9b8aff9b9eda",
+      "detect": "ckan", "detect_ref": "f7e5498e-0ad8-4417-85c9-9b8aff9b9eda",
+      "population": "french_speaking_ex_qc", "country_basis": "citizenship"
+    },
+    {
+      "key": "ircc_pr_fre_sp_cma", "parser": "ircc_odp", "grain": "month",
+      "publisher": "Immigration, Refugees and Citizenship Canada",
+      "title": "Canada ex-QC - French-Speaking Permanent Residents by Province/Territory and CMA (monthly)",
+      "url": "https://www.ircc.canada.ca/opendata-donneesouvertes/data/ODP-French-speaking-PR-CMA.csv",
+      "landing": "https://open.canada.ca/data/en/dataset/f7e5498e-0ad8-4417-85c9-9b8aff9b9eda",
+      "detect": "ckan", "detect_ref": "f7e5498e-0ad8-4417-85c9-9b8aff9b9eda",
+      "population": "french_speaking_ex_qc"
+    },
+    {
+      "key": "ircc_pr_fre_sp_gender", "parser": "ircc_odp", "grain": "month",
+      "publisher": "Immigration, Refugees and Citizenship Canada",
+      "title": "Canada ex-QC - French-Speaking Permanent Residents by Province/Territory and Gender (monthly)",
+      "url": "https://www.ircc.canada.ca/opendata-donneesouvertes/data/ODP-French-speaking-PR-Gender.csv",
+      "landing": "https://open.canada.ca/data/en/dataset/f7e5498e-0ad8-4417-85c9-9b8aff9b9eda",
+      "detect": "ckan", "detect_ref": "f7e5498e-0ad8-4417-85c9-9b8aff9b9eda",
+      "population": "french_speaking_ex_qc"
+    },
+    {
+      "key": "ircc_pr_fre_sp_provimmcat", "parser": "ircc_odp", "grain": "month",
+      "publisher": "Immigration, Refugees and Citizenship Canada",
+      "title": "Canada ex-QC - French-Speaking Permanent Residents by Province/Territory and Immigration Category (monthly)",
+      "url": "https://www.ircc.canada.ca/opendata-donneesouvertes/data/ODP-French-speaking-PR-ProvImmCat.csv",
+      "landing": "https://open.canada.ca/data/en/dataset/f7e5498e-0ad8-4417-85c9-9b8aff9b9eda",
+      "detect": "ckan", "detect_ref": "f7e5498e-0ad8-4417-85c9-9b8aff9b9eda",
+      "population": "french_speaking_ex_qc"
+    },
+    {
+      "key": "ircc_pr_citz_1980_2015", "parser": "ircc_hist_xls", "grain": "year",
+      "publisher": "Immigration, Refugees and Citizenship Canada",
+      "title": "Canada - Admissions of Permanent Residents by Country of Citizenship, 1980 - 2015 (IRCC_PRadmiss_0004)",
+      "url": "https://www.ircc.canada.ca/opendata-donneesouvertes/data/IRCC_PRadmiss_0004_E.xls",
+      "landing": "https://open.canada.ca/data/en/dataset/ad975a26-df23-456a-8ada-756191a23695",
+      "detect": "http",
+      "population": "permanent_residents", "country_basis": "citizenship",
+      "coverage_note": "1980-2014 final; 2015 preliminary (IRCC, June 30, 2016 data). The file's partial 'Q1-Q2 2016' column is not loaded.",
+      "rounded": false
+    },
+    {
+      "key": "statcan_17100040", "parser": "statcan_csv", "grain": "quarter",
+      "publisher": "Statistics Canada",
+      "title": "Estimates of the components of international migration, quarterly (17-10-0040-01), Canada and provinces",
+      "url": "https://www150.statcan.gc.ca/n1/tbl/csv/17100040-eng.zip",
+      "landing": "https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1710004001",
+      "detect": "statcan_wds", "detect_ref": "17100040",
+      "member_column": "Components of population growth", "member_role": "population", "geo_role": "province",
+      "rounded": false
+    },
+    {
+      "key": "statcan_17100010", "parser": "statcan_csv", "grain": "quarter",
+      "publisher": "Statistics Canada",
+      "title": "Immigrants to Canada, by country of last permanent residence, quarterly 1955-2013 (17-10-0010-01, archived)",
+      "url": "https://www150.statcan.gc.ca/n1/tbl/csv/17100010-eng.zip",
+      "landing": "https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1710001001",
+      "detect": "statcan_wds", "detect_ref": "17100010",
+      "member_column": "Last permanent residence", "member_role": "country", "geo_role": "province",
+      "population": "immigrants", "country_basis": "last_permanent_residence",
+      "rounded": false
+    },
+    {
+      "key": "statcan_43100002", "parser": "statcan_csv", "grain": "year",
+      "publisher": "Statistics Canada",
+      "title": "Historical statistics, immigration to Canada, by country of last permanent residence, 1956-1976 (43-10-0002-01, archived)",
+      "url": "https://www150.statcan.gc.ca/n1/tbl/csv/43100002-eng.zip",
+      "landing": "https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=4310000201",
+      "detect": "statcan_wds", "detect_ref": "43100002",
+      "member_column": null, "geo_role": "country",
+      "population": "immigrants", "country_basis": "last_permanent_residence",
+      "rounded": false
+    }
+  ]
+}
