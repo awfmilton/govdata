@@ -1,0 +1,11 @@
+[Unit]
+Description=Daily govdata.ca immigration data refresh
+
+[Timer]
+# 14:30 UTC: after StatCan's 08:30 ET releases; IRCC open data posts during the Ottawa business day.
+OnCalendar=*-*-* 14:30:00 UTC
+RandomizedDelaySec=900
+Persistent=true
+
+[Install]
+WantedBy=timers.target
