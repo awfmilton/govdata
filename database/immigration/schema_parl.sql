@@ -116,7 +116,8 @@ LEFT JOIN parl_divisions d ON d.legisinfo_id = b.legisinfo_id;
 
 -- Express Entry rounds of invitations, each issued under a ministerial instruction (IRCC, 2015 onward).
 CREATE TABLE IF NOT EXISTS imm_ee_draws (
-  draw_number   SMALLINT UNSIGNED NOT NULL PRIMARY KEY,
+  draw_number   VARCHAR(10) NOT NULL PRIMARY KEY,          -- as published; IRCC numbered one round '91b'
+  draw_seq      SMALLINT UNSIGNED NOT NULL,               -- numeric part, for ordering
   draw_date     DATE NOT NULL,
   draw_name     VARCHAR(300) NOT NULL,                  -- program / category (e.g. "STEM occupations, 2026-Version 3")
   invitations   INT UNSIGNED NULL,
@@ -124,5 +125,6 @@ CREATE TABLE IF NOT EXISTS imm_ee_draws (
   instruction_url VARCHAR(500) NULL,
   raw_json      JSON NOT NULL,
   fetched_at    DATETIME NOT NULL,
-  KEY idx_date (draw_date)
+  KEY idx_date (draw_date),
+  KEY idx_seq (draw_seq)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
