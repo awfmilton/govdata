@@ -1,0 +1,153 @@
+year,table,basis,row_label,row_kind,column,value,page
+1979,11,citizenship,Austria,country,Canada,184,26
+1979,11,citizenship,Belgium,country,Canada,400,26
+1979,11,citizenship,Britain and Colonies,country,Canada,16814,26
+1979,11,citizenship,Bulgaria,country,Canada,27,26
+1979,11,citizenship,Czechoslovakia,country,Canada,89,26
+1979,11,citizenship,Denmark,country,Canada,227,26
+1979,11,citizenship,Estonian S.S.R.,country,Canada,1,26
+1979,11,citizenship,Finland,country,Canada,195,26
+1979,11,citizenship,France,country,Canada,1767,26
+1979,11,citizenship,German Dem. Rep.,country,Canada,16,26
+1979,11,citizenship,"Germany, Fed. Rep.",country,Canada,1304,26
+1979,11,citizenship,Greece,country,Canada,1212,26
+1979,11,citizenship,Hungary,country,Canada,193,26
+1979,11,citizenship,Iceland,country,Canada,14,26
+1979,11,citizenship,Irish Republic,country,Canada,631,26
+1979,11,citizenship,Italy,country,Canada,2129,26
+1979,11,citizenship,Liechtenstein,country,Canada,7,26
+1979,11,citizenship,Lithuanian S.S.R.,country,Canada,2,26
+1979,11,citizenship,Luxembourg,country,Canada,8,26
+1979,11,citizenship,Malta,country,Canada,201,26
+1979,11,citizenship,Netherlands,country,Canada,1524,26
+1979,11,citizenship,Norway,country,Canada,74,26
+1979,11,citizenship,Poland,country,Canada,877,26
+1979,11,citizenship,Portugal,country,Canada,3954,26
+1979,11,citizenship,Romania,country,Canada,192,26
+1979,11,citizenship,Spain,country,Canada,236,26
+1979,11,citizenship,Sweden,country,Canada,220,26
+1979,11,citizenship,Switzerland,country,Canada,1011,26
+1979,11,citizenship,Turkey,country,Canada,283,26
+1979,11,citizenship,U.S.S.R.,country,Canada,183,26
+1979,11,citizenship,Yugoslavia,country,Canada,927,26
+1979,11,citizenship,Total: Europe,subtotal,Canada,34902,26
+1979,11,citizenship,Algeria,country,Canada,81,26
+1979,11,citizenship,"Benin, Peoples Rep. of",country,Canada,2,26
+1979,11,citizenship,"Botswana, Republic of",country,Canada,2,26
+1979,11,citizenship,Burundi,country,Canada,8,26
+1979,11,citizenship,"Cameroun, Fed. Rep. of",country,Canada,2,26
+1979,11,citizenship,Central African Emp.,country,Canada,2,26
+1979,11,citizenship,Egypt,country,Canada,503,26
+1979,11,citizenship,Ethiopia,country,Canada,58,26
+1979,11,citizenship,Gabon Rep.,country,Canada,3,26
+1979,11,citizenship,Ghana,country,Canada,127,26
+1979,11,citizenship,Ivory Coast,country,Canada,16,26
+1979,11,citizenship,Kenya,country,Canada,238,26
+1979,11,citizenship,Lesotho,country,Canada,2,26
+1979,11,citizenship,Liberia,country,Canada,2,26
+1979,11,citizenship,Malagasy Republic,country,Canada,13,26
+1979,11,citizenship,Malawi,country,Canada,4,26
+1979,11,citizenship,Mali Rep.,country,Canada,4,26
+1979,11,citizenship,Mauritania,country,Canada,7,26
+1979,11,citizenship,Morocco,country,Canada,141,26
+1979,11,citizenship,Namibia,country,Canada,2,26
+1979,11,citizenship,Nigeria,country,Canada,63,26
+1979,11,citizenship,Rhodesia,country,Canada,39,26
+1979,11,citizenship,Rwanda,country,Canada,11,26
+1979,11,citizenship,Senegal,country,Canada,13,26
+1979,11,citizenship,Sierra Leone,country,Canada,4,26
+1979,11,citizenship,"Somali, Republic",country,Canada,1,26
+1979,11,citizenship,"South Africa, Rep.",country,Canada,994,26
+1979,11,citizenship,"Sudan, Dem. Rep. of",country,Canada,6,26
+1979,11,citizenship,"Tanzania, United Rep. of",country,Canada,664,28
+1979,11,citizenship,"Togo, Rep. of",country,Canada,5,28
+1979,11,citizenship,Tunisia,country,Canada,67,28
+1979,11,citizenship,Uganda,country,Canada,17,28
+1979,11,citizenship,Upper-Volta,country,Canada,3,28
+1979,11,citizenship,"Zaire, Republic",country,Canada,11,28
+1979,11,citizenship,Zambia,country,Canada,13,28
+1979,11,citizenship,Total: Africa,subtotal,Canada,3128,28
+1979,11,citizenship,Afghanistan,country,Canada,8,28
+1979,11,citizenship,Bangladesh,country,Canada,62,28
+1979,11,citizenship,Brunei,country,Canada,106,28
+1979,11,citizenship,"Burma, Union of",country,Canada,25,28
+1979,11,citizenship,"China, Peop. Rep. of",country,Canada,2264,28
+1979,11,citizenship,Cyprus,country,Canada,105,28
+1979,11,citizenship,India,country,Canada,4853,28
+1979,11,citizenship,"Indonesia, Rep. of",country,Canada,153,28
+1979,11,citizenship,Iran,country,Canada,1067,28
+1979,11,citizenship,Iraq,country,Canada,260,28
+1979,11,citizenship,Israel,country,Canada,759,28
+1979,11,citizenship,Japan,country,Canada,576,28
+1979,11,citizenship,Jordan,country,Canada,162,28
+1979,11,citizenship,"Kampuchea, Dem. Rep. of",country,Canada,11,28
+1979,11,citizenship,"Korea, Rep. of",country,Canada,846,28
+1979,11,citizenship,Laos,country,Canada,14,28
+1979,11,citizenship,Lebanon,country,Canada,1722,28
+1979,11,citizenship,Malaysia,country,Canada,552,28
+1979,11,citizenship,Nepal,country,Canada,5,28
+1979,11,citizenship,Pakistan,country,Canada,1151,28
+1979,11,citizenship,"Philippines, Rep. of the",country,Canada,3870,28
+1979,11,citizenship,Singapore,country,Canada,179,28
+1979,11,citizenship,Sri Lanka,country,Canada,141,28
+1979,11,citizenship,Syria,country,Canada,241,28
+1979,11,citizenship,Taiwan (Formosa),country,Canada,793,28
+1979,11,citizenship,Thailand,country,Canada,48,28
+1979,11,citizenship,United Arab Emirates,country,Canada,1,28
+1979,11,citizenship,"Vietnam, Soc. Rep.",country,Canada,929,28
+1979,11,citizenship,Yemen Arab Rep.,country,Canada,1,28
+1979,11,citizenship,"Yemen, P.D.R.",country,Canada,1,28
+1979,11,citizenship,Total: Asia,subtotal,Canada,20905,28
+1979,11,citizenship,Australia,country,Canada,680,28
+1979,11,citizenship,New Zealand,country,Canada,525,28
+1979,11,citizenship,Papua New Guinea,country,Canada,1,28
+1979,11,citizenship,Total: Australasia,subtotal,Canada,1206,28
+1979,11,citizenship,Belize,country,Canada,12,28
+1979,11,citizenship,Costa Rica,country,Canada,20,28
+1979,11,citizenship,El Salvador,country,Canada,106,28
+1979,11,citizenship,Guatemala,country,Canada,58,28
+1979,11,citizenship,Honduras,country,Canada,39,28
+1979,11,citizenship,Mexico,country,Canada,371,28
+1979,11,citizenship,Nicaragua,country,Canada,47,28
+1979,11,citizenship,Panama,country,Canada,10,28
+1979,11,citizenship,Panama Canal Zone,country,Canada,2,28
+1979,11,citizenship,U.S.A.,country,Canada,9122,28
+1979,11,citizenship,Total: North and Central America,subtotal,Canada,9787,28
+1979,11,citizenship,Antigua,country,Canada,3,30
+1979,11,citizenship,Bahamas Islands,country,Canada,28,30
+1979,11,citizenship,Barbados,country,Canada,312,30
+1979,11,citizenship,Cuba,country,Canada,3,30
+1979,11,citizenship,Dominica,country,Canada,44,30
+1979,11,citizenship,Dominican Rep.,country,Canada,30,30
+1979,11,citizenship,Grenada,country,Canada,148,30
+1979,11,citizenship,Haiti,country,Canada,1300,30
+1979,11,citizenship,Jamaica,country,Canada,3278,30
+1979,11,citizenship,St. Kitts,country,Canada,3,30
+1979,11,citizenship,St. Lucia,country,Canada,20,30
+1979,11,citizenship,St. Vincent,country,Canada,20,30
+1979,11,citizenship,"Trinidad and Tobago, Dem. Rep. of",country,Canada,798,30
+1979,11,citizenship,Total: Caribbean,subtotal,Canada,5987,30
+1979,11,citizenship,Argentina,country,Canada,410,30
+1979,11,citizenship,Bolivia,country,Canada,22,30
+1979,11,citizenship,Brazil,country,Canada,168,30
+1979,11,citizenship,Chile,country,Canada,1237,30
+1979,11,citizenship,Colombia,country,Canada,323,30
+1979,11,citizenship,Ecuador,country,Canada,285,30
+1979,11,citizenship,Guyana,country,Canada,2519,30
+1979,11,citizenship,Paraguay,country,Canada,67,30
+1979,11,citizenship,Peru,country,Canada,345,30
+1979,11,citizenship,Surinam,country,Canada,3,30
+1979,11,citizenship,Uruguay,country,Canada,207,30
+1979,11,citizenship,Venezuela,country,Canada,71,30
+1979,11,citizenship,Total: South America,subtotal,Canada,5657,30
+1979,11,citizenship,Cape Verde Islands,country,Canada,4,30
+1979,11,citizenship,Comoro Islands,country,Canada,2,30
+1979,11,citizenship,Fiji,country,Canada,514,30
+1979,11,citizenship,Mauritius,country,Canada,212,30
+1979,11,citizenship,"Samoa, American",country,Canada,1,30
+1979,11,citizenship,"Samoa, Western",country,Canada,3,30
+1979,11,citizenship,Tonga,country,Canada,2,30
+1979,11,citizenship,Total: Oceania and Other Ocean Islands,subtotal,Canada,738,30
+1979,11,citizenship,Not Stated,country,Canada,10,30
+1979,11,citizenship,Stateless,country,Canada,29776,30
+1979,11,citizenship,TOTAL,total,Canada,112096,30

@@ -34,6 +34,9 @@ extracted separately.
   They are never redistributed to successor states.
 - IRCC's country × category file publishes **French labels in its English component column**; they are translated to
   IRCC's own English labels on load (`COMPONENT_FR_EN` in `govdata_imm/parsers.py`).
+- **MP22-1 (1966-1979) reclassification:** the 1971 report re-states 1969 and 1970 with 467 / 194 citizenship (421 / 421
+  birth) moved from "China" to "Asia, n.e.s." (most likely Taiwan, after Canada recognised the People's Republic in
+  October 1970). The loader keeps each year as first published; the later restatement stays in the CSV.
 - Calendar years (sum of months/quarters). StatCan's flagship annual table (17-10-0008) uses July–June years and
   differs by more than 2 % in most years.
 
