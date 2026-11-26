@@ -119,10 +119,20 @@ def load_divisions(conn, ua: str, which: list[tuple[int, int]], refetch_last: in
     for p, s in which:
         if (p, s) < FIRST_VOTES_SESSION:
             continue
-        root = ET.fromstring(get(f'https://www.ourcommons.ca/Members/en/votes/xml?parlSession={p}-{s}', ua))
-        votes = root.findall('Vote')
-        # An unknown session silently returns the CURRENT session's list: only accept matching records.
-        votes = [v for v in votes if _int(_txt(v, 'ParliamentNumber')) == p and _int(_txt(v, 'SessionNumber')) == s]
+        # An unknown session silently returns the CURRENT session's list, so only matching records are accepted. The
+        # site has also served that fallback for REAL sessions (41-1, 42-1, 43-1 on the 2026-11-26 back-load, which
+        # then loaded nothing for them and said nothing): a known session that comes back as another one is retried,
+        # then fails loudly. Only the speculative probes for a session that may not exist yet stay quiet.
+        for attempt in range(4):
+            root = ET.fromstring(get(f'https://www.ourcommons.ca/Members/en/votes/xml?parlSession={p}-{s}', ua))
+            published = root.findall('Vote')
+            votes = [v for v in published if _int(_txt(v, 'ParliamentNumber')) == p and _int(_txt(v, 'SessionNumber')) == s]
+            if votes or not published or (p, s) not in KNOWN_SESSIONS:
+                break
+            time.sleep(20 * (attempt + 1))
+        else:
+            raise RuntimeError(f'{p}-{s}: the House returned {len(published)} divisions of another session four times '
+                               '(its fallback for an unknown session); refusing to treat this session as empty')
         with conn.cursor() as cur:
             for v in votes:
                 n = cur.execute(
