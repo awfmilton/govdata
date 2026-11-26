@@ -1,0 +1,14 @@
+[Unit]
+Description=govdata.ca House of Commons votes, bills and immigration-law amendments refresh
+Documentation=file:///opt/govdata-imm/README.md
+After=mysql.service network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/opt/govdata-imm/run.sh parl
+ExecStartPost=/usr/bin/touch /var/lib/govdata-imm/parl-last-ok
+Nice=10
+IOSchedulingClass=idle
+MemoryMax=600M
+TimeoutStartSec=3h

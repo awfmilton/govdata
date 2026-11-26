@@ -10,3 +10,10 @@ GRANT SELECT, INSERT, UPDATE         ON grantconts.imm_country_alias  TO 'imm_lo
 GRANT SELECT, INSERT, UPDATE, DELETE ON grantconts.imm_fact           TO 'imm_load'@'localhost';
 GRANT SELECT, INSERT                 ON grantconts.imm_fact_revisions TO 'imm_load'@'localhost';
 GRANT SELECT, INSERT                 ON grantconts.imm_fact_removed   TO 'imm_load'@'localhost';
+-- House / bills / laws (schema_parl.sql)
+GRANT SELECT, INSERT, UPDATE         ON grantconts.parl_bills          TO 'imm_load'@'localhost';
+GRANT SELECT, INSERT, UPDATE         ON grantconts.parl_divisions      TO 'imm_load'@'localhost';
+GRANT SELECT, INSERT, UPDATE, DELETE ON grantconts.parl_division_votes TO 'imm_load'@'localhost';
+GRANT SELECT, INSERT, UPDATE         ON grantconts.law_instruments     TO 'imm_load'@'localhost';
+GRANT SELECT, INSERT, UPDATE, DELETE ON grantconts.law_amendments      TO 'imm_load'@'localhost';
+GRANT SELECT, INSERT, UPDATE         ON grantconts.imm_bill_tags       TO 'imm_load'@'localhost';

@@ -1,0 +1,11 @@
+[Unit]
+Description=Daily House of Commons / LEGISinfo / Justice Laws refresh for govdata.ca
+
+[Timer]
+# 06:00 UTC: after evening divisions are published (sitting days end by midnight ET).
+OnCalendar=*-*-* 06:00:00 UTC
+RandomizedDelaySec=900
+Persistent=true
+
+[Install]
+WantedBy=timers.target
