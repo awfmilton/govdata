@@ -27,14 +27,14 @@ def _batches(seq, n=BATCH):
 
 def apply_edition(cur, src: dict, edition_id: int, rows: list[dict], resolver) -> dict:
     key = src['key']
-    canonical = src['parser'] in ('ircc_odp', 'statcan_csv')
+    may_create = {'ircc_odp': 'all', 'statcan_csv': 'groups'}.get(src['parser'], 'none')
     new = {}
     for r in rows:
         k = row_key(key, r)
         if k in new:
             raise LayoutError(f'{key}: two rows with identical dimensions for {r["ref_period"]} '
                               f'{[r.get(d) for d in DIMS if r.get(d)]} -- a subtotal or a layout change?')
-        r['country_id'] = resolver.resolve(r.get('country_raw'), key, canonical)
+        r['country_id'] = resolver.resolve(r.get('country_raw'), key, may_create)
         new[k] = r
 
     cur.execute('SELECT id, row_key, value, suppressed, edition_id, ref_period, country_raw, country_id '

@@ -23,3 +23,9 @@ Ocean NES,Ocean NES,group,not elsewhere specified
 South America NES,South America NES,group,not elsewhere specified
 West Indies NES,West Indies NES,group,not elsewhere specified
 Great Britain,United Kingdom and Overseas Territories,country,StatCan last-permanent-residence label
+Netherlands,"Netherlands, The",country,StatCan last-permanent-residence label
+United States,United States of America,country,StatCan last-permanent-residence label
+"South Africa","South Africa, Republic of",country,StatCan last-permanent-residence label
+China,"China, People's Republic of",country,"StatCan 1955-1976 label; place of last permanent residence, mapped to the PRC entry"
+West Indies,West Indies,region,StatCan region label
+All other countries,All other countries,other,StatCan residual

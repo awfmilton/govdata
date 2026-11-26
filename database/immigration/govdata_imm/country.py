@@ -70,8 +70,11 @@ class CountryResolver:
                 if norm(row['alias']) not in self.by_alias:
                     self._alias(row['alias'], canon, None, 'manual')
 
-    def resolve(self, raw: str | None, source_key: str, canonical_source: bool) -> int | None:
-        """canonical_source: this source's spellings may DEFINE new countries (IRCC 2015+ and StatCan groups)."""
+    def resolve(self, raw: str | None, source_key: str, may_create: str) -> int | None:
+        """may_create: 'all'    -- this source's spellings DEFINE countries (IRCC 2015+ only);
+                      'groups' -- it may add regions / residual groups / totals, but a country must match an existing
+                                  name or a reviewed alias (StatCan's "United States" is IRCC's "United States of America");
+                      'none'   -- everything must match."""
         if not raw:
             return None
         n = norm(raw)
@@ -81,8 +84,9 @@ class CountryResolver:
             cid = self.by_name[n]
             self._alias(raw, cid, source_key, 'exact' if raw.strip() == raw else 'normalised')
             return cid
-        if canonical_source:
-            cid = self._create(raw.strip(), guess_kind(raw))
+        kind = guess_kind(raw)
+        if may_create == 'all' or (may_create == 'groups' and kind != 'country'):
+            cid = self._create(raw.strip(), kind)
             self._alias(raw, cid, source_key, 'exact')
             return cid
         self.unmatched[raw] = self.unmatched.get(raw, 0) + 1
