@@ -277,3 +277,21 @@ def tag_bills(cur) -> dict:
     cur.executemany('INSERT INTO imm_bill_tags (legisinfo_id, reasons, tagged_at) VALUES (%s,%s,%s) '
                     'ON DUPLICATE KEY UPDATE reasons=VALUES(reasons), tagged_at=VALUES(tagged_at)', rows)
     return {'tagged_bills': len(rows)}
+
+
+# ── Express Entry rounds ────────────────────────────────────────────────────
+
+def load_ee_draws(cur, ua: str) -> dict:
+    data = json.loads(get('https://www.canada.ca/content/dam/ircc/documents/json/ee_rounds_123_en.json', ua))
+    rows = []
+    for r in data['rounds']:
+        href = re.search(r"href='([^']+)'", r.get('mitext') or '')
+        rows.append((int(r['drawNumber']), r['drawDate'], (r.get('drawName') or '').strip(),
+                     _int(str(r.get('drawSize') or '').replace(',', '')), _int(str(r.get('drawCRS') or '').replace(',', '')),
+                     ('https://www.canada.ca' + href.group(1).replace('/content/canadasite', '')) if href else None,
+                     json.dumps(r, ensure_ascii=False), _now()))
+    cur.executemany('INSERT INTO imm_ee_draws (draw_number, draw_date, draw_name, invitations, crs_cutoff, instruction_url, '
+                    'raw_json, fetched_at) VALUES (%s,%s,%s,%s,%s,%s,%s,%s) ON DUPLICATE KEY UPDATE draw_date=VALUES(draw_date), '
+                    'draw_name=VALUES(draw_name), invitations=VALUES(invitations), crs_cutoff=VALUES(crs_cutoff), '
+                    'instruction_url=VALUES(instruction_url), raw_json=VALUES(raw_json), fetched_at=VALUES(fetched_at)', rows)
+    return {'draws': len(rows)}

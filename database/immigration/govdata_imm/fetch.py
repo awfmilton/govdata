@@ -60,7 +60,22 @@ def _publisher_signal(src: dict, ua: str) -> str | None:
     return None
 
 
+def _repo_bundle(rel: str) -> bytes:
+    """A source that lives in this repository (transcribed tables): every CSV under the directory, in name order,
+    joined with '#FILE <name>' markers. Its sha256 changes exactly when a reviewed transcription changes."""
+    d = Path(__file__).resolve().parent.parent / rel
+    parts = []
+    for f in sorted(d.glob('*.csv')):
+        parts.append(f'#FILE {f.name}\n'.encode() + f.read_bytes().replace(b'\r\n', b'\n'))
+    if not parts:
+        raise FileNotFoundError(f'no CSV files in {d}')
+    return b''.join(parts)
+
+
 def download(src: dict, ua: str, signal: str | None) -> Download:
+    if src['url'].startswith('repo:'):
+        data = _repo_bundle(src['url'][5:])
+        return Download(data, hashlib.sha256(data).hexdigest(), None, None, signal, datetime.now(timezone.utc))
     with _request(src['url'], ua) as r:
         data = r.read()
         etag, lm = r.headers.get('ETag'), r.headers.get('Last-Modified')
@@ -69,7 +84,7 @@ def download(src: dict, ua: str, signal: str | None) -> Download:
 
 def archive(raw_dir: Path, src: dict, dl: Download) -> Path:
     """Keep the exact bytes published (gzip). The file name carries the date and hash, so nothing is overwritten."""
-    ext = Path(src['url'].split('?')[0]).suffix or '.bin'
+    ext = '.csvbundle' if src['url'].startswith('repo:') else (Path(src['url'].split('?')[0]).suffix or '.bin')
     d = raw_dir / src['key']
     d.mkdir(parents=True, exist_ok=True)
     p = d / f"{dl.retrieved_at:%Y%m%dT%H%M%SZ}-{dl.sha256[:12]}{ext}.gz"

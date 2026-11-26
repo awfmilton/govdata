@@ -144,7 +144,7 @@ def relink(cur, resolver, sources) -> int:
     """Resolve rows loaded while their spelling had no match. Values are untouched, so this is not a revision."""
     n = 0
     for src in sources:
-        may_create = {'ircc_odp': 'all', 'statcan_csv': 'groups'}.get(src['parser'], 'none')
+        may_create = {'ircc_odp': 'all', 'statcan_csv': 'groups', 'mp22_csv': 'groups'}.get(src['parser'], 'none')
         cur.execute('SELECT DISTINCT country_raw FROM imm_fact WHERE source_key = %s AND country_raw IS NOT NULL '
                     'AND country_id IS NULL', (src['key'],))
         for (raw,) in cur.fetchall():
@@ -166,6 +166,7 @@ def run_parl(conn, cfg, everything: bool) -> int:
         ('law_amendments', lambda: parl.load_laws(conn.cursor(), cfg.user_agent)),
         ('parl_divisions', lambda: parl.load_divisions(conn, cfg.user_agent, recent, refetch_last=0 if everything else 5)),
         ('imm_bill_tags', lambda: parl.tag_bills(conn.cursor())),
+        ('imm_ee_draws', lambda: parl.load_ee_draws(conn.cursor(), cfg.user_agent)),
     ]
     for key, fn in steps:
         t0 = time.time()

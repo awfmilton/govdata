@@ -17,3 +17,4 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON grantconts.parl_division_votes TO 'imm_l
 GRANT SELECT, INSERT, UPDATE         ON grantconts.law_instruments     TO 'imm_load'@'localhost';
 GRANT SELECT, INSERT, UPDATE, DELETE ON grantconts.law_amendments      TO 'imm_load'@'localhost';
 GRANT SELECT, INSERT, UPDATE         ON grantconts.imm_bill_tags       TO 'imm_load'@'localhost';
+GRANT SELECT, INSERT, UPDATE         ON grantconts.imm_ee_draws        TO 'imm_load'@'localhost';

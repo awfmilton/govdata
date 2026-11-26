@@ -113,3 +113,16 @@ SELECT b.legisinfo_id, b.parliament, b.session, b.number_code, b.short_title_en,
 FROM parl_bills b
 JOIN imm_bill_tags t ON t.legisinfo_id = b.legisinfo_id AND t.review_status <> 'rejected'
 LEFT JOIN parl_divisions d ON d.legisinfo_id = b.legisinfo_id;
+
+-- Express Entry rounds of invitations, each issued under a ministerial instruction (IRCC, 2015 onward).
+CREATE TABLE IF NOT EXISTS imm_ee_draws (
+  draw_number   SMALLINT UNSIGNED NOT NULL PRIMARY KEY,
+  draw_date     DATE NOT NULL,
+  draw_name     VARCHAR(300) NOT NULL,                  -- program / category (e.g. "STEM occupations, 2026-Version 3")
+  invitations   INT UNSIGNED NULL,
+  crs_cutoff    SMALLINT UNSIGNED NULL,                 -- lowest Comprehensive Ranking System score invited
+  instruction_url VARCHAR(500) NULL,
+  raw_json      JSON NOT NULL,
+  fetched_at    DATETIME NOT NULL,
+  KEY idx_date (draw_date)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;

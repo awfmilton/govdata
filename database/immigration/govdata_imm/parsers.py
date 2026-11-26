@@ -195,4 +195,55 @@ def parse_ircc_hist_xls(data: bytes, src: dict) -> tuple[list[dict], dict]:
     return rows, control
 
 
-PARSERS = {'ircc_odp': parse_ircc_odp, 'statcan_csv': parse_statcan_csv, 'ircc_hist_xls': parse_ircc_hist_xls}
+# Province / territory column headings in the MP22-1 reports -> the names IRCC open data uses.
+MP22_PROVINCES = {
+    'nfld.': 'Newfoundland and Labrador', 'p.e.i.': 'Prince Edward Island', 'n.s.': 'Nova Scotia',
+    'n.b.': 'New Brunswick', 'que.': 'Quebec', 'ont.': 'Ontario', 'man.': 'Manitoba', 'sask.': 'Saskatchewan',
+    'alta.': 'Alberta', 'b.c.': 'British Columbia', 'n.w.t. yukon': 'Northwest Territories and Yukon',
+    'yukon': 'Yukon', 'n.w.t.': 'Northwest Territories',
+}
+MP22_BASIS = {'residence': 'last_permanent_residence', 'citizenship': 'citizenship', 'birth': 'birth'}
+
+
+def parse_mp22_csv(data: bytes, src: dict) -> list[dict]:
+    """Tables transcribed from the scanned 'Immigration Statistics' reports (MP22-1, 1966-1979), checked row- and
+    column-wise against the printed totals (data/mp22/validate.py). Subtotal rows are dropped (they would double
+    count); the printed TOTAL row is kept as a country-less control. Period-range columns (e.g. 1946-1955) are not
+    single years and are skipped; a single-year column (1964) becomes that year."""
+    rows, seen = [], set()
+    for block in data.decode('utf-8').split('#FILE ')[1:]:
+        name, _, body = block.partition('\n')
+        for rec in csv.DictReader(io.StringIO(body)):
+            if rec['row_kind'] == 'subtotal':
+                continue
+            col = rec['column'].strip()
+            year, province = int(rec['year']), None
+            if re.fullmatch(r'\d{4}', col):
+                year = int(col)
+            elif re.fullmatch(r'\d{4}\s*-\s*\d{4}', col):
+                continue
+            elif col != 'Canada':
+                province = MP22_PROVINCES.get(col.lower())
+                if province is None:
+                    raise LayoutError(f'{name}: unknown column {col!r}')
+            basis = MP22_BASIS.get(rec['basis'])
+            if basis is None:
+                raise LayoutError(f'{name}: unknown basis {rec["basis"]!r}')
+            label = rec['row_label'].strip()
+            # One table per (year, basis) is the authority for a cell; a second table repeating the same cell is ignored.
+            k = (year, basis, label, province)
+            if k in seen:
+                continue
+            seen.add(k)
+            row = {k2: None for k2 in DIMS}
+            row.update(population='immigrants', grain='year', ref_period=date(year, 1, 1), country_basis=basis,
+                       country_raw=None if rec['row_kind'] == 'total' else label, province=province,
+                       value=int(rec['value']), suppressed=0, rounded=0)
+            if rec['row_kind'] == 'total':
+                row['cat_main'] = 'TOTAL (printed)'
+            rows.append(row)
+    return rows
+
+
+PARSERS = {'ircc_odp': parse_ircc_odp, 'statcan_csv': parse_statcan_csv, 'ircc_hist_xls': parse_ircc_hist_xls,
+           'mp22_csv': parse_mp22_csv}
