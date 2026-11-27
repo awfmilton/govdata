@@ -100,8 +100,13 @@ get_header(); ?>
 		</div>
 		<div class="kpi">
 			<div class="lab"><?php printf( esc_html__( 'Canadian aid %1$d–%2$d', 'publictech-terminal' ), $pt_aid_last - 9, $pt_aid_last ); ?></div>
-			<div class="val"><?php echo esc_html( $pt_usd( $pt_ad['last10_gross'] ?? null ) ); ?></div>
-			<div class="delta dim"><?php printf( esc_html__( 'Gross ODA, %1$d US$ · rank %2$s', 'publictech-terminal' ), $pt_base_year, esc_html( $pt_rank( $pt_ad['rank_last10'] ?? null ) ) ); ?></div>
+			<?php if ( (float) ( $pt_ad['last10_gross'] ?? 0 ) > 0 ) : ?>
+				<div class="val"><?php echo esc_html( $pt_usd( $pt_ad['last10_gross'] ) ); ?></div>
+				<div class="delta dim"><?php printf( esc_html__( 'Gross ODA, %1$d US$ · rank %2$s', 'publictech-terminal' ), $pt_base_year, esc_html( $pt_rank( $pt_ad['rank_last10'] ?? null ) ) ); ?></div>
+			<?php else : ?>
+				<div class="val"><?php esc_html_e( 'None', 'publictech-terminal' ); ?></div>
+				<div class="delta dim"><?php echo esc_html( (float) ( $pt_ad['total_gross'] ?? 0 ) > 0 ? sprintf( __( '%s in earlier years', 'publictech-terminal' ), $pt_usd( $pt_ad['total_gross'] ) ) : __( 'not an aid recipient', 'publictech-terminal' ) ); ?></div>
+			<?php endif; ?>
 			<svg class="spark" id="ptCtySparkAid" aria-hidden="true"></svg>
 		</div>
 		<div class="kpi">

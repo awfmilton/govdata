@@ -107,7 +107,7 @@ def immigration_detail(cur, last_year: int) -> dict:
                     f"GROUP BY 1, 2", (src,))
         for cid, y, v in cur.fetchall():
             out[cid][key][y] = int(v or 0)
-    cur.execute(f"SELECT country_id, DATE_FORMAT(ref_period, '%%Y-%%m'), SUM(value) FROM imm_fact WHERE source_key='ircc_pr_citz' "
+    cur.execute(f"SELECT country_id, DATE_FORMAT(ref_period, '%Y-%m'), SUM(value) FROM imm_fact WHERE source_key='ircc_pr_citz' "
                 f"AND {NATIONAL} AND country_id IS NOT NULL AND ref_period >= (SELECT DATE_SUB(MAX(ref_period), INTERVAL 23 MONTH) "
                 f"FROM imm_fact WHERE source_key='ircc_pr_citz') GROUP BY 1, 2")
     for cid, ym, v in cur.fetchall():
