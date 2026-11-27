@@ -110,8 +110,16 @@ def immigration_detail(cur, last_year: int) -> dict:
     cur.execute(f"SELECT country_id, DATE_FORMAT(ref_period, '%Y-%m'), SUM(value) FROM imm_fact WHERE source_key='ircc_pr_citz' "
                 f"AND {NATIONAL} AND country_id IS NOT NULL AND ref_period >= (SELECT DATE_SUB(MAX(ref_period), INTERVAL 23 MONTH) "
                 f"FROM imm_fact WHERE source_key='ircc_pr_citz') GROUP BY 1, 2")
+    months = set()
     for cid, ym, v in cur.fetchall():
         out[cid]['monthly'][ym] = int(v or 0)
+        months.add(ym)
+    # A month with no row means IRCC admitted nobody from that country (or suppressed a count of 1-4): show it as 0
+    # rather than leaving a gap, for every country that had any arrival in the window.
+    for o in out.values():
+        if o['monthly']:
+            for ym in months:
+                o['monthly'].setdefault(ym, 0)
     return out, dict(canada), (y0, last_year)
 
 

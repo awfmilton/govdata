@@ -33,6 +33,7 @@ $pt_n    = static fn( $v ): string => null === $v ? '—' : number_format( (floa
 $pt_usd  = static function ( $m ): string {           // US$ millions
 	if ( null === $m ) { return '—'; }
 	$m = (float) $m;
+	if ( 0.0 === $m ) { return __( 'None', 'publictech-terminal' ); }
 	return abs( $m ) >= 1000 ? 'US$' . number_format( $m / 1000, 2 ) . 'B' : 'US$' . number_format( $m, abs( $m ) >= 10 ? 0 : 1 ) . 'M';
 };
 $pt_pct  = static fn( $v ): string => null === $v ? '—' : ( ( $v > 0 ? '+' : '' ) . number_format( (float) $v, 1 ) . '%' );
