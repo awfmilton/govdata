@@ -97,7 +97,6 @@ get_header(); ?>
 			<div class="lab"><?php printf( esc_html__( 'Immigrants %1$d–%2$d', 'publictech-terminal' ), $pt_last_full - 9, $pt_last_full ); ?></div>
 			<div class="val"><?php echo esc_html( $pt_n( $pt_im['last10'] ?? null ) ); ?></div>
 			<div class="delta dim"><?php printf( esc_html__( 'Rank %s among source countries', 'publictech-terminal' ), esc_html( $pt_rank( $pt_im['rank_last10'] ?? null ) ) ); ?></div>
-			<svg class="spark" id="ptCtySparkImm" aria-hidden="true"></svg>
 		</div>
 		<div class="kpi">
 			<div class="lab"><?php printf( esc_html__( 'Canadian aid %1$d–%2$d', 'publictech-terminal' ), $pt_aid_last - 9, $pt_aid_last ); ?></div>
@@ -108,7 +107,6 @@ get_header(); ?>
 				<div class="val"><?php esc_html_e( 'None', 'publictech-terminal' ); ?></div>
 				<div class="delta dim"><?php echo esc_html( (float) ( $pt_ad['total_gross'] ?? 0 ) > 0 ? sprintf( __( '%s in earlier years', 'publictech-terminal' ), $pt_usd( $pt_ad['total_gross'] ) ) : __( 'not an aid recipient', 'publictech-terminal' ) ); ?></div>
 			<?php endif; ?>
-			<svg class="spark" id="ptCtySparkAid" aria-hidden="true"></svg>
 		</div>
 		<div class="kpi">
 			<div class="lab"><?php esc_html_e( 'Parliamentarians born here', 'publictech-terminal' ); ?></div>

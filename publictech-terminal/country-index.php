@@ -40,13 +40,14 @@ $pt_verdict = static function ( array $s, string $what ) use ( $pt_pct ): string
 	}
 	$diff = (float) $s['difference_pct'];
 	$p    = (float) $s['p_value'];
+	$size = number_format( abs( $diff ), 1 ) . '%';
 	$dir  = $diff > 0 ? __( 'higher', 'publictech-terminal' ) : __( 'lower', 'publictech-terminal' );
 	if ( $p >= 0.05 ) {
-		/* translators: 1: immigration|aid, 2: change, 3: higher|lower, 4: p-value */
-		return sprintf( __( 'No clear effect: in the five years after, the country’s share of Canada’s %1$s averaged %2$s (%3$s) against comparable years with no such member — a difference this size turns up by chance often (p = %4$s).', 'publictech-terminal' ), $what, $pt_pct( $diff ), $dir, number_format( $p, 2 ) );
+		/* translators: 1: immigrants|aid, 2: size of change, 3: higher|lower, 4: p-value */
+		return sprintf( __( 'No clear effect. In the five years after, the country’s share of Canada’s %1$s was %2$s %3$s than in comparable years with no such member — a difference this size turns up by chance often (p = %4$s).', 'publictech-terminal' ), $what, $size, $dir, number_format( $p, 2 ) );
 	}
-	/* translators: 1: immigration|aid, 2: change, 3: higher|lower, 4: p-value */
-	return sprintf( __( 'In the five years after, the country’s share of Canada’s %1$s was %2$s (%3$s) than in comparable years with no such member (p = %4$s), but read the pre-trend and the medians before drawing a conclusion.', 'publictech-terminal' ), $what, $pt_pct( $diff ), $dir, number_format( $p, 3 ) );
+	/* translators: 1: immigrants|aid, 2: size of change, 3: higher|lower, 4: p-value */
+	return sprintf( __( 'In the five years after, the country’s share of Canada’s %1$s was %2$s %3$s than in comparable years with no such member (p = %4$s). Read the pre-trend, the medians and the second check below before drawing a conclusion: this is one of several comparisons, and it is an association, not a cause.', 'publictech-terminal' ), $what, $size, $dir, number_format( $p, 3 ) );
 };
 
 get_header(); ?>

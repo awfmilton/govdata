@@ -39,13 +39,22 @@
 		return { svg: svg, W: W, H: H, m: m };
 	}
 
+	/** Log scales: one tick per power of ten, so labels never pile up. */
+	function decades(scale) {
+		var d = scale.domain(), out = [];
+		for (var e = Math.ceil(Math.log10(d[0])); e <= Math.floor(Math.log10(d[1])); e++) { out.push(Math.pow(10, e)); }
+		return out;
+	}
+
 	function axes(f, x, y, t, xfmt, yfmt) {
-		var g = f.svg.append('g').attr('transform', 'translate(0,' + (f.H - f.m.b) + ')')
-			.call(d3.axisBottom(x).ticks(Math.max(2, Math.floor(f.W / 80))).tickFormat(xfmt || d3.format('d')));
-		var h = f.svg.append('g').attr('transform', 'translate(' + f.m.l + ',0)').call(d3.axisLeft(y).ticks(5).tickFormat(yfmt || fmtShort));
+		var ax = d3.axisBottom(x).tickFormat(xfmt || d3.format('d')), ay = d3.axisLeft(y).tickFormat(yfmt || fmtShort);
+		if (x.base) { ax.tickValues(decades(x)); } else { ax.ticks(Math.max(2, Math.floor(f.W / 80))); }
+		if (y.base) { ay.tickValues(decades(y)); } else { ay.ticks(5); }
+		var g = f.svg.append('g').attr('transform', 'translate(0,' + (f.H - f.m.b) + ')').call(ax);
+		var h = f.svg.append('g').attr('transform', 'translate(' + f.m.l + ',0)').call(ay);
 		[g, h].forEach(function (a) { a.selectAll('text').attr('fill', t.ink2).style('font-size', '10px'); a.selectAll('path,line').attr('stroke', t.line); });
 		f.svg.append('g').attr('transform', 'translate(' + f.m.l + ',0)')
-			.call(d3.axisLeft(y).ticks(5).tickSize(-(f.W - f.m.l - f.m.r)).tickFormat(''))
+			.call((y.base ? d3.axisLeft(y).tickValues(decades(y)) : d3.axisLeft(y).ticks(5)).tickSize(-(f.W - f.m.l - f.m.r)).tickFormat(''))
 			.selectAll('line').attr('stroke', t.line).attr('opacity', 0.35);
 		f.svg.selectAll('.domain').attr('stroke', t.line);
 	}
@@ -126,7 +135,7 @@
 		var r = d3.scaleSqrt().domain([0, d3.max(rows, function (d) { return d[4]; }) || 1]).range([3, 14]);
 		axes(f, x, y, t, function (d) { return '$' + fmtShort(d) + 'M'; }, fmtShort);
 		f.svg.append('text').attr('x', f.W - f.m.r).attr('y', f.H - 4).attr('text-anchor', 'end').attr('fill', t.ink3).style('font-size', '10px').text('Aid, US$ millions (log)');
-		f.svg.append('text').attr('x', 4).attr('y', f.m.t + 2).attr('fill', t.ink3).style('font-size', '10px').text('Immigrants (log)');
+		f.svg.append('text').attr('x', f.m.l + 6).attr('y', f.m.t + 10).attr('fill', t.ink3).style('font-size', '10px').text('Immigrants (log)');
 		var dots = f.svg.append('g').selectAll('a').data(rows).enter().append('a')
 			.attr('href', function (d) { return '/country/' + d[0] + '/'; });
 		dots.append('circle').attr('cx', function (d) { return x(d[3]); }).attr('cy', function (d) { return y(d[2]); })
@@ -137,11 +146,6 @@
 		f.svg.append('g').selectAll('text').data(big).enter().append('text')
 			.attr('x', function (d) { return x(d[3]) + r(d[4]) + 2; }).attr('y', function (d) { return y(d[2]) + 3; })
 			.text(function (d) { return d[1]; }).attr('fill', t.ink2).style('font-size', '9px').style('pointer-events', 'none');
-	}
-
-	function spark(id, vals, color) {
-		var el = document.getElementById(id);
-		if (el && window.PT && PT.chart && vals.length > 1) { PT.chart(el, 'spark', vals, { color: color }); }
 	}
 
 	/* ── country page ───────────────────────────────────────────────────── */
@@ -198,8 +202,6 @@
 		mount(document.getElementById('ptCtyBases'), function (host) {
 			lineChart(host, Object.keys(bases).map(function (k) { return { name: names[k] || k, color: cols[k] || t.ink1, values: bases[k] }; }), { gap: 1 });
 		});
-		spark('ptCtySparkImm', imm.filter(function (r) { return r[0] >= 1980; }).map(function (r) { return r[1]; }), t.accent);
-		spark('ptCtySparkAid', aid.map(function (r) { return r[1] || 0; }), t.pos);
 	}
 
 	/* ── index page ─────────────────────────────────────────────────────── */
