@@ -412,6 +412,30 @@ def lead_lag(a: dict, b: dict) -> list:
     return out
 
 
+def spearman(pairs: list) -> float | None:
+    """Rank correlation (average ranks for ties)."""
+    if len(pairs) < 10:
+        return None
+
+    def ranks(vals):
+        order = sorted(range(len(vals)), key=lambda i: vals[i])
+        r = [0.0] * len(vals)
+        i = 0
+        while i < len(order):
+            j = i
+            while j + 1 < len(order) and vals[order[j + 1]] == vals[order[i]]:
+                j += 1
+            for k in range(i, j + 1):
+                r[order[k]] = (i + j) / 2 + 1
+            i = j + 1
+        return r
+    a, b = ranks([p[0] for p in pairs]), ranks([p[1] for p in pairs])
+    ma, mb = _mean(a), _mean(b)
+    cov = sum((x - ma) * (y - mb) for x, y in zip(a, b))
+    va, vb = sum((x - ma) ** 2 for x in a), sum((y - mb) ** 2 for y in b)
+    return round(cov / math.sqrt(va * vb), 3) if va and vb else None
+
+
 # ── build ───────────────────────────────────────────────────────────────────
 
 def build_all(cur) -> dict:
@@ -585,6 +609,8 @@ def build_all(cur) -> dict:
         'scatter': [[r['slug'], r['name'], r['imm_last10'], r['aid_last10'], r['mps']] for r in index_rows
                     if r['imm_last10'] and r['aid_last10']],
     }
+    analysis['scatter_spearman'] = spearman([(r[2], r[3]) for r in analysis['scatter']])
+    analysis['scatter_n'] = len(analysis['scatter'])
     totals = {'countries': len(index_rows), 'immigration_last_full_year': last_full, 'aid_last_year': aid_last,
               'aid_base_year': aid_base,
               'parliamentarians_born_abroad': sum(r['mps'] + r['senators'] for r in index_rows),

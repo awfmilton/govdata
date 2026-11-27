@@ -29,6 +29,7 @@ require_once PUBLICTECH_CORE_DIR . 'inc/class-cpt.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-rest-api.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-riding-cache-warmer.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-riding-cache.php';
+require_once PUBLICTECH_CORE_DIR . 'inc/class-country-reports.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-map-cache.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-mp-finance-warmer.php';
 require_once PUBLICTECH_CORE_DIR . 'inc/class-entity-reports.php';
@@ -94,6 +95,7 @@ add_action( 'after_setup_theme', static function () {
 	\PublicTech\Core\Anomalies::instance();
 	\PublicTech\Core\Dashboard_Stats::instance();
 	\PublicTech\Core\Riding_Cache::instance();
+	\PublicTech\Core\Country_Reports::instance();
 	\PublicTech\Core\Analytics::instance();
 	\PublicTech\Core\Captcha_Admin::instance();
 	\PublicTech\Core\External_Screenshots_Admin::instance();
