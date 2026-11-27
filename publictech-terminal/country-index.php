@@ -115,6 +115,42 @@ get_header(); ?>
 		</div>
 	</div>
 
+	<?php $pt_cm = (array) ( $pt_ix['current_mps'] ?? [] ); if ( ! empty( $pt_cm['members'] ) ) : ?>
+	<div class="panel corner" id="current-mps" style="margin-bottom:14px">
+		<div class="hd">
+			<h3>◇ <?php esc_html_e( 'Today’s House of Commons: where members were born', 'publictech-terminal' ); ?></h3>
+			<span class="meta"><?php esc_html_e( 'LIBRARY OF PARLIAMENT · WIKIDATA', 'publictech-terminal' ); ?></span>
+		</div>
+		<div class="bd">
+			<div class="kvs" style="max-width:560px">
+				<div class="kv"><span class="k"><?php esc_html_e( 'Members voting this session', 'publictech-terminal' ); ?></span><span class="v"><?php echo (int) $pt_cm['members']; ?></span></div>
+				<div class="kv"><span class="k"><?php esc_html_e( 'Born in Canada', 'publictech-terminal' ); ?></span><span class="v"><?php echo (int) $pt_cm['born_in_canada']; ?></span></div>
+				<div class="kv"><span class="k"><?php esc_html_e( 'Born outside Canada', 'publictech-terminal' ); ?></span><span class="v"><?php echo (int) $pt_cm['born_abroad']; ?></span></div>
+				<div class="kv"><span class="k"><?php esc_html_e( 'Asked the Library of Parliament not to publish their birthplace', 'publictech-terminal' ); ?></span><span class="v"><?php echo (int) $pt_cm['not_disclosed']; ?></span></div>
+				<div class="kv"><span class="k"><?php esc_html_e( 'Not recorded anywhere we can find', 'publictech-terminal' ); ?></span><span class="v"><?php echo (int) $pt_cm['unknown']; ?></span></div>
+			</div>
+			<p class="pt-cty-note"><?php esc_html_e( 'Birthplace from the Library of Parliament’s biographies (Parlinfo) where they record one, otherwise Wikidata, whose entries cite Parlinfo. No public source records whether a member immigrated or became a citizen by naturalization; birthplace is the closest public fact.', 'publictech-terminal' ); ?></p>
+			<?php if ( ! empty( $pt_cm['born_abroad_list'] ) ) : ?>
+			<div class="pt-cty-scroll" style="max-height:360px;margin-top:10px">
+			<table class="pt-cty-table compact sortable">
+				<thead><tr><th data-sort="text"><?php esc_html_e( 'Member', 'publictech-terminal' ); ?></th><th data-sort="text"><?php esc_html_e( 'Caucus', 'publictech-terminal' ); ?></th><th data-sort="text"><?php esc_html_e( 'Riding', 'publictech-terminal' ); ?></th><th data-sort="text"><?php esc_html_e( 'Born in', 'publictech-terminal' ); ?></th></tr></thead>
+				<tbody>
+				<?php foreach ( (array) $pt_cm['born_abroad_list'] as $r ) : ?>
+					<tr>
+						<td data-v="<?php echo esc_attr( (string) $r[0] ); ?>"><?php echo esc_html( (string) $r[0] ); ?></td>
+						<td data-v="<?php echo esc_attr( (string) $r[1] ); ?>"><?php echo esc_html( (string) $r[1] ); ?></td>
+						<td data-v="<?php echo esc_attr( (string) $r[2] ); ?>"><?php echo esc_html( (string) $r[2] ); ?></td>
+						<td data-v="<?php echo esc_attr( (string) $r[3] ); ?>"><?php if ( ! empty( $r[4] ) ) : ?><a href="<?php echo esc_url( Country_Reports::url( (string) $r[4] ) ); ?>"><?php echo esc_html( (string) $r[3] ); ?></a><?php else : echo esc_html( (string) $r[3] ); endif; ?><?php echo ! empty( $r[5] ) ? ' <span class="pt-cty-sub">' . esc_html( (string) $r[5] ) . '</span>' : ''; ?></td>
+					</tr>
+				<?php endforeach; ?>
+				</tbody>
+			</table>
+			</div>
+			<?php endif; ?>
+		</div>
+	</div>
+	<?php endif; ?>
+
 	<div class="panel corner" id="analysis" style="margin-bottom:14px">
 		<div class="hd">
 			<h3>◇ <?php esc_html_e( 'When an MP born in a country takes a seat, does Canada take more of its immigrants or send it more aid?', 'publictech-terminal' ); ?></h3>

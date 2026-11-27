@@ -114,6 +114,78 @@ get_header(); ?>
 				</div>
 			</div>
 
+			<?php $pt_wg = (array) ( $pt_a['cad'] ?? [] ); if ( ! empty( $pt_wg['totals'] ) ) :
+				$pt_m = static fn( $v ): string => null === $v ? '—' : pt_format_money_short( (float) $v ); ?>
+			<div class="panel corner" id="departments">
+				<div class="hd"><h3>◇ <?php esc_html_e( 'Every federal department, in Canadian dollars', 'publictech-terminal' ); ?></h3><span class="meta"><?php esc_html_e( 'GLOBAL AFFAIRS CANADA STATISTICS', 'publictech-terminal' ); ?></span></div>
+				<div class="bd">
+					<div class="chart-host" id="ptAidCadDept" style="height:280px"></div>
+					<p class="pt-cty-note"><?php printf( esc_html__( 'International assistance by department and fiscal year, from Global Affairs Canada’s Statistical Report on International Assistance (to 2015-16) and Historical Project Data Set (%s on). It includes other official flows, such as loans to Ukraine, that the OECD does not count as aid; the OECD figures above do not.', 'publictech-terminal' ), esc_html( (string) ( $pt_wg['wog_from'] ?? '' ) ) ); ?></p>
+					<div class="pt-cty-two" style="margin-top:10px">
+						<div>
+							<h4 class="pt-cty-h4" style="margin-top:0"><?php echo esc_html( sprintf( __( 'Departments, %s', 'publictech-terminal' ), $pt_wg['last_fy'] ?? '' ) ); ?></h4>
+							<table class="pt-cty-table compact"><tbody>
+							<?php foreach ( (array) ( $pt_wg['departments_last'] ?? [] ) as $r ) : ?>
+								<tr><td><?php echo esc_html( (string) $r[0] ); ?></td><td class="mono"><?php echo esc_html( $pt_m( $r[1] ) ); ?></td></tr>
+							<?php endforeach; ?>
+							</tbody></table>
+						</div>
+						<div>
+							<h4 class="pt-cty-h4" style="margin-top:0"><?php echo esc_html( sprintf( __( 'Sectors, %s', 'publictech-terminal' ), $pt_wg['last_fy'] ?? '' ) ); ?></h4>
+							<table class="pt-cty-table compact"><tbody>
+							<?php foreach ( (array) ( $pt_wg['sectors_last'] ?? [] ) as $r ) : ?>
+								<tr><td><?php echo esc_html( (string) $r[0] ); ?></td><td class="mono"><?php echo esc_html( $pt_m( $r[1] ) ); ?></td></tr>
+							<?php endforeach; ?>
+							</tbody></table>
+						</div>
+						<div>
+							<h4 class="pt-cty-h4"><?php esc_html_e( 'Counted as aid, or other official flows', 'publictech-terminal' ); ?></h4>
+							<table class="pt-cty-table compact"><tbody>
+							<?php foreach ( (array) ( $pt_wg['flows_last'] ?? [] ) as $r ) : ?>
+								<tr><td><?php echo esc_html( (string) $r[0] ); ?></td><td class="mono"><?php echo esc_html( $pt_m( $r[1] ) ); ?></td></tr>
+							<?php endforeach; ?>
+							</tbody></table>
+						</div>
+						<div>
+							<h4 class="pt-cty-h4"><?php esc_html_e( 'Through what kind of partner', 'publictech-terminal' ); ?></h4>
+							<table class="pt-cty-table compact"><tbody>
+							<?php foreach ( (array) ( $pt_wg['partner_classes_last'] ?? [] ) as $r ) : ?>
+								<tr><td><?php echo esc_html( (string) $r[0] ); ?></td><td class="mono"><?php echo esc_html( $pt_m( $r[1] ) ); ?></td></tr>
+							<?php endforeach; ?>
+							</tbody></table>
+						</div>
+					</div>
+					<h4 class="pt-cty-h4"><?php echo esc_html( sprintf( __( 'Countries receiving the most, %s (CAD)', 'publictech-terminal' ), $pt_wg['last_fy'] ?? '' ) ); ?></h4>
+					<div class="pt-cty-scroll" style="max-height:340px">
+					<table class="pt-cty-table compact">
+						<thead><tr><th><?php esc_html_e( 'Country', 'publictech-terminal' ); ?></th><th><?php esc_html_e( 'All assistance', 'publictech-terminal' ); ?></th><th><?php esc_html_e( 'Of which ODA', 'publictech-terminal' ); ?></th></tr></thead>
+						<tbody>
+						<?php foreach ( (array) ( $pt_wg['countries_last'] ?? [] ) as $r ) : ?>
+							<tr><td><a href="<?php echo esc_url( Country_Reports::url( (string) $r[0] ) . '#aid-cad' ); ?>"><?php echo esc_html( (string) $r[1] ); ?></a></td><td class="mono"><?php echo esc_html( $pt_m( $r[2] ) ); ?></td><td class="mono"><?php echo esc_html( $pt_m( $r[3] ) ); ?></td></tr>
+						<?php endforeach; ?>
+						</tbody>
+					</table>
+					</div>
+					<h4 class="pt-cty-h4"><?php echo esc_html( sprintf( __( 'Largest projects, %s', 'publictech-terminal' ), $pt_wg['last_fy'] ?? '' ) ); ?></h4>
+					<div class="pt-cty-scroll" style="max-height:380px">
+					<table class="pt-cty-table compact">
+						<thead><tr><th><?php esc_html_e( 'Project', 'publictech-terminal' ); ?></th><th><?php esc_html_e( 'Department / partner', 'publictech-terminal' ); ?></th><th><?php esc_html_e( 'Where', 'publictech-terminal' ); ?></th><th><?php esc_html_e( 'Spent', 'publictech-terminal' ); ?></th></tr></thead>
+						<tbody>
+						<?php foreach ( (array) ( $pt_wg['projects_last'] ?? [] ) as $r ) : ?>
+							<tr>
+								<td><?php if ( ! empty( $r[6] ) ) : ?><a href="<?php echo esc_url( (string) $r[6] ); ?>" rel="noopener" target="_blank"><?php endif; ?><?php echo esc_html( (string) ( $r[1] ?: ( $r[0] ?: '—' ) ) ); ?><?php if ( ! empty( $r[6] ) ) : ?></a><?php endif; ?></td>
+								<td><?php echo esc_html( trim( (string) $r[2] . ( $r[3] ? ' · ' . $r[3] : '' ) ) ); ?></td>
+								<td><?php echo esc_html( (string) $r[4] ); ?></td>
+								<td class="mono"><?php echo esc_html( $pt_m( $r[5] ) ); ?></td>
+							</tr>
+						<?php endforeach; ?>
+						</tbody>
+					</table>
+					</div>
+				</div>
+			</div>
+			<?php endif; ?>
+
 			<div class="panel corner">
 				<div class="hd"><h3>◇ <?php esc_html_e( 'Directly, or through international organisations', 'publictech-terminal' ); ?></h3><span class="meta">CAD · DAC1</span></div>
 				<div class="bd">
@@ -288,6 +360,8 @@ echo wp_json_encode( [
 	'refugees' => $pt_ref,
 	'gacYears' => array_values( array_filter( (array) ( $pt_gac['by_year'] ?? [] ), static fn( $r ) => (int) $r[0] >= $pt_gac_from && (int) $r[0] <= (int) gmdate( 'Y' ) ) ),
 	'baseYear' => $pt_base,
+	'cadTotals' => $pt_a['cad']['totals'] ?? [],
+	'cadDepts'  => $pt_a['cad']['department_series'] ?? new \stdClass(),
 ], JSON_HEX_TAG | JSON_HEX_AMP );
 ?></script>
 

@@ -283,6 +283,42 @@ def immigration_loyalty(cur) -> tuple[dict, float, int]:
     return {pid: (a, n) for pid, (a, n) in per.items()}, (agree / total if total else None), len(divs)
 
 
+def current_mp_births(cur, C: dict) -> dict:
+    """Birthplace coverage for the members voting in the newest session (last 120 days of divisions)."""
+    cur.execute('SELECT DISTINCT v.person_id, v.first_name, v.last_name, v.caucus, v.constituency FROM parl_division_votes v '
+                'JOIN parl_divisions d USING (parliament, session, division_no) '
+                'WHERE d.held_at >= DATE_SUB((SELECT MAX(held_at) FROM parl_divisions), INTERVAL 120 DAY)')
+    roll = {}
+    for pid, fn, ln, caucus, riding in cur.fetchall():
+        roll[pid] = (f'{fn} {ln}'.strip(), caucus, riding)
+    if not roll:
+        return {}
+    ids = sorted(roll)
+    cur.execute(f"SELECT vote_person_id, birth_iso2, country_id, birth_place, birth_source, birth_disclosure FROM parl_person_birth "
+                f"WHERE vote_person_id IN ({','.join(['%s'] * len(ids))})", ids)
+    found = {r[0]: r[1:] for r in cur.fetchall()}
+    counts = {'members': len(roll), 'matched': len(found), 'known': 0, 'born_in_canada': 0, 'born_abroad': 0,
+              'not_disclosed': 0, 'unknown': 0, 'from_parlinfo': 0}
+    abroad = []
+    for pid, (name, caucus, riding) in roll.items():
+        r = found.get(pid)
+        if r and r[0]:
+            counts['known'] += 1
+            counts['from_parlinfo'] += r[3] == 'parlinfo'
+            if r[0] == 'CA':
+                counts['born_in_canada'] += 1
+            else:
+                counts['born_abroad'] += 1
+                c = C.get(r[1], {})
+                abroad.append([name, caucus, riding, c.get('name') or r[0], c.get('slug'), r[2]])
+        elif r and r[4] == 'not_disclosed':
+            counts['not_disclosed'] += 1
+        else:
+            counts['unknown'] += 1
+    counts['born_abroad_list'] = sorted(abroad, key=lambda a: (a[3] or '', a[0]))
+    return counts
+
+
 # ── statistics (no third-party packages on the loader host) ─────────────────
 
 def _mean(xs):
@@ -453,6 +489,7 @@ def build_all(cur) -> dict:
     imm, basis, total, by_basis, last_full = immigration(cur, ids)
     detail, canada_mix, mix_years = immigration_detail(cur, last_full)
     aid_s, aid_base, aid_total = aid(cur)
+    cad_by_c, cad_wog = aid_cad(cur)
     aid_last = max(aid_total) if aid_total else None
     g = grants(cur)
     cur.execute('SELECT MAX(held_at) FROM parl_divisions')
@@ -576,6 +613,7 @@ def build_all(cur) -> dict:
                 'lead_lag': lead_lag(aid_gross.get(cid, {}), s),
             },
             'grants': gr,
+            'aid_cad': cad_by_c.get(cid),
             'parliamentarians': plist,
             'representation': {'mps_since_1968': mps_since[cid], 'immigrants_since_1964': imm_since[cid],
                                'per_100k': round(mps_since[cid] / imm_since[cid] * 1e5, 2) if imm_since[cid] else None,
@@ -620,17 +658,20 @@ def build_all(cur) -> dict:
     }
     analysis['scatter_spearman'] = spearman([(r[2], r[3]) for r in analysis['scatter']])
     analysis['scatter_n'] = len(analysis['scatter'])
+    current_mps = current_mp_births(cur, C)
     totals = {'countries': len(index_rows), 'immigration_last_full_year': last_full, 'aid_last_year': aid_last,
               'aid_base_year': aid_base,
               'parliamentarians_born_abroad': sum(r['mps'] + r['senators'] for r in index_rows),
               'laws': sum(r['laws'] for r in index_rows), 'bills': sum(r['bills'] for r in index_rows)}
     cur.execute('REPLACE INTO cty_report (report_key, country_id, payload, generated_at) VALUES (%s,%s,%s,%s)',
                 ('index', None, json.dumps({'generated_at': generated.isoformat() + 'Z', 'totals': totals,
+                                            'current_mps': current_mps,
                                             'countries': sorted(index_rows, key=lambda r: r['name'])}, separators=(',', ':')), generated))
     cur.execute('REPLACE INTO cty_report (report_key, country_id, payload, generated_at) VALUES (%s,%s,%s,%s)',
                 ('analysis', None, json.dumps(analysis, separators=(',', ':'), default=str), generated))
     aid_payload = build_aid(cur, C, index_rows, generated)
     aid_payload['base_year'] = aid_base
+    aid_payload['cad'] = cad_wog
     aid_payload['spearman_imm_aid'] = analysis['scatter_spearman']
     cur.execute('REPLACE INTO cty_report (report_key, country_id, payload, generated_at) VALUES (%s,%s,%s,%s)',
                 ('aid', None, json.dumps(aid_payload, separators=(',', ':'), default=str), generated))
@@ -639,6 +680,92 @@ def build_all(cur) -> dict:
             'imm_diff_pct': imm_study.get('difference_pct'), 'imm_p': imm_study.get('p_value'),
             'aid_diff_pct': aid_study.get('difference_pct'), 'aid_p': aid_study.get('p_value'),
             'fe_imm': fe['immigration'], 'fe_aid': fe['aid']}
+
+
+# ── Canadian-dollar aid from Global Affairs Canada (HPDS, SRIA) ─────────────
+
+def _fy(y):
+    return f'{y}-{str(y + 1)[2:]}'
+
+
+def aid_cad(cur) -> tuple[dict, dict]:
+    """-> (per-country dict, whole-of-government dict). Country series: SRIA (every federal source) for fiscal
+    2000-01 .. 2015-16, HPDS whole-of-government from 2016-17 (international assistance, ODA flagged). The CIDA-only
+    HPDS years (2005-06 .. 2015-16) supply project detail, not totals."""
+    cur.execute("SELECT MIN(fy_start), MAX(fy_start) FROM aid_hpds WHERE layout='wog'")
+    wog_from, last = cur.fetchone()
+    if wog_from is None:
+        return {}, {}
+    w5 = last - 4
+    by_c = defaultdict(lambda: {'series': {}, 'departments': [], 'sectors': [], 'partners': [], 'projects': []})
+    cur.execute('SELECT country_id, fy_start, SUM(amount_cad) FROM aid_sria WHERE country_id IS NOT NULL AND fy_start < %s GROUP BY 1, 2',
+                (wog_from,))
+    for cid, fy, v in cur.fetchall():
+        by_c[cid]['series'][fy] = [round(float(v), 2), None, 'sria', None]
+    cur.execute("SELECT country_id, fy_start, SUM(amount_cad), SUM(CASE WHEN flow_code = '10' THEN amount_cad ELSE 0 END), "
+                "SUM(CASE WHEN humanitarian = 1 THEN amount_cad ELSE 0 END) FROM aid_hpds WHERE layout='wog' AND country_id IS NOT NULL "
+                "GROUP BY 1, 2")
+    for cid, fy, v, oda, hum in cur.fetchall():
+        by_c[cid]['series'][fy] = [round(float(v), 2), round(float(oda), 2), 'hpds', round(float(hum), 2)]
+    for key, col, n in (('departments', 'department', 8), ('sectors', 'sector_name', 10), ('partners', 'org_name', 10)):
+        cur.execute(f"SELECT country_id, {col}, SUM(amount_cad) FROM aid_hpds WHERE layout='wog' AND country_id IS NOT NULL "
+                    f"AND fy_start >= %s AND {col} IS NOT NULL GROUP BY 1, 2", (w5,))
+        tmp = defaultdict(list)
+        for cid, name, v in cur.fetchall():
+            tmp[cid].append([name, round(float(v), 2)])
+        for cid, lst in tmp.items():
+            by_c[cid][key] = sorted(lst, key=lambda r: -r[1])[:n]
+    cur.execute("SELECT country_id, project_number, MAX(project_title), MAX(department), MAX(org_name), SUM(amount_cad), MAX(project_url) "
+                "FROM aid_hpds WHERE layout='wog' AND country_id IS NOT NULL AND fy_start >= %s GROUP BY 1, 2", (last - 2,))
+    tmp = defaultdict(list)
+    for cid, pn, title, dept, org, v, url in cur.fetchall():
+        tmp[cid].append([pn, title, dept, org, round(float(v), 2), url])
+    for cid, lst in tmp.items():
+        by_c[cid]['projects'] = sorted(lst, key=lambda r: -r[4])[:12]
+    out = {}
+    for cid, d in by_c.items():
+        out[cid] = {'series': [[_fy(y)] + v for y, v in sorted(d['series'].items())], 'window': [_fy(w5), _fy(last)],
+                    'projects_window': [_fy(last - 2), _fy(last)], 'departments': d['departments'], 'sectors': d['sectors'],
+                    'partners': d['partners'], 'projects': d['projects']}
+
+    # Whole of government.
+    wg = {'last_fy': _fy(last), 'wog_from': _fy(wog_from)}
+    cur.execute("SELECT s.department, a.fy_start, SUM(a.amount_cad) FROM aid_sria a LEFT JOIN aid_sria_sources s USING (source_code) "
+                "WHERE a.fy_start < %s GROUP BY 1, 2", (wog_from,))
+    dept = defaultdict(dict)
+    for d_, fy, v in cur.fetchall():
+        dept[d_ or 'Not stated'][fy] = float(v)
+    cur.execute("SELECT department, fy_start, SUM(amount_cad) FROM aid_hpds WHERE layout='wog' GROUP BY 1, 2")
+    for d_, fy, v in cur.fetchall():
+        dept[d_][fy] = float(v)
+    totals = defaultdict(float)
+    for series in dept.values():
+        for fy, v in series.items():
+            totals[fy] += v
+    wg['totals'] = [[_fy(fy), round(v, 2)] for fy, v in sorted(totals.items())]
+    lastd = sorted(((d_, s_.get(last, 0)) for d_, s_ in dept.items()), key=lambda t: -t[1])
+    wg['departments_last'] = [[d_, round(v, 2)] for d_, v in lastd if v][:15]
+    wg['department_series'] = {d_: [[_fy(fy), round(v, 2)] for fy, v in sorted(dept[d_].items())] for d_, _ in lastd[:6]}
+    for key, col in (('sectors_last', 'sector_name'), ('partner_classes_last', 'org_class'), ('continents_last', 'continent'),
+                     ('flows_last', 'flow_name')):
+        cur.execute(f"SELECT {col}, SUM(amount_cad) FROM aid_hpds WHERE layout='wog' AND fy_start=%s GROUP BY 1 ORDER BY 2 DESC LIMIT 15",
+                    (last,))
+        wg[key] = [[n or 'Not stated', round(float(v), 2)] for n, v in cur.fetchall()]
+    cur.execute("SELECT i.slug, i.display_name, SUM(h.amount_cad), SUM(CASE WHEN h.flow_code='10' THEN h.amount_cad ELSE 0 END) "
+                "FROM aid_hpds h JOIN imm_country_iso i USING (country_id) WHERE h.layout='wog' AND h.fy_start=%s GROUP BY 1, 2 "
+                "ORDER BY 3 DESC LIMIT 25", (last,))
+    wg['countries_last'] = [[sl, n, round(float(v), 2), round(float(o), 2)] for sl, n, v, o in cur.fetchall()]
+    cur.execute("SELECT project_number, MAX(project_title), MAX(department), MAX(org_name), GROUP_CONCAT(DISTINCT recipient_name ORDER BY "
+                "recipient_name SEPARATOR ', '), SUM(amount_cad), MAX(project_url) FROM aid_hpds WHERE layout='wog' AND fy_start=%s "
+                "GROUP BY 1 ORDER BY 6 DESC LIMIT 25", (last,))
+    wg['projects_last'] = [[pn, t, d_, o, (r or '')[:160], round(float(v), 2), u] for pn, t, d_, o, r, v, u in cur.fetchall()]
+    cur.execute("SELECT fy_start, SUM(amount_cad), SUM(CASE WHEN flow_code='10' THEN amount_cad ELSE 0 END), "
+                "SUM(CASE WHEN humanitarian=1 THEN amount_cad ELSE 0 END) FROM aid_hpds WHERE layout='wog' GROUP BY 1 ORDER BY 1")
+    wg['wog_years'] = [[_fy(fy), round(float(v), 2), round(float(o), 2), round(float(h), 2)] for fy, v, o, h in cur.fetchall()]
+    cur.execute("SELECT fy_start, SUM(amount_cad) FROM aid_hpds WHERE layout='wog' AND (department LIKE 'Immigration%%' OR "
+                "department LIKE 'Cost of refugees%%') GROUP BY 1 ORDER BY 1")
+    wg['refugee_costs'] = [[_fy(fy), round(float(v), 2)] for fy, v in cur.fetchall()]
+    return out, wg
 
 
 # ── foreign aid page (report_key 'aid') ─────────────────────────────────────

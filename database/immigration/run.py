@@ -33,7 +33,7 @@ from govdata_imm.country import CountryResolver  # noqa: E402
 from govdata_imm.load import apply_edition  # noqa: E402
 from govdata_imm.parsers import PARSERS  # noqa: E402
 from govdata_imm import parl  # noqa: E402
-from govdata_imm import countries, report  # noqa: E402
+from govdata_imm import aid_data, countries, report  # noqa: E402
 
 
 def connect(cfg):
@@ -178,9 +178,13 @@ def run_countries(conn, cfg, only_report: bool) -> int:
         ('imm_country_iso', lambda: countries.apply_iso(conn.cursor())),
         ('cty_oda', lambda: countries.load_oda(conn.cursor(), ua)),
         ('parl_person_birth', lambda: countries.load_births(conn.cursor(), ua)),
+        ('parl_person_parlinfo', lambda: countries.load_parlinfo(conn, ua, import_path=cfg.raw_dir / 'parlinfo-import.jsonl')),
+        ('parlinfo_merge', lambda: countries.merge_parlinfo(conn.cursor())),
         ('cty_law_tags', lambda: countries.tag_country_laws(conn.cursor(), ua)),
         ('cty_dac1', lambda: countries.load_dac1(conn.cursor(), ua)),
         ('aid_law_tags', lambda: countries.tag_aid_laws(conn.cursor(), ua)),
+        ('aid_sria', lambda: aid_data.load_sria(conn, ua, cfg.raw_dir)),
+        ('aid_hpds', lambda: aid_data.load_hpds(conn, ua, cfg.raw_dir)),
     ]
     return run_steps(conn, steps + [('cty_report', lambda: report.build_all(conn.cursor()))])
 

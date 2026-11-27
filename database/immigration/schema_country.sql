@@ -55,6 +55,9 @@ CREATE TABLE IF NOT EXISTS parl_person_birth (
   terms_json          JSON         NULL,             -- [[role, start, end], ...]
   vote_person_id      INT UNSIGNED NULL,             -- parl_division_votes.person_id (House PersonId), name-matched
   vote_match          VARCHAR(40)  NULL,             -- how vote_person_id was matched
+  birth_source        VARCHAR(20)  NULL,             -- wikidata | parlinfo (the Library of Parliament filled the gap)
+  birth_disclosure    VARCHAR(20)  NULL,             -- not_disclosed: the member asked Parlinfo not to publish it
+  parlinfo_birth      VARCHAR(400) NULL,             -- Parlinfo's own wording: city, province, country at birth
   fetched_at          DATETIME     NOT NULL,
   KEY idx_country (country_id),
   KEY idx_vote_person (vote_person_id)
@@ -112,4 +115,107 @@ CREATE TABLE IF NOT EXISTS aid_law_tags (
   url           VARCHAR(400) NULL,
   tagged_at     DATETIME     NOT NULL,
   PRIMARY KEY (ref_kind, ref_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- Library of Parliament (Parlinfo) profiles: the official birthplace, fetched by Parlinfo person id
+-- (loppublicservices.parl.ca/ParlinfoWebApi/Person/GetPersonWebProfile/{id}). Only birth fields are kept; the profile's
+-- other personal fields (ethnicity among them) are deliberately not stored.
+CREATE TABLE IF NOT EXISTS parl_person_parlinfo (
+  lop_person_id   INT UNSIGNED NOT NULL PRIMARY KEY,
+  name            VARCHAR(200) NULL,
+  birth_date      DATE         NULL,
+  birth_city      VARCHAR(200) NULL,
+  birth_province  VARCHAR(200) NULL,
+  birth_country   VARCHAR(200) NULL,
+  birth_hidden    TINYINT(1)   NOT NULL DEFAULT 0,   -- the member asked the Library not to disclose the birthplace
+  http_status     SMALLINT     NULL,
+  fetched_at      DATETIME     NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- Global Affairs Canada publications in Canadian dollars (govdata_imm/aid_data.py). One row per downloaded file.
+CREATE TABLE IF NOT EXISTS aid_files (
+  file_key      VARCHAR(40)  NOT NULL PRIMARY KEY,     -- hpds:<fy_start> | sria:<fy_start>
+  kind          VARCHAR(10)  NOT NULL,
+  fy_start      SMALLINT     NOT NULL,                 -- 2024 = fiscal year 2024-25
+  url           VARCHAR(400) NOT NULL,
+  sha256        CHAR(64)     NOT NULL,
+  row_count     INT          NOT NULL,
+  amount_total  DECIMAL(18,2) NULL,
+  archive_path  VARCHAR(400) NULL,
+  fetched_at    DATETIME     NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- Historical Project Data Set: project x recipient x sector, fiscal 2005-06 onward. layout 'cida' (to 2015-16: CIDA/DFATD
+-- only, "amount spent") or 'wog' (2016-17 on: every federal department, "international assistance" incl. other
+-- official flows -- flow_code 10 = ODA).
+CREATE TABLE IF NOT EXISTS aid_hpds (
+  id                 BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  fy_start           SMALLINT     NOT NULL,
+  layout             VARCHAR(6)   NOT NULL,
+  department         VARCHAR(200) NOT NULL,
+  reporting_l1       VARCHAR(200) NULL,
+  project_number     VARCHAR(60)  NOT NULL,
+  project_title      VARCHAR(600) NULL,
+  status             VARCHAR(40)  NULL,
+  aid_type           VARCHAR(10)  NULL,
+  aid_type_name      VARCHAR(200) NULL,
+  bilat_multi        VARCHAR(10)  NULL,
+  flow_code          VARCHAR(10)  NULL,
+  flow_name          VARCHAR(120) NULL,
+  finance_name       VARCHAR(120) NULL,
+  iae                TINYINT(1)   NULL,                -- inside the International Assistance Envelope
+  org_name           VARCHAR(300) NULL,
+  org_level1         VARCHAR(100) NULL,
+  org_level2         VARCHAR(100) NULL,
+  org_type           VARCHAR(120) NULL,
+  org_class          VARCHAR(100) NULL,
+  channel_code       VARCHAR(20)  NULL,
+  sector_code        VARCHAR(10)  NULL,
+  sector_name        VARCHAR(200) NULL,
+  sector_l2          VARCHAR(200) NULL,
+  humanitarian       TINYINT(1)   NOT NULL DEFAULT 0,
+  recipient_code     VARCHAR(20)  NULL,
+  recipient_name     VARCHAR(200) NULL,
+  recipient_kind     CHAR(1)      NULL,                -- C country, R region / global
+  continent          VARCHAR(80)  NULL,
+  country_id         SMALLINT UNSIGNED NULL,
+  alloc_pct          DECIMAL(9,6) NULL,
+  gender_marker      VARCHAR(10)  NULL,
+  climate_mitigation VARCHAR(10)  NULL,
+  climate_adaptation VARCHAR(10)  NULL,
+  project_url        VARCHAR(400) NULL,
+  amount_cad         DECIMAL(18,2) NOT NULL,
+  reflows_cad        DECIMAL(18,2) NOT NULL DEFAULT 0,
+  KEY idx_fy (fy_start),
+  KEY idx_country (country_id, fy_start),
+  KEY idx_project (project_number),
+  KEY idx_dept (department, fy_start)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- Statistical Report on International Assistance, by country: fiscal 2000-01 .. 2016-17, every federal source.
+CREATE TABLE IF NOT EXISTS aid_sria (
+  id             BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  fy_start       SMALLINT     NOT NULL,
+  source_code    VARCHAR(20)  NOT NULL,
+  recipient_code VARCHAR(20)  NOT NULL,
+  amount_cad     DECIMAL(18,2) NOT NULL,
+  country_id     SMALLINT UNSIGNED NULL,
+  KEY idx_fy (fy_start),
+  KEY idx_country (country_id, fy_start)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE IF NOT EXISTS aid_sria_sources (
+  source_code    VARCHAR(20)  NOT NULL PRIMARY KEY,
+  name           VARCHAR(300) NOT NULL,
+  department     VARCHAR(200) NULL,
+  program_group  VARCHAR(200) NULL,
+  channel        VARCHAR(120) NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE IF NOT EXISTS aid_sria_recipients (
+  recipient_code VARCHAR(20)  NOT NULL PRIMARY KEY,
+  name           VARCHAR(200) NOT NULL,
+  continent      VARCHAR(120) NULL,
+  kind           CHAR(1)      NOT NULL,
+  country_id     SMALLINT UNSIGNED NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;

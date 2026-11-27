@@ -28,3 +28,10 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON grantconts.cty_report        TO 'imm_loa
 GRANT SELECT ON grantconts.master_table       TO 'imm_load'@'localhost';
 GRANT SELECT, INSERT, UPDATE, DELETE ON grantconts.cty_dac1          TO 'imm_load'@'localhost';
 GRANT SELECT, INSERT, UPDATE, DELETE ON grantconts.aid_law_tags      TO 'imm_load'@'localhost';
+GRANT SELECT, INSERT, UPDATE, DELETE ON grantconts.parl_person_parlinfo TO 'imm_load'@'localhost';
+-- Global Affairs Canada aid data in Canadian dollars (aid_data.py)
+GRANT SELECT, INSERT, UPDATE, DELETE ON grantconts.aid_files           TO 'imm_load'@'localhost';
+GRANT SELECT, INSERT, UPDATE, DELETE ON grantconts.aid_hpds            TO 'imm_load'@'localhost';
+GRANT SELECT, INSERT, UPDATE, DELETE ON grantconts.aid_sria            TO 'imm_load'@'localhost';
+GRANT SELECT, INSERT, UPDATE, DELETE ON grantconts.aid_sria_sources    TO 'imm_load'@'localhost';
+GRANT SELECT, INSERT, UPDATE, DELETE ON grantconts.aid_sria_recipients TO 'imm_load'@'localhost';
