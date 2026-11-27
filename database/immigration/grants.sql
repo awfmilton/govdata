@@ -18,3 +18,11 @@ GRANT SELECT, INSERT, UPDATE         ON grantconts.law_instruments     TO 'imm_l
 GRANT SELECT, INSERT, UPDATE, DELETE ON grantconts.law_amendments      TO 'imm_load'@'localhost';
 GRANT SELECT, INSERT, UPDATE         ON grantconts.imm_bill_tags       TO 'imm_load'@'localhost';
 GRANT SELECT, INSERT, UPDATE         ON grantconts.imm_ee_draws        TO 'imm_load'@'localhost';
+-- Country pages (schema_country.sql)
+GRANT SELECT, INSERT, UPDATE, DELETE ON grantconts.imm_country_iso   TO 'imm_load'@'localhost';
+GRANT SELECT, INSERT, UPDATE, DELETE ON grantconts.cty_oda           TO 'imm_load'@'localhost';
+GRANT SELECT, INSERT, UPDATE, DELETE ON grantconts.parl_person_birth TO 'imm_load'@'localhost';
+GRANT SELECT, INSERT, UPDATE, DELETE ON grantconts.cty_law_tags      TO 'imm_load'@'localhost';
+GRANT SELECT, INSERT, UPDATE, DELETE ON grantconts.cty_report        TO 'imm_load'@'localhost';
+-- The report builder reads the grants table and the House roster.
+GRANT SELECT ON grantconts.master_table       TO 'imm_load'@'localhost';

@@ -8,6 +8,9 @@
   run.py status                       latest edition and coverage per source
   run.py parl [--all]                 House divisions + ballots, LEGISinfo bills, Justice Laws amendment history,
                                       immigration-bill tags. Default: the newest sessions; --all: every session.
+  run.py countries                    country pages: ISO codes, OECD aid by recipient, parliamentarians' birthplaces,
+                                      laws and bills naming a country; then rebuild the page payloads (report)
+  run.py report                       rebuild only the page payloads (cty_report) from what is loaded
 
 Exit status is 1 if any source failed, so a systemd timer surfaces it. Every check is written to imm_refresh_log.
 """
@@ -30,6 +33,7 @@ from govdata_imm.country import CountryResolver  # noqa: E402
 from govdata_imm.load import apply_edition  # noqa: E402
 from govdata_imm.parsers import PARSERS  # noqa: E402
 from govdata_imm import parl  # noqa: E402
+from govdata_imm import countries, report  # noqa: E402
 
 
 def connect(cfg):
@@ -156,18 +160,32 @@ def relink(cur, resolver, sources) -> int:
 
 
 def run_parl(conn, cfg, everything: bool) -> int:
-    """Each step is logged on its own; one failing (a publisher down) does not stop the others."""
-    rid, failed = run_id(), 0
     with conn.cursor() as cur:
         all_sessions = parl.sessions(cur)
     recent = all_sessions if everything else all_sessions[-4:]       # current + the probes for the next session
-    steps = [
+    return run_steps(conn, [
         ('parl_bills', lambda: parl.load_bills(conn.cursor(), cfg.user_agent, recent)),
         ('law_amendments', lambda: parl.load_laws(conn.cursor(), cfg.user_agent)),
         ('parl_divisions', lambda: parl.load_divisions(conn, cfg.user_agent, recent, refetch_last=0 if everything else 5)),
         ('imm_bill_tags', lambda: parl.tag_bills(conn.cursor())),
         ('imm_ee_draws', lambda: parl.load_ee_draws(conn.cursor(), cfg.user_agent)),
+    ])
+
+
+def run_countries(conn, cfg, only_report: bool) -> int:
+    ua = cfg.user_agent
+    steps = [] if only_report else [
+        ('imm_country_iso', lambda: countries.apply_iso(conn.cursor())),
+        ('cty_oda', lambda: countries.load_oda(conn.cursor(), ua)),
+        ('parl_person_birth', lambda: countries.load_births(conn.cursor(), ua)),
+        ('cty_law_tags', lambda: countries.tag_country_laws(conn.cursor(), ua)),
     ]
+    return run_steps(conn, steps + [('cty_report', lambda: report.build_all(conn.cursor()))])
+
+
+def run_steps(conn, steps) -> int:
+    """Each step is logged on its own; one failing (a publisher down) does not stop the others."""
+    rid, failed = run_id(), 0
     for key, fn in steps:
         t0 = time.time()
         try:
@@ -187,7 +205,7 @@ def run_parl(conn, cfg, everything: bool) -> int:
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument('command', choices=['init', 'relink', 'refresh', 'status', 'parl'])
+    ap.add_argument('command', choices=['init', 'relink', 'refresh', 'status', 'parl', 'countries', 'report'])
     ap.add_argument('--all', action='store_true')
     ap.add_argument('--source', action='append')
     ap.add_argument('--force', action='store_true')
@@ -226,6 +244,8 @@ def main():
 
     if a.command == 'parl':
         return run_parl(conn, cfg, a.all)
+    if a.command in ('countries', 'report'):
+        return run_countries(conn, cfg, a.command == 'report')
 
     rid = run_id()
     with conn.cursor() as cur:

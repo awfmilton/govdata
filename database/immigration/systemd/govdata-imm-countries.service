@@ -1,0 +1,14 @@
+[Unit]
+Description=govdata.ca country pages: OECD aid, parliamentarians' birthplaces, country-named laws, page payloads
+Documentation=file:///opt/govdata-imm/README.md
+After=mysql.service network-online.target govdata-imm-parl.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/opt/govdata-imm/run.sh countries
+ExecStartPost=/usr/bin/touch /var/lib/govdata-imm/countries-last-ok
+Nice=10
+IOSchedulingClass=idle
+MemoryMax=900M
+TimeoutStartSec=1h
