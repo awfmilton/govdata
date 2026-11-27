@@ -1,0 +1,355 @@
+year,table,basis,row_label,row_kind,column,value,page
+1966,16,citizenship,Albania,country,1946-1955,218,26
+1966,16,citizenship,Albania,country,1956-1963,10,26
+1966,16,citizenship,Albania,country,1964,2,26
+1966,16,citizenship,Albania,country,1965,4,26
+1966,16,citizenship,Albania,country,1966,5,26
+1966,16,citizenship,Albania,country,Canada,239,26
+1966,16,citizenship,"Arabia, Saudi",country,1946-1955,0,26
+1966,16,citizenship,"Arabia, Saudi",country,1956-1963,8,26
+1966,16,citizenship,"Arabia, Saudi",country,1964,1,26
+1966,16,citizenship,"Arabia, Saudi",country,1965,2,26
+1966,16,citizenship,"Arabia, Saudi",country,1966,3,26
+1966,16,citizenship,"Arabia, Saudi",country,Canada,14,26
+1966,16,citizenship,Argentina,country,1946-1955,442,26
+1966,16,citizenship,Argentina,country,1956-1963,1102,26
+1966,16,citizenship,Argentina,country,1964,227,26
+1966,16,citizenship,Argentina,country,1965,253,26
+1966,16,citizenship,Argentina,country,1966,278,26
+1966,16,citizenship,Argentina,country,Canada,2302,26
+1966,16,citizenship,Australia,country,1946-1955,1298,26
+1966,16,citizenship,Australia,country,1956-1963,12548,26
+1966,16,citizenship,Australia,country,1964,1896,26
+1966,16,citizenship,Australia,country,1965,2322,26
+1966,16,citizenship,Australia,country,1966,3233,26
+1966,16,citizenship,Australia,country,Canada,21297,26
+1966,16,citizenship,Austria,country,1946-1955,18305,26
+1966,16,citizenship,Austria,country,1956-1963,10359,26
+1966,16,citizenship,Austria,country,1964,658,26
+1966,16,citizenship,Austria,country,1965,770,26
+1966,16,citizenship,Austria,country,1966,856,26
+1966,16,citizenship,Austria,country,Canada,30948,26
+1966,16,citizenship,Belgium,country,1946-1955,12044,26
+1966,16,citizenship,Belgium,country,1956-1963,9673,26
+1966,16,citizenship,Belgium,country,1964,675,26
+1966,16,citizenship,Belgium,country,1965,645,26
+1966,16,citizenship,Belgium,country,1966,875,26
+1966,16,citizenship,Belgium,country,Canada,23912,26
+1966,16,citizenship,Brazil,country,1946-1955,256,26
+1966,16,citizenship,Brazil,country,1956-1963,659,26
+1966,16,citizenship,Brazil,country,1964,152,26
+1966,16,citizenship,Brazil,country,1965,244,26
+1966,16,citizenship,Brazil,country,1966,286,26
+1966,16,citizenship,Brazil,country,Canada,1597,26
+1966,16,citizenship,Britain & Colonies,country,1946-1955,396194,26
+1966,16,citizenship,Britain & Colonies,country,1956-1963,289686,26
+1966,16,citizenship,Britain & Colonies,country,1964,32773,26
+1966,16,citizenship,Britain & Colonies,country,1965,42785,26
+1966,16,citizenship,Britain & Colonies,country,1966,65176,26
+1966,16,citizenship,Britain & Colonies,country,Canada,826614,26
+1966,16,citizenship,Bulgaria,country,1946-1955,867,26
+1966,16,citizenship,Bulgaria,country,1956-1963,66,26
+1966,16,citizenship,Bulgaria,country,1964,7,26
+1966,16,citizenship,Bulgaria,country,1965,22,26
+1966,16,citizenship,Bulgaria,country,1966,22,26
+1966,16,citizenship,Bulgaria,country,Canada,984,26
+1966,16,citizenship,Ceylon,country,1946-1955,27,26
+1966,16,citizenship,Ceylon,country,1956-1963,231,26
+1966,16,citizenship,Ceylon,country,1964,78,26
+1966,16,citizenship,Ceylon,country,1965,141,26
+1966,16,citizenship,Ceylon,country,1966,180,26
+1966,16,citizenship,Ceylon,country,Canada,657,26
+1966,16,citizenship,China,country,1946-1955,13820,26
+1966,16,citizenship,China,country,1956-1963,11710,26
+1966,16,citizenship,China,country,1964,2127,26
+1966,16,citizenship,China,country,1965,3375,26
+1966,16,citizenship,China,country,1966,2978,26
+1966,16,citizenship,China,country,Canada,34010,26
+1966,16,citizenship,Czechoslovakia,country,1946-1955,13211,26
+1966,16,citizenship,Czechoslovakia,country,1956-1963,207,26
+1966,16,citizenship,Czechoslovakia,country,1964,92,26
+1966,16,citizenship,Czechoslovakia,country,1965,80,26
+1966,16,citizenship,Czechoslovakia,country,1966,129,26
+1966,16,citizenship,Czechoslovakia,country,Canada,13719,26
+1966,16,citizenship,Denmark,country,1946-1955,13640,26
+1966,16,citizenship,Denmark,country,1956-1963,17367,26
+1966,16,citizenship,Denmark,country,1964,716,26
+1966,16,citizenship,Denmark,country,1965,874,26
+1966,16,citizenship,Denmark,country,1966,1079,26
+1966,16,citizenship,Denmark,country,Canada,33676,26
+1966,16,citizenship,Egypt,country,1946-1955,32,26
+1966,16,citizenship,Egypt,country,1956-1963,2536,26
+1966,16,citizenship,Egypt,country,1964,1532,26
+1966,16,citizenship,Egypt,country,1965,1270,26
+1966,16,citizenship,Egypt,country,1966,1680,26
+1966,16,citizenship,Egypt,country,Canada,7050,26
+1966,16,citizenship,Estonia,country,1946-1955,13536,26
+1966,16,citizenship,Estonia,country,1956-1963,105,26
+1966,16,citizenship,Estonia,country,1964,1,26
+1966,16,citizenship,Estonia,country,1965,3,26
+1966,16,citizenship,Estonia,country,1966,5,26
+1966,16,citizenship,Estonia,country,Canada,13650,26
+1966,16,citizenship,Finland,country,1946-1955,9596,26
+1966,16,citizenship,Finland,country,1956-1963,7997,26
+1966,16,citizenship,Finland,country,1964,401,26
+1966,16,citizenship,Finland,country,1965,558,26
+1966,16,citizenship,Finland,country,1966,614,26
+1966,16,citizenship,Finland,country,Canada,19166,26
+1966,16,citizenship,France,country,1946-1955,23689,26
+1966,16,citizenship,France,country,1956-1963,23913,26
+1966,16,citizenship,France,country,1964,3417,26
+1966,16,citizenship,France,country,1965,3691,26
+1966,16,citizenship,France,country,1966,5896,26
+1966,16,citizenship,France,country,Canada,60606,26
+1966,16,citizenship,Germany Federal Republic,country,1946-1955,132265,26
+1966,16,citizenship,Germany Federal Republic,country,1956-1963,105088,26
+1966,16,citizenship,Germany Federal Republic,country,1964,4866,26
+1966,16,citizenship,Germany Federal Republic,country,1965,7031,26
+1966,16,citizenship,Germany Federal Republic,country,1966,7249,26
+1966,16,citizenship,Germany Federal Republic,country,Canada,256499,26
+1966,16,citizenship,Greece,country,1946-1955,15155,26
+1966,16,citizenship,Greece,country,1956-1963,38893,26
+1966,16,citizenship,Greece,country,1964,4819,26
+1966,16,citizenship,Greece,country,1965,6181,26
+1966,16,citizenship,Greece,country,1966,7714,26
+1966,16,citizenship,Greece,country,Canada,72762,26
+1966,16,citizenship,Hungary,country,1946-1955,13916,26
+1966,16,citizenship,Hungary,country,1956-1963,40448,26
+1966,16,citizenship,Hungary,country,1964,460,26
+1966,16,citizenship,Hungary,country,1965,592,26
+1966,16,citizenship,Hungary,country,1966,598,26
+1966,16,citizenship,Hungary,country,Canada,56014,26
+1966,16,citizenship,Iceland,country,1946-1955,181,26
+1966,16,citizenship,Iceland,country,1956-1963,202,26
+1966,16,citizenship,Iceland,country,1964,16,26
+1966,16,citizenship,Iceland,country,1965,4,26
+1966,16,citizenship,Iceland,country,1966,12,26
+1966,16,citizenship,Iceland,country,Canada,415,26
+1966,16,citizenship,India,country,1946-1955,460,26
+1966,16,citizenship,India,country,1956-1963,3900,26
+1966,16,citizenship,India,country,1964,1309,26
+1966,16,citizenship,India,country,1965,2386,26
+1966,16,citizenship,India,country,1966,2775,26
+1966,16,citizenship,India,country,Canada,10830,26
+1966,16,citizenship,Iran,country,1946-1955,68,26
+1966,16,citizenship,Iran,country,1956-1963,202,26
+1966,16,citizenship,Iran,country,1964,48,26
+1966,16,citizenship,Iran,country,1965,176,26
+1966,16,citizenship,Iran,country,1966,169,26
+1966,16,citizenship,Iran,country,Canada,663,26
+1966,16,citizenship,"Ireland, Republic",country,1946-1955,9031,26
+1966,16,citizenship,"Ireland, Republic",country,1956-1963,14413,26
+1966,16,citizenship,"Ireland, Republic",country,1964,908,26
+1966,16,citizenship,"Ireland, Republic",country,1965,1311,26
+1966,16,citizenship,"Ireland, Republic",country,1966,2272,26
+1966,16,citizenship,"Ireland, Republic",country,Canada,27935,26
+1966,16,citizenship,Israel,country,1946-1955,4590,26
+1966,16,citizenship,Israel,country,1956-1963,6625,26
+1966,16,citizenship,Israel,country,1964,929,26
+1966,16,citizenship,Israel,country,1965,837,26
+1966,16,citizenship,Israel,country,1966,1455,26
+1966,16,citizenship,Israel,country,Canada,14436,26
+1966,16,citizenship,Italy,country,1946-1955,132664,26
+1966,16,citizenship,Italy,country,1956-1963,178195,26
+1966,16,citizenship,Italy,country,1964,20720,26
+1966,16,citizenship,Italy,country,1965,28397,26
+1966,16,citizenship,Italy,country,1966,33977,26
+1966,16,citizenship,Italy,country,Canada,393953,26
+1966,16,citizenship,Japan,country,1946-1955,267,26
+1966,16,citizenship,Japan,country,1956-1963,1259,26
+1966,16,citizenship,Japan,country,1964,140,26
+1966,16,citizenship,Japan,country,1965,188,26
+1966,16,citizenship,Japan,country,1966,500,26
+1966,16,citizenship,Japan,country,Canada,2354,26
+1966,16,citizenship,Latvia,country,1946-1955,13737,26
+1966,16,citizenship,Latvia,country,1956-1963,271,26
+1966,16,citizenship,Latvia,country,1964,3,26
+1966,16,citizenship,Latvia,country,1965,10,26
+1966,16,citizenship,Latvia,country,1966,4,26
+1966,16,citizenship,Latvia,country,Canada,14025,26
+1966,16,citizenship,Lebanon,country,1946-1955,334,26
+1966,16,citizenship,Lebanon,country,1956-1963,2936,26
+1966,16,citizenship,Lebanon,country,1964,385,26
+1966,16,citizenship,Lebanon,country,1965,637,26
+1966,16,citizenship,Lebanon,country,1966,892,26
+1966,16,citizenship,Lebanon,country,Canada,5184,26
+1966,16,citizenship,Lithuania,country,1946-1955,11820,26
+1966,16,citizenship,Lithuania,country,1956-1963,143,26
+1966,16,citizenship,Lithuania,country,1964,4,26
+1966,16,citizenship,Lithuania,country,1965,5,26
+1966,16,citizenship,Lithuania,country,1966,3,26
+1966,16,citizenship,Lithuania,country,Canada,11975,26
+1966,16,citizenship,Luxemburg,country,1946-1955,42,26
+1966,16,citizenship,Luxemburg,country,1956-1963,440,26
+1966,16,citizenship,Luxemburg,country,1964,12,26
+1966,16,citizenship,Luxemburg,country,1965,11,26
+1966,16,citizenship,Luxemburg,country,1966,25,26
+1966,16,citizenship,Luxemburg,country,Canada,530,26
+1966,16,citizenship,Mexico,country,1946-1955,341,26
+1966,16,citizenship,Mexico,country,1956-1963,702,26
+1966,16,citizenship,Mexico,country,1964,114,26
+1966,16,citizenship,Mexico,country,1965,130,26
+1966,16,citizenship,Mexico,country,1966,105,26
+1966,16,citizenship,Mexico,country,Canada,1392,26
+1966,16,citizenship,Morocco,country,1946-1955,0,26
+1966,16,citizenship,Morocco,country,1956-1963,1277,26
+1966,16,citizenship,Morocco,country,1964,980,26
+1966,16,citizenship,Morocco,country,1965,775,26
+1966,16,citizenship,Morocco,country,1966,309,26
+1966,16,citizenship,Morocco,country,Canada,3341,26
+1966,16,citizenship,"Netherlands, The",country,1946-1955,107869,26
+1966,16,citizenship,"Netherlands, The",country,1956-1963,43607,26
+1966,16,citizenship,"Netherlands, The",country,1964,1989,26
+1966,16,citizenship,"Netherlands, The",country,1965,2525,26
+1966,16,citizenship,"Netherlands, The",country,1966,3671,26
+1966,16,citizenship,"Netherlands, The",country,Canada,159661,26
+1966,16,citizenship,New Zealand,country,1946-1955,306,26
+1966,16,citizenship,New Zealand,country,1956-1963,3227,26
+1966,16,citizenship,New Zealand,country,1964,457,26
+1966,16,citizenship,New Zealand,country,1965,642,26
+1966,16,citizenship,New Zealand,country,1966,784,26
+1966,16,citizenship,New Zealand,country,Canada,5416,26
+1966,16,citizenship,Norway,country,1946-1955,6043,26
+1966,16,citizenship,Norway,country,1956-1963,4003,26
+1966,16,citizenship,Norway,country,1964,268,26
+1966,16,citizenship,Norway,country,1965,317,26
+1966,16,citizenship,Norway,country,1966,524,26
+1966,16,citizenship,Norway,country,Canada,11155,26
+1966,16,citizenship,Pakistan,country,1946-1955,120,26
+1966,16,citizenship,Pakistan,country,1956-1963,631,26
+1966,16,citizenship,Pakistan,country,1964,307,26
+1966,16,citizenship,Pakistan,country,1965,470,26
+1966,16,citizenship,Pakistan,country,1966,672,26
+1966,16,citizenship,Pakistan,country,Canada,2200,26
+1966,16,citizenship,Poland,country,1946-1955,104450,26
+1966,16,citizenship,Poland,country,1956-1963,15246,26
+1966,16,citizenship,Poland,country,1964,1995,26
+1966,16,citizenship,Poland,country,1965,2027,26
+1966,16,citizenship,Poland,country,1966,1758,26
+1966,16,citizenship,Poland,country,Canada,125476,26
+1966,16,citizenship,Portugal,country,1946-1955,2688,26
+1966,16,citizenship,Portugal,country,1956-1963,27667,26
+1966,16,citizenship,Portugal,country,1964,5721,26
+1966,16,citizenship,Portugal,country,1965,6583,26
+1966,16,citizenship,Portugal,country,1966,8900,26
+1966,16,citizenship,Portugal,country,Canada,51559,26
+1966,16,citizenship,Roumania,country,1946-1955,8780,26
+1966,16,citizenship,Roumania,country,1956-1963,696,26
+1966,16,citizenship,Roumania,country,1964,41,26
+1966,16,citizenship,Roumania,country,1965,45,26
+1966,16,citizenship,Roumania,country,1966,23,26
+1966,16,citizenship,Roumania,country,Canada,9585,26
+1966,16,citizenship,South Africa Republic,country,1946-1955,276,26
+1966,16,citizenship,South Africa Republic,country,1956-1963,3447,26
+1966,16,citizenship,South Africa Republic,country,1964,455,26
+1966,16,citizenship,South Africa Republic,country,1965,581,26
+1966,16,citizenship,South Africa Republic,country,1966,881,26
+1966,16,citizenship,South Africa Republic,country,Canada,5640,26
+1966,16,citizenship,Spain,country,1946-1955,1190,26
+1966,16,citizenship,Spain,country,1956-1963,4733,26
+1966,16,citizenship,Spain,country,1964,1123,26
+1966,16,citizenship,Spain,country,1965,1414,26
+1966,16,citizenship,Spain,country,1966,1931,26
+1966,16,citizenship,Spain,country,Canada,10391,26
+1966,16,citizenship,Sweden,country,1946-1955,2876,26
+1966,16,citizenship,Sweden,country,1956-1963,2498,26
+1966,16,citizenship,Sweden,country,1964,217,26
+1966,16,citizenship,Sweden,country,1965,240,26
+1966,16,citizenship,Sweden,country,1966,383,26
+1966,16,citizenship,Sweden,country,Canada,6214,26
+1966,16,citizenship,Switzerland,country,1946-1955,6950,26
+1966,16,citizenship,Switzerland,country,1956-1963,7024,26
+1966,16,citizenship,Switzerland,country,1964,760,26
+1966,16,citizenship,Switzerland,country,1965,1144,26
+1966,16,citizenship,Switzerland,country,1966,1650,26
+1966,16,citizenship,Switzerland,country,Canada,17528,26
+1966,16,citizenship,Syria,country,1946-1955,1075,26
+1966,16,citizenship,Syria,country,1956-1963,116,26
+1966,16,citizenship,Syria,country,1964,53,26
+1966,16,citizenship,Syria,country,1965,100,26
+1966,16,citizenship,Syria,country,1966,203,26
+1966,16,citizenship,Syria,country,Canada,1547,26
+1966,16,citizenship,Tunisia,country,1946-1955,0,26
+1966,16,citizenship,Tunisia,country,1956-1963,209,26
+1966,16,citizenship,Tunisia,country,1964,64,26
+1966,16,citizenship,Tunisia,country,1965,27,26
+1966,16,citizenship,Tunisia,country,1966,41,26
+1966,16,citizenship,Tunisia,country,Canada,341,26
+1966,16,citizenship,Turkey,country,1946-1955,230,26
+1966,16,citizenship,Turkey,country,1956-1963,1525,26
+1966,16,citizenship,Turkey,country,1964,395,26
+1966,16,citizenship,Turkey,country,1965,662,26
+1966,16,citizenship,Turkey,country,1966,672,26
+1966,16,citizenship,Turkey,country,Canada,3484,26
+1966,16,citizenship,U.S.S.R.,country,1946-1955,18010,26
+1966,16,citizenship,U.S.S.R.,country,1956-1963,581,26
+1966,16,citizenship,U.S.S.R.,country,1964,80,26
+1966,16,citizenship,U.S.S.R.,country,1965,159,26
+1966,16,citizenship,U.S.S.R.,country,1966,265,26
+1966,16,citizenship,U.S.S.R.,country,Canada,19095,26
+1966,16,citizenship,United States,country,1946-1955,81582,26
+1966,16,citizenship,United States,country,1956-1963,80280,26
+1966,16,citizenship,United States,country,1964,11350,26
+1966,16,citizenship,United States,country,1965,13857,26
+1966,16,citizenship,United States,country,1966,16154,26
+1966,16,citizenship,United States,country,Canada,203223,26
+1966,16,citizenship,Yugoslavia,country,1946-1955,20953,26
+1966,16,citizenship,Yugoslavia,country,1956-1963,7250,26
+1966,16,citizenship,Yugoslavia,country,1964,1519,26
+1966,16,citizenship,Yugoslavia,country,1965,1886,26
+1966,16,citizenship,Yugoslavia,country,1966,2897,26
+1966,16,citizenship,Yugoslavia,country,Canada,34505,26
+1966,16,citizenship,"Africa, other",country,1946-1955,277,26
+1966,16,citizenship,"Africa, other",country,1956-1963,553,26
+1966,16,citizenship,"Africa, other",country,1964,163,26
+1966,16,citizenship,"Africa, other",country,1965,119,26
+1966,16,citizenship,"Africa, other",country,1966,233,26
+1966,16,citizenship,"Africa, other",country,Canada,1345,26
+1966,16,citizenship,"Asia, other",country,1946-1955,17,26
+1966,16,citizenship,"Asia, other",country,1956-1963,727,26
+1966,16,citizenship,"Asia, other",country,1964,520,26
+1966,16,citizenship,"Asia, other",country,1965,2163,26
+1966,16,citizenship,"Asia, other",country,1966,3778,26
+1966,16,citizenship,"Asia, other",country,Canada,7205,26
+1966,16,citizenship,Central America,country,1946-1955,137,26
+1966,16,citizenship,Central America,country,1956-1963,130,26
+1966,16,citizenship,Central America,country,1964,21,26
+1966,16,citizenship,Central America,country,1965,25,26
+1966,16,citizenship,Central America,country,1966,41,26
+1966,16,citizenship,Central America,country,Canada,354,26
+1966,16,citizenship,"Europe, other",country,1946-1955,358,26
+1966,16,citizenship,"Europe, other",country,1956-1963,15,26
+1966,16,citizenship,"Europe, other",country,1964,2,26
+1966,16,citizenship,"Europe, other",country,1965,619,26
+1966,16,citizenship,"Europe, other",country,1966,585,26
+1966,16,citizenship,"Europe, other",country,Canada,1579,26
+1966,16,citizenship,"South America, other",country,1946-1955,696,26
+1966,16,citizenship,"South America, other",country,1956-1963,1833,26
+1966,16,citizenship,"South America, other",country,1964,353,26
+1966,16,citizenship,"South America, other",country,1965,431,26
+1966,16,citizenship,"South America, other",country,1966,804,26
+1966,16,citizenship,"South America, other",country,Canada,4117,26
+1966,16,citizenship,West Indies,country,1946-1955,227,26
+1966,16,citizenship,West Indies,country,1956-1963,562,26
+1966,16,citizenship,West Indies,country,1964,1624,26
+1966,16,citizenship,West Indies,country,1965,2486,26
+1966,16,citizenship,West Indies,country,1966,3731,26
+1966,16,citizenship,West Indies,country,Canada,8630,26
+1966,16,citizenship,Other Countries,country,1946-1955,754,26
+1966,16,citizenship,Other Countries,country,1956-1963,462,26
+1966,16,citizenship,Other Countries,country,1964,0,26
+1966,16,citizenship,Other Countries,country,1965,0,26
+1966,16,citizenship,Other Countries,country,1966,0,26
+1966,16,citizenship,Other Countries,country,Canada,1216,26
+1966,16,citizenship,Stateless,country,1946-1955,4409,26
+1966,16,citizenship,Stateless,country,1956-1963,32144,26
+1966,16,citizenship,Stateless,country,1964,2661,26
+1966,16,citizenship,Stateless,country,1965,2526,26
+1966,16,citizenship,Stateless,country,1966,2808,26
+1966,16,citizenship,Stateless,country,Canada,44548,26
+1966,16,citizenship,TOTAL,total,1946-1955,1222319,26
+1966,16,citizenship,TOTAL,total,1956-1963,1022337,26
+1966,16,citizenship,TOTAL,total,1964,112606,26
+1966,16,citizenship,TOTAL,total,1965,146758,26
+1966,16,citizenship,TOTAL,total,1966,194743,26
+1966,16,citizenship,TOTAL,total,Canada,2698763,26
