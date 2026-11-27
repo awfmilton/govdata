@@ -140,7 +140,23 @@ def _name_key(name: str) -> str:
     return f'{parts[0]} {parts[-1]}' if len(parts) >= 2 else ' '.join(parts)
 
 
-def load_births(cur, ua: str) -> dict:
+def load_births(cur, ua: str, attempts: int = 3) -> dict:
+    """Wikidata sometimes ends a long query early and returns a truncated (still valid) CSV; retry before failing."""
+    import time
+    for attempt in range(attempts):
+        try:
+            return _load_births(cur, ua)
+        except _Truncated:
+            if attempt == attempts - 1:
+                raise
+            time.sleep(30)
+
+
+class _Truncated(RuntimeError):
+    pass
+
+
+def _load_births(cur, ua: str) -> dict:
     url = WIKIDATA_URL + '?' + urllib.parse.urlencode({'query': SPARQL})
     data = get(url, ua, timeout=300, accept='text/csv')
     people: dict[str, dict] = {}
@@ -154,7 +170,7 @@ def load_births(cur, ua: str) -> dict:
         role = 'mp' if _qid(r['pos']) == MP_POS else 'senator'
         p['terms'].add((role, r['start'][:10] if _d(r['start']) else '', r['end'][:10] if _d(r['end']) else ''))
     if len(people) < 4000:
-        raise RuntimeError(f'Wikidata returned only {len(people)} parliamentarians; keeping the previous load')
+        raise _Truncated(f'Wikidata returned only {len(people)} parliamentarians; keeping the previous load')
 
     cur.execute('SELECT iso2, country_id FROM imm_country_iso WHERE iso2 IS NOT NULL')
     by_iso = dict(cur.fetchall())
@@ -356,7 +372,8 @@ PARLINFO_COUNTRY = {'england': 'GB', 'scotland': 'GB', 'wales': 'GB', 'northern 
                     'united kingdom': 'GB', 'ireland': 'IE', 'irish free state': 'IE', 'prussia': 'DE', 'west germany': 'DE',
                     'newfoundland': 'CA', 'canada': 'CA', 'united states of america': 'US', 'usa': 'US',
                     'burma': 'MM', 'ceylon': 'LK', 'persia': 'IR', 'siam': 'TH', 'zaire': 'CD', 'rhodesia': 'ZW',
-                    'east pakistan': 'BD', 'formosa': 'TW', 'holland': 'NL', 'the netherlands': 'NL'}
+                    'east pakistan': 'BD', 'formosa': 'TW', 'holland': 'NL', 'the netherlands': 'NL',
+                    'trinidad': 'TT', 'tobago': 'TT', 'british guyana': 'GY', 'british guiana': 'GY', 'palestine': 'PS'}
 
 
 def _country_lookup(cur) -> dict:
@@ -436,23 +453,25 @@ def load_parlinfo(conn, ua: str, max_fetch: int = 6000, import_path=None) -> dic
         elif age >= 180:
             due.append((2, int(lop)))
     due = [lop for _, lop in sorted(due)][:max_fetch]
-    done = failed = 0
+    done = failed = in_a_row = 0
     for lop in due:
+        if in_a_row >= 5:
+            break                                            # refused mid-run: stop, the import path covers it
         try:
-            p = json.loads(get(PARLINFO_PROFILE.format(lop), ua, timeout=60, accept='application/json'))['Person']
+            p = json.loads(get(PARLINFO_PROFILE.format(lop), ua, timeout=20, tries=1, accept='application/json'))['Person']
+            in_a_row = 0
             name = ' '.join(x for x in (p.get('UsedFirstName'), p.get('LastName')) if x)
             row = (lop, name[:200] or None, (p.get('DateOfBirth') or '')[:10] or None,
                    p.get('CityOfBirthEn') or None, p.get('ProvinceOfBirthEn') or None, p.get('CountryOfBirthEn') or None,
                    int(bool(p.get('DoNotDiscloseBirthLocation'))), 200, _now())
-        except Exception:  # noqa: BLE001 -- recorded with status 0; retried on the next run
+        except Exception:  # noqa: BLE001 -- a failed fetch keeps whatever was stored before; retried next run
             failed += 1
-            row = (lop, None, None, None, None, None, 0, 0, _now())
+            in_a_row += 1
+            continue
         cur.execute(PARLINFO_UPSERT, row)
         done += 1
         if done % 200 == 0:
             conn.commit()
-        if failed >= 10 and failed == done:
-            break                                            # refused mid-run: stop rather than time out 6,000 times
         time.sleep(0.5)
     conn.commit()
     return {'imported_file': imported, 'fetched': done, 'failed': failed}

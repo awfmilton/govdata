@@ -38,6 +38,25 @@ PARSER_VERSION = b'aid-parsers-3'
 OLD_CODES = {'KV': 'XK'}           # Kosovo before ISO's user-assigned XK
 
 
+# Department names GAC spells differently from year to year (reviewed 2026-11-27); applied at parse time.
+DEPT_NAMES = {
+    'Department of Finance Canada': 'Finance Canada',
+    'Department of National Defence': 'National Defence',
+    'Immigration, Refugees and Citizenships Canada': 'Immigration, Refugees and Citizenship Canada',
+    'Cost of refugees in Canada (1st year) - Immigration, Refugees and Citizenship Canada': 'Immigration, Refugees and Citizenship Canada',
+    'Employment and Social Development Canada (ESDC) - Labour Program': 'Employment and Social Development Canada - Labour Program',
+    'EDC': 'Export Development Canada',
+    'British-Co': 'British Columbia', 'British-Columbia': 'British Columbia', 'New-Brunswick': 'New Brunswick',
+    'Nova-Scotia': 'Nova Scotia',
+    'CSC-Correc': 'Correctional Service Canada',
+    'PSC': 'Public Service Commission of Canada',
+    'Transport': 'Transport Canada',
+    'Justice': 'Justice Canada',
+    'CIHR': 'Canadian Institutes of Health Research',
+    'Canada Post - Universal Postal Union': 'Canada Post',
+}
+
+
 class LayoutError(Exception):
     pass
 
@@ -215,7 +234,7 @@ def _parse_hpds(rows: list[list[str]], fy: int, look: dict, iso: dict) -> list[t
             if kind == 'C' and cid is None:
                 cid = look.get(norm(g(r, 'rn')))
                 cid = None if cid == 'CA' else cid
-            out.append((fy, 'wog', g(r, 'dept')[:200], g(r, 'rl1')[:200] or None, g(r, 'pn')[:60], g(r, 'pt')[:600] or None, None,
+            out.append((fy, 'wog', DEPT_NAMES.get(g(r, 'dept'), g(r, 'dept'))[:200], g(r, 'rl1')[:200] or None, g(r, 'pn')[:60], g(r, 'pt')[:600] or None, None,
                         g(r, 'at')[:10] or None, g(r, 'atn')[:200] or None, g(r, 'bm')[:10] or None, g(r, 'fc')[:10] or None,
                         g(r, 'fn')[:120] or None, g(r, 'fin')[:120] or None, 1 if g(r, 'iae') == '1' else 0 if g(r, 'iae') == '0' else None,
                         g(r, 'org')[:300] or None, g(r, 'ol1')[:100] or None, g(r, 'ol2')[:100] or None, g(r, 'ot')[:120] or None,
