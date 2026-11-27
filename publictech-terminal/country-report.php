@@ -158,6 +158,57 @@ get_header(); ?>
 				</div>
 			</div>
 
+			<?php $pt_cad = is_array( $pt_p['aid_cad'] ?? null ) ? $pt_p['aid_cad'] : null; if ( $pt_cad && ! empty( $pt_cad['series'] ) ) :
+				$pt_m = static fn( $v ): string => null === $v ? '—' : pt_format_money_short( (float) $v ); ?>
+			<div class="panel corner" id="aid-cad">
+				<div class="hd">
+					<h3>◇ <?php esc_html_e( 'Canadian spending here, by fiscal year', 'publictech-terminal' ); ?></h3>
+					<span class="meta"><?php esc_html_e( 'GLOBAL AFFAIRS CANADA · CAD', 'publictech-terminal' ); ?></span>
+				</div>
+				<div class="bd">
+					<div class="chart-host" id="ptCtyAidCad" style="height:240px"></div>
+					<p class="pt-cty-note"><?php esc_html_e( 'International assistance disbursed by every federal department to this country, in Canadian dollars, from Global Affairs Canada’s own statistics: the Statistical Report on International Assistance to 2015-16, the Historical Project Data Set after. From 2016-17 the darker line is the part that counts as official development assistance; the rest is mostly loans and other official flows.', 'publictech-terminal' ); ?></p>
+					<div class="pt-cty-two" style="margin-top:10px">
+						<?php foreach ( [ 'departments' => __( 'Departments', 'publictech-terminal' ), 'sectors' => __( 'Sectors', 'publictech-terminal' ) ] as $k => $label ) : if ( empty( $pt_cad[ $k ] ) ) { continue; } ?>
+							<div>
+								<h4 class="pt-cty-h4" style="margin-top:0"><?php echo esc_html( $label . ' · ' . implode( '–', (array) $pt_cad['window'] ) ); ?></h4>
+								<table class="pt-cty-table compact"><tbody>
+								<?php foreach ( (array) $pt_cad[ $k ] as $r ) : ?>
+									<tr><td><?php echo esc_html( (string) $r[0] ); ?></td><td class="mono"><?php echo esc_html( $pt_m( $r[1] ) ); ?></td></tr>
+								<?php endforeach; ?>
+								</tbody></table>
+							</div>
+						<?php endforeach; ?>
+					</div>
+					<?php if ( ! empty( $pt_cad['partners'] ) ) : ?>
+						<h4 class="pt-cty-h4"><?php echo esc_html( __( 'Partner organisations', 'publictech-terminal' ) . ' · ' . implode( '–', (array) $pt_cad['window'] ) ); ?></h4>
+						<table class="pt-cty-table compact"><tbody>
+						<?php foreach ( (array) $pt_cad['partners'] as $r ) : ?>
+							<tr><td><?php echo esc_html( (string) $r[0] ); ?></td><td class="mono"><?php echo esc_html( $pt_m( $r[1] ) ); ?></td></tr>
+						<?php endforeach; ?>
+						</tbody></table>
+					<?php endif; ?>
+					<?php if ( ! empty( $pt_cad['projects'] ) ) : ?>
+						<h4 class="pt-cty-h4"><?php echo esc_html( __( 'Largest projects', 'publictech-terminal' ) . ' · ' . implode( '–', (array) $pt_cad['projects_window'] ) ); ?></h4>
+						<div class="pt-cty-scroll" style="max-height:340px">
+						<table class="pt-cty-table compact">
+							<thead><tr><th><?php esc_html_e( 'Project', 'publictech-terminal' ); ?></th><th><?php esc_html_e( 'Department / partner', 'publictech-terminal' ); ?></th><th><?php esc_html_e( 'Spent', 'publictech-terminal' ); ?></th></tr></thead>
+							<tbody>
+							<?php foreach ( (array) $pt_cad['projects'] as $r ) : ?>
+								<tr>
+									<td><?php if ( ! empty( $r[5] ) ) : ?><a href="<?php echo esc_url( (string) $r[5] ); ?>" rel="noopener" target="_blank"><?php endif; ?><?php echo esc_html( (string) ( $r[1] ?: $r[0] ) ); ?><?php if ( ! empty( $r[5] ) ) : ?></a><?php endif; ?> <span class="mono pt-cty-sub"><?php echo esc_html( (string) $r[0] ); ?></span></td>
+									<td><?php echo esc_html( trim( (string) $r[2] . ( $r[3] ? ' · ' . $r[3] : '' ) ) ); ?></td>
+									<td class="mono"><?php echo esc_html( $pt_m( $r[4] ) ); ?></td>
+								</tr>
+							<?php endforeach; ?>
+							</tbody>
+						</table>
+						</div>
+					<?php endif; ?>
+				</div>
+			</div>
+			<?php endif; ?>
+
 			<div class="panel corner" id="deep-dive">
 				<div class="hd">
 					<h3>◇ <?php esc_html_e( 'After an MP born here took a seat', 'publictech-terminal' ); ?></h3>
@@ -410,6 +461,7 @@ get_header(); ?>
 echo wp_json_encode( [
 	'immigration' => $pt_im['series'] ?? [],
 	'aid'         => $pt_ad['series'] ?? [],
+	'aidCad'      => $pt_p['aid_cad']['series'] ?? [],
 	'aidShare'    => $pt_ad['share'] ?? [],
 	'sitting'     => $pt_p['sitting_by_year'] ?? [],
 	'events'      => array_map( static fn( $e ) => (int) $e['year'], $pt_ev ),

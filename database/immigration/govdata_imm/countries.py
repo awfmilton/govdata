@@ -346,3 +346,149 @@ def tag_aid_laws(cur, ua: str) -> dict:
     cur.executemany('INSERT INTO aid_law_tags (ref_kind, ref_id, title, matched_term, official_number, url, tagged_at) '
                     'VALUES (%s,%s,%s,%s,%s,%s,%s)', rows)
     return {'laws': n_laws, 'bills': len(rows) - n_laws}
+
+
+# ── Library of Parliament birthplaces ───────────────────────────────────────
+
+PARLINFO_PROFILE = 'https://loppublicservices.parl.ca/ParlinfoWebApi/Person/GetPersonWebProfile/{}'
+# Parlinfo names the country as it was at birth; these are the constituent nations and older names it uses.
+PARLINFO_COUNTRY = {'england': 'GB', 'scotland': 'GB', 'wales': 'GB', 'northern ireland': 'GB', 'great britain': 'GB',
+                    'united kingdom': 'GB', 'ireland': 'IE', 'irish free state': 'IE', 'prussia': 'DE', 'west germany': 'DE',
+                    'newfoundland': 'CA', 'canada': 'CA', 'united states of america': 'US', 'usa': 'US',
+                    'burma': 'MM', 'ceylon': 'LK', 'persia': 'IR', 'siam': 'TH', 'zaire': 'CD', 'rhodesia': 'ZW',
+                    'east pakistan': 'BD', 'formosa': 'TW', 'holland': 'NL', 'the netherlands': 'NL'}
+
+
+def _country_lookup(cur) -> dict:
+    """Normalised country text -> country_id ('CA' for Canada), from display names, canonical names, reviewed
+    aliases, and the two tables above."""
+    from .country import norm
+    look, by_iso = {}, {}
+    cur.execute('SELECT c.country_id, c.name_en, i.display_name, i.iso2 FROM imm_country c LEFT JOIN imm_country_iso i USING (country_id) '
+                "WHERE c.kind = 'country'")
+    for cid, name, disp, iso in cur.fetchall():
+        look[norm(name)] = cid
+        if disp:
+            look[norm(disp)] = cid
+        if iso:
+            by_iso[iso] = cid
+    cur.execute("SELECT a.alias_norm, a.country_id FROM imm_country_alias a JOIN imm_country c USING (country_id) WHERE c.kind = 'country'")
+    for a, cid in cur.fetchall():
+        look.setdefault(a, cid)
+    for text, iso in list(PARLINFO_COUNTRY.items()) + list(HISTORICAL_BIRTH.items()):
+        look[norm(text)] = 'CA' if iso == 'CA' else by_iso.get(iso)
+    return look
+
+
+PARLINFO_UPSERT = ('INSERT INTO parl_person_parlinfo (lop_person_id, name, birth_date, birth_city, birth_province, birth_country, '
+                   'birth_hidden, http_status, fetched_at) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s) ON DUPLICATE KEY UPDATE '
+                   'name=VALUES(name), birth_date=VALUES(birth_date), birth_city=VALUES(birth_city), '
+                   'birth_province=VALUES(birth_province), birth_country=VALUES(birth_country), birth_hidden=VALUES(birth_hidden), '
+                   'http_status=VALUES(http_status), fetched_at=VALUES(fetched_at)')
+
+
+def import_parlinfo_file(conn, path) -> int:
+    """Load a file written by tools/parlinfo_fetch.js (Parlinfo refuses the loader host's address), then rename it
+    so it is imported once."""
+    from pathlib import Path
+    p = Path(path)
+    if not p.exists():
+        return 0
+    rows = []
+    for line in p.read_text(encoding='utf-8').splitlines():
+        try:
+            r = json.loads(line)
+        except ValueError:
+            continue
+        rows.append((int(r['lop_person_id']), (r.get('name') or '')[:200] or None, r.get('birth_date') or None,
+                     r.get('birth_city') or None, r.get('birth_province') or None, r.get('birth_country') or None,
+                     int(r.get('birth_hidden') or 0), int(r.get('http_status') or 0), r.get('fetched_at') or _now()))
+    cur = conn.cursor()
+    for i in range(0, len(rows), 500):
+        cur.executemany(PARLINFO_UPSERT, rows[i:i + 500])
+    conn.commit()
+    p.rename(p.with_name(p.name + '.' + _now().strftime('%Y%m%d%H%M') + '.done'))
+    return len(rows)
+
+
+def load_parlinfo(conn, ua: str, max_fetch: int = 6000, import_path=None) -> dict:
+    """Import a workstation-fetched file if one is waiting, then fetch what is due from Parlinfo directly when the
+    API answers this host: never-fetched first, then sitting members weekly, everyone else twice a year. Only
+    birth fields are kept. Commits every 200 profiles."""
+    import time
+    imported = import_parlinfo_file(conn, import_path) if import_path else 0
+    try:
+        get(PARLINFO_PROFILE.format(18796), ua, timeout=15, tries=1, accept='application/json')
+    except Exception as e:  # noqa: BLE001 -- the API refuses some datacenter addresses; the import path covers it
+        return {'imported_file': imported, 'network': f'unreachable ({type(e).__name__}); run tools/parlinfo_fetch.js'}
+    cur = conn.cursor()
+    cur.execute("SELECT b.lop_person_id, p.fetched_at, (b.last_mp_end IS NULL AND b.was_mp = 1) OR "
+                "(b.last_senate_end IS NULL AND b.was_senator = 1) FROM parl_person_birth b "
+                "LEFT JOIN parl_person_parlinfo p ON p.lop_person_id = b.lop_person_id WHERE b.lop_person_id REGEXP '^[0-9]+$'")
+    now = _now()
+    due = []
+    for lop, fetched, sitting in cur.fetchall():
+        age = (now - fetched).days if fetched else None
+        if age is None:
+            due.append((0, int(lop)))
+        elif sitting and age >= 7:
+            due.append((1, int(lop)))
+        elif age >= 180:
+            due.append((2, int(lop)))
+    due = [lop for _, lop in sorted(due)][:max_fetch]
+    done = failed = 0
+    for lop in due:
+        try:
+            p = json.loads(get(PARLINFO_PROFILE.format(lop), ua, timeout=60, accept='application/json'))['Person']
+            name = ' '.join(x for x in (p.get('UsedFirstName'), p.get('LastName')) if x)
+            row = (lop, name[:200] or None, (p.get('DateOfBirth') or '')[:10] or None,
+                   p.get('CityOfBirthEn') or None, p.get('ProvinceOfBirthEn') or None, p.get('CountryOfBirthEn') or None,
+                   int(bool(p.get('DoNotDiscloseBirthLocation'))), 200, _now())
+        except Exception:  # noqa: BLE001 -- recorded with status 0; retried on the next run
+            failed += 1
+            row = (lop, None, None, None, None, None, 0, 0, _now())
+        cur.execute(PARLINFO_UPSERT, row)
+        done += 1
+        if done % 200 == 0:
+            conn.commit()
+        if failed >= 10 and failed == done:
+            break                                            # refused mid-run: stop rather than time out 6,000 times
+        time.sleep(0.5)
+    conn.commit()
+    return {'imported_file': imported, 'fetched': done, 'failed': failed}
+
+
+def merge_parlinfo(cur) -> dict:
+    """Fill parl_person_birth from Parlinfo where Wikidata has no birth country, record non-disclosure, and keep
+    Parlinfo's wording beside Wikidata's (Parlinfo names the country at birth; Wikidata the birthplace's country today,
+    which is what the comparisons use when both exist)."""
+    from .country import norm
+    look = _country_lookup(cur)
+    cur.execute('SELECT iso2, country_id FROM imm_country_iso WHERE iso2 IS NOT NULL')
+    iso_of = {cid: iso for iso, cid in cur.fetchall()}
+    cur.execute('SELECT b.wikidata_qid, b.birth_iso2, p.birth_city, p.birth_province, p.birth_country, p.birth_hidden '
+                'FROM parl_person_birth b JOIN parl_person_parlinfo p ON p.lop_person_id = b.lop_person_id WHERE p.http_status = 200')
+    filled = hidden = disagree = 0
+    unmatched = {}
+    for qid, w_iso, city, prov, country, hide in cur.fetchall():
+        wording = ', '.join(x for x in (city, prov, country) if x) or None
+        target = look.get(norm(country)) if country else None
+        if country and target is None:
+            unmatched[country] = unmatched.get(country, 0) + 1
+        iso = 'CA' if target == 'CA' else iso_of.get(target)
+        if not w_iso and iso:
+            cur.execute("UPDATE parl_person_birth SET birth_place=%s, birth_country_label=%s, birth_iso2=%s, country_id=%s, "
+                        "birth_source='parlinfo', parlinfo_birth=%s WHERE wikidata_qid=%s",
+                        ((', '.join(x for x in (city, prov) if x))[:200] or None, country[:200], iso,
+                         None if iso == 'CA' else target, wording, qid))
+            filled += 1
+            continue
+        if w_iso and iso and iso != w_iso:
+            disagree += 1
+        not_disclosed = bool(hide) and not country
+        hidden += not_disclosed
+        cur.execute('UPDATE parl_person_birth SET parlinfo_birth=%s, birth_disclosure=%s WHERE wikidata_qid=%s',
+                    (wording, 'not_disclosed' if not_disclosed else None, qid))
+    cur.execute("UPDATE parl_person_birth SET birth_source='wikidata' WHERE birth_source IS NULL AND birth_iso2 IS NOT NULL")
+    return {'filled_from_parlinfo': filled, 'not_disclosed': hidden, 'country_differs_from_wikidata': disagree,
+            'unmatched_parlinfo_countries': unmatched}
