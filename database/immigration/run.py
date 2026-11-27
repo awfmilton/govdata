@@ -88,7 +88,7 @@ def refresh_one(conn, cfg, src, rid, force):
     with conn.cursor() as cur:
         cur.execute("SELECT edition_id, status FROM imm_editions WHERE source_key = %s AND file_sha256 = %s", (key, dl.sha256))
         same = cur.fetchone()
-    if same and same[1] == 'loaded':
+    if same and same[1] == 'loaded' and not force:
         with conn.cursor() as cur:
             if signal and signal != (last[2] if last else None):
                 cur.execute('UPDATE imm_editions SET publisher_modified = %s WHERE edition_id = %s', (signal, same[0]))
