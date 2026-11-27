@@ -1,0 +1,49 @@
+/* Country pages (/countries/, /country/{slug}/). Uses the terminal theme's colour variables only. */
+
+.pt-cty-grid { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 14px; align-items: start; }
+.pt-cty-main, .pt-cty-side { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.pt-cty-two { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+@media (max-width: 1100px) { .pt-cty-grid { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 760px) { .pt-cty-two { grid-template-columns: 1fr; } }
+
+.pt-cty-note { font-size: 11px; color: var(--ink-2); line-height: 1.6; margin: 8px 0 0; }
+.pt-cty-note a { color: var(--accent); }
+.pt-cty-sub { font-size: 10px; color: var(--ink-3); }
+.pt-cty-h4 { font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-1); margin: 20px 0 6px; }
+.pt-cty-list { padding-left: 18px; }
+.pt-cty-list li { margin-bottom: 6px; }
+.pt-cty-empty { font-size: 11px; color: var(--ink-3); padding: 20px; text-align: center; }
+.pt-cty-finding p { font-size: 13px; line-height: 1.6; color: var(--ink-1); margin: 6px 0 10px; }
+
+.pt-cty-scroll { overflow: auto; max-height: 460px; border: 1px solid var(--line); }
+.pt-cty-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.pt-cty-table th { position: sticky; top: 0; background: var(--bg-2); color: var(--ink-2); font-weight: 600; text-align: left;
+	font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; padding: 7px 8px; border-bottom: 1px solid var(--line); }
+.pt-cty-table td { padding: 6px 8px; border-bottom: 1px solid var(--line); color: var(--ink-1); vertical-align: top; }
+.pt-cty-table tr:hover td { background: var(--bg-1); }
+.pt-cty-table a { color: var(--accent); text-decoration: none; }
+.pt-cty-table a:hover { text-decoration: underline; }
+.pt-cty-table.compact td, .pt-cty-table.compact th { padding: 4px 6px; }
+.pt-cty-table th[aria-sort="ascending"]::after { content: " ▲"; }
+.pt-cty-table th[aria-sort="descending"]::after { content: " ▼"; }
+.pt-cty-table td.mono { font-family: 'JetBrains Mono', monospace; white-space: nowrap; }
+
+.pt-cty-filter { width: 100%; max-width: 320px; margin-bottom: 10px; padding: 7px 10px; background: var(--bg-1); color: var(--ink-0);
+	border: 1px solid var(--line-2); font: inherit; font-size: 12px; }
+
+.pt-cty-toggle { display: inline-flex; border: 1px solid var(--line-2); margin-bottom: 8px; }
+.pt-cty-toggle button { background: transparent; color: var(--ink-2); border: 0; padding: 4px 10px; font: inherit; font-size: 10px; cursor: pointer; }
+.pt-cty-toggle button.on { background: var(--accent-soft); color: var(--ink-0); }
+
+.pt-cty-key { display: inline-block; width: 14px; height: 0; border-top: 2px dashed var(--warn); vertical-align: middle; }
+
+.pt-cty-tag { font-size: 10px; padding: 1px 6px; border: 1px solid var(--line-2); color: var(--ink-2); white-space: nowrap; }
+.pt-cty-tag.t-sanctions { border-color: var(--neg); color: var(--neg); }
+.pt-cty-tag.t-immigration { border-color: var(--accent); color: var(--accent); }
+.pt-cty-tag.t-trade { border-color: var(--pos); color: var(--pos); }
+.pt-cty-tag.t-tax, .pt-cty-tag.t-social-security { border-color: var(--warn); color: var(--warn); }
+
+.pt-cty-bill { padding: 8px 0; border-bottom: 1px solid var(--line); font-size: 12px; }
+.pt-cty-bill a { color: var(--ink-0); text-decoration: none; }
+.pt-cty-bill a:hover { color: var(--accent); }
+.pt-cty-div { font-size: 10px; color: var(--ink-2); margin-top: 3px; padding-left: 10px; border-left: 2px solid var(--line-2); }

@@ -33,11 +33,11 @@ def _now():
     return datetime.now(timezone.utc).replace(tzinfo=None)
 
 
-def get(url: str, ua: str, timeout: int = 120, tries: int = 4) -> bytes:
+def get(url: str, ua: str, timeout: int = 120, tries: int = 4, accept: str = '*/*') -> bytes:
     """GET with retries. The House site redirects its vote list (302), which urllib follows."""
     for attempt in range(tries):
         try:
-            req = urllib.request.Request(url, headers={'User-Agent': ua, 'Accept': '*/*'})
+            req = urllib.request.Request(url, headers={'User-Agent': ua, 'Accept': accept})
             with urllib.request.urlopen(req, timeout=timeout) as r:
                 return r.read()
         except (OSError, http.client.HTTPException):   # URLError, timeouts, and RemoteDisconnected (Justice Laws)

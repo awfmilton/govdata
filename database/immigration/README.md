@@ -78,3 +78,33 @@ mysql grantconts < schema.sql                      # as root (auth_socket)
 mysql -e "CREATE USER 'imm_load'@'localhost' IDENTIFIED BY '<generated on the server>'"
 mysql < grants.sql
 ```
+
+## Country pages
+
+`run.sh countries` (daily, `govdata-imm-countries.timer`, after the House refresh) loads four more sources and then
+rebuilds the page payloads; `run.sh report` rebuilds only the payloads.
+
+| Table | Source | Notes |
+|---|---|---|
+| `imm_country_iso` | `country_iso.csv` (reviewed) | ISO and OECD codes, page slug and display name for every `imm_country` country. Historical states (USSR, Yugoslavia, Czechoslovakia, the two Vietnams and Yemens, East Germany) have no code; their pages show only the immigration years they existed. A country added to `imm_country` later is reported as `not_in_csv` until it is reviewed. |
+| `cty_oda` | OECD DAC2a, donor Canada | Gross and net ODA, grants, humanitarian aid, imputed multilateral ODA by recipient, 1960 onward, current and constant US dollars. Regions, income groups and agencies keep `country_id` NULL. |
+| `parl_person_birth` | Wikidata SPARQL (CC0) | Every member of the House of Commons (Q15964890) and Senate (Q18524027) with place of birth, the birthplace's current country, terms, and the Library of Parliament person ID. Parlinfo itself refuses requests from the server's network, so Wikidata (whose statements cite Parlinfo) is the repeatable source. About 940 of ~5,400 people have no birthplace there. House PersonIds are matched by name and overlapping tenure to the division rolls (2004 onward). |
+| `cty_law_tags` | Justice Laws `Legis.xml`, `parl_bills` | Consolidated acts and regulations, and House bills since 1994, whose title names a country (`country_terms.csv` holds the reviewed extra terms and exclusions, e.g. "Norway House", provincial "Turkey Order"s). Rows set to `confirmed`/`rejected` survive rebuilds. |
+| `cty_report` | computed | One JSON payload per country (`country:<slug>`), plus `index` and `analysis`. The site reads only this table. |
+
+### The comparison method (report.py)
+
+- **One immigration series per country:** MP22-1 1964-1979 (the basis printed for most countries each year), IRCC
+  citizenship 1980-2014, IRCC open data 2015 onward (complete years only). Shares use the same publisher's total.
+- **Aid:** gross ODA in constant US dollars, as a share of Canada's gross ODA to individual countries that year.
+- **Event study:** an event is a year in which the number of sitting MPs born in a country rises from zero. The
+  change is log(mean share in the 5 years after) − log(mean share in the 5 years before), with at least 3 years of
+  data in each window. The comparison pool is every other country-year with no such MP within ±5 years. The p-value
+  is a permutation test (5,000 draws of the same number of comparison years). The pre-trend (5 years before vs the 5
+  before that) is reported because a growing community both sends more immigrants and elects MPs.
+- **Fixed effects:** log share on "an MP born there sits this year", with country and year fixed effects and
+  country-clustered standard errors; the same with the MP indicator moved three years ahead as a reverse-causation
+  check.
+- **Caveats shown on the pages:** this measures association, not cause; MPs are counted by birthplace, not by
+  community; the 1964-1979 tables list only the larger source countries each year; new states (Croatia 1993) and
+  refugee crises (Syria 2015) produce very large changes that the medians are reported beside.
