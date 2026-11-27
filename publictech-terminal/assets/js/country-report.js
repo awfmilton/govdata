@@ -133,7 +133,7 @@
 		var x = d3.scaleLog().domain(d3.extent(rows, function (r) { return r[3]; })).nice().range([f.m.l, f.W - f.m.r]);
 		var y = d3.scaleLog().domain(d3.extent(rows, function (r) { return r[2]; })).nice().range([f.H - f.m.b, f.m.t]);
 		var r = d3.scaleSqrt().domain([0, d3.max(rows, function (d) { return d[4]; }) || 1]).range([3, 14]);
-		axes(f, x, y, t, function (d) { return '$' + fmtShort(d) + 'M'; }, fmtShort);
+		axes(f, x, y, t, function (d) { return d >= 1000 ? '$' + d3.format('~g')(d / 1000) + 'B' : '$' + d3.format('~g')(d) + 'M'; }, fmtShort);
 		f.svg.append('text').attr('x', f.W - f.m.r).attr('y', f.H - 4).attr('text-anchor', 'end').attr('fill', t.ink3).style('font-size', '10px').text('Aid, US$ millions (log)');
 		f.svg.append('text').attr('x', f.m.l + 6).attr('y', f.m.t + 10).attr('fill', t.ink3).style('font-size', '10px').text('Immigrants (log)');
 		var dots = f.svg.append('g').selectAll('a').data(rows).enter().append('a')
