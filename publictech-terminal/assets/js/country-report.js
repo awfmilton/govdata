@@ -258,7 +258,7 @@
 		var node = document.getElementById('ptAidData');
 		if (!node) { return; }
 		var D = JSON.parse(node.textContent || '{}'), t = theme(), tot = D.totals || [];
-		var cad = function (d) { return 'C$' + fmtShort(d) + 'M'; };
+		var cad = function (d) { return d === 0 ? '0' : 'C$' + fmtShort(d) + 'M'; };
 		var mode = 'cad';
 		function drawTotal(host) {
 			if (mode === 'gni') {
@@ -272,7 +272,7 @@
 				lineChart(host, series, { yfmt: pct, tipfmt: pct, hlines: [{ y: 0.7, label: 'UN target 0.7%' }] });
 			} else if (mode === 'real') {
 				lineChart(host, [{ name: 'Net ODA, ' + D.baseYear + ' US$', color: t.pos, values: tot.map(function (r) { return [r[0], r[2]]; }) }],
-					{ yfmt: function (d) { return '$' + fmtShort(d) + 'M'; }, tipfmt: function (d) { return 'US$' + d3.format(',.0f')(d) + 'M'; } });
+					{ yfmt: function (d) { return d === 0 ? '0' : '$' + fmtShort(d) + 'M'; }, tipfmt: function (d) { return 'US$' + d3.format(',.0f')(d) + 'M'; } });
 			} else {
 				lineChart(host, [{ name: 'Net ODA, current C$', color: t.accent, values: tot.map(function (r) { return [r[0], r[1]]; }) }],
 					{ yfmt: cad, tipfmt: function (d) { return 'C$' + d3.format(',.0f')(d) + 'M'; } });
@@ -304,7 +304,7 @@
 		});
 		mount(document.getElementById('ptAidGac'), function (h) {
 			barChart(h, (D.gacYears || []).map(function (r) { return [r[0] + '-' + String(r[0] + 1).slice(2), r[2] / 1e6]; }),
-				{ yfmt: function (d) { return 'C$' + fmtShort(d) + 'M'; } });
+				{ yfmt: function (d) { return d === 0 ? '0' : 'C$' + fmtShort(d) + 'M'; } });
 		});
 	}
 

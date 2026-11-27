@@ -79,7 +79,7 @@ get_header(); ?>
 		<div class="kpi corner">
 			<div class="lab"><?php printf( esc_html__( 'Aid in %d', 'publictech-terminal' ), (int) $pt_lastr[0] ); ?></div>
 			<div class="val"><?php echo esc_html( $pt_cad( $pt_lastr[1] ) ); ?></div>
-			<div class="delta dim"><?php esc_html_e( 'Net ODA, current dollars', 'publictech-terminal' ); ?></div>
+			<div class="delta dim"><?php echo esc_html( (int) $pt_lastr[0] >= (int) gmdate( 'Y' ) - 1 ? __( 'Net ODA, current dollars · preliminary', 'publictech-terminal' ) : __( 'Net ODA, current dollars', 'publictech-terminal' ) ); ?></div>
 		</div>
 		<div class="kpi">
 			<div class="lab"><?php esc_html_e( 'Share of national income', 'publictech-terminal' ); ?></div>
