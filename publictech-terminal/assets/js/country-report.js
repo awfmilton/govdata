@@ -70,6 +70,13 @@
 		var lo = Math.min(0, d3.min(pts, function (p) { return p[1]; }));
 		var y = d3.scaleLinear().domain([lo, d3.max(pts, function (p) { return p[1]; }) * 1.08 || 1]).nice().range([f.H - f.m.b, f.m.t]);
 		axes(f, x, y, t, null, opts.yfmt);
+		(opts.hlines || []).forEach(function (h) {
+			if (h.y < y.domain()[0] || h.y > y.domain()[1]) { return; }
+			f.svg.append('line').attr('x1', f.m.l).attr('x2', f.W - f.m.r).attr('y1', y(h.y)).attr('y2', y(h.y))
+				.attr('stroke', t.neg).attr('stroke-dasharray', '4,3');
+			f.svg.append('text').attr('x', f.W - f.m.r - 4).attr('y', y(h.y) - 4).attr('text-anchor', 'end')
+				.attr('fill', t.neg).style('font-size', '10px').text(h.label);
+		});
 		(opts.markers || []).forEach(function (mx) {
 			if (mx < x.domain()[0] || mx > x.domain()[1]) { return; }
 			f.svg.append('line').attr('x1', x(mx)).attr('x2', x(mx)).attr('y1', f.m.t).attr('y2', f.H - f.m.b)
@@ -99,8 +106,11 @@
 		});
 		if (series.length > 1) {
 			var lg = f.svg.append('g').attr('transform', 'translate(' + (f.m.l + 6) + ',' + (f.m.t + 4) + ')');
-			series.forEach(function (s, i) {
-				var g = lg.append('g').attr('transform', 'translate(' + (i * 130) + ',0)');
+			var lx = 0;
+			series.forEach(function (s) {
+				if (!s.name) { return; }
+				var g = lg.append('g').attr('transform', 'translate(' + lx + ',0)');
+				lx += 24 + s.name.length * 5.6;
 				g.append('rect').attr('width', 10).attr('height', 3).attr('y', 4).attr('fill', s.color);
 				g.append('text').attr('x', 14).attr('y', 9).text(s.name).attr('fill', t.ink2).style('font-size', '10px');
 			});
@@ -243,6 +253,61 @@
 		}
 	}
 
-	function boot() { countryPage(); indexPage(); }
+	/* ── foreign aid page ───────────────────────────────────────────────── */
+	function aidPage() {
+		var node = document.getElementById('ptAidData');
+		if (!node) { return; }
+		var D = JSON.parse(node.textContent || '{}'), t = theme(), tot = D.totals || [];
+		var cad = function (d) { return 'C$' + fmtShort(d) + 'M'; };
+		var mode = 'cad';
+		function drawTotal(host) {
+			if (mode === 'gni') {
+				var pct = function (d) { return d3.format('.2f')(d) + '%'; };
+				// Lift the y-axis to show the 0.7% target even when aid sits well below it.
+				var series = [
+					{ name: 'Net ODA / GNI', color: t.accent, values: tot.map(function (r) { return [r[0], r[3]]; }) },
+					{ name: 'Grant-equivalent (official, 2018+)', color: t.warn, values: tot.filter(function (r) { return r[4] !== null; }).map(function (r) { return [r[0], r[4]]; }) },
+					{ name: '', color: 'transparent', values: [[tot[0][0], 0.75]] }
+				];
+				lineChart(host, series, { yfmt: pct, tipfmt: pct, hlines: [{ y: 0.7, label: 'UN target 0.7%' }] });
+			} else if (mode === 'real') {
+				lineChart(host, [{ name: 'Net ODA, ' + D.baseYear + ' US$', color: t.pos, values: tot.map(function (r) { return [r[0], r[2]]; }) }],
+					{ yfmt: function (d) { return '$' + fmtShort(d) + 'M'; }, tipfmt: function (d) { return 'US$' + d3.format(',.0f')(d) + 'M'; } });
+			} else {
+				lineChart(host, [{ name: 'Net ODA, current C$', color: t.accent, values: tot.map(function (r) { return [r[0], r[1]]; }) }],
+					{ yfmt: cad, tipfmt: function (d) { return 'C$' + d3.format(',.0f')(d) + 'M'; } });
+			}
+		}
+		var host = document.getElementById('ptAidTotal');
+		mount(host, drawTotal);
+		document.querySelectorAll('[data-pt-aid]').forEach(function (b) {
+			b.addEventListener('click', function () {
+				mode = b.getAttribute('data-pt-aid');
+				document.querySelectorAll('[data-pt-aid]').forEach(function (o) { o.classList.toggle('on', o === b); });
+				drawTotal(host);
+			});
+		});
+		mount(document.getElementById('ptAidChannels'), function (h) {
+			lineChart(h, [
+				{ name: 'Bilateral', color: t.accent, values: tot.filter(function (r) { return r[5] !== null; }).map(function (r) { return [r[0], r[5]]; }) },
+				{ name: 'Multilateral', color: t.warn, values: tot.filter(function (r) { return r[6] !== null; }).map(function (r) { return [r[0], r[6]]; }) }
+			], { yfmt: cad, tipfmt: function (d) { return 'C$' + d3.format(',.0f')(d) + 'M'; } });
+		});
+		mount(document.getElementById('ptAidRefugees'), function (h) {
+			lineChart(h, [{ name: 'Refugee costs in Canada counted as aid', color: t.neg, values: (D.refugees || []).filter(function (r) { return r[1] !== null; }).map(function (r) { return [r[0], r[1]]; }) }],
+				{ yfmt: cad, tipfmt: function (d) { return 'C$' + d3.format(',.0f')(d) + 'M'; } });
+		});
+		var regs = D.regions || {}, cols = [t.accent, t.warn, t.pos, t.neg, t.ink2];
+		mount(document.getElementById('ptAidRegions'), function (h) {
+			lineChart(h, Object.keys(regs).map(function (k, i) { return { name: k, color: cols[i % cols.length], values: regs[k] }; }),
+				{ yfmt: function (d) { return '$' + fmtShort(d) + 'M'; }, tipfmt: function (d) { return 'US$' + d3.format(',.0f')(d) + 'M'; } });
+		});
+		mount(document.getElementById('ptAidGac'), function (h) {
+			barChart(h, (D.gacYears || []).map(function (r) { return [r[0] + '-' + String(r[0] + 1).slice(2), r[2] / 1e6]; }),
+				{ yfmt: function (d) { return 'C$' + fmtShort(d) + 'M'; } });
+		});
+	}
+
+	function boot() { countryPage(); indexPage(); aidPage(); }
 	if (document.readyState === 'complete') { boot(); } else { window.addEventListener('load', boot); }
 })();

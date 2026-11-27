@@ -26,3 +26,5 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON grantconts.cty_law_tags      TO 'imm_loa
 GRANT SELECT, INSERT, UPDATE, DELETE ON grantconts.cty_report        TO 'imm_load'@'localhost';
 -- The report builder reads the grants table and the House roster.
 GRANT SELECT ON grantconts.master_table       TO 'imm_load'@'localhost';
+GRANT SELECT, INSERT, UPDATE, DELETE ON grantconts.cty_dac1          TO 'imm_load'@'localhost';
+GRANT SELECT, INSERT, UPDATE, DELETE ON grantconts.aid_law_tags      TO 'imm_load'@'localhost';
