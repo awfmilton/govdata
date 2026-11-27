@@ -1,0 +1,204 @@
+year,table,basis,row_label,row_kind,column,value,page
+1977,8,birth,Albania,country,Canada,1,18
+1977,8,birth,Austria,country,Canada,209,18
+1977,8,birth,Belgium,country,Canada,343,18
+1977,8,birth,Britain,subtotal,Canada,16634,18
+1977,8,birth,England,country,Canada,11845,18
+1977,8,birth,Northern Ireland,country,Canada,1483,18
+1977,8,birth,Scotland,country,Canada,2622,18
+1977,8,birth,Wales,country,Canada,660,18
+1977,8,birth,Channel Islands,country,Canada,24,18
+1977,8,birth,Bulgaria,country,Canada,61,18
+1977,8,birth,Czechoslovakia,country,Canada,336,18
+1977,8,birth,Denmark,country,Canada,254,18
+1977,8,birth,Estonia,country,Canada,15,18
+1977,8,birth,Finland,country,Canada,187,18
+1977,8,birth,France,country,Canada,2090,18
+1977,8,birth,German Democratic Rep.,country,Canada,65,18
+1977,8,birth,"Germany, Fed. Rep.",country,Canada,2139,18
+1977,8,birth,Gibraltar,country,Canada,18,18
+1977,8,birth,Greece,country,Canada,1874,18
+1977,8,birth,Hungary,country,Canada,514,18
+1977,8,birth,Iceland,country,Canada,38,18
+1977,8,birth,Irish Rep.,country,Canada,685,18
+1977,8,birth,Italy,country,Canada,3088,18
+1977,8,birth,Latvia,country,Canada,33,18
+1977,8,birth,Liechtenstein,country,Canada,1,18
+1977,8,birth,Lithuania,country,Canada,32,18
+1977,8,birth,Luxembourg,country,Canada,12,18
+1977,8,birth,Malta,country,Canada,182,18
+1977,8,birth,Monaco,country,Canada,1,18
+1977,8,birth,Netherlands,country,Canada,1291,18
+1977,8,birth,Norway,country,Canada,81,18
+1977,8,birth,Poland,country,Canada,1293,18
+1977,8,birth,Portugal,country,Canada,4238,18
+1977,8,birth,Romania,country,Canada,544,18
+1977,8,birth,San Marino,country,Canada,1,18
+1977,8,birth,Spain,country,Canada,372,18
+1977,8,birth,Sweden,country,Canada,283,18
+1977,8,birth,Switzerland,country,Canada,820,18
+1977,8,birth,Turkey,country,Canada,527,18
+1977,8,birth,U.S.S.R.,country,Canada,998,18
+1977,8,birth,Yugoslavia,country,Canada,1707,18
+1977,8,birth,Total: Europe,subtotal,Canada,40967,18
+1977,8,birth,Algeria,country,Canada,147,18
+1977,8,birth,Angola,country,Canada,277,18
+1977,8,birth,"Benin, Peoples Rep. of",country,Canada,7,18
+1977,8,birth,Botswana,country,Canada,8,18
+1977,8,birth,Burundi,country,Canada,15,18
+1977,8,birth,Cameroun,country,Canada,12,18
+1977,8,birth,Central African Rep.,country,Canada,2,18
+1977,8,birth,Chad,country,Canada,1,18
+1977,8,birth,"Congo, Republic of",country,Canada,7,18
+1977,8,birth,Egypt,country,Canada,899,18
+1977,8,birth,Ethiopia,country,Canada,79,18
+1977,8,birth,Gambia,country,Canada,3,18
+1977,8,birth,Ghana,country,Canada,149,18
+1977,8,birth,Guinea,country,Canada,7,18
+1977,8,birth,Ivory Coast,country,Canada,7,18
+1977,8,birth,Kenya,country,Canada,540,18
+1977,8,birth,Lesotho,country,Canada,1,18
+1977,8,birth,Liberia,country,Canada,12,18
+1977,8,birth,Libya,country,Canada,17,20
+1977,8,birth,Malagasy Republic,country,Canada,71,20
+1977,8,birth,Malawi,country,Canada,44,20
+1977,8,birth,Mali,country,Canada,4,20
+1977,8,birth,Morocco,country,Canada,461,20
+1977,8,birth,Mozambique,country,Canada,118,20
+1977,8,birth,Namibia,country,Canada,3,20
+1977,8,birth,Nigeria,country,Canada,154,20
+1977,8,birth,Rhodesia,country,Canada,205,20
+1977,8,birth,Rwanda,country,Canada,8,20
+1977,8,birth,Senegal,country,Canada,26,20
+1977,8,birth,Sierra Leone,country,Canada,17,20
+1977,8,birth,"Somali, Republic",country,Canada,15,20
+1977,8,birth,South Africa Rep.,country,Canada,1935,20
+1977,8,birth,Sudan,country,Canada,19,20
+1977,8,birth,Swaziland,country,Canada,5,20
+1977,8,birth,Tanzania,country,Canada,790,20
+1977,8,birth,Togo,country,Canada,4,20
+1977,8,birth,Tunisia,country,Canada,121,20
+1977,8,birth,Uganda,country,Canada,248,20
+1977,8,birth,Upper Volta,country,Canada,2,20
+1977,8,birth,Zaire,country,Canada,41,20
+1977,8,birth,Zambia,country,Canada,108,20
+1977,8,birth,"Africa, N.E.S.",country,Canada,6,20
+1977,8,birth,Total: Africa,subtotal,Canada,6595,20
+1977,8,birth,Afghanistan,country,Canada,16,20
+1977,8,birth,Bahrain,country,Canada,9,20
+1977,8,birth,Bangladesh,country,Canada,164,20
+1977,8,birth,Bhutan,country,Canada,1,20
+1977,8,birth,Brunei,country,Canada,59,20
+1977,8,birth,Burma,country,Canada,110,20
+1977,8,birth,China,country,Canada,4037,20
+1977,8,birth,Cyprus,country,Canada,328,20
+1977,8,birth,Hong Kong,country,Canada,3903,20
+1977,8,birth,India,country,Canada,6772,20
+1977,8,birth,Indonesia,country,Canada,199,20
+1977,8,birth,Iran,country,Canada,393,20
+1977,8,birth,Iraq,country,Canada,290,20
+1977,8,birth,Israel,country,Canada,635,20
+1977,8,birth,Japan,country,Canada,431,20
+1977,8,birth,Jordan,country,Canada,125,20
+1977,8,birth,Kampuchea,country,Canada,68,20
+1977,8,birth,"Korea, D.P.R. of",country,Canada,26,20
+1977,8,birth,"Korea, Rep. of",country,Canada,1309,20
+1977,8,birth,Kuwait,country,Canada,46,20
+1977,8,birth,Laos,country,Canada,54,20
+1977,8,birth,Lebanon,country,Canada,3334,20
+1977,8,birth,Macao,country,Canada,131,20
+1977,8,birth,Malaysia,country,Canada,574,20
+1977,8,birth,Nepal,country,Canada,5,20
+1977,8,birth,Oman,country,Canada,1,20
+1977,8,birth,Pakistan,country,Canada,1321,20
+1977,8,birth,Philippines,country,Canada,6101,20
+1977,8,birth,Qatar,country,Canada,2,20
+1977,8,birth,Saudi Arabia,country,Canada,12,20
+1977,8,birth,Singapore,country,Canada,251,20
+1977,8,birth,Sri Lanka,country,Canada,223,20
+1977,8,birth,Syria,country,Canada,318,20
+1977,8,birth,Taiwan,country,Canada,649,20
+1977,8,birth,Thailand,country,Canada,63,20
+1977,8,birth,United Arab Emirates,country,Canada,3,20
+1977,8,birth,"Vietnam, Soc. Rep. of",country,Canada,502,20
+1977,8,birth,"Vietnam, South",country,Canada,423,20
+1977,8,birth,"Yemen, Arab Rep.",country,Canada,2,20
+1977,8,birth,"Yemen, P.D.R.",country,Canada,2,20
+1977,8,birth,"Asia, N.E.S.",country,Canada,12,20
+1977,8,birth,Total: Asia,subtotal,Canada,32904,20
+1977,8,birth,Australia,country,Canada,698,22
+1977,8,birth,Nauru,country,Canada,2,22
+1977,8,birth,New Zealand,country,Canada,443,22
+1977,8,birth,"Papua, New Guinea",country,Canada,2,22
+1977,8,birth,"Australasia, N.E.S.",country,Canada,2,22
+1977,8,birth,Total: Australasia,subtotal,Canada,1147,22
+1977,8,birth,Belize,country,Canada,70,22
+1977,8,birth,Canada,country,Canada,728,22
+1977,8,birth,Costa Rica,country,Canada,30,22
+1977,8,birth,El Salvador,country,Canada,127,22
+1977,8,birth,Guatemala,country,Canada,145,22
+1977,8,birth,Honduras,country,Canada,71,22
+1977,8,birth,Mexico,country,Canada,757,22
+1977,8,birth,Nicaragua,country,Canada,15,22
+1977,8,birth,Panama,country,Canada,36,22
+1977,8,birth,Panama Canal Zone,country,Canada,2,22
+1977,8,birth,St. Pierre and Miquelon,country,Canada,51,22
+1977,8,birth,U.S.A.,country,Canada,10723,22
+1977,8,birth,Total: North and Central America,subtotal,Canada,12755,22
+1977,8,birth,Anguilla,country,Canada,2,22
+1977,8,birth,Antigua,country,Canada,128,22
+1977,8,birth,Bahamas,country,Canada,84,22
+1977,8,birth,Barbados,country,Canada,630,22
+1977,8,birth,Bermuda,country,Canada,64,22
+1977,8,birth,Cayman Islands,country,Canada,10,22
+1977,8,birth,Cuba,country,Canada,24,22
+1977,8,birth,Dominica,country,Canada,111,22
+1977,8,birth,Dominican Rep.,country,Canada,38,22
+1977,8,birth,Grenada,country,Canada,235,22
+1977,8,birth,Guadeloupe,country,Canada,10,22
+1977,8,birth,Haiti,country,Canada,2096,22
+1977,8,birth,Jamaica,country,Canada,6147,22
+1977,8,birth,Martinique,country,Canada,36,22
+1977,8,birth,Montserrat,country,Canada,32,22
+1977,8,birth,Netherlands Antilles,country,Canada,38,22
+1977,8,birth,Nevis,country,Canada,26,22
+1977,8,birth,Puerto Rico,country,Canada,16,22
+1977,8,birth,St. Kitts,country,Canada,101,22
+1977,8,birth,St. Lucia,country,Canada,114,22
+1977,8,birth,St. Vincent,country,Canada,290,22
+1977,8,birth,Trinidad and Tobago,country,Canada,1576,22
+1977,8,birth,Turks and Caicos Islands,country,Canada,1,22
+1977,8,birth,"Virgin Is., Br.",country,Canada,2,22
+1977,8,birth,"Virgin Is., U.S.A.",country,Canada,7,22
+1977,8,birth,"West Indies, N.E.S.",country,Canada,4,22
+1977,8,birth,Total: Caribbean,subtotal,Canada,11822,22
+1977,8,birth,Argentina,country,Canada,717,22
+1977,8,birth,Bolivia,country,Canada,32,22
+1977,8,birth,Brazil,country,Canada,225,22
+1977,8,birth,Chile,country,Canada,2249,22
+1977,8,birth,Colombia,country,Canada,520,22
+1977,8,birth,Ecuador,country,Canada,557,22
+1977,8,birth,French Guiana,country,Canada,2,22
+1977,8,birth,Guyana,country,Canada,2634,22
+1977,8,birth,Paraguay,country,Canada,133,22
+1977,8,birth,Peru,country,Canada,323,22
+1977,8,birth,Surinam,country,Canada,14,22
+1977,8,birth,Uruguay,country,Canada,312,22
+1977,8,birth,Venezuela,country,Canada,56,22
+1977,8,birth,Total: South America,subtotal,Canada,7774,22
+1977,8,birth,Cape Verde Islands,country,Canada,5,24
+1977,8,birth,Fiji,country,Canada,713,24
+1977,8,birth,French Polynesia,country,Canada,1,24
+1977,8,birth,Gilbert Islands,country,Canada,2,24
+1977,8,birth,Guam,country,Canada,3,24
+1977,8,birth,Mauritius,country,Canada,198,24
+1977,8,birth,New Caledonia,country,Canada,7,24
+1977,8,birth,New Hebrides,country,Canada,1,24
+1977,8,birth,Reunion,country,Canada,6,24
+1977,8,birth,"Samoa, West",country,Canada,3,24
+1977,8,birth,Seychelles,country,Canada,1,24
+1977,8,birth,"Solomon Islands, Br.",country,Canada,1,24
+1977,8,birth,Tonga,country,Canada,8,24
+1977,8,birth,Others,country,Canada,1,24
+1977,8,birth,Total: Oceania and Other Ocean Islands,subtotal,Canada,950,24
+1977,8,birth,TOTAL,total,Canada,114914,24

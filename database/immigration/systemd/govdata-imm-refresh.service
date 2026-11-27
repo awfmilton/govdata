@@ -1,0 +1,15 @@
+[Unit]
+Description=govdata.ca immigration data refresh (load sources whose publication changed)
+Documentation=file:///opt/govdata-imm/README.md
+After=mysql.service network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/opt/govdata-imm/run.sh refresh
+# Only reached when every source succeeded (run.py exits 1 if any failed): monitoring reads this file's age.
+ExecStartPost=/usr/bin/touch /var/lib/govdata-imm/last-ok
+Nice=10
+IOSchedulingClass=idle
+MemoryMax=800M
+TimeoutStartSec=2h

@@ -1,0 +1,212 @@
+year,table,basis,row_label,row_kind,column,value,page
+1975,9,birth,Albania,country,Canada,6,19
+1975,9,birth,Andorra,country,Canada,1,19
+1975,9,birth,Austria,country,Canada,332,19
+1975,9,birth,Belgium,country,Canada,342,19
+1975,9,birth,Britain,subtotal,Canada,29454,19
+1975,9,birth,England,country,Canada,21634,19
+1975,9,birth,Northern Ireland,country,Canada,2106,19
+1975,9,birth,Scotland,country,Canada,4634,19
+1975,9,birth,Wales,country,Canada,1047,19
+1975,9,birth,Lesser Br. Isles,country,Canada,33,19
+1975,9,birth,Bulgaria,country,Canada,69,19
+1975,9,birth,Czechoslovakia,country,Canada,406,19
+1975,9,birth,Denmark,country,Canada,515,19
+1975,9,birth,Estonia,country,Canada,24,19
+1975,9,birth,Finland,country,Canada,308,19
+1975,9,birth,France,country,Canada,2831,19
+1975,9,birth,German Dem. Rep.,country,Canada,79,19
+1975,9,birth,Germany Fed. Rep.,country,Canada,2730,19
+1975,9,birth,Gibraltar,country,Canada,22,19
+1975,9,birth,Greece,country,Canada,3954,19
+1975,9,birth,Hungary,country,Canada,663,19
+1975,9,birth,Iceland,country,Canada,21,19
+1975,9,birth,Ireland (Republic),country,Canada,1305,19
+1975,9,birth,Italy,country,Canada,4919,19
+1975,9,birth,Latvia,country,Canada,22,19
+1975,9,birth,Liechtenstein,country,Canada,2,19
+1975,9,birth,Lithuania,country,Canada,51,19
+1975,9,birth,Luxembourg,country,Canada,8,19
+1975,9,birth,Malta,country,Canada,431,19
+1975,9,birth,Monaco,country,Canada,2,19
+1975,9,birth,Netherlands,country,Canada,1327,19
+1975,9,birth,Norway,country,Canada,184,19
+1975,9,birth,Poland,country,Canada,1191,19
+1975,9,birth,Portugal,country,Canada,9158,19
+1975,9,birth,Romania,country,Canada,662,19
+1975,9,birth,Spain,country,Canada,651,19
+1975,9,birth,Sweden,country,Canada,396,19
+1975,9,birth,Switzerland,country,Canada,934,19
+1975,9,birth,Turkey,country,Canada,549,19
+1975,9,birth,U.S.S.R.,country,Canada,1437,19
+1975,9,birth,Yugoslavia,country,Canada,3745,19
+1975,9,birth,"Europe, N.E.S.",country,Canada,2,19
+1975,9,birth,TOTAL: EUROPE,subtotal,Canada,68733,19
+1975,9,birth,Algeria,country,Canada,172,19
+1975,9,birth,Angola,country,Canada,86,19
+1975,9,birth,Botswana,country,Canada,2,19
+1975,9,birth,Burundi,country,Canada,55,19
+1975,9,birth,Cameroon,country,Canada,23,19
+1975,9,birth,Central African Rep.,country,Canada,3,19
+1975,9,birth,Chad,country,Canada,1,19
+1975,9,birth,Congo Republic of,country,Canada,17,19
+1975,9,birth,Dahomey,country,Canada,4,19
+1975,9,birth,Egypt,country,Canada,1146,19
+1975,9,birth,Ethiopia,country,Canada,34,19
+1975,9,birth,Gabon,country,Canada,1,19
+1975,9,birth,Gambia,country,Canada,4,19
+1975,9,birth,Ghana,country,Canada,296,19
+1975,9,birth,Guinea,country,Canada,14,19
+1975,9,birth,Guinea-Bissau,country,Canada,1,19
+1975,9,birth,Ivory Coast,country,Canada,6,19
+1975,9,birth,Kenya,country,Canada,2545,19
+1975,9,birth,Lesotho,country,Canada,5,19
+1975,9,birth,Liberia,country,Canada,6,19
+1975,9,birth,Libya,country,Canada,23,19
+1975,9,birth,Malagasy Republic,country,Canada,74,19
+1975,9,birth,Malawi,country,Canada,56,19
+1975,9,birth,Mali,country,Canada,5,19
+1975,9,birth,Mauritania,country,Canada,6,19
+1975,9,birth,Morocco,country,Canada,961,19
+1975,9,birth,Mozambique,country,Canada,82,19
+1975,9,birth,Namibia,country,Canada,6,19
+1975,9,birth,Nigeria,country,Canada,269,20
+1975,9,birth,Rhodesia,country,Canada,90,20
+1975,9,birth,Rwanda,country,Canada,51,20
+1975,9,birth,Senegal,country,Canada,28,20
+1975,9,birth,Sierra Leone,country,Canada,14,20
+1975,9,birth,Somali Republic,country,Canada,10,20
+1975,9,birth,"South Africa, Rep.",country,Canada,1402,20
+1975,9,birth,Sudan,country,Canada,20,20
+1975,9,birth,Swaziland,country,Canada,3,20
+1975,9,birth,Tanzania,country,Canada,2757,20
+1975,9,birth,Togo,country,Canada,3,20
+1975,9,birth,Tunisia,country,Canada,186,20
+1975,9,birth,Uganda,country,Canada,969,20
+1975,9,birth,Upper Volta,country,Canada,1,20
+1975,9,birth,Zaire,country,Canada,194,20
+1975,9,birth,Zambia,country,Canada,70,20
+1975,9,birth,"Africa, N.E.S.",country,Canada,14,20
+1975,9,birth,TOTAL: AFRICA,subtotal,Canada,11715,20
+1975,9,birth,Afghanistan,country,Canada,12,20
+1975,9,birth,Bahrain,country,Canada,10,20
+1975,9,birth,Bangladesh,country,Canada,175,20
+1975,9,birth,Brunei,country,Canada,190,20
+1975,9,birth,Burma,country,Canada,218,20
+1975,9,birth,China,country,Canada,6235,20
+1975,9,birth,Cyprus,country,Canada,1030,20
+1975,9,birth,Hong Kong,country,Canada,6438,20
+1975,9,birth,India,country,Canada,13401,20
+1975,9,birth,Indonesia,country,Canada,358,20
+1975,9,birth,Iran,country,Canada,190,20
+1975,9,birth,Iraq,country,Canada,161,20
+1975,9,birth,Israel,country,Canada,801,20
+1975,9,birth,Japan,country,Canada,654,20
+1975,9,birth,Jordan,country,Canada,238,20
+1975,9,birth,Khmer Rep.,country,Canada,251,20
+1975,9,birth,"Korea, North",country,Canada,45,20
+1975,9,birth,"Korea, South",country,Canada,4226,20
+1975,9,birth,Kuwait,country,Canada,34,20
+1975,9,birth,Laos,country,Canada,18,20
+1975,9,birth,Lebanon,country,Canada,1201,20
+1975,9,birth,Macao,country,Canada,246,20
+1975,9,birth,Malaysia,country,Canada,694,20
+1975,9,birth,Nepal,country,Canada,5,20
+1975,9,birth,Pakistan,country,Canada,2092,20
+1975,9,birth,Philippines,country,Canada,7688,20
+1975,9,birth,Qatar,country,Canada,8,20
+1975,9,birth,Saudi Arabia,country,Canada,9,20
+1975,9,birth,Singapore,country,Canada,327,20
+1975,9,birth,Sri Lanka,country,Canada,557,20
+1975,9,birth,Syria,country,Canada,441,20
+1975,9,birth,Taiwan,country,Canada,837,20
+1975,9,birth,Thailand,country,Canada,70,20
+1975,9,birth,United Arab Emirates,country,Canada,4,20
+1975,9,birth,"Vietnam, North",country,Canada,268,20
+1975,9,birth,"Vietnam, South",country,Canada,2840,20
+1975,9,birth,Yemen Arab Rep.,country,Canada,12,20
+1975,9,birth,"Yemen, P.D.R.",country,Canada,2,20
+1975,9,birth,"Asia, N.E.S.",country,Canada,38,20
+1975,9,birth,TOTAL: ASIA,subtotal,Canada,52024,20
+1975,9,birth,Australia,country,Canada,1105,20
+1975,9,birth,New Guinea,country,Canada,6,20
+1975,9,birth,New Zealand,country,Canada,452,20
+1975,9,birth,Papua,country,Canada,2,20
+1975,9,birth,"Australasia, N.E.S.",country,Canada,9,20
+1975,9,birth,TOTAL: AUSTRALASIA,subtotal,Canada,1574,20
+1975,9,birth,Belize,country,Canada,59,20
+1975,9,birth,Canada,country,Canada,1110,20
+1975,9,birth,Costa Rica,country,Canada,38,20
+1975,9,birth,El Salvador,country,Canada,179,20
+1975,9,birth,Guatemala,country,Canada,254,20
+1975,9,birth,Honduras,country,Canada,39,20
+1975,9,birth,Mexico,country,Canada,791,20
+1975,9,birth,Nicaragua,country,Canada,21,21
+1975,9,birth,Panama,country,Canada,12,21
+1975,9,birth,Panama Canal Zone,country,Canada,4,21
+1975,9,birth,St. Pierre & Miquelon,country,Canada,31,21
+1975,9,birth,U.S.A.,country,Canada,16729,21
+1975,9,birth,Central America N.E.S.,country,Canada,1,21
+1975,9,birth,TOTAL: NORTH AND CENTRAL AMERICA,subtotal,Canada,19268,21
+1975,9,birth,Anguilla,country,Canada,8,21
+1975,9,birth,Antigua,country,Canada,151,21
+1975,9,birth,Bahamas,country,Canada,68,21
+1975,9,birth,Barbados,country,Canada,903,21
+1975,9,birth,Bermuda,country,Canada,111,21
+1975,9,birth,Cayman Islands,country,Canada,9,21
+1975,9,birth,Cuba,country,Canada,36,21
+1975,9,birth,Dominica,country,Canada,123,21
+1975,9,birth,Dominican Rep.,country,Canada,25,21
+1975,9,birth,Grenada,country,Canada,411,21
+1975,9,birth,Guadeloupe,country,Canada,9,21
+1975,9,birth,Haiti,country,Canada,3551,21
+1975,9,birth,Jamaica,country,Canada,8624,21
+1975,9,birth,Martinique,country,Canada,14,21
+1975,9,birth,Montserrat,country,Canada,48,21
+1975,9,birth,Netherlands Antilles,country,Canada,55,21
+1975,9,birth,Nevis,country,Canada,41,21
+1975,9,birth,Puerto Rico,country,Canada,35,21
+1975,9,birth,St. Kitts,country,Canada,106,21
+1975,9,birth,St. Lucia,country,Canada,128,21
+1975,9,birth,St. Vincent,country,Canada,412,21
+1975,9,birth,Trinidad and Tobago,country,Canada,3883,21
+1975,9,birth,Turks and Caicos Islands,country,Canada,2,21
+1975,9,birth,Virgin Is. Br.,country,Canada,6,21
+1975,9,birth,Virgin Is. (U.S.A.),country,Canada,16,21
+1975,9,birth,"West Indies, N.E.S.",country,Canada,15,21
+1975,9,birth,TOTAL: CARIBBEAN,subtotal,Canada,18790,21
+1975,9,birth,Argentina,country,Canada,674,21
+1975,9,birth,Bolivia,country,Canada,78,21
+1975,9,birth,Brazil,country,Canada,356,21
+1975,9,birth,Chile,country,Canada,3127,21
+1975,9,birth,Colombia,country,Canada,1068,21
+1975,9,birth,Ecuador,country,Canada,1698,21
+1975,9,birth,French Guiana,country,Canada,1,21
+1975,9,birth,Guyana,country,Canada,4619,21
+1975,9,birth,Paraguay,country,Canada,246,21
+1975,9,birth,Peru,country,Canada,410,21
+1975,9,birth,Surinam,country,Canada,66,21
+1975,9,birth,Uruguay,country,Canada,633,21
+1975,9,birth,Venezuela,country,Canada,126,21
+1975,9,birth,TOTAL: SOUTH AMERICA,subtotal,Canada,13102,21
+1975,9,birth,Admiralty Islands,country,Canada,1,21
+1975,9,birth,Cape Verde Islands,country,Canada,12,21
+1975,9,birth,Caroline Islands,country,Canada,1,21
+1975,9,birth,Comoro Islands,country,Canada,1,21
+1975,9,birth,Falkland Islands,country,Canada,1,21
+1975,9,birth,Fiji,country,Canada,2278,21
+1975,9,birth,Gilbert and Ellice Islands,country,Canada,1,21
+1975,9,birth,Guam,country,Canada,3,21
+1975,9,birth,Mauritius,country,Canada,328,21
+1975,9,birth,New Caledonia & Loyalty Is.,country,Canada,5,21
+1975,9,birth,New Hebrides,country,Canada,3,21
+1975,9,birth,Reunion,country,Canada,3,21
+1975,9,birth,"Samoa, Eastern",country,Canada,2,21
+1975,9,birth,"Samoa, Western",country,Canada,3,21
+1975,9,birth,Sao Tome,country,Canada,5,21
+1975,9,birth,Seychelles Islands,country,Canada,11,21
+1975,9,birth,Society Islands,country,Canada,2,21
+1975,9,birth,Tonga,country,Canada,10,21
+1975,9,birth,Others,country,Canada,5,21
+1975,9,birth,TOTAL: OCEANIA AND OTHER OCEAN ISLANDS,subtotal,Canada,2675,21
+1975,9,birth,GRAND TOTAL,total,Canada,187881,21

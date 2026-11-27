@@ -261,6 +261,23 @@ describe( 'NLP — fiscal year', () => {
 		assert.equal( r.params.city, undefined );
 	} );
 
+	// REGRESSION: a bare year used to become fiscal_year = "2024", but fiscal_year holds "2024-2025", so every query
+	// naming a year returned 0 rows. The `year` column is the calendar year of agreement_start_date (checked on the
+	// 2026-11 rebuild: equal for every row), which is what "in 2024" means.
+	it( '"grants over $1 million in Ontario in 2024" → year = 2024, no fiscal_year filter', () => {
+		const r = run( 'grants over $1 million in Ontario to not-for-profits in 2024' );
+		assert.equal( filter( r.filters, 'year' )?.op, '=' );
+		assert.equal( filter( r.filters, 'year' )?.val, '2024' );
+		assert.equal( filter( r.filters, 'fiscal_year' ), null );
+		assert.equal( filter( r.filters, 'recipient_province' )?.val, 'ON' );
+	} );
+
+	it( 'a fiscal range still filters fiscal_year in its stored YYYY-YYYY form', () => {
+		const r = run( 'grants in Alberta in 2022/23' );
+		assert.equal( filter( r.filters, 'fiscal_year' )?.val, '2022-2023' );
+		assert.equal( filter( r.filters, 'year' ), null );
+	} );
+
 	it( '"since 2020" → start_year (agreement_start_date >=)', () => {
 		const r = run( 'funding from Health Canada since 2020' );
 		assert.equal( filter( r.filters, 'agreement_start_date' )?.op, '>=' );

@@ -171,11 +171,27 @@ final class REST_API {
 
 		// Parse sort parameter into WP_Query orderby args.
 		// Posts without total_spend meta (new MPs) are included but sink to the bottom.
-		$sort     = sanitize_text_field( (string) $req['sort'] );
-		$meta_q   = array_filter( [
-			$req['postal']   ? [ 'key' => 'postal_codes', 'value' => sanitize_text_field( (string) $req['postal'] ), 'compare' => 'LIKE' ] : null,
-			$req['spend_gt'] ? [ 'key' => 'total_spend', 'value' => (int) $req['spend_gt'], 'compare' => '>', 'type' => 'NUMERIC' ] : null,
-		] );
+		$sort = sanitize_text_field( (string) $req['sort'] );
+
+		// FILTERS. These are ANDed onto whatever the sort adds (see the end of the switch). They used to be merged INTO
+		// the sort's `relation => OR` group, where "total_spend EXISTS OR NOT EXISTS" is always true, so every filter was
+		// silently ignored for three of the four sorts. The postal filter also matched a meta key (`postal_codes`) no
+		// post has; a postal code now resolves to the riding(s) it lies in and matches the MP's riding number.
+		$filters = [];
+		$postal  = strtoupper( preg_replace( '/[^A-Za-z0-9]/', '', (string) $req['postal'] ) ?? '' );
+		$ridings = strlen( $postal ) >= 3 ? $this->ridings_for_postal( $postal ) : null;   // null: lookup unavailable, skip
+		if ( null !== $ridings ) {
+			$filters[] = $ridings
+				? [ 'key' => 'pt_riding_number', 'value' => $ridings, 'compare' => 'IN' ]
+				: [ 'key' => 'pt_riding_number', 'value' => '__no_riding__', 'compare' => '=' ];   // unknown code: no matches
+		}
+		if ( (int) $req['spend_gt'] > 0 ) {
+			$filters[] = [ 'key' => 'total_spend', 'value' => (int) $req['spend_gt'], 'compare' => '>=', 'type' => 'NUMERIC' ];
+		}
+		if ( (int) $req['spend_lt'] > 0 && (int) $req['spend_lt'] < PHP_INT_MAX ) {
+			$filters[] = [ 'key' => 'total_spend', 'value' => (int) $req['spend_lt'], 'compare' => '<=', 'type' => 'NUMERIC' ];
+		}
+		$meta_q = [];
 
 		switch ( $sort ) {
 			case 'name ASC':
@@ -223,6 +239,12 @@ final class REST_API {
 				break;
 		}
 
+		// The sort group (if any) stays an OR of EXISTS / NOT EXISTS so MPs without the sort key still list; the filters
+		// must hold for every row, so they sit beside it under AND. Named sort clauses still work for orderby when nested.
+		if ( $filters ) {
+			$meta_q = array_merge( [ 'relation' => 'AND' ], $meta_q ? [ $meta_q ] : [], $filters );
+		}
+
 		$args = [
 			'post_type'      => 'member-parliament',
 			'posts_per_page' => (int) $req['per_page'],
@@ -252,6 +274,36 @@ final class REST_API {
 			'per_page' => (int) $req['per_page'],
 			'rows'     => $rows,
 		] );
+	}
+
+	/**
+	 * Current-Representation-Order riding numbers a postal code (6 characters) or prefix (3-5, e.g. an FSA "P7B")
+	 * lies in, from pcbfr. A code can straddle ridings, so this is a list. Null when the lookup itself failed, so the
+	 * caller can skip the filter instead of answering "no MPs". Cached per code for a day.
+	 *
+	 * @return string[]|null
+	 */
+	private function ridings_for_postal( string $postal ): ?array {
+		$key = 'pt_postal_ridings_' . $postal;
+		$hit = get_transient( $key );
+		if ( is_array( $hit ) ) {
+			return $hit;
+		}
+		$exact = 6 === strlen( $postal );
+		try {
+			$rows = publictech_db( 'pt-grantconts-01' )->select(
+				'SELECT DISTINCT p.`riding_number` FROM `pcbfr` p
+				 JOIN `representation_orders` o ON o.`id` = p.`ro_id` AND o.`effective_end` IS NULL
+				 WHERE p.`postal_code` ' . ( $exact ? '= ?' : 'LIKE ?' ) . ' AND p.`riding_number` IS NOT NULL LIMIT 50',
+				[ $exact ? $postal : $postal . '%' ]
+			);
+		} catch ( \Throwable $e ) {
+			error_log( '[PublicTech] postal riding lookup failed: ' . $e->getMessage() );
+			return null;
+		}
+		$out = array_values( array_unique( array_map( static fn( $r ) => (string) $r['riding_number'], $rows ) ) );
+		set_transient( $key, $out, DAY_IN_SECONDS );
+		return $out;
 	}
 
 	public function stream_rows( \WP_REST_Request $req ): void {

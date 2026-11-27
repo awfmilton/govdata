@@ -15,6 +15,16 @@ $region_terms    = get_terms( [ 'taxonomy' => 'mp_region',    'hide_empty' => fa
 $committee_terms = get_terms( [ 'taxonomy' => 'mp_committee', 'hide_empty' => false ] );
 $total           = (int) ( wp_count_posts( 'member-parliament' )->publish ?? 0 );
 
+// Party / region archives (/party/<slug>/, /region/<xx>/) render this directory pre-filtered to their term. They used to
+// fall through to index.php, which printed each MP's title over an empty box. The preset tells search.js which facet the
+// page already applies, so its first client-side search keeps the filter instead of re-listing all members.
+$pt_preset = [];
+$pt_term   = ( is_tax( 'mp_party' ) || is_tax( 'mp_region' ) ) ? get_queried_object() : null;
+if ( $pt_term instanceof WP_Term ) {
+	$pt_preset[ 'mp_party' === $pt_term->taxonomy ? 'party' : 'region' ] = [ $pt_term->slug ];
+	$total = (int) $pt_term->count;
+}
+
 get_header(); ?>
 
 <main id="pt-main" tabindex="-1">
@@ -25,6 +35,14 @@ get_header(); ?>
 			<input id="globalSearch" placeholder="<?php esc_attr_e( 'Search by name, riding, party, postal code, committee…', 'publictech-terminal' ); ?>" autocomplete="off" />
 			<div class="shortcut" aria-hidden="true"><kbd>⌘</kbd><kbd>K</kbd></div>
 		</div>
+
+		<?php if ( $pt_term instanceof WP_Term ) : ?>
+			<h1 class="pt-dir-title" style="margin:12px 0 4px"><?php
+				/* translators: %s: party or region name */
+				printf( esc_html__( 'Members of Parliament — %s', 'publictech-terminal' ), esc_html( $pt_term->name ) );
+			?></h1>
+			<script>window.PT_DIRECTORY_PRESET = <?php echo wp_json_encode( $pt_preset ); ?>;</script>
+		<?php endif; ?>
 
 		<?php do_action( 'govads_zone', 'archive_after_search' ); ?>
 
@@ -39,7 +57,7 @@ get_header(); ?>
 					<?php foreach ( $party_terms as $t ) :
 						$slug = sanitize_html_class( strtolower( $t->slug ) ); ?>
 						<div class="check"><label>
-							<input type="checkbox" data-pt-facet="party" value="<?php echo esc_attr( $t->slug ); ?>" />
+							<input type="checkbox" data-pt-facet="party" value="<?php echo esc_attr( $t->slug ); ?>"<?php checked( in_array( $t->slug, $pt_preset['party'] ?? [], true ) ); ?> />
 							<span class="party-bar party-<?php echo esc_attr( $slug ); ?>"></span><?php echo esc_html( $t->name ); ?>
 						</label><span class="n"><?php echo esc_html( $t->count ); ?></span></div>
 					<?php endforeach; ?>
@@ -49,7 +67,7 @@ get_header(); ?>
 					<h4><?php esc_html_e( 'Region', 'publictech-terminal' ); ?> <span class="count"><?php echo esc_html( count( $region_terms ) ); ?></span></h4>
 					<?php foreach ( $region_terms as $t ) : ?>
 						<div class="check"><label>
-							<input type="checkbox" data-pt-facet="region" value="<?php echo esc_attr( $t->slug ); ?>" />
+							<input type="checkbox" data-pt-facet="region" value="<?php echo esc_attr( $t->slug ); ?>"<?php checked( in_array( $t->slug, $pt_preset['region'] ?? [], true ) ); ?> />
 							<?php echo esc_html( $t->name ); ?>
 						</label><span class="n"><?php echo esc_html( $t->count ); ?></span></div>
 					<?php endforeach; ?>

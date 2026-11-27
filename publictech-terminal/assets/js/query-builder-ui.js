@@ -528,8 +528,12 @@
 					params.start_year = yr;
 				} else if ( /\b(before|until|prior\s+to|up\s+to|ending|through)\b/i.test( consumed ) ) {
 					params.end_year = yr;
+				} else if ( yr.includes( '-' ) ) {
+					params.fiscal_year = yr;          // a fiscal range, stored as "YYYY-YYYY"
 				} else {
-					params.fiscal_year = yr;
+					// A bare year is the calendar year the agreement started (column `year`). It used to become
+					// fiscal_year = "2024", which matches nothing: fiscal_year is stored as "2024-2025".
+					params.year = yr;
 				}
 				// Remove the year from consumed
 				const yrEscaped = yr.replace( '-', '[\\-/–]' );
@@ -703,7 +707,7 @@
 
 		// ── Confidence check ─────────────────────────────────────────────────
 		const definite  = [ 'agreement_type', 'recipient_type', 'value_gt', 'value_lt',
-			'province', 'fiscal_year', 'start_year', 'end_year',
+			'province', 'fiscal_year', 'year', 'start_year', 'end_year',
 			'department', 'program', 'recipient', 'riding', 'city',
 			'naics', 'fulltext', 'field_name' ];
 		const hasMatch  = definite.some( k => params[k] != null );
@@ -771,6 +775,8 @@
 
 		// Fiscal year — varchar(9) e.g. "2022-2023"
 		if ( params.fiscal_year ) push( 'fiscal_year', '=', params.fiscal_year );
+		// Calendar year of agreement_start_date (column `year`)
+		if ( params.year ) push( 'year', '=', String( params.year ) );
 
 		// Year range via date columns (agreement_start_date / agreement_end_date are DATE)
 		if ( params.start_year ) {

@@ -1,0 +1,2413 @@
+year,table,basis,row_label,row_kind,column,value,page
+1975,3,residence,Albania,country,Canada,1,5
+1975,3,residence,Albania,country,Nfld.,0,5
+1975,3,residence,Albania,country,P.E.I.,0,5
+1975,3,residence,Albania,country,N.S.,0,5
+1975,3,residence,Albania,country,N.B.,0,5
+1975,3,residence,Albania,country,Que.,0,5
+1975,3,residence,Albania,country,Ont.,1,5
+1975,3,residence,Albania,country,Man.,0,5
+1975,3,residence,Albania,country,Sask.,0,5
+1975,3,residence,Albania,country,Alta.,0,5
+1975,3,residence,Albania,country,B.C.,0,5
+1975,3,residence,Albania,country,N.W.T. Yukon,0,5
+1975,3,residence,Andorra,country,Canada,2,5
+1975,3,residence,Andorra,country,Nfld.,0,5
+1975,3,residence,Andorra,country,P.E.I.,0,5
+1975,3,residence,Andorra,country,N.S.,0,5
+1975,3,residence,Andorra,country,N.B.,0,5
+1975,3,residence,Andorra,country,Que.,0,5
+1975,3,residence,Andorra,country,Ont.,1,5
+1975,3,residence,Andorra,country,Man.,0,5
+1975,3,residence,Andorra,country,Sask.,0,5
+1975,3,residence,Andorra,country,Alta.,1,5
+1975,3,residence,Andorra,country,B.C.,0,5
+1975,3,residence,Andorra,country,N.W.T. Yukon,0,5
+1975,3,residence,Austria,country,Canada,724,5
+1975,3,residence,Austria,country,Nfld.,5,5
+1975,3,residence,Austria,country,P.E.I.,1,5
+1975,3,residence,Austria,country,N.S.,3,5
+1975,3,residence,Austria,country,N.B.,7,5
+1975,3,residence,Austria,country,Que.,64,5
+1975,3,residence,Austria,country,Ont.,343,5
+1975,3,residence,Austria,country,Man.,28,5
+1975,3,residence,Austria,country,Sask.,22,5
+1975,3,residence,Austria,country,Alta.,161,5
+1975,3,residence,Austria,country,B.C.,90,5
+1975,3,residence,Austria,country,N.W.T. Yukon,0,5
+1975,3,residence,Belgium,country,Canada,656,5
+1975,3,residence,Belgium,country,Nfld.,2,5
+1975,3,residence,Belgium,country,P.E.I.,0,5
+1975,3,residence,Belgium,country,N.S.,3,5
+1975,3,residence,Belgium,country,N.B.,5,5
+1975,3,residence,Belgium,country,Que.,286,5
+1975,3,residence,Belgium,country,Ont.,219,5
+1975,3,residence,Belgium,country,Man.,33,5
+1975,3,residence,Belgium,country,Sask.,6,5
+1975,3,residence,Belgium,country,Alta.,71,5
+1975,3,residence,Belgium,country,B.C.,31,5
+1975,3,residence,Belgium,country,N.W.T. Yukon,0,5
+1975,3,residence,Britain,subtotal,Canada,34978,5
+1975,3,residence,Britain,subtotal,Nfld.,392,5
+1975,3,residence,Britain,subtotal,P.E.I.,35,5
+1975,3,residence,Britain,subtotal,N.S.,552,5
+1975,3,residence,Britain,subtotal,N.B.,488,5
+1975,3,residence,Britain,subtotal,Que.,2586,5
+1975,3,residence,Britain,subtotal,Ont.,18265,5
+1975,3,residence,Britain,subtotal,Man.,1641,5
+1975,3,residence,Britain,subtotal,Sask.,995,5
+1975,3,residence,Britain,subtotal,Alta.,4267,5
+1975,3,residence,Britain,subtotal,B.C.,5682,5
+1975,3,residence,Britain,subtotal,N.W.T. Yukon,75,5
+1975,3,residence,England,country,Canada,27761,5
+1975,3,residence,England,country,Nfld.,307,5
+1975,3,residence,England,country,P.E.I.,25,5
+1975,3,residence,England,country,N.S.,408,5
+1975,3,residence,England,country,N.B.,386,5
+1975,3,residence,England,country,Que.,2313,5
+1975,3,residence,England,country,Ont.,14141,5
+1975,3,residence,England,country,Man.,1319,5
+1975,3,residence,England,country,Sask.,805,5
+1975,3,residence,England,country,Alta.,3337,5
+1975,3,residence,England,country,B.C.,4670,5
+1975,3,residence,England,country,N.W.T. Yukon,50,5
+1975,3,residence,Northern Ireland,country,Canada,1977,5
+1975,3,residence,Northern Ireland,country,Nfld.,9,5
+1975,3,residence,Northern Ireland,country,P.E.I.,0,5
+1975,3,residence,Northern Ireland,country,N.S.,36,5
+1975,3,residence,Northern Ireland,country,N.B.,17,5
+1975,3,residence,Northern Ireland,country,Que.,29,5
+1975,3,residence,Northern Ireland,country,Ont.,1257,5
+1975,3,residence,Northern Ireland,country,Man.,60,5
+1975,3,residence,Northern Ireland,country,Sask.,30,5
+1975,3,residence,Northern Ireland,country,Alta.,271,5
+1975,3,residence,Northern Ireland,country,B.C.,250,5
+1975,3,residence,Northern Ireland,country,N.W.T. Yukon,18,5
+1975,3,residence,Scotland,country,Canada,4182,5
+1975,3,residence,Scotland,country,Nfld.,41,5
+1975,3,residence,Scotland,country,P.E.I.,7,5
+1975,3,residence,Scotland,country,N.S.,82,5
+1975,3,residence,Scotland,country,N.B.,53,5
+1975,3,residence,Scotland,country,Que.,198,5
+1975,3,residence,Scotland,country,Ont.,2395,5
+1975,3,residence,Scotland,country,Man.,218,5
+1975,3,residence,Scotland,country,Sask.,113,5
+1975,3,residence,Scotland,country,Alta.,470,5
+1975,3,residence,Scotland,country,B.C.,603,5
+1975,3,residence,Scotland,country,N.W.T. Yukon,2,5
+1975,3,residence,Wales,country,Canada,1031,5
+1975,3,residence,Wales,country,Nfld.,35,5
+1975,3,residence,Wales,country,P.E.I.,3,5
+1975,3,residence,Wales,country,N.S.,23,5
+1975,3,residence,Wales,country,N.B.,26,5
+1975,3,residence,Wales,country,Que.,40,5
+1975,3,residence,Wales,country,Ont.,466,5
+1975,3,residence,Wales,country,Man.,42,5
+1975,3,residence,Wales,country,Sask.,47,5
+1975,3,residence,Wales,country,Alta.,189,5
+1975,3,residence,Wales,country,B.C.,155,5
+1975,3,residence,Wales,country,N.W.T. Yukon,5,5
+1975,3,residence,Lesser Br. Isles,country,Canada,27,5
+1975,3,residence,Lesser Br. Isles,country,Nfld.,0,5
+1975,3,residence,Lesser Br. Isles,country,P.E.I.,0,5
+1975,3,residence,Lesser Br. Isles,country,N.S.,3,5
+1975,3,residence,Lesser Br. Isles,country,N.B.,6,5
+1975,3,residence,Lesser Br. Isles,country,Que.,6,5
+1975,3,residence,Lesser Br. Isles,country,Ont.,6,5
+1975,3,residence,Lesser Br. Isles,country,Man.,2,5
+1975,3,residence,Lesser Br. Isles,country,Sask.,0,5
+1975,3,residence,Lesser Br. Isles,country,Alta.,0,5
+1975,3,residence,Lesser Br. Isles,country,B.C.,4,5
+1975,3,residence,Lesser Br. Isles,country,N.W.T. Yukon,0,5
+1975,3,residence,Bulgaria,country,Canada,15,5
+1975,3,residence,Bulgaria,country,Nfld.,0,5
+1975,3,residence,Bulgaria,country,P.E.I.,0,5
+1975,3,residence,Bulgaria,country,N.S.,0,5
+1975,3,residence,Bulgaria,country,N.B.,0,5
+1975,3,residence,Bulgaria,country,Que.,5,5
+1975,3,residence,Bulgaria,country,Ont.,10,5
+1975,3,residence,Bulgaria,country,Man.,0,5
+1975,3,residence,Bulgaria,country,Sask.,0,5
+1975,3,residence,Bulgaria,country,Alta.,0,5
+1975,3,residence,Bulgaria,country,B.C.,0,5
+1975,3,residence,Bulgaria,country,N.W.T. Yukon,0,5
+1975,3,residence,Czechoslovakia,country,Canada,107,5
+1975,3,residence,Czechoslovakia,country,Nfld.,0,5
+1975,3,residence,Czechoslovakia,country,P.E.I.,0,5
+1975,3,residence,Czechoslovakia,country,N.S.,1,5
+1975,3,residence,Czechoslovakia,country,N.B.,0,5
+1975,3,residence,Czechoslovakia,country,Que.,22,5
+1975,3,residence,Czechoslovakia,country,Ont.,49,5
+1975,3,residence,Czechoslovakia,country,Man.,15,5
+1975,3,residence,Czechoslovakia,country,Sask.,1,5
+1975,3,residence,Czechoslovakia,country,Alta.,6,5
+1975,3,residence,Czechoslovakia,country,B.C.,13,5
+1975,3,residence,Czechoslovakia,country,N.W.T. Yukon,0,5
+1975,3,residence,Denmark,country,Canada,580,5
+1975,3,residence,Denmark,country,Nfld.,1,5
+1975,3,residence,Denmark,country,P.E.I.,0,5
+1975,3,residence,Denmark,country,N.S.,1,5
+1975,3,residence,Denmark,country,N.B.,5,5
+1975,3,residence,Denmark,country,Que.,40,5
+1975,3,residence,Denmark,country,Ont.,172,5
+1975,3,residence,Denmark,country,Man.,24,5
+1975,3,residence,Denmark,country,Sask.,12,5
+1975,3,residence,Denmark,country,Alta.,158,5
+1975,3,residence,Denmark,country,B.C.,165,5
+1975,3,residence,Denmark,country,N.W.T. Yukon,2,5
+1975,3,residence,Estonia,country,Canada,2,5
+1975,3,residence,Estonia,country,Nfld.,0,5
+1975,3,residence,Estonia,country,P.E.I.,0,5
+1975,3,residence,Estonia,country,N.S.,0,5
+1975,3,residence,Estonia,country,N.B.,0,5
+1975,3,residence,Estonia,country,Que.,0,5
+1975,3,residence,Estonia,country,Ont.,2,5
+1975,3,residence,Estonia,country,Man.,0,5
+1975,3,residence,Estonia,country,Sask.,0,5
+1975,3,residence,Estonia,country,Alta.,0,5
+1975,3,residence,Estonia,country,B.C.,0,5
+1975,3,residence,Estonia,country,N.W.T. Yukon,0,5
+1975,3,residence,Finland,country,Canada,256,5
+1975,3,residence,Finland,country,Nfld.,0,5
+1975,3,residence,Finland,country,P.E.I.,0,5
+1975,3,residence,Finland,country,N.S.,0,5
+1975,3,residence,Finland,country,N.B.,0,5
+1975,3,residence,Finland,country,Que.,10,5
+1975,3,residence,Finland,country,Ont.,170,5
+1975,3,residence,Finland,country,Man.,6,5
+1975,3,residence,Finland,country,Sask.,0,5
+1975,3,residence,Finland,country,Alta.,6,5
+1975,3,residence,Finland,country,B.C.,63,5
+1975,3,residence,Finland,country,N.W.T. Yukon,1,5
+1975,3,residence,France,country,Canada,3891,5
+1975,3,residence,France,country,Nfld.,8,5
+1975,3,residence,France,country,P.E.I.,0,5
+1975,3,residence,France,country,N.S.,3,5
+1975,3,residence,France,country,N.B.,13,5
+1975,3,residence,France,country,Que.,2922,5
+1975,3,residence,France,country,Ont.,617,5
+1975,3,residence,France,country,Man.,60,5
+1975,3,residence,France,country,Sask.,30,5
+1975,3,residence,France,country,Alta.,107,5
+1975,3,residence,France,country,B.C.,129,5
+1975,3,residence,France,country,N.W.T. Yukon,2,5
+1975,3,residence,German Democratic Rep.,country,Canada,12,5
+1975,3,residence,German Democratic Rep.,country,Nfld.,0,5
+1975,3,residence,German Democratic Rep.,country,P.E.I.,0,5
+1975,3,residence,German Democratic Rep.,country,N.S.,0,5
+1975,3,residence,German Democratic Rep.,country,N.B.,0,5
+1975,3,residence,German Democratic Rep.,country,Que.,0,5
+1975,3,residence,German Democratic Rep.,country,Ont.,6,5
+1975,3,residence,German Democratic Rep.,country,Man.,1,5
+1975,3,residence,German Democratic Rep.,country,Sask.,0,5
+1975,3,residence,German Democratic Rep.,country,Alta.,1,5
+1975,3,residence,German Democratic Rep.,country,B.C.,4,5
+1975,3,residence,German Democratic Rep.,country,N.W.T. Yukon,0,5
+1975,3,residence,"Germany, Fed. Rep.",country,Canada,3469,5
+1975,3,residence,"Germany, Fed. Rep.",country,Nfld.,16,5
+1975,3,residence,"Germany, Fed. Rep.",country,P.E.I.,3,5
+1975,3,residence,"Germany, Fed. Rep.",country,N.S.,26,5
+1975,3,residence,"Germany, Fed. Rep.",country,N.B.,41,5
+1975,3,residence,"Germany, Fed. Rep.",country,Que.,405,5
+1975,3,residence,"Germany, Fed. Rep.",country,Ont.,1710,5
+1975,3,residence,"Germany, Fed. Rep.",country,Man.,166,5
+1975,3,residence,"Germany, Fed. Rep.",country,Sask.,41,5
+1975,3,residence,"Germany, Fed. Rep.",country,Alta.,512,5
+1975,3,residence,"Germany, Fed. Rep.",country,B.C.,533,5
+1975,3,residence,"Germany, Fed. Rep.",country,N.W.T. Yukon,16,5
+1975,3,residence,Gibraltar,country,Canada,21,5
+1975,3,residence,Gibraltar,country,Nfld.,0,5
+1975,3,residence,Gibraltar,country,P.E.I.,0,5
+1975,3,residence,Gibraltar,country,N.S.,0,5
+1975,3,residence,Gibraltar,country,N.B.,0,5
+1975,3,residence,Gibraltar,country,Que.,0,5
+1975,3,residence,Gibraltar,country,Ont.,11,5
+1975,3,residence,Gibraltar,country,Man.,0,5
+1975,3,residence,Gibraltar,country,Sask.,0,5
+1975,3,residence,Gibraltar,country,Alta.,1,5
+1975,3,residence,Gibraltar,country,B.C.,9,5
+1975,3,residence,Gibraltar,country,N.W.T. Yukon,0,5
+1975,3,residence,Greece,country,Canada,4062,5
+1975,3,residence,Greece,country,Nfld.,3,5
+1975,3,residence,Greece,country,P.E.I.,1,5
+1975,3,residence,Greece,country,N.S.,61,5
+1975,3,residence,Greece,country,N.B.,30,5
+1975,3,residence,Greece,country,Que.,1142,5
+1975,3,residence,Greece,country,Ont.,2312,5
+1975,3,residence,Greece,country,Man.,114,5
+1975,3,residence,Greece,country,Sask.,33,5
+1975,3,residence,Greece,country,Alta.,101,5
+1975,3,residence,Greece,country,B.C.,254,5
+1975,3,residence,Greece,country,N.W.T. Yukon,11,5
+1975,3,residence,Hungary,country,Canada,301,5
+1975,3,residence,Hungary,country,Nfld.,1,5
+1975,3,residence,Hungary,country,P.E.I.,0,5
+1975,3,residence,Hungary,country,N.S.,0,5
+1975,3,residence,Hungary,country,N.B.,1,5
+1975,3,residence,Hungary,country,Que.,35,5
+1975,3,residence,Hungary,country,Ont.,168,5
+1975,3,residence,Hungary,country,Man.,12,5
+1975,3,residence,Hungary,country,Sask.,7,5
+1975,3,residence,Hungary,country,Alta.,29,5
+1975,3,residence,Hungary,country,B.C.,46,5
+1975,3,residence,Hungary,country,N.W.T. Yukon,2,5
+1975,3,residence,Iceland,country,Canada,16,5
+1975,3,residence,Iceland,country,Nfld.,0,5
+1975,3,residence,Iceland,country,P.E.I.,0,5
+1975,3,residence,Iceland,country,N.S.,0,5
+1975,3,residence,Iceland,country,N.B.,2,5
+1975,3,residence,Iceland,country,Que.,0,5
+1975,3,residence,Iceland,country,Ont.,3,5
+1975,3,residence,Iceland,country,Man.,5,5
+1975,3,residence,Iceland,country,Sask.,0,5
+1975,3,residence,Iceland,country,Alta.,0,5
+1975,3,residence,Iceland,country,B.C.,6,5
+1975,3,residence,Iceland,country,N.W.T. Yukon,0,5
+1975,3,residence,Ireland (Republic),country,Canada,1098,5
+1975,3,residence,Ireland (Republic),country,Nfld.,18,5
+1975,3,residence,Ireland (Republic),country,P.E.I.,0,5
+1975,3,residence,Ireland (Republic),country,N.S.,8,5
+1975,3,residence,Ireland (Republic),country,N.B.,5,5
+1975,3,residence,Ireland (Republic),country,Que.,73,5
+1975,3,residence,Ireland (Republic),country,Ont.,603,5
+1975,3,residence,Ireland (Republic),country,Man.,66,5
+1975,3,residence,Ireland (Republic),country,Sask.,26,5
+1975,3,residence,Ireland (Republic),country,Alta.,165,5
+1975,3,residence,Ireland (Republic),country,B.C.,130,5
+1975,3,residence,Ireland (Republic),country,N.W.T. Yukon,4,5
+1975,3,residence,Italy,country,Canada,5078,5
+1975,3,residence,Italy,country,Nfld.,16,5
+1975,3,residence,Italy,country,P.E.I.,0,5
+1975,3,residence,Italy,country,N.S.,26,5
+1975,3,residence,Italy,country,N.B.,7,5
+1975,3,residence,Italy,country,Que.,982,5
+1975,3,residence,Italy,country,Ont.,3396,5
+1975,3,residence,Italy,country,Man.,139,5
+1975,3,residence,Italy,country,Sask.,8,5
+1975,3,residence,Italy,country,Alta.,175,5
+1975,3,residence,Italy,country,B.C.,329,5
+1975,3,residence,Italy,country,N.W.T. Yukon,0,5
+1975,3,residence,Latvia,country,Canada,8,5
+1975,3,residence,Latvia,country,Nfld.,0,5
+1975,3,residence,Latvia,country,P.E.I.,0,5
+1975,3,residence,Latvia,country,N.S.,0,5
+1975,3,residence,Latvia,country,N.B.,0,5
+1975,3,residence,Latvia,country,Que.,3,5
+1975,3,residence,Latvia,country,Ont.,5,5
+1975,3,residence,Latvia,country,Man.,0,5
+1975,3,residence,Latvia,country,Sask.,0,5
+1975,3,residence,Latvia,country,Alta.,0,5
+1975,3,residence,Latvia,country,B.C.,0,5
+1975,3,residence,Latvia,country,N.W.T. Yukon,0,5
+1975,3,residence,Lithuania,country,Canada,18,5
+1975,3,residence,Lithuania,country,Nfld.,0,5
+1975,3,residence,Lithuania,country,P.E.I.,0,5
+1975,3,residence,Lithuania,country,N.S.,0,5
+1975,3,residence,Lithuania,country,N.B.,1,5
+1975,3,residence,Lithuania,country,Que.,2,5
+1975,3,residence,Lithuania,country,Ont.,8,5
+1975,3,residence,Lithuania,country,Man.,6,5
+1975,3,residence,Lithuania,country,Sask.,0,5
+1975,3,residence,Lithuania,country,Alta.,0,5
+1975,3,residence,Lithuania,country,B.C.,1,5
+1975,3,residence,Lithuania,country,N.W.T. Yukon,0,5
+1975,3,residence,Luxembourg,country,Canada,19,5
+1975,3,residence,Luxembourg,country,Nfld.,0,5
+1975,3,residence,Luxembourg,country,P.E.I.,0,5
+1975,3,residence,Luxembourg,country,N.S.,0,5
+1975,3,residence,Luxembourg,country,N.B.,0,5
+1975,3,residence,Luxembourg,country,Que.,7,5
+1975,3,residence,Luxembourg,country,Ont.,10,5
+1975,3,residence,Luxembourg,country,Man.,0,5
+1975,3,residence,Luxembourg,country,Sask.,0,5
+1975,3,residence,Luxembourg,country,Alta.,0,5
+1975,3,residence,Luxembourg,country,B.C.,2,5
+1975,3,residence,Luxembourg,country,N.W.T. Yukon,0,5
+1975,3,residence,Malta,country,Canada,408,5
+1975,3,residence,Malta,country,Nfld.,0,5
+1975,3,residence,Malta,country,P.E.I.,0,5
+1975,3,residence,Malta,country,N.S.,0,5
+1975,3,residence,Malta,country,N.B.,0,5
+1975,3,residence,Malta,country,Que.,5,5
+1975,3,residence,Malta,country,Ont.,383,5
+1975,3,residence,Malta,country,Man.,0,5
+1975,3,residence,Malta,country,Sask.,0,5
+1975,3,residence,Malta,country,Alta.,13,5
+1975,3,residence,Malta,country,B.C.,7,5
+1975,3,residence,Malta,country,N.W.T. Yukon,0,5
+1975,3,residence,Monaco,country,Canada,3,5
+1975,3,residence,Monaco,country,Nfld.,0,5
+1975,3,residence,Monaco,country,P.E.I.,0,5
+1975,3,residence,Monaco,country,N.S.,0,5
+1975,3,residence,Monaco,country,N.B.,0,5
+1975,3,residence,Monaco,country,Que.,1,5
+1975,3,residence,Monaco,country,Ont.,0,5
+1975,3,residence,Monaco,country,Man.,0,5
+1975,3,residence,Monaco,country,Sask.,0,5
+1975,3,residence,Monaco,country,Alta.,1,5
+1975,3,residence,Monaco,country,B.C.,1,5
+1975,3,residence,Monaco,country,N.W.T. Yukon,0,5
+1975,3,residence,Netherlands,country,Canada,1448,5
+1975,3,residence,Netherlands,country,Nfld.,5,5
+1975,3,residence,Netherlands,country,P.E.I.,2,5
+1975,3,residence,Netherlands,country,N.S.,9,5
+1975,3,residence,Netherlands,country,N.B.,6,5
+1975,3,residence,Netherlands,country,Que.,47,5
+1975,3,residence,Netherlands,country,Ont.,638,5
+1975,3,residence,Netherlands,country,Man.,157,5
+1975,3,residence,Netherlands,country,Sask.,19,5
+1975,3,residence,Netherlands,country,Alta.,297,5
+1975,3,residence,Netherlands,country,B.C.,266,5
+1975,3,residence,Netherlands,country,N.W.T. Yukon,2,5
+1975,3,residence,Norway,country,Canada,187,5
+1975,3,residence,Norway,country,Nfld.,1,5
+1975,3,residence,Norway,country,P.E.I.,0,5
+1975,3,residence,Norway,country,N.S.,11,5
+1975,3,residence,Norway,country,N.B.,1,5
+1975,3,residence,Norway,country,Que.,25,5
+1975,3,residence,Norway,country,Ont.,52,5
+1975,3,residence,Norway,country,Man.,8,5
+1975,3,residence,Norway,country,Sask.,13,5
+1975,3,residence,Norway,country,Alta.,15,5
+1975,3,residence,Norway,country,B.C.,60,5
+1975,3,residence,Norway,country,N.W.T. Yukon,1,5
+1975,3,residence,Poland,country,Canada,809,5
+1975,3,residence,Poland,country,Nfld.,0,5
+1975,3,residence,Poland,country,P.E.I.,1,5
+1975,3,residence,Poland,country,N.S.,10,5
+1975,3,residence,Poland,country,N.B.,1,5
+1975,3,residence,Poland,country,Que.,108,5
+1975,3,residence,Poland,country,Ont.,479,5
+1975,3,residence,Poland,country,Man.,60,5
+1975,3,residence,Poland,country,Sask.,7,5
+1975,3,residence,Poland,country,Alta.,102,5
+1975,3,residence,Poland,country,B.C.,41,5
+1975,3,residence,Poland,country,N.W.T. Yukon,0,5
+1975,3,residence,Portugal,country,Canada,8547,5
+1975,3,residence,Portugal,country,Nfld.,94,5
+1975,3,residence,Portugal,country,P.E.I.,0,5
+1975,3,residence,Portugal,country,N.S.,8,5
+1975,3,residence,Portugal,country,N.B.,89,5
+1975,3,residence,Portugal,country,Que.,1059,5
+1975,3,residence,Portugal,country,Ont.,6361,5
+1975,3,residence,Portugal,country,Man.,318,5
+1975,3,residence,Portugal,country,Sask.,10,5
+1975,3,residence,Portugal,country,Alta.,172,5
+1975,3,residence,Portugal,country,B.C.,432,5
+1975,3,residence,Portugal,country,N.W.T. Yukon,4,5
+1975,3,residence,Romania,country,Canada,274,5
+1975,3,residence,Romania,country,Nfld.,0,5
+1975,3,residence,Romania,country,P.E.I.,0,5
+1975,3,residence,Romania,country,N.S.,0,5
+1975,3,residence,Romania,country,N.B.,1,5
+1975,3,residence,Romania,country,Que.,113,5
+1975,3,residence,Romania,country,Ont.,130,5
+1975,3,residence,Romania,country,Man.,4,5
+1975,3,residence,Romania,country,Sask.,0,5
+1975,3,residence,Romania,country,Alta.,20,5
+1975,3,residence,Romania,country,B.C.,6,5
+1975,3,residence,Romania,country,N.W.T. Yukon,0,5
+1975,3,residence,Spain,country,Canada,697,5
+1975,3,residence,Spain,country,Nfld.,1,5
+1975,3,residence,Spain,country,P.E.I.,0,5
+1975,3,residence,Spain,country,N.S.,8,5
+1975,3,residence,Spain,country,N.B.,9,5
+1975,3,residence,Spain,country,Que.,246,5
+1975,3,residence,Spain,country,Ont.,254,5
+1975,3,residence,Spain,country,Man.,29,5
+1975,3,residence,Spain,country,Sask.,7,5
+1975,3,residence,Spain,country,Alta.,65,5
+1975,3,residence,Spain,country,B.C.,72,5
+1975,3,residence,Spain,country,N.W.T. Yukon,6,5
+1975,3,residence,Sweden,country,Canada,408,5
+1975,3,residence,Sweden,country,Nfld.,4,5
+1975,3,residence,Sweden,country,P.E.I.,0,5
+1975,3,residence,Sweden,country,N.S.,10,5
+1975,3,residence,Sweden,country,N.B.,3,5
+1975,3,residence,Sweden,country,Que.,60,5
+1975,3,residence,Sweden,country,Ont.,163,5
+1975,3,residence,Sweden,country,Man.,16,5
+1975,3,residence,Sweden,country,Sask.,11,5
+1975,3,residence,Sweden,country,Alta.,51,5
+1975,3,residence,Sweden,country,B.C.,90,5
+1975,3,residence,Sweden,country,N.W.T. Yukon,0,5
+1975,3,residence,Switzerland,country,Canada,1272,5
+1975,3,residence,Switzerland,country,Nfld.,3,5
+1975,3,residence,Switzerland,country,P.E.I.,0,5
+1975,3,residence,Switzerland,country,N.S.,14,5
+1975,3,residence,Switzerland,country,N.B.,12,5
+1975,3,residence,Switzerland,country,Que.,460,5
+1975,3,residence,Switzerland,country,Ont.,434,5
+1975,3,residence,Switzerland,country,Man.,25,5
+1975,3,residence,Switzerland,country,Sask.,18,5
+1975,3,residence,Switzerland,country,Alta.,123,5
+1975,3,residence,Switzerland,country,B.C.,180,5
+1975,3,residence,Switzerland,country,N.W.T. Yukon,3,5
+1975,3,residence,Turkey,country,Canada,320,5
+1975,3,residence,Turkey,country,Nfld.,1,5
+1975,3,residence,Turkey,country,P.E.I.,0,5
+1975,3,residence,Turkey,country,N.S.,3,5
+1975,3,residence,Turkey,country,N.B.,2,5
+1975,3,residence,Turkey,country,Que.,74,5
+1975,3,residence,Turkey,country,Ont.,208,5
+1975,3,residence,Turkey,country,Man.,2,5
+1975,3,residence,Turkey,country,Sask.,1,5
+1975,3,residence,Turkey,country,Alta.,23,5
+1975,3,residence,Turkey,country,B.C.,6,5
+1975,3,residence,Turkey,country,N.W.T. Yukon,0,5
+1975,3,residence,U.S.S.R.,country,Canada,278,5
+1975,3,residence,U.S.S.R.,country,Nfld.,0,5
+1975,3,residence,U.S.S.R.,country,P.E.I.,0,5
+1975,3,residence,U.S.S.R.,country,N.S.,1,5
+1975,3,residence,U.S.S.R.,country,N.B.,0,5
+1975,3,residence,U.S.S.R.,country,Que.,87,5
+1975,3,residence,U.S.S.R.,country,Ont.,100,5
+1975,3,residence,U.S.S.R.,country,Man.,36,5
+1975,3,residence,U.S.S.R.,country,Sask.,4,5
+1975,3,residence,U.S.S.R.,country,Alta.,19,5
+1975,3,residence,U.S.S.R.,country,B.C.,31,5
+1975,3,residence,U.S.S.R.,country,N.W.T. Yukon,0,5
+1975,3,residence,Vatican City State,country,Canada,1,5
+1975,3,residence,Vatican City State,country,Nfld.,0,5
+1975,3,residence,Vatican City State,country,P.E.I.,0,5
+1975,3,residence,Vatican City State,country,N.S.,0,5
+1975,3,residence,Vatican City State,country,N.B.,0,5
+1975,3,residence,Vatican City State,country,Que.,0,5
+1975,3,residence,Vatican City State,country,Ont.,1,5
+1975,3,residence,Vatican City State,country,Man.,0,5
+1975,3,residence,Vatican City State,country,Sask.,0,5
+1975,3,residence,Vatican City State,country,Alta.,0,5
+1975,3,residence,Vatican City State,country,B.C.,0,5
+1975,3,residence,Vatican City State,country,N.W.T. Yukon,0,5
+1975,3,residence,Yugoslavia,country,Canada,2932,5
+1975,3,residence,Yugoslavia,country,Nfld.,1,5
+1975,3,residence,Yugoslavia,country,P.E.I.,0,5
+1975,3,residence,Yugoslavia,country,N.S.,16,5
+1975,3,residence,Yugoslavia,country,N.B.,2,5
+1975,3,residence,Yugoslavia,country,Que.,157,5
+1975,3,residence,Yugoslavia,country,Ont.,2164,5
+1975,3,residence,Yugoslavia,country,Man.,79,5
+1975,3,residence,Yugoslavia,country,Sask.,11,5
+1975,3,residence,Yugoslavia,country,Alta.,189,5
+1975,3,residence,Yugoslavia,country,B.C.,306,5
+1975,3,residence,Yugoslavia,country,N.W.T. Yukon,7,5
+1975,3,residence,Total: Europe,subtotal,Canada,72898,5
+1975,3,residence,Total: Europe,subtotal,Nfld.,572,5
+1975,3,residence,Total: Europe,subtotal,P.E.I.,43,5
+1975,3,residence,Total: Europe,subtotal,N.S.,774,5
+1975,3,residence,Total: Europe,subtotal,N.B.,731,5
+1975,3,residence,Total: Europe,subtotal,Que.,11026,5
+1975,3,residence,Total: Europe,subtotal,Ont.,39448,5
+1975,3,residence,Total: Europe,subtotal,Man.,3050,5
+1975,3,residence,Total: Europe,subtotal,Sask.,1282,5
+1975,3,residence,Total: Europe,subtotal,Alta.,6851,5
+1975,3,residence,Total: Europe,subtotal,B.C.,8985,5
+1975,3,residence,Total: Europe,subtotal,N.W.T. Yukon,136,5
+1975,3,residence,Algeria,country,Canada,45,5
+1975,3,residence,Algeria,country,Nfld.,0,5
+1975,3,residence,Algeria,country,P.E.I.,0,5
+1975,3,residence,Algeria,country,N.S.,0,5
+1975,3,residence,Algeria,country,N.B.,0,5
+1975,3,residence,Algeria,country,Que.,39,5
+1975,3,residence,Algeria,country,Ont.,1,5
+1975,3,residence,Algeria,country,Man.,0,5
+1975,3,residence,Algeria,country,Sask.,0,5
+1975,3,residence,Algeria,country,Alta.,4,5
+1975,3,residence,Algeria,country,B.C.,1,5
+1975,3,residence,Algeria,country,N.W.T. Yukon,0,5
+1975,3,residence,Angola,country,Canada,161,5
+1975,3,residence,Angola,country,Nfld.,0,5
+1975,3,residence,Angola,country,P.E.I.,0,5
+1975,3,residence,Angola,country,N.S.,0,5
+1975,3,residence,Angola,country,N.B.,0,5
+1975,3,residence,Angola,country,Que.,40,5
+1975,3,residence,Angola,country,Ont.,95,5
+1975,3,residence,Angola,country,Man.,1,5
+1975,3,residence,Angola,country,Sask.,0,5
+1975,3,residence,Angola,country,Alta.,13,5
+1975,3,residence,Angola,country,B.C.,12,5
+1975,3,residence,Angola,country,N.W.T. Yukon,0,5
+1975,3,residence,Botswana,country,Canada,4,5
+1975,3,residence,Botswana,country,Nfld.,0,5
+1975,3,residence,Botswana,country,P.E.I.,0,5
+1975,3,residence,Botswana,country,N.S.,0,5
+1975,3,residence,Botswana,country,N.B.,0,5
+1975,3,residence,Botswana,country,Que.,1,5
+1975,3,residence,Botswana,country,Ont.,1,5
+1975,3,residence,Botswana,country,Man.,1,5
+1975,3,residence,Botswana,country,Sask.,0,5
+1975,3,residence,Botswana,country,Alta.,0,5
+1975,3,residence,Botswana,country,B.C.,1,5
+1975,3,residence,Botswana,country,N.W.T. Yukon,0,5
+1975,3,residence,Burundi,country,Canada,45,5
+1975,3,residence,Burundi,country,Nfld.,0,5
+1975,3,residence,Burundi,country,P.E.I.,0,5
+1975,3,residence,Burundi,country,N.S.,0,5
+1975,3,residence,Burundi,country,N.B.,0,5
+1975,3,residence,Burundi,country,Que.,6,5
+1975,3,residence,Burundi,country,Ont.,33,5
+1975,3,residence,Burundi,country,Man.,6,5
+1975,3,residence,Burundi,country,Sask.,0,5
+1975,3,residence,Burundi,country,Alta.,0,5
+1975,3,residence,Burundi,country,B.C.,0,5
+1975,3,residence,Burundi,country,N.W.T. Yukon,0,5
+1975,3,residence,Cameroon,country,Canada,15,5
+1975,3,residence,Cameroon,country,Nfld.,0,5
+1975,3,residence,Cameroon,country,P.E.I.,0,5
+1975,3,residence,Cameroon,country,N.S.,0,5
+1975,3,residence,Cameroon,country,N.B.,0,5
+1975,3,residence,Cameroon,country,Que.,9,5
+1975,3,residence,Cameroon,country,Ont.,0,5
+1975,3,residence,Cameroon,country,Man.,3,5
+1975,3,residence,Cameroon,country,Sask.,0,5
+1975,3,residence,Cameroon,country,Alta.,0,5
+1975,3,residence,Cameroon,country,B.C.,3,5
+1975,3,residence,Cameroon,country,N.W.T. Yukon,0,5
+1975,3,residence,Chad,country,Canada,5,5
+1975,3,residence,Chad,country,Nfld.,0,5
+1975,3,residence,Chad,country,P.E.I.,0,5
+1975,3,residence,Chad,country,N.S.,0,5
+1975,3,residence,Chad,country,N.B.,0,5
+1975,3,residence,Chad,country,Que.,5,5
+1975,3,residence,Chad,country,Ont.,0,5
+1975,3,residence,Chad,country,Man.,0,5
+1975,3,residence,Chad,country,Sask.,0,5
+1975,3,residence,Chad,country,Alta.,0,5
+1975,3,residence,Chad,country,B.C.,0,5
+1975,3,residence,Chad,country,N.W.T. Yukon,0,5
+1975,3,residence,"Congo, Republic of",country,Canada,9,5
+1975,3,residence,"Congo, Republic of",country,Nfld.,0,5
+1975,3,residence,"Congo, Republic of",country,P.E.I.,0,5
+1975,3,residence,"Congo, Republic of",country,N.S.,0,5
+1975,3,residence,"Congo, Republic of",country,N.B.,0,5
+1975,3,residence,"Congo, Republic of",country,Que.,9,5
+1975,3,residence,"Congo, Republic of",country,Ont.,0,5
+1975,3,residence,"Congo, Republic of",country,Man.,0,5
+1975,3,residence,"Congo, Republic of",country,Sask.,0,5
+1975,3,residence,"Congo, Republic of",country,Alta.,0,5
+1975,3,residence,"Congo, Republic of",country,B.C.,0,5
+1975,3,residence,"Congo, Republic of",country,N.W.T. Yukon,0,5
+1975,3,residence,Dahomey,country,Canada,1,5
+1975,3,residence,Dahomey,country,Nfld.,0,5
+1975,3,residence,Dahomey,country,P.E.I.,0,5
+1975,3,residence,Dahomey,country,N.S.,0,5
+1975,3,residence,Dahomey,country,N.B.,0,5
+1975,3,residence,Dahomey,country,Que.,1,5
+1975,3,residence,Dahomey,country,Ont.,0,5
+1975,3,residence,Dahomey,country,Man.,0,5
+1975,3,residence,Dahomey,country,Sask.,0,5
+1975,3,residence,Dahomey,country,Alta.,0,5
+1975,3,residence,Dahomey,country,B.C.,0,5
+1975,3,residence,Dahomey,country,N.W.T. Yukon,0,5
+1975,3,residence,Egypt,country,Canada,892,5
+1975,3,residence,Egypt,country,Nfld.,1,5
+1975,3,residence,Egypt,country,P.E.I.,0,5
+1975,3,residence,Egypt,country,N.S.,10,5
+1975,3,residence,Egypt,country,N.B.,4,5
+1975,3,residence,Egypt,country,Que.,372,5
+1975,3,residence,Egypt,country,Ont.,444,5
+1975,3,residence,Egypt,country,Man.,10,5
+1975,3,residence,Egypt,country,Sask.,3,5
+1975,3,residence,Egypt,country,Alta.,34,5
+1975,3,residence,Egypt,country,B.C.,14,5
+1975,3,residence,Egypt,country,N.W.T. Yukon,0,5
+1975,3,residence,Ethiopia,country,Canada,45,5
+1975,3,residence,Ethiopia,country,Nfld.,0,5
+1975,3,residence,Ethiopia,country,P.E.I.,0,5
+1975,3,residence,Ethiopia,country,N.S.,0,5
+1975,3,residence,Ethiopia,country,N.B.,0,5
+1975,3,residence,Ethiopia,country,Que.,19,5
+1975,3,residence,Ethiopia,country,Ont.,15,5
+1975,3,residence,Ethiopia,country,Man.,1,5
+1975,3,residence,Ethiopia,country,Sask.,2,5
+1975,3,residence,Ethiopia,country,Alta.,2,5
+1975,3,residence,Ethiopia,country,B.C.,6,5
+1975,3,residence,Ethiopia,country,N.W.T. Yukon,0,5
+1975,3,residence,Gabon,country,Canada,5,5
+1975,3,residence,Gabon,country,Nfld.,0,5
+1975,3,residence,Gabon,country,P.E.I.,0,5
+1975,3,residence,Gabon,country,N.S.,0,5
+1975,3,residence,Gabon,country,N.B.,0,5
+1975,3,residence,Gabon,country,Que.,1,5
+1975,3,residence,Gabon,country,Ont.,0,5
+1975,3,residence,Gabon,country,Man.,0,5
+1975,3,residence,Gabon,country,Sask.,4,5
+1975,3,residence,Gabon,country,Alta.,0,5
+1975,3,residence,Gabon,country,B.C.,0,5
+1975,3,residence,Gabon,country,N.W.T. Yukon,0,5
+1975,3,residence,Gambia,country,Canada,3,5
+1975,3,residence,Gambia,country,Nfld.,0,5
+1975,3,residence,Gambia,country,P.E.I.,0,5
+1975,3,residence,Gambia,country,N.S.,0,5
+1975,3,residence,Gambia,country,N.B.,0,5
+1975,3,residence,Gambia,country,Que.,1,5
+1975,3,residence,Gambia,country,Ont.,2,5
+1975,3,residence,Gambia,country,Man.,0,5
+1975,3,residence,Gambia,country,Sask.,0,5
+1975,3,residence,Gambia,country,Alta.,0,5
+1975,3,residence,Gambia,country,B.C.,0,5
+1975,3,residence,Gambia,country,N.W.T. Yukon,0,5
+1975,3,residence,Ghana,country,Canada,274,5
+1975,3,residence,Ghana,country,Nfld.,0,5
+1975,3,residence,Ghana,country,P.E.I.,0,5
+1975,3,residence,Ghana,country,N.S.,2,5
+1975,3,residence,Ghana,country,N.B.,6,5
+1975,3,residence,Ghana,country,Que.,24,5
+1975,3,residence,Ghana,country,Ont.,197,5
+1975,3,residence,Ghana,country,Man.,14,5
+1975,3,residence,Ghana,country,Sask.,1,5
+1975,3,residence,Ghana,country,Alta.,13,5
+1975,3,residence,Ghana,country,B.C.,17,5
+1975,3,residence,Ghana,country,N.W.T. Yukon,0,5
+1975,3,residence,Guinea,country,Canada,7,5
+1975,3,residence,Guinea,country,Nfld.,0,5
+1975,3,residence,Guinea,country,P.E.I.,0,5
+1975,3,residence,Guinea,country,N.S.,0,5
+1975,3,residence,Guinea,country,N.B.,0,5
+1975,3,residence,Guinea,country,Que.,7,5
+1975,3,residence,Guinea,country,Ont.,0,5
+1975,3,residence,Guinea,country,Man.,0,5
+1975,3,residence,Guinea,country,Sask.,0,5
+1975,3,residence,Guinea,country,Alta.,0,5
+1975,3,residence,Guinea,country,B.C.,0,5
+1975,3,residence,Guinea,country,N.W.T. Yukon,0,5
+1975,3,residence,Ivory Coast,country,Canada,20,5
+1975,3,residence,Ivory Coast,country,Nfld.,0,5
+1975,3,residence,Ivory Coast,country,P.E.I.,0,5
+1975,3,residence,Ivory Coast,country,N.S.,0,5
+1975,3,residence,Ivory Coast,country,N.B.,0,5
+1975,3,residence,Ivory Coast,country,Que.,17,5
+1975,3,residence,Ivory Coast,country,Ont.,2,5
+1975,3,residence,Ivory Coast,country,Man.,0,5
+1975,3,residence,Ivory Coast,country,Sask.,0,5
+1975,3,residence,Ivory Coast,country,Alta.,0,5
+1975,3,residence,Ivory Coast,country,B.C.,1,5
+1975,3,residence,Ivory Coast,country,N.W.T. Yukon,0,5
+1975,3,residence,Kenya,country,Canada,2477,5
+1975,3,residence,Kenya,country,Nfld.,9,5
+1975,3,residence,Kenya,country,P.E.I.,0,5
+1975,3,residence,Kenya,country,N.S.,10,5
+1975,3,residence,Kenya,country,N.B.,12,5
+1975,3,residence,Kenya,country,Que.,123,5
+1975,3,residence,Kenya,country,Ont.,1194,5
+1975,3,residence,Kenya,country,Man.,42,5
+1975,3,residence,Kenya,country,Sask.,54,5
+1975,3,residence,Kenya,country,Alta.,408,5
+1975,3,residence,Kenya,country,B.C.,625,5
+1975,3,residence,Kenya,country,N.W.T. Yukon,0,5
+1975,3,residence,Lesotho,country,Canada,4,5
+1975,3,residence,Lesotho,country,Nfld.,0,5
+1975,3,residence,Lesotho,country,P.E.I.,0,5
+1975,3,residence,Lesotho,country,N.S.,0,5
+1975,3,residence,Lesotho,country,N.B.,0,5
+1975,3,residence,Lesotho,country,Que.,0,5
+1975,3,residence,Lesotho,country,Ont.,2,5
+1975,3,residence,Lesotho,country,Man.,0,5
+1975,3,residence,Lesotho,country,Sask.,0,5
+1975,3,residence,Lesotho,country,Alta.,0,5
+1975,3,residence,Lesotho,country,B.C.,2,5
+1975,3,residence,Lesotho,country,N.W.T. Yukon,0,5
+1975,3,residence,Liberia,country,Canada,12,5
+1975,3,residence,Liberia,country,Nfld.,3,5
+1975,3,residence,Liberia,country,P.E.I.,0,5
+1975,3,residence,Liberia,country,N.S.,0,5
+1975,3,residence,Liberia,country,N.B.,0,5
+1975,3,residence,Liberia,country,Que.,7,5
+1975,3,residence,Liberia,country,Ont.,2,5
+1975,3,residence,Liberia,country,Man.,0,5
+1975,3,residence,Liberia,country,Sask.,0,5
+1975,3,residence,Liberia,country,Alta.,0,5
+1975,3,residence,Liberia,country,B.C.,0,5
+1975,3,residence,Liberia,country,N.W.T. Yukon,0,5
+1975,3,residence,Libya,country,Canada,35,5
+1975,3,residence,Libya,country,Nfld.,4,5
+1975,3,residence,Libya,country,P.E.I.,0,5
+1975,3,residence,Libya,country,N.S.,0,5
+1975,3,residence,Libya,country,N.B.,0,5
+1975,3,residence,Libya,country,Que.,11,5
+1975,3,residence,Libya,country,Ont.,17,5
+1975,3,residence,Libya,country,Man.,0,5
+1975,3,residence,Libya,country,Sask.,0,5
+1975,3,residence,Libya,country,Alta.,3,5
+1975,3,residence,Libya,country,B.C.,0,5
+1975,3,residence,Libya,country,N.W.T. Yukon,0,5
+1975,3,residence,Malagasy Republic,country,Canada,38,5
+1975,3,residence,Malagasy Republic,country,Nfld.,0,5
+1975,3,residence,Malagasy Republic,country,P.E.I.,0,5
+1975,3,residence,Malagasy Republic,country,N.S.,0,5
+1975,3,residence,Malagasy Republic,country,N.B.,0,5
+1975,3,residence,Malagasy Republic,country,Que.,36,5
+1975,3,residence,Malagasy Republic,country,Ont.,2,5
+1975,3,residence,Malagasy Republic,country,Man.,0,5
+1975,3,residence,Malagasy Republic,country,Sask.,0,5
+1975,3,residence,Malagasy Republic,country,Alta.,0,5
+1975,3,residence,Malagasy Republic,country,B.C.,0,5
+1975,3,residence,Malagasy Republic,country,N.W.T. Yukon,0,5
+1975,3,residence,Malawi,country,Canada,85,5
+1975,3,residence,Malawi,country,Nfld.,0,5
+1975,3,residence,Malawi,country,P.E.I.,0,5
+1975,3,residence,Malawi,country,N.S.,5,5
+1975,3,residence,Malawi,country,N.B.,1,5
+1975,3,residence,Malawi,country,Que.,7,5
+1975,3,residence,Malawi,country,Ont.,12,5
+1975,3,residence,Malawi,country,Man.,9,5
+1975,3,residence,Malawi,country,Sask.,7,5
+1975,3,residence,Malawi,country,Alta.,18,5
+1975,3,residence,Malawi,country,B.C.,26,5
+1975,3,residence,Malawi,country,N.W.T. Yukon,0,5
+1975,3,residence,Mali,country,Canada,3,5
+1975,3,residence,Mali,country,Nfld.,0,5
+1975,3,residence,Mali,country,P.E.I.,0,5
+1975,3,residence,Mali,country,N.S.,0,5
+1975,3,residence,Mali,country,N.B.,0,5
+1975,3,residence,Mali,country,Que.,2,5
+1975,3,residence,Mali,country,Ont.,1,5
+1975,3,residence,Mali,country,Man.,0,5
+1975,3,residence,Mali,country,Sask.,0,5
+1975,3,residence,Mali,country,Alta.,0,5
+1975,3,residence,Mali,country,B.C.,0,5
+1975,3,residence,Mali,country,N.W.T. Yukon,0,5
+1975,3,residence,Mauritania,country,Canada,1,5
+1975,3,residence,Mauritania,country,Nfld.,0,5
+1975,3,residence,Mauritania,country,P.E.I.,0,5
+1975,3,residence,Mauritania,country,N.S.,0,5
+1975,3,residence,Mauritania,country,N.B.,0,5
+1975,3,residence,Mauritania,country,Que.,0,5
+1975,3,residence,Mauritania,country,Ont.,1,5
+1975,3,residence,Mauritania,country,Man.,0,5
+1975,3,residence,Mauritania,country,Sask.,0,5
+1975,3,residence,Mauritania,country,Alta.,0,5
+1975,3,residence,Mauritania,country,B.C.,0,5
+1975,3,residence,Mauritania,country,N.W.T. Yukon,0,5
+1975,3,residence,Morocco,country,Canada,545,5
+1975,3,residence,Morocco,country,Nfld.,0,5
+1975,3,residence,Morocco,country,P.E.I.,0,5
+1975,3,residence,Morocco,country,N.S.,0,5
+1975,3,residence,Morocco,country,N.B.,0,5
+1975,3,residence,Morocco,country,Que.,469,5
+1975,3,residence,Morocco,country,Ont.,63,5
+1975,3,residence,Morocco,country,Man.,0,5
+1975,3,residence,Morocco,country,Sask.,4,5
+1975,3,residence,Morocco,country,Alta.,7,5
+1975,3,residence,Morocco,country,B.C.,2,5
+1975,3,residence,Morocco,country,N.W.T. Yukon,0,5
+1975,3,residence,Mozambique,country,Canada,106,5
+1975,3,residence,Mozambique,country,Nfld.,1,5
+1975,3,residence,Mozambique,country,P.E.I.,0,5
+1975,3,residence,Mozambique,country,N.S.,4,5
+1975,3,residence,Mozambique,country,N.B.,0,5
+1975,3,residence,Mozambique,country,Que.,32,5
+1975,3,residence,Mozambique,country,Ont.,51,5
+1975,3,residence,Mozambique,country,Man.,0,5
+1975,3,residence,Mozambique,country,Sask.,0,5
+1975,3,residence,Mozambique,country,Alta.,3,5
+1975,3,residence,Mozambique,country,B.C.,15,5
+1975,3,residence,Mozambique,country,N.W.T. Yukon,0,5
+1975,3,residence,Namibia,country,Canada,8,5
+1975,3,residence,Namibia,country,Nfld.,0,5
+1975,3,residence,Namibia,country,P.E.I.,0,5
+1975,3,residence,Namibia,country,N.S.,0,5
+1975,3,residence,Namibia,country,N.B.,0,5
+1975,3,residence,Namibia,country,Que.,0,5
+1975,3,residence,Namibia,country,Ont.,7,5
+1975,3,residence,Namibia,country,Man.,0,5
+1975,3,residence,Namibia,country,Sask.,0,5
+1975,3,residence,Namibia,country,Alta.,1,5
+1975,3,residence,Namibia,country,B.C.,0,5
+1975,3,residence,Namibia,country,N.W.T. Yukon,0,5
+1975,3,residence,Nigeria,country,Canada,263,5
+1975,3,residence,Nigeria,country,Nfld.,0,5
+1975,3,residence,Nigeria,country,P.E.I.,0,5
+1975,3,residence,Nigeria,country,N.S.,3,5
+1975,3,residence,Nigeria,country,N.B.,1,5
+1975,3,residence,Nigeria,country,Que.,14,5
+1975,3,residence,Nigeria,country,Ont.,185,5
+1975,3,residence,Nigeria,country,Man.,24,5
+1975,3,residence,Nigeria,country,Sask.,5,5
+1975,3,residence,Nigeria,country,Alta.,28,5
+1975,3,residence,Nigeria,country,B.C.,3,5
+1975,3,residence,Nigeria,country,N.W.T. Yukon,0,5
+1975,3,residence,Rhodesia,country,Canada,86,5
+1975,3,residence,Rhodesia,country,Nfld.,0,5
+1975,3,residence,Rhodesia,country,P.E.I.,0,5
+1975,3,residence,Rhodesia,country,N.S.,0,5
+1975,3,residence,Rhodesia,country,N.B.,0,5
+1975,3,residence,Rhodesia,country,Que.,15,5
+1975,3,residence,Rhodesia,country,Ont.,38,5
+1975,3,residence,Rhodesia,country,Man.,0,5
+1975,3,residence,Rhodesia,country,Sask.,1,5
+1975,3,residence,Rhodesia,country,Alta.,4,5
+1975,3,residence,Rhodesia,country,B.C.,28,5
+1975,3,residence,Rhodesia,country,N.W.T. Yukon,0,5
+1975,3,residence,Rwanda,country,Canada,90,5
+1975,3,residence,Rwanda,country,Nfld.,0,5
+1975,3,residence,Rwanda,country,P.E.I.,0,5
+1975,3,residence,Rwanda,country,N.S.,0,5
+1975,3,residence,Rwanda,country,N.B.,0,5
+1975,3,residence,Rwanda,country,Que.,18,5
+1975,3,residence,Rwanda,country,Ont.,36,5
+1975,3,residence,Rwanda,country,Man.,5,5
+1975,3,residence,Rwanda,country,Sask.,0,5
+1975,3,residence,Rwanda,country,Alta.,1,5
+1975,3,residence,Rwanda,country,B.C.,30,5
+1975,3,residence,Rwanda,country,N.W.T. Yukon,0,5
+1975,3,residence,Senegal,country,Canada,21,5
+1975,3,residence,Senegal,country,Nfld.,0,5
+1975,3,residence,Senegal,country,P.E.I.,0,5
+1975,3,residence,Senegal,country,N.S.,0,5
+1975,3,residence,Senegal,country,N.B.,0,5
+1975,3,residence,Senegal,country,Que.,17,5
+1975,3,residence,Senegal,country,Ont.,3,5
+1975,3,residence,Senegal,country,Man.,0,5
+1975,3,residence,Senegal,country,Sask.,0,5
+1975,3,residence,Senegal,country,Alta.,1,5
+1975,3,residence,Senegal,country,B.C.,0,5
+1975,3,residence,Senegal,country,N.W.T. Yukon,0,5
+1975,3,residence,Sierra Leone,country,Canada,14,5
+1975,3,residence,Sierra Leone,country,Nfld.,0,5
+1975,3,residence,Sierra Leone,country,P.E.I.,0,5
+1975,3,residence,Sierra Leone,country,N.S.,0,5
+1975,3,residence,Sierra Leone,country,N.B.,0,5
+1975,3,residence,Sierra Leone,country,Que.,0,5
+1975,3,residence,Sierra Leone,country,Ont.,9,5
+1975,3,residence,Sierra Leone,country,Man.,0,5
+1975,3,residence,Sierra Leone,country,Sask.,5,5
+1975,3,residence,Sierra Leone,country,Alta.,0,5
+1975,3,residence,Sierra Leone,country,B.C.,0,5
+1975,3,residence,Sierra Leone,country,N.W.T. Yukon,0,5
+1975,3,residence,Somali Republic,country,Canada,3,5
+1975,3,residence,Somali Republic,country,Nfld.,0,5
+1975,3,residence,Somali Republic,country,P.E.I.,0,5
+1975,3,residence,Somali Republic,country,N.S.,0,5
+1975,3,residence,Somali Republic,country,N.B.,0,5
+1975,3,residence,Somali Republic,country,Que.,0,5
+1975,3,residence,Somali Republic,country,Ont.,3,5
+1975,3,residence,Somali Republic,country,Man.,0,5
+1975,3,residence,Somali Republic,country,Sask.,0,5
+1975,3,residence,Somali Republic,country,Alta.,0,5
+1975,3,residence,Somali Republic,country,B.C.,0,5
+1975,3,residence,Somali Republic,country,N.W.T. Yukon,0,5
+1975,3,residence,"South Africa, Rep.",country,Canada,1567,5
+1975,3,residence,"South Africa, Rep.",country,Nfld.,3,5
+1975,3,residence,"South Africa, Rep.",country,P.E.I.,0,5
+1975,3,residence,"South Africa, Rep.",country,N.S.,4,5
+1975,3,residence,"South Africa, Rep.",country,N.B.,0,5
+1975,3,residence,"South Africa, Rep.",country,Que.,112,5
+1975,3,residence,"South Africa, Rep.",country,Ont.,924,5
+1975,3,residence,"South Africa, Rep.",country,Man.,18,5
+1975,3,residence,"South Africa, Rep.",country,Sask.,13,5
+1975,3,residence,"South Africa, Rep.",country,Alta.,99,5
+1975,3,residence,"South Africa, Rep.",country,B.C.,390,5
+1975,3,residence,"South Africa, Rep.",country,N.W.T. Yukon,4,5
+1975,3,residence,Sudan,country,Canada,8,6
+1975,3,residence,Sudan,country,Nfld.,0,6
+1975,3,residence,Sudan,country,P.E.I.,0,6
+1975,3,residence,Sudan,country,N.S.,0,6
+1975,3,residence,Sudan,country,N.B.,0,6
+1975,3,residence,Sudan,country,Que.,1,6
+1975,3,residence,Sudan,country,Ont.,6,6
+1975,3,residence,Sudan,country,Man.,0,6
+1975,3,residence,Sudan,country,Sask.,0,6
+1975,3,residence,Sudan,country,Alta.,1,6
+1975,3,residence,Sudan,country,B.C.,0,6
+1975,3,residence,Sudan,country,N.W.T. Yukon,0,6
+1975,3,residence,Swaziland,country,Canada,12,6
+1975,3,residence,Swaziland,country,Nfld.,0,6
+1975,3,residence,Swaziland,country,P.E.I.,0,6
+1975,3,residence,Swaziland,country,N.S.,0,6
+1975,3,residence,Swaziland,country,N.B.,1,6
+1975,3,residence,Swaziland,country,Que.,0,6
+1975,3,residence,Swaziland,country,Ont.,2,6
+1975,3,residence,Swaziland,country,Man.,3,6
+1975,3,residence,Swaziland,country,Sask.,0,6
+1975,3,residence,Swaziland,country,Alta.,0,6
+1975,3,residence,Swaziland,country,B.C.,5,6
+1975,3,residence,Swaziland,country,N.W.T. Yukon,1,6
+1975,3,residence,Tanzania,country,Canada,2188,6
+1975,3,residence,Tanzania,country,Nfld.,5,6
+1975,3,residence,Tanzania,country,P.E.I.,0,6
+1975,3,residence,Tanzania,country,N.S.,5,6
+1975,3,residence,Tanzania,country,N.B.,1,6
+1975,3,residence,Tanzania,country,Que.,36,6
+1975,3,residence,Tanzania,country,Ont.,1466,6
+1975,3,residence,Tanzania,country,Man.,21,6
+1975,3,residence,Tanzania,country,Sask.,3,6
+1975,3,residence,Tanzania,country,Alta.,273,6
+1975,3,residence,Tanzania,country,B.C.,378,6
+1975,3,residence,Tanzania,country,N.W.T. Yukon,0,6
+1975,3,residence,Togo,country,Canada,1,6
+1975,3,residence,Togo,country,Nfld.,0,6
+1975,3,residence,Togo,country,P.E.I.,0,6
+1975,3,residence,Togo,country,N.S.,0,6
+1975,3,residence,Togo,country,N.B.,0,6
+1975,3,residence,Togo,country,Que.,1,6
+1975,3,residence,Togo,country,Ont.,0,6
+1975,3,residence,Togo,country,Man.,0,6
+1975,3,residence,Togo,country,Sask.,0,6
+1975,3,residence,Togo,country,Alta.,0,6
+1975,3,residence,Togo,country,B.C.,0,6
+1975,3,residence,Togo,country,N.W.T. Yukon,0,6
+1975,3,residence,Tunisia,country,Canada,115,6
+1975,3,residence,Tunisia,country,Nfld.,0,6
+1975,3,residence,Tunisia,country,P.E.I.,0,6
+1975,3,residence,Tunisia,country,N.S.,1,6
+1975,3,residence,Tunisia,country,N.B.,0,6
+1975,3,residence,Tunisia,country,Que.,99,6
+1975,3,residence,Tunisia,country,Ont.,12,6
+1975,3,residence,Tunisia,country,Man.,2,6
+1975,3,residence,Tunisia,country,Sask.,0,6
+1975,3,residence,Tunisia,country,Alta.,1,6
+1975,3,residence,Tunisia,country,B.C.,0,6
+1975,3,residence,Tunisia,country,N.W.T. Yukon,0,6
+1975,3,residence,Uganda,country,Canada,112,6
+1975,3,residence,Uganda,country,Nfld.,0,6
+1975,3,residence,Uganda,country,P.E.I.,0,6
+1975,3,residence,Uganda,country,N.S.,0,6
+1975,3,residence,Uganda,country,N.B.,0,6
+1975,3,residence,Uganda,country,Que.,4,6
+1975,3,residence,Uganda,country,Ont.,64,6
+1975,3,residence,Uganda,country,Man.,0,6
+1975,3,residence,Uganda,country,Sask.,0,6
+1975,3,residence,Uganda,country,Alta.,28,6
+1975,3,residence,Uganda,country,B.C.,16,6
+1975,3,residence,Uganda,country,N.W.T. Yukon,0,6
+1975,3,residence,Zaire,country,Canada,354,6
+1975,3,residence,Zaire,country,Nfld.,0,6
+1975,3,residence,Zaire,country,P.E.I.,0,6
+1975,3,residence,Zaire,country,N.S.,0,6
+1975,3,residence,Zaire,country,N.B.,0,6
+1975,3,residence,Zaire,country,Que.,157,6
+1975,3,residence,Zaire,country,Ont.,115,6
+1975,3,residence,Zaire,country,Man.,0,6
+1975,3,residence,Zaire,country,Sask.,0,6
+1975,3,residence,Zaire,country,Alta.,28,6
+1975,3,residence,Zaire,country,B.C.,54,6
+1975,3,residence,Zaire,country,N.W.T. Yukon,0,6
+1975,3,residence,Zambia,country,Canada,188,6
+1975,3,residence,Zambia,country,Nfld.,0,6
+1975,3,residence,Zambia,country,P.E.I.,0,6
+1975,3,residence,Zambia,country,N.S.,0,6
+1975,3,residence,Zambia,country,N.B.,9,6
+1975,3,residence,Zambia,country,Que.,18,6
+1975,3,residence,Zambia,country,Ont.,81,6
+1975,3,residence,Zambia,country,Man.,6,6
+1975,3,residence,Zambia,country,Sask.,8,6
+1975,3,residence,Zambia,country,Alta.,36,6
+1975,3,residence,Zambia,country,B.C.,30,6
+1975,3,residence,Zambia,country,N.W.T. Yukon,0,6
+1975,3,residence,Total: Africa,subtotal,Canada,9867,6
+1975,3,residence,Total: Africa,subtotal,Nfld.,26,6
+1975,3,residence,Total: Africa,subtotal,P.E.I.,0,6
+1975,3,residence,Total: Africa,subtotal,N.S.,44,6
+1975,3,residence,Total: Africa,subtotal,N.B.,35,6
+1975,3,residence,Total: Africa,subtotal,Que.,1730,6
+1975,3,residence,Total: Africa,subtotal,Ont.,5086,6
+1975,3,residence,Total: Africa,subtotal,Man.,166,6
+1975,3,residence,Total: Africa,subtotal,Sask.,110,6
+1975,3,residence,Total: Africa,subtotal,Alta.,1006,6
+1975,3,residence,Total: Africa,subtotal,B.C.,1659,6
+1975,3,residence,Total: Africa,subtotal,N.W.T. Yukon,5,6
+1975,3,residence,Afghanistan,country,Canada,7,6
+1975,3,residence,Afghanistan,country,Nfld.,0,6
+1975,3,residence,Afghanistan,country,P.E.I.,0,6
+1975,3,residence,Afghanistan,country,N.S.,0,6
+1975,3,residence,Afghanistan,country,N.B.,0,6
+1975,3,residence,Afghanistan,country,Que.,5,6
+1975,3,residence,Afghanistan,country,Ont.,2,6
+1975,3,residence,Afghanistan,country,Man.,0,6
+1975,3,residence,Afghanistan,country,Sask.,0,6
+1975,3,residence,Afghanistan,country,Alta.,0,6
+1975,3,residence,Afghanistan,country,B.C.,0,6
+1975,3,residence,Afghanistan,country,N.W.T. Yukon,0,6
+1975,3,residence,Bahrain,country,Canada,13,6
+1975,3,residence,Bahrain,country,Nfld.,0,6
+1975,3,residence,Bahrain,country,P.E.I.,0,6
+1975,3,residence,Bahrain,country,N.S.,0,6
+1975,3,residence,Bahrain,country,N.B.,0,6
+1975,3,residence,Bahrain,country,Que.,3,6
+1975,3,residence,Bahrain,country,Ont.,6,6
+1975,3,residence,Bahrain,country,Man.,1,6
+1975,3,residence,Bahrain,country,Sask.,1,6
+1975,3,residence,Bahrain,country,Alta.,0,6
+1975,3,residence,Bahrain,country,B.C.,2,6
+1975,3,residence,Bahrain,country,N.W.T. Yukon,0,6
+1975,3,residence,Bangladesh,country,Canada,104,6
+1975,3,residence,Bangladesh,country,Nfld.,2,6
+1975,3,residence,Bangladesh,country,P.E.I.,0,6
+1975,3,residence,Bangladesh,country,N.S.,0,6
+1975,3,residence,Bangladesh,country,N.B.,1,6
+1975,3,residence,Bangladesh,country,Que.,37,6
+1975,3,residence,Bangladesh,country,Ont.,57,6
+1975,3,residence,Bangladesh,country,Man.,0,6
+1975,3,residence,Bangladesh,country,Sask.,1,6
+1975,3,residence,Bangladesh,country,Alta.,5,6
+1975,3,residence,Bangladesh,country,B.C.,1,6
+1975,3,residence,Bangladesh,country,N.W.T. Yukon,0,6
+1975,3,residence,Brunei,country,Canada,280,6
+1975,3,residence,Brunei,country,Nfld.,0,6
+1975,3,residence,Brunei,country,P.E.I.,0,6
+1975,3,residence,Brunei,country,N.S.,1,6
+1975,3,residence,Brunei,country,N.B.,0,6
+1975,3,residence,Brunei,country,Que.,0,6
+1975,3,residence,Brunei,country,Ont.,21,6
+1975,3,residence,Brunei,country,Man.,1,6
+1975,3,residence,Brunei,country,Sask.,0,6
+1975,3,residence,Brunei,country,Alta.,108,6
+1975,3,residence,Brunei,country,B.C.,147,6
+1975,3,residence,Brunei,country,N.W.T. Yukon,2,6
+1975,3,residence,Burma,country,Canada,153,6
+1975,3,residence,Burma,country,Nfld.,0,6
+1975,3,residence,Burma,country,P.E.I.,0,6
+1975,3,residence,Burma,country,N.S.,1,6
+1975,3,residence,Burma,country,N.B.,0,6
+1975,3,residence,Burma,country,Que.,9,6
+1975,3,residence,Burma,country,Ont.,82,6
+1975,3,residence,Burma,country,Man.,5,6
+1975,3,residence,Burma,country,Sask.,1,6
+1975,3,residence,Burma,country,Alta.,9,6
+1975,3,residence,Burma,country,B.C.,46,6
+1975,3,residence,Burma,country,N.W.T. Yukon,0,6
+1975,3,residence,China,country,Canada,903,6
+1975,3,residence,China,country,Nfld.,10,6
+1975,3,residence,China,country,P.E.I.,0,6
+1975,3,residence,China,country,N.S.,0,6
+1975,3,residence,China,country,N.B.,5,6
+1975,3,residence,China,country,Que.,66,6
+1975,3,residence,China,country,Ont.,329,6
+1975,3,residence,China,country,Man.,28,6
+1975,3,residence,China,country,Sask.,32,6
+1975,3,residence,China,country,Alta.,88,6
+1975,3,residence,China,country,B.C.,345,6
+1975,3,residence,China,country,N.W.T. Yukon,0,6
+1975,3,residence,Cyprus,country,Canada,1021,6
+1975,3,residence,Cyprus,country,Nfld.,0,6
+1975,3,residence,Cyprus,country,P.E.I.,0,6
+1975,3,residence,Cyprus,country,N.S.,11,6
+1975,3,residence,Cyprus,country,N.B.,2,6
+1975,3,residence,Cyprus,country,Que.,63,6
+1975,3,residence,Cyprus,country,Ont.,874,6
+1975,3,residence,Cyprus,country,Man.,20,6
+1975,3,residence,Cyprus,country,Sask.,0,6
+1975,3,residence,Cyprus,country,Alta.,8,6
+1975,3,residence,Cyprus,country,B.C.,43,6
+1975,3,residence,Cyprus,country,N.W.T. Yukon,0,6
+1975,3,residence,Hong Kong,country,Canada,11132,6
+1975,3,residence,Hong Kong,country,Nfld.,33,6
+1975,3,residence,Hong Kong,country,P.E.I.,4,6
+1975,3,residence,Hong Kong,country,N.S.,56,6
+1975,3,residence,Hong Kong,country,N.B.,54,6
+1975,3,residence,Hong Kong,country,Que.,954,6
+1975,3,residence,Hong Kong,country,Ont.,4698,6
+1975,3,residence,Hong Kong,country,Man.,277,6
+1975,3,residence,Hong Kong,country,Sask.,231,6
+1975,3,residence,Hong Kong,country,Alta.,1335,6
+1975,3,residence,Hong Kong,country,B.C.,3475,6
+1975,3,residence,Hong Kong,country,N.W.T. Yukon,15,6
+1975,3,residence,India,country,Canada,10144,6
+1975,3,residence,India,country,Nfld.,27,6
+1975,3,residence,India,country,P.E.I.,0,6
+1975,3,residence,India,country,N.S.,82,6
+1975,3,residence,India,country,N.B.,30,6
+1975,3,residence,India,country,Que.,776,6
+1975,3,residence,India,country,Ont.,4980,6
+1975,3,residence,India,country,Man.,290,6
+1975,3,residence,India,country,Sask.,71,6
+1975,3,residence,India,country,Alta.,479,6
+1975,3,residence,India,country,B.C.,3405,6
+1975,3,residence,India,country,N.W.T. Yukon,4,6
+1975,3,residence,Indonesia,country,Canada,188,6
+1975,3,residence,Indonesia,country,Nfld.,2,6
+1975,3,residence,Indonesia,country,P.E.I.,0,6
+1975,3,residence,Indonesia,country,N.S.,0,6
+1975,3,residence,Indonesia,country,N.B.,0,6
+1975,3,residence,Indonesia,country,Que.,8,6
+1975,3,residence,Indonesia,country,Ont.,120,6
+1975,3,residence,Indonesia,country,Man.,2,6
+1975,3,residence,Indonesia,country,Sask.,9,6
+1975,3,residence,Indonesia,country,Alta.,1,6
+1975,3,residence,Indonesia,country,B.C.,46,6
+1975,3,residence,Indonesia,country,N.W.T. Yukon,0,6
+1975,3,residence,Iran,country,Canada,205,6
+1975,3,residence,Iran,country,Nfld.,0,6
+1975,3,residence,Iran,country,P.E.I.,0,6
+1975,3,residence,Iran,country,N.S.,0,6
+1975,3,residence,Iran,country,N.B.,0,6
+1975,3,residence,Iran,country,Que.,40,6
+1975,3,residence,Iran,country,Ont.,109,6
+1975,3,residence,Iran,country,Man.,3,6
+1975,3,residence,Iran,country,Sask.,2,6
+1975,3,residence,Iran,country,Alta.,12,6
+1975,3,residence,Iran,country,B.C.,37,6
+1975,3,residence,Iran,country,N.W.T. Yukon,2,6
+1975,3,residence,Iraq,country,Canada,41,6
+1975,3,residence,Iraq,country,Nfld.,0,6
+1975,3,residence,Iraq,country,P.E.I.,0,6
+1975,3,residence,Iraq,country,N.S.,0,6
+1975,3,residence,Iraq,country,N.B.,0,6
+1975,3,residence,Iraq,country,Que.,1,6
+1975,3,residence,Iraq,country,Ont.,32,6
+1975,3,residence,Iraq,country,Man.,1,6
+1975,3,residence,Iraq,country,Sask.,0,6
+1975,3,residence,Iraq,country,Alta.,7,6
+1975,3,residence,Iraq,country,B.C.,0,6
+1975,3,residence,Iraq,country,N.W.T. Yukon,0,6
+1975,3,residence,Israel,country,Canada,1527,6
+1975,3,residence,Israel,country,Nfld.,1,6
+1975,3,residence,Israel,country,P.E.I.,0,6
+1975,3,residence,Israel,country,N.S.,9,6
+1975,3,residence,Israel,country,N.B.,0,6
+1975,3,residence,Israel,country,Que.,584,6
+1975,3,residence,Israel,country,Ont.,772,6
+1975,3,residence,Israel,country,Man.,42,6
+1975,3,residence,Israel,country,Sask.,4,6
+1975,3,residence,Israel,country,Alta.,55,6
+1975,3,residence,Israel,country,B.C.,60,6
+1975,3,residence,Israel,country,N.W.T. Yukon,0,6
+1975,3,residence,Japan,country,Canada,635,6
+1975,3,residence,Japan,country,Nfld.,1,6
+1975,3,residence,Japan,country,P.E.I.,0,6
+1975,3,residence,Japan,country,N.S.,3,6
+1975,3,residence,Japan,country,N.B.,6,6
+1975,3,residence,Japan,country,Que.,51,6
+1975,3,residence,Japan,country,Ont.,216,6
+1975,3,residence,Japan,country,Man.,30,6
+1975,3,residence,Japan,country,Sask.,5,6
+1975,3,residence,Japan,country,Alta.,95,6
+1975,3,residence,Japan,country,B.C.,227,6
+1975,3,residence,Japan,country,N.W.T. Yukon,1,6
+1975,3,residence,Jordan,country,Canada,216,6
+1975,3,residence,Jordan,country,Nfld.,0,6
+1975,3,residence,Jordan,country,P.E.I.,0,6
+1975,3,residence,Jordan,country,N.S.,2,6
+1975,3,residence,Jordan,country,N.B.,0,6
+1975,3,residence,Jordan,country,Que.,28,6
+1975,3,residence,Jordan,country,Ont.,160,6
+1975,3,residence,Jordan,country,Man.,3,6
+1975,3,residence,Jordan,country,Sask.,0,6
+1975,3,residence,Jordan,country,Alta.,6,6
+1975,3,residence,Jordan,country,B.C.,17,6
+1975,3,residence,Jordan,country,N.W.T. Yukon,0,6
+1975,3,residence,"Khmer, Rep.",country,Canada,120,6
+1975,3,residence,"Khmer, Rep.",country,Nfld.,0,6
+1975,3,residence,"Khmer, Rep.",country,P.E.I.,0,6
+1975,3,residence,"Khmer, Rep.",country,N.S.,0,6
+1975,3,residence,"Khmer, Rep.",country,N.B.,0,6
+1975,3,residence,"Khmer, Rep.",country,Que.,70,6
+1975,3,residence,"Khmer, Rep.",country,Ont.,45,6
+1975,3,residence,"Khmer, Rep.",country,Man.,0,6
+1975,3,residence,"Khmer, Rep.",country,Sask.,1,6
+1975,3,residence,"Khmer, Rep.",country,Alta.,1,6
+1975,3,residence,"Khmer, Rep.",country,B.C.,3,6
+1975,3,residence,"Khmer, Rep.",country,N.W.T. Yukon,0,6
+1975,3,residence,"Korea, North",country,Canada,15,6
+1975,3,residence,"Korea, North",country,Nfld.,0,6
+1975,3,residence,"Korea, North",country,P.E.I.,0,6
+1975,3,residence,"Korea, North",country,N.S.,0,6
+1975,3,residence,"Korea, North",country,N.B.,0,6
+1975,3,residence,"Korea, North",country,Que.,0,6
+1975,3,residence,"Korea, North",country,Ont.,10,6
+1975,3,residence,"Korea, North",country,Man.,0,6
+1975,3,residence,"Korea, North",country,Sask.,0,6
+1975,3,residence,"Korea, North",country,Alta.,2,6
+1975,3,residence,"Korea, North",country,B.C.,3,6
+1975,3,residence,"Korea, North",country,N.W.T. Yukon,0,6
+1975,3,residence,"Korea, South",country,Canada,4316,6
+1975,3,residence,"Korea, South",country,Nfld.,2,6
+1975,3,residence,"Korea, South",country,P.E.I.,0,6
+1975,3,residence,"Korea, South",country,N.S.,2,6
+1975,3,residence,"Korea, South",country,N.B.,13,6
+1975,3,residence,"Korea, South",country,Que.,262,6
+1975,3,residence,"Korea, South",country,Ont.,2655,6
+1975,3,residence,"Korea, South",country,Man.,95,6
+1975,3,residence,"Korea, South",country,Sask.,55,6
+1975,3,residence,"Korea, South",country,Alta.,610,6
+1975,3,residence,"Korea, South",country,B.C.,600,6
+1975,3,residence,"Korea, South",country,N.W.T. Yukon,22,6
+1975,3,residence,Kuwait,country,Canada,94,6
+1975,3,residence,Kuwait,country,Nfld.,0,6
+1975,3,residence,Kuwait,country,P.E.I.,0,6
+1975,3,residence,Kuwait,country,N.S.,0,6
+1975,3,residence,Kuwait,country,N.B.,0,6
+1975,3,residence,Kuwait,country,Que.,8,6
+1975,3,residence,Kuwait,country,Ont.,80,6
+1975,3,residence,Kuwait,country,Man.,0,6
+1975,3,residence,Kuwait,country,Sask.,0,6
+1975,3,residence,Kuwait,country,Alta.,2,6
+1975,3,residence,Kuwait,country,B.C.,4,6
+1975,3,residence,Kuwait,country,N.W.T. Yukon,0,6
+1975,3,residence,Laos,country,Canada,11,6
+1975,3,residence,Laos,country,Nfld.,0,6
+1975,3,residence,Laos,country,P.E.I.,0,6
+1975,3,residence,Laos,country,N.S.,0,6
+1975,3,residence,Laos,country,N.B.,0,6
+1975,3,residence,Laos,country,Que.,8,6
+1975,3,residence,Laos,country,Ont.,1,6
+1975,3,residence,Laos,country,Man.,0,6
+1975,3,residence,Laos,country,Sask.,0,6
+1975,3,residence,Laos,country,Alta.,0,6
+1975,3,residence,Laos,country,B.C.,2,6
+1975,3,residence,Laos,country,N.W.T. Yukon,0,6
+1975,3,residence,Lebanon,country,Canada,1506,6
+1975,3,residence,Lebanon,country,Nfld.,0,6
+1975,3,residence,Lebanon,country,P.E.I.,1,6
+1975,3,residence,Lebanon,country,N.S.,82,6
+1975,3,residence,Lebanon,country,N.B.,9,6
+1975,3,residence,Lebanon,country,Que.,471,6
+1975,3,residence,Lebanon,country,Ont.,679,6
+1975,3,residence,Lebanon,country,Man.,7,6
+1975,3,residence,Lebanon,country,Sask.,2,6
+1975,3,residence,Lebanon,country,Alta.,215,6
+1975,3,residence,Lebanon,country,B.C.,40,6
+1975,3,residence,Lebanon,country,N.W.T. Yukon,0,6
+1975,3,residence,Macao,country,Canada,105,6
+1975,3,residence,Macao,country,Nfld.,0,6
+1975,3,residence,Macao,country,P.E.I.,0,6
+1975,3,residence,Macao,country,N.S.,0,6
+1975,3,residence,Macao,country,N.B.,0,6
+1975,3,residence,Macao,country,Que.,7,6
+1975,3,residence,Macao,country,Ont.,43,6
+1975,3,residence,Macao,country,Man.,0,6
+1975,3,residence,Macao,country,Sask.,3,6
+1975,3,residence,Macao,country,Alta.,7,6
+1975,3,residence,Macao,country,B.C.,45,6
+1975,3,residence,Macao,country,N.W.T. Yukon,0,6
+1975,3,residence,Malaysia,country,Canada,461,6
+1975,3,residence,Malaysia,country,Nfld.,2,6
+1975,3,residence,Malaysia,country,P.E.I.,0,6
+1975,3,residence,Malaysia,country,N.S.,0,6
+1975,3,residence,Malaysia,country,N.B.,2,6
+1975,3,residence,Malaysia,country,Que.,30,6
+1975,3,residence,Malaysia,country,Ont.,181,6
+1975,3,residence,Malaysia,country,Man.,14,6
+1975,3,residence,Malaysia,country,Sask.,3,6
+1975,3,residence,Malaysia,country,Alta.,56,6
+1975,3,residence,Malaysia,country,B.C.,172,6
+1975,3,residence,Malaysia,country,N.W.T. Yukon,1,6
+1975,3,residence,Nepal,country,Canada,5,6
+1975,3,residence,Nepal,country,Nfld.,0,6
+1975,3,residence,Nepal,country,P.E.I.,0,6
+1975,3,residence,Nepal,country,N.S.,0,6
+1975,3,residence,Nepal,country,N.B.,0,6
+1975,3,residence,Nepal,country,Que.,0,6
+1975,3,residence,Nepal,country,Ont.,5,6
+1975,3,residence,Nepal,country,Man.,0,6
+1975,3,residence,Nepal,country,Sask.,0,6
+1975,3,residence,Nepal,country,Alta.,0,6
+1975,3,residence,Nepal,country,B.C.,0,6
+1975,3,residence,Nepal,country,N.W.T. Yukon,0,6
+1975,3,residence,Oman,country,Canada,2,6
+1975,3,residence,Oman,country,Nfld.,0,6
+1975,3,residence,Oman,country,P.E.I.,0,6
+1975,3,residence,Oman,country,N.S.,0,6
+1975,3,residence,Oman,country,N.B.,0,6
+1975,3,residence,Oman,country,Que.,0,6
+1975,3,residence,Oman,country,Ont.,0,6
+1975,3,residence,Oman,country,Man.,1,6
+1975,3,residence,Oman,country,Sask.,0,6
+1975,3,residence,Oman,country,Alta.,0,6
+1975,3,residence,Oman,country,B.C.,1,6
+1975,3,residence,Oman,country,N.W.T. Yukon,0,6
+1975,3,residence,Pakistan,country,Canada,2165,6
+1975,3,residence,Pakistan,country,Nfld.,3,6
+1975,3,residence,Pakistan,country,P.E.I.,1,6
+1975,3,residence,Pakistan,country,N.S.,24,6
+1975,3,residence,Pakistan,country,N.B.,8,6
+1975,3,residence,Pakistan,country,Que.,261,6
+1975,3,residence,Pakistan,country,Ont.,1500,6
+1975,3,residence,Pakistan,country,Man.,54,6
+1975,3,residence,Pakistan,country,Sask.,41,6
+1975,3,residence,Pakistan,country,Alta.,149,6
+1975,3,residence,Pakistan,country,B.C.,124,6
+1975,3,residence,Pakistan,country,N.W.T. Yukon,0,6
+1975,3,residence,Philippines,country,Canada,7364,6
+1975,3,residence,Philippines,country,Nfld.,66,6
+1975,3,residence,Philippines,country,P.E.I.,2,6
+1975,3,residence,Philippines,country,N.S.,23,6
+1975,3,residence,Philippines,country,N.B.,24,6
+1975,3,residence,Philippines,country,Que.,528,6
+1975,3,residence,Philippines,country,Ont.,3871,6
+1975,3,residence,Philippines,country,Man.,941,6
+1975,3,residence,Philippines,country,Sask.,177,6
+1975,3,residence,Philippines,country,Alta.,547,6
+1975,3,residence,Philippines,country,B.C.,1175,6
+1975,3,residence,Philippines,country,N.W.T. Yukon,10,6
+1975,3,residence,Qatar,country,Canada,24,6
+1975,3,residence,Qatar,country,Nfld.,0,6
+1975,3,residence,Qatar,country,P.E.I.,0,6
+1975,3,residence,Qatar,country,N.S.,0,6
+1975,3,residence,Qatar,country,N.B.,0,6
+1975,3,residence,Qatar,country,Que.,6,6
+1975,3,residence,Qatar,country,Ont.,15,6
+1975,3,residence,Qatar,country,Man.,0,6
+1975,3,residence,Qatar,country,Sask.,0,6
+1975,3,residence,Qatar,country,Alta.,3,6
+1975,3,residence,Qatar,country,B.C.,0,6
+1975,3,residence,Qatar,country,N.W.T. Yukon,0,6
+1975,3,residence,Saudi Arabia,country,Canada,28,6
+1975,3,residence,Saudi Arabia,country,Nfld.,0,6
+1975,3,residence,Saudi Arabia,country,P.E.I.,0,6
+1975,3,residence,Saudi Arabia,country,N.S.,0,6
+1975,3,residence,Saudi Arabia,country,N.B.,0,6
+1975,3,residence,Saudi Arabia,country,Que.,3,6
+1975,3,residence,Saudi Arabia,country,Ont.,14,6
+1975,3,residence,Saudi Arabia,country,Man.,1,6
+1975,3,residence,Saudi Arabia,country,Sask.,0,6
+1975,3,residence,Saudi Arabia,country,Alta.,3,6
+1975,3,residence,Saudi Arabia,country,B.C.,7,6
+1975,3,residence,Saudi Arabia,country,N.W.T. Yukon,0,6
+1975,3,residence,Singapore,country,Canada,442,6
+1975,3,residence,Singapore,country,Nfld.,2,6
+1975,3,residence,Singapore,country,P.E.I.,0,6
+1975,3,residence,Singapore,country,N.S.,2,6
+1975,3,residence,Singapore,country,N.B.,1,6
+1975,3,residence,Singapore,country,Que.,41,6
+1975,3,residence,Singapore,country,Ont.,195,6
+1975,3,residence,Singapore,country,Man.,10,6
+1975,3,residence,Singapore,country,Sask.,4,6
+1975,3,residence,Singapore,country,Alta.,46,6
+1975,3,residence,Singapore,country,B.C.,141,6
+1975,3,residence,Singapore,country,N.W.T. Yukon,0,6
+1975,3,residence,Sri Lanka,country,Canada,369,6
+1975,3,residence,Sri Lanka,country,Nfld.,6,6
+1975,3,residence,Sri Lanka,country,P.E.I.,0,6
+1975,3,residence,Sri Lanka,country,N.S.,2,6
+1975,3,residence,Sri Lanka,country,N.B.,0,6
+1975,3,residence,Sri Lanka,country,Que.,37,6
+1975,3,residence,Sri Lanka,country,Ont.,250,6
+1975,3,residence,Sri Lanka,country,Man.,4,6
+1975,3,residence,Sri Lanka,country,Sask.,10,6
+1975,3,residence,Sri Lanka,country,Alta.,27,6
+1975,3,residence,Sri Lanka,country,B.C.,33,6
+1975,3,residence,Sri Lanka,country,N.W.T. Yukon,0,6
+1975,3,residence,Syria,country,Canada,246,6
+1975,3,residence,Syria,country,Nfld.,0,6
+1975,3,residence,Syria,country,P.E.I.,1,6
+1975,3,residence,Syria,country,N.S.,1,6
+1975,3,residence,Syria,country,N.B.,1,6
+1975,3,residence,Syria,country,Que.,104,6
+1975,3,residence,Syria,country,Ont.,125,6
+1975,3,residence,Syria,country,Man.,2,6
+1975,3,residence,Syria,country,Sask.,0,6
+1975,3,residence,Syria,country,Alta.,9,6
+1975,3,residence,Syria,country,B.C.,3,6
+1975,3,residence,Syria,country,N.W.T. Yukon,0,6
+1975,3,residence,Taiwan,country,Canada,1131,6
+1975,3,residence,Taiwan,country,Nfld.,9,6
+1975,3,residence,Taiwan,country,P.E.I.,2,6
+1975,3,residence,Taiwan,country,N.S.,2,6
+1975,3,residence,Taiwan,country,N.B.,8,6
+1975,3,residence,Taiwan,country,Que.,73,6
+1975,3,residence,Taiwan,country,Ont.,592,6
+1975,3,residence,Taiwan,country,Man.,40,6
+1975,3,residence,Taiwan,country,Sask.,17,6
+1975,3,residence,Taiwan,country,Alta.,56,6
+1975,3,residence,Taiwan,country,B.C.,330,6
+1975,3,residence,Taiwan,country,N.W.T. Yukon,2,6
+1975,3,residence,Thailand,country,Canada,98,6
+1975,3,residence,Thailand,country,Nfld.,0,6
+1975,3,residence,Thailand,country,P.E.I.,0,6
+1975,3,residence,Thailand,country,N.S.,0,6
+1975,3,residence,Thailand,country,N.B.,0,6
+1975,3,residence,Thailand,country,Que.,30,6
+1975,3,residence,Thailand,country,Ont.,30,6
+1975,3,residence,Thailand,country,Man.,1,6
+1975,3,residence,Thailand,country,Sask.,2,6
+1975,3,residence,Thailand,country,Alta.,11,6
+1975,3,residence,Thailand,country,B.C.,24,6
+1975,3,residence,Thailand,country,N.W.T. Yukon,0,6
+1975,3,residence,United Arab Emirates,country,Canada,23,6
+1975,3,residence,United Arab Emirates,country,Nfld.,0,6
+1975,3,residence,United Arab Emirates,country,P.E.I.,0,6
+1975,3,residence,United Arab Emirates,country,N.S.,0,6
+1975,3,residence,United Arab Emirates,country,N.B.,0,6
+1975,3,residence,United Arab Emirates,country,Que.,4,6
+1975,3,residence,United Arab Emirates,country,Ont.,13,6
+1975,3,residence,United Arab Emirates,country,Man.,0,6
+1975,3,residence,United Arab Emirates,country,Sask.,0,6
+1975,3,residence,United Arab Emirates,country,Alta.,6,6
+1975,3,residence,United Arab Emirates,country,B.C.,0,6
+1975,3,residence,United Arab Emirates,country,N.W.T. Yukon,0,6
+1975,3,residence,"Vietnam, North",country,Canada,12,6
+1975,3,residence,"Vietnam, North",country,Nfld.,0,6
+1975,3,residence,"Vietnam, North",country,P.E.I.,0,6
+1975,3,residence,"Vietnam, North",country,N.S.,0,6
+1975,3,residence,"Vietnam, North",country,N.B.,0,6
+1975,3,residence,"Vietnam, North",country,Que.,5,6
+1975,3,residence,"Vietnam, North",country,Ont.,4,6
+1975,3,residence,"Vietnam, North",country,Man.,1,6
+1975,3,residence,"Vietnam, North",country,Sask.,1,6
+1975,3,residence,"Vietnam, North",country,Alta.,0,6
+1975,3,residence,"Vietnam, North",country,B.C.,1,6
+1975,3,residence,"Vietnam, North",country,N.W.T. Yukon,0,6
+1975,3,residence,"Vietnam, South",country,Canada,2269,6
+1975,3,residence,"Vietnam, South",country,Nfld.,0,6
+1975,3,residence,"Vietnam, South",country,P.E.I.,0,6
+1975,3,residence,"Vietnam, South",country,N.S.,27,6
+1975,3,residence,"Vietnam, South",country,N.B.,4,6
+1975,3,residence,"Vietnam, South",country,Que.,1271,6
+1975,3,residence,"Vietnam, South",country,Ont.,485,6
+1975,3,residence,"Vietnam, South",country,Man.,97,6
+1975,3,residence,"Vietnam, South",country,Sask.,34,6
+1975,3,residence,"Vietnam, South",country,Alta.,242,6
+1975,3,residence,"Vietnam, South",country,B.C.,109,6
+1975,3,residence,"Vietnam, South",country,N.W.T. Yukon,0,6
+1975,3,residence,"Yemen, Arab Rep.",country,Canada,2,6
+1975,3,residence,"Yemen, Arab Rep.",country,Nfld.,0,6
+1975,3,residence,"Yemen, Arab Rep.",country,P.E.I.,0,6
+1975,3,residence,"Yemen, Arab Rep.",country,N.S.,0,6
+1975,3,residence,"Yemen, Arab Rep.",country,N.B.,0,6
+1975,3,residence,"Yemen, Arab Rep.",country,Que.,0,6
+1975,3,residence,"Yemen, Arab Rep.",country,Ont.,2,6
+1975,3,residence,"Yemen, Arab Rep.",country,Man.,0,6
+1975,3,residence,"Yemen, Arab Rep.",country,Sask.,0,6
+1975,3,residence,"Yemen, Arab Rep.",country,Alta.,0,6
+1975,3,residence,"Yemen, Arab Rep.",country,B.C.,0,6
+1975,3,residence,"Yemen, Arab Rep.",country,N.W.T. Yukon,0,6
+1975,3,residence,"Asia, N.E.S.",country,Canada,5,6
+1975,3,residence,"Asia, N.E.S.",country,Nfld.,0,6
+1975,3,residence,"Asia, N.E.S.",country,P.E.I.,0,6
+1975,3,residence,"Asia, N.E.S.",country,N.S.,0,6
+1975,3,residence,"Asia, N.E.S.",country,N.B.,0,6
+1975,3,residence,"Asia, N.E.S.",country,Que.,1,6
+1975,3,residence,"Asia, N.E.S.",country,Ont.,2,6
+1975,3,residence,"Asia, N.E.S.",country,Man.,0,6
+1975,3,residence,"Asia, N.E.S.",country,Sask.,0,6
+1975,3,residence,"Asia, N.E.S.",country,Alta.,1,6
+1975,3,residence,"Asia, N.E.S.",country,B.C.,1,6
+1975,3,residence,"Asia, N.E.S.",country,N.W.T. Yukon,0,6
+1975,3,residence,Total: Asia,subtotal,Canada,47382,6
+1975,3,residence,Total: Asia,subtotal,Nfld.,166,6
+1975,3,residence,Total: Asia,subtotal,P.E.I.,11,6
+1975,3,residence,Total: Asia,subtotal,N.S.,330,6
+1975,3,residence,Total: Asia,subtotal,N.B.,168,6
+1975,3,residence,Total: Asia,subtotal,Que.,5845,6
+1975,3,residence,Total: Asia,subtotal,Ont.,23255,6
+1975,3,residence,Total: Asia,subtotal,Man.,1971,6
+1975,3,residence,Total: Asia,subtotal,Sask.,707,6
+1975,3,residence,Total: Asia,subtotal,Alta.,4201,6
+1975,3,residence,Total: Asia,subtotal,B.C.,10669,6
+1975,3,residence,Total: Asia,subtotal,N.W.T. Yukon,59,6
+1975,3,residence,Australia,country,Canada,1654,6
+1975,3,residence,Australia,country,Nfld.,15,6
+1975,3,residence,Australia,country,P.E.I.,0,6
+1975,3,residence,Australia,country,N.S.,2,6
+1975,3,residence,Australia,country,N.B.,2,6
+1975,3,residence,Australia,country,Que.,111,6
+1975,3,residence,Australia,country,Ont.,639,6
+1975,3,residence,Australia,country,Man.,33,6
+1975,3,residence,Australia,country,Sask.,46,6
+1975,3,residence,Australia,country,Alta.,203,6
+1975,3,residence,Australia,country,B.C.,596,6
+1975,3,residence,Australia,country,N.W.T. Yukon,7,6
+1975,3,residence,New Guinea,country,Canada,6,6
+1975,3,residence,New Guinea,country,Nfld.,0,6
+1975,3,residence,New Guinea,country,P.E.I.,0,6
+1975,3,residence,New Guinea,country,N.S.,3,6
+1975,3,residence,New Guinea,country,N.B.,0,6
+1975,3,residence,New Guinea,country,Que.,0,6
+1975,3,residence,New Guinea,country,Ont.,1,6
+1975,3,residence,New Guinea,country,Man.,0,6
+1975,3,residence,New Guinea,country,Sask.,0,6
+1975,3,residence,New Guinea,country,Alta.,0,6
+1975,3,residence,New Guinea,country,B.C.,2,6
+1975,3,residence,New Guinea,country,N.W.T. Yukon,0,6
+1975,3,residence,New Zealand,country,Canada,509,6
+1975,3,residence,New Zealand,country,Nfld.,1,6
+1975,3,residence,New Zealand,country,P.E.I.,0,6
+1975,3,residence,New Zealand,country,N.S.,6,6
+1975,3,residence,New Zealand,country,N.B.,1,6
+1975,3,residence,New Zealand,country,Que.,14,6
+1975,3,residence,New Zealand,country,Ont.,154,6
+1975,3,residence,New Zealand,country,Man.,30,6
+1975,3,residence,New Zealand,country,Sask.,15,6
+1975,3,residence,New Zealand,country,Alta.,76,6
+1975,3,residence,New Zealand,country,B.C.,211,6
+1975,3,residence,New Zealand,country,N.W.T. Yukon,1,6
+1975,3,residence,Papua,country,Canada,1,6
+1975,3,residence,Papua,country,Nfld.,0,6
+1975,3,residence,Papua,country,P.E.I.,0,6
+1975,3,residence,Papua,country,N.S.,0,6
+1975,3,residence,Papua,country,N.B.,0,6
+1975,3,residence,Papua,country,Que.,0,6
+1975,3,residence,Papua,country,Ont.,0,6
+1975,3,residence,Papua,country,Man.,0,6
+1975,3,residence,Papua,country,Sask.,0,6
+1975,3,residence,Papua,country,Alta.,0,6
+1975,3,residence,Papua,country,B.C.,1,6
+1975,3,residence,Papua,country,N.W.T. Yukon,0,6
+1975,3,residence,"Australasia, N.E.S.",country,Canada,4,6
+1975,3,residence,"Australasia, N.E.S.",country,Nfld.,0,6
+1975,3,residence,"Australasia, N.E.S.",country,P.E.I.,0,6
+1975,3,residence,"Australasia, N.E.S.",country,N.S.,0,6
+1975,3,residence,"Australasia, N.E.S.",country,N.B.,0,6
+1975,3,residence,"Australasia, N.E.S.",country,Que.,0,6
+1975,3,residence,"Australasia, N.E.S.",country,Ont.,0,6
+1975,3,residence,"Australasia, N.E.S.",country,Man.,0,6
+1975,3,residence,"Australasia, N.E.S.",country,Sask.,0,6
+1975,3,residence,"Australasia, N.E.S.",country,Alta.,2,6
+1975,3,residence,"Australasia, N.E.S.",country,B.C.,2,6
+1975,3,residence,"Australasia, N.E.S.",country,N.W.T. Yukon,0,6
+1975,3,residence,Total: Australasia,subtotal,Canada,2174,6
+1975,3,residence,Total: Australasia,subtotal,Nfld.,16,6
+1975,3,residence,Total: Australasia,subtotal,P.E.I.,0,6
+1975,3,residence,Total: Australasia,subtotal,N.S.,11,6
+1975,3,residence,Total: Australasia,subtotal,N.B.,3,6
+1975,3,residence,Total: Australasia,subtotal,Que.,125,6
+1975,3,residence,Total: Australasia,subtotal,Ont.,794,6
+1975,3,residence,Total: Australasia,subtotal,Man.,63,6
+1975,3,residence,Total: Australasia,subtotal,Sask.,61,6
+1975,3,residence,Total: Australasia,subtotal,Alta.,281,6
+1975,3,residence,Total: Australasia,subtotal,B.C.,812,6
+1975,3,residence,Total: Australasia,subtotal,N.W.T. Yukon,8,6
+1975,3,residence,Belize,country,Canada,42,6
+1975,3,residence,Belize,country,Nfld.,0,6
+1975,3,residence,Belize,country,P.E.I.,0,6
+1975,3,residence,Belize,country,N.S.,0,6
+1975,3,residence,Belize,country,N.B.,6,6
+1975,3,residence,Belize,country,Que.,2,6
+1975,3,residence,Belize,country,Ont.,22,6
+1975,3,residence,Belize,country,Man.,0,6
+1975,3,residence,Belize,country,Sask.,0,6
+1975,3,residence,Belize,country,Alta.,4,6
+1975,3,residence,Belize,country,B.C.,8,6
+1975,3,residence,Belize,country,N.W.T. Yukon,0,6
+1975,3,residence,Costa Rica,country,Canada,50,6
+1975,3,residence,Costa Rica,country,Nfld.,0,6
+1975,3,residence,Costa Rica,country,P.E.I.,0,6
+1975,3,residence,Costa Rica,country,N.S.,0,6
+1975,3,residence,Costa Rica,country,N.B.,0,6
+1975,3,residence,Costa Rica,country,Que.,9,6
+1975,3,residence,Costa Rica,country,Ont.,20,6
+1975,3,residence,Costa Rica,country,Man.,2,6
+1975,3,residence,Costa Rica,country,Sask.,0,6
+1975,3,residence,Costa Rica,country,Alta.,1,6
+1975,3,residence,Costa Rica,country,B.C.,18,6
+1975,3,residence,Costa Rica,country,N.W.T. Yukon,0,6
+1975,3,residence,El Salvador,country,Canada,178,6
+1975,3,residence,El Salvador,country,Nfld.,0,6
+1975,3,residence,El Salvador,country,P.E.I.,0,6
+1975,3,residence,El Salvador,country,N.S.,0,6
+1975,3,residence,El Salvador,country,N.B.,0,6
+1975,3,residence,El Salvador,country,Que.,82,6
+1975,3,residence,El Salvador,country,Ont.,84,6
+1975,3,residence,El Salvador,country,Man.,0,6
+1975,3,residence,El Salvador,country,Sask.,0,6
+1975,3,residence,El Salvador,country,Alta.,4,6
+1975,3,residence,El Salvador,country,B.C.,8,6
+1975,3,residence,El Salvador,country,N.W.T. Yukon,0,6
+1975,3,residence,Guatemala,country,Canada,254,6
+1975,3,residence,Guatemala,country,Nfld.,0,6
+1975,3,residence,Guatemala,country,P.E.I.,0,6
+1975,3,residence,Guatemala,country,N.S.,1,6
+1975,3,residence,Guatemala,country,N.B.,1,6
+1975,3,residence,Guatemala,country,Que.,77,6
+1975,3,residence,Guatemala,country,Ont.,158,6
+1975,3,residence,Guatemala,country,Man.,0,6
+1975,3,residence,Guatemala,country,Sask.,2,6
+1975,3,residence,Guatemala,country,Alta.,4,6
+1975,3,residence,Guatemala,country,B.C.,8,6
+1975,3,residence,Guatemala,country,N.W.T. Yukon,3,6
+1975,3,residence,Honduras,country,Canada,50,6
+1975,3,residence,Honduras,country,Nfld.,0,6
+1975,3,residence,Honduras,country,P.E.I.,0,6
+1975,3,residence,Honduras,country,N.S.,1,6
+1975,3,residence,Honduras,country,N.B.,0,6
+1975,3,residence,Honduras,country,Que.,8,6
+1975,3,residence,Honduras,country,Ont.,17,6
+1975,3,residence,Honduras,country,Man.,5,6
+1975,3,residence,Honduras,country,Sask.,0,6
+1975,3,residence,Honduras,country,Alta.,7,6
+1975,3,residence,Honduras,country,B.C.,12,6
+1975,3,residence,Honduras,country,N.W.T. Yukon,0,6
+1975,3,residence,Mexico,country,Canada,845,6
+1975,3,residence,Mexico,country,Nfld.,1,6
+1975,3,residence,Mexico,country,P.E.I.,0,6
+1975,3,residence,Mexico,country,N.S.,0,6
+1975,3,residence,Mexico,country,N.B.,0,6
+1975,3,residence,Mexico,country,Que.,93,6
+1975,3,residence,Mexico,country,Ont.,440,6
+1975,3,residence,Mexico,country,Man.,104,6
+1975,3,residence,Mexico,country,Sask.,5,6
+1975,3,residence,Mexico,country,Alta.,53,6
+1975,3,residence,Mexico,country,B.C.,144,6
+1975,3,residence,Mexico,country,N.W.T. Yukon,5,6
+1975,3,residence,Nicaragua,country,Canada,23,6
+1975,3,residence,Nicaragua,country,Nfld.,0,6
+1975,3,residence,Nicaragua,country,P.E.I.,0,6
+1975,3,residence,Nicaragua,country,N.S.,0,6
+1975,3,residence,Nicaragua,country,N.B.,0,6
+1975,3,residence,Nicaragua,country,Que.,2,6
+1975,3,residence,Nicaragua,country,Ont.,16,6
+1975,3,residence,Nicaragua,country,Man.,0,6
+1975,3,residence,Nicaragua,country,Sask.,0,6
+1975,3,residence,Nicaragua,country,Alta.,0,6
+1975,3,residence,Nicaragua,country,B.C.,5,6
+1975,3,residence,Nicaragua,country,N.W.T. Yukon,0,6
+1975,3,residence,Panama,country,Canada,21,6
+1975,3,residence,Panama,country,Nfld.,0,6
+1975,3,residence,Panama,country,P.E.I.,0,6
+1975,3,residence,Panama,country,N.S.,0,6
+1975,3,residence,Panama,country,N.B.,0,6
+1975,3,residence,Panama,country,Que.,3,6
+1975,3,residence,Panama,country,Ont.,9,6
+1975,3,residence,Panama,country,Man.,0,6
+1975,3,residence,Panama,country,Sask.,0,6
+1975,3,residence,Panama,country,Alta.,0,6
+1975,3,residence,Panama,country,B.C.,9,6
+1975,3,residence,Panama,country,N.W.T. Yukon,0,6
+1975,3,residence,Panama Canal Zone,country,Canada,3,6
+1975,3,residence,Panama Canal Zone,country,Nfld.,0,6
+1975,3,residence,Panama Canal Zone,country,P.E.I.,0,6
+1975,3,residence,Panama Canal Zone,country,N.S.,0,6
+1975,3,residence,Panama Canal Zone,country,N.B.,0,6
+1975,3,residence,Panama Canal Zone,country,Que.,1,6
+1975,3,residence,Panama Canal Zone,country,Ont.,2,6
+1975,3,residence,Panama Canal Zone,country,Man.,0,6
+1975,3,residence,Panama Canal Zone,country,Sask.,0,6
+1975,3,residence,Panama Canal Zone,country,Alta.,0,6
+1975,3,residence,Panama Canal Zone,country,B.C.,0,6
+1975,3,residence,Panama Canal Zone,country,N.W.T. Yukon,0,6
+1975,3,residence,St. Pierre & Miquelon,country,Canada,42,6
+1975,3,residence,St. Pierre & Miquelon,country,Nfld.,1,6
+1975,3,residence,St. Pierre & Miquelon,country,P.E.I.,0,6
+1975,3,residence,St. Pierre & Miquelon,country,N.S.,9,6
+1975,3,residence,St. Pierre & Miquelon,country,N.B.,5,6
+1975,3,residence,St. Pierre & Miquelon,country,Que.,18,6
+1975,3,residence,St. Pierre & Miquelon,country,Ont.,2,6
+1975,3,residence,St. Pierre & Miquelon,country,Man.,1,6
+1975,3,residence,St. Pierre & Miquelon,country,Sask.,0,6
+1975,3,residence,St. Pierre & Miquelon,country,Alta.,1,6
+1975,3,residence,St. Pierre & Miquelon,country,B.C.,5,6
+1975,3,residence,St. Pierre & Miquelon,country,N.W.T. Yukon,0,6
+1975,3,residence,U.S.A.,country,Canada,20155,6
+1975,3,residence,U.S.A.,country,Nfld.,315,6
+1975,3,residence,U.S.A.,country,P.E.I.,175,6
+1975,3,residence,U.S.A.,country,N.S.,868,6
+1975,3,residence,U.S.A.,country,N.B.,1101,6
+1975,3,residence,U.S.A.,country,Que.,2474,6
+1975,3,residence,U.S.A.,country,Ont.,7723,6
+1975,3,residence,U.S.A.,country,Man.,727,6
+1975,3,residence,U.S.A.,country,Sask.,445,6
+1975,3,residence,U.S.A.,country,Alta.,2293,6
+1975,3,residence,U.S.A.,country,B.C.,3965,6
+1975,3,residence,U.S.A.,country,N.W.T. Yukon,69,6
+1975,3,residence,"Central America, N.E.S.",country,Canada,2,6
+1975,3,residence,"Central America, N.E.S.",country,Nfld.,0,6
+1975,3,residence,"Central America, N.E.S.",country,P.E.I.,0,6
+1975,3,residence,"Central America, N.E.S.",country,N.S.,0,6
+1975,3,residence,"Central America, N.E.S.",country,N.B.,0,6
+1975,3,residence,"Central America, N.E.S.",country,Que.,2,6
+1975,3,residence,"Central America, N.E.S.",country,Ont.,0,6
+1975,3,residence,"Central America, N.E.S.",country,Man.,0,6
+1975,3,residence,"Central America, N.E.S.",country,Sask.,0,6
+1975,3,residence,"Central America, N.E.S.",country,Alta.,0,6
+1975,3,residence,"Central America, N.E.S.",country,B.C.,0,6
+1975,3,residence,"Central America, N.E.S.",country,N.W.T. Yukon,0,6
+1975,3,residence,Total: North & Central America,subtotal,Canada,21665,6
+1975,3,residence,Total: North & Central America,subtotal,Nfld.,317,6
+1975,3,residence,Total: North & Central America,subtotal,P.E.I.,175,6
+1975,3,residence,Total: North & Central America,subtotal,N.S.,879,6
+1975,3,residence,Total: North & Central America,subtotal,N.B.,1113,6
+1975,3,residence,Total: North & Central America,subtotal,Que.,2771,6
+1975,3,residence,Total: North & Central America,subtotal,Ont.,8493,6
+1975,3,residence,Total: North & Central America,subtotal,Man.,839,6
+1975,3,residence,Total: North & Central America,subtotal,Sask.,452,6
+1975,3,residence,Total: North & Central America,subtotal,Alta.,2367,6
+1975,3,residence,Total: North & Central America,subtotal,B.C.,4182,6
+1975,3,residence,Total: North & Central America,subtotal,N.W.T. Yukon,77,6
+1975,3,residence,Anguilla,country,Canada,5,7
+1975,3,residence,Anguilla,country,Nfld.,0,7
+1975,3,residence,Anguilla,country,P.E.I.,0,7
+1975,3,residence,Anguilla,country,N.S.,0,7
+1975,3,residence,Anguilla,country,N.B.,0,7
+1975,3,residence,Anguilla,country,Que.,0,7
+1975,3,residence,Anguilla,country,Ont.,5,7
+1975,3,residence,Anguilla,country,Man.,0,7
+1975,3,residence,Anguilla,country,Sask.,0,7
+1975,3,residence,Anguilla,country,Alta.,0,7
+1975,3,residence,Anguilla,country,B.C.,0,7
+1975,3,residence,Anguilla,country,N.W.T. Yukon,0,7
+1975,3,residence,Antigua,country,Canada,145,7
+1975,3,residence,Antigua,country,Nfld.,0,7
+1975,3,residence,Antigua,country,P.E.I.,0,7
+1975,3,residence,Antigua,country,N.S.,2,7
+1975,3,residence,Antigua,country,N.B.,0,7
+1975,3,residence,Antigua,country,Que.,15,7
+1975,3,residence,Antigua,country,Ont.,118,7
+1975,3,residence,Antigua,country,Man.,5,7
+1975,3,residence,Antigua,country,Sask.,0,7
+1975,3,residence,Antigua,country,Alta.,5,7
+1975,3,residence,Antigua,country,B.C.,0,7
+1975,3,residence,Antigua,country,N.W.T. Yukon,0,7
+1975,3,residence,Bahamas,country,Canada,169,7
+1975,3,residence,Bahamas,country,Nfld.,0,7
+1975,3,residence,Bahamas,country,P.E.I.,0,7
+1975,3,residence,Bahamas,country,N.S.,2,7
+1975,3,residence,Bahamas,country,N.B.,0,7
+1975,3,residence,Bahamas,country,Que.,21,7
+1975,3,residence,Bahamas,country,Ont.,126,7
+1975,3,residence,Bahamas,country,Man.,4,7
+1975,3,residence,Bahamas,country,Sask.,0,7
+1975,3,residence,Bahamas,country,Alta.,2,7
+1975,3,residence,Bahamas,country,B.C.,14,7
+1975,3,residence,Bahamas,country,N.W.T. Yukon,0,7
+1975,3,residence,Barbados,country,Canada,782,7
+1975,3,residence,Barbados,country,Nfld.,0,7
+1975,3,residence,Barbados,country,P.E.I.,0,7
+1975,3,residence,Barbados,country,N.S.,13,7
+1975,3,residence,Barbados,country,N.B.,0,7
+1975,3,residence,Barbados,country,Que.,153,7
+1975,3,residence,Barbados,country,Ont.,548,7
+1975,3,residence,Barbados,country,Man.,19,7
+1975,3,residence,Barbados,country,Sask.,1,7
+1975,3,residence,Barbados,country,Alta.,8,7
+1975,3,residence,Barbados,country,B.C.,40,7
+1975,3,residence,Barbados,country,N.W.T. Yukon,0,7
+1975,3,residence,Bermuda,country,Canada,173,7
+1975,3,residence,Bermuda,country,Nfld.,0,7
+1975,3,residence,Bermuda,country,P.E.I.,0,7
+1975,3,residence,Bermuda,country,N.S.,5,7
+1975,3,residence,Bermuda,country,N.B.,4,7
+1975,3,residence,Bermuda,country,Que.,18,7
+1975,3,residence,Bermuda,country,Ont.,101,7
+1975,3,residence,Bermuda,country,Man.,0,7
+1975,3,residence,Bermuda,country,Sask.,0,7
+1975,3,residence,Bermuda,country,Alta.,5,7
+1975,3,residence,Bermuda,country,B.C.,40,7
+1975,3,residence,Bermuda,country,N.W.T. Yukon,0,7
+1975,3,residence,Cayman Islands,country,Canada,19,7
+1975,3,residence,Cayman Islands,country,Nfld.,0,7
+1975,3,residence,Cayman Islands,country,P.E.I.,0,7
+1975,3,residence,Cayman Islands,country,N.S.,0,7
+1975,3,residence,Cayman Islands,country,N.B.,1,7
+1975,3,residence,Cayman Islands,country,Que.,0,7
+1975,3,residence,Cayman Islands,country,Ont.,11,7
+1975,3,residence,Cayman Islands,country,Man.,4,7
+1975,3,residence,Cayman Islands,country,Sask.,0,7
+1975,3,residence,Cayman Islands,country,Alta.,1,7
+1975,3,residence,Cayman Islands,country,B.C.,2,7
+1975,3,residence,Cayman Islands,country,N.W.T. Yukon,0,7
+1975,3,residence,Cuba,country,Canada,6,7
+1975,3,residence,Cuba,country,Nfld.,0,7
+1975,3,residence,Cuba,country,P.E.I.,0,7
+1975,3,residence,Cuba,country,N.S.,0,7
+1975,3,residence,Cuba,country,N.B.,0,7
+1975,3,residence,Cuba,country,Que.,1,7
+1975,3,residence,Cuba,country,Ont.,4,7
+1975,3,residence,Cuba,country,Man.,0,7
+1975,3,residence,Cuba,country,Sask.,0,7
+1975,3,residence,Cuba,country,Alta.,0,7
+1975,3,residence,Cuba,country,B.C.,1,7
+1975,3,residence,Cuba,country,N.W.T. Yukon,0,7
+1975,3,residence,Dominica,country,Canada,106,7
+1975,3,residence,Dominica,country,Nfld.,0,7
+1975,3,residence,Dominica,country,P.E.I.,0,7
+1975,3,residence,Dominica,country,N.S.,0,7
+1975,3,residence,Dominica,country,N.B.,0,7
+1975,3,residence,Dominica,country,Que.,7,7
+1975,3,residence,Dominica,country,Ont.,92,7
+1975,3,residence,Dominica,country,Man.,5,7
+1975,3,residence,Dominica,country,Sask.,0,7
+1975,3,residence,Dominica,country,Alta.,1,7
+1975,3,residence,Dominica,country,B.C.,1,7
+1975,3,residence,Dominica,country,N.W.T. Yukon,0,7
+1975,3,residence,Dominican Republic,country,Canada,28,7
+1975,3,residence,Dominican Republic,country,Nfld.,0,7
+1975,3,residence,Dominican Republic,country,P.E.I.,0,7
+1975,3,residence,Dominican Republic,country,N.S.,0,7
+1975,3,residence,Dominican Republic,country,N.B.,0,7
+1975,3,residence,Dominican Republic,country,Que.,17,7
+1975,3,residence,Dominican Republic,country,Ont.,4,7
+1975,3,residence,Dominican Republic,country,Man.,0,7
+1975,3,residence,Dominican Republic,country,Sask.,0,7
+1975,3,residence,Dominican Republic,country,Alta.,4,7
+1975,3,residence,Dominican Republic,country,B.C.,3,7
+1975,3,residence,Dominican Republic,country,N.W.T. Yukon,0,7
+1975,3,residence,Grenada,country,Canada,340,7
+1975,3,residence,Grenada,country,Nfld.,0,7
+1975,3,residence,Grenada,country,P.E.I.,0,7
+1975,3,residence,Grenada,country,N.S.,0,7
+1975,3,residence,Grenada,country,N.B.,0,7
+1975,3,residence,Grenada,country,Que.,48,7
+1975,3,residence,Grenada,country,Ont.,251,7
+1975,3,residence,Grenada,country,Man.,16,7
+1975,3,residence,Grenada,country,Sask.,0,7
+1975,3,residence,Grenada,country,Alta.,14,7
+1975,3,residence,Grenada,country,B.C.,11,7
+1975,3,residence,Grenada,country,N.W.T. Yukon,0,7
+1975,3,residence,Guadeloupe,country,Canada,8,7
+1975,3,residence,Guadeloupe,country,Nfld.,0,7
+1975,3,residence,Guadeloupe,country,P.E.I.,0,7
+1975,3,residence,Guadeloupe,country,N.S.,0,7
+1975,3,residence,Guadeloupe,country,N.B.,0,7
+1975,3,residence,Guadeloupe,country,Que.,7,7
+1975,3,residence,Guadeloupe,country,Ont.,0,7
+1975,3,residence,Guadeloupe,country,Man.,1,7
+1975,3,residence,Guadeloupe,country,Sask.,0,7
+1975,3,residence,Guadeloupe,country,Alta.,0,7
+1975,3,residence,Guadeloupe,country,B.C.,0,7
+1975,3,residence,Guadeloupe,country,N.W.T. Yukon,0,7
+1975,3,residence,Haiti,country,Canada,3431,7
+1975,3,residence,Haiti,country,Nfld.,0,7
+1975,3,residence,Haiti,country,P.E.I.,0,7
+1975,3,residence,Haiti,country,N.S.,0,7
+1975,3,residence,Haiti,country,N.B.,4,7
+1975,3,residence,Haiti,country,Que.,3308,7
+1975,3,residence,Haiti,country,Ont.,108,7
+1975,3,residence,Haiti,country,Man.,8,7
+1975,3,residence,Haiti,country,Sask.,0,7
+1975,3,residence,Haiti,country,Alta.,3,7
+1975,3,residence,Haiti,country,B.C.,0,7
+1975,3,residence,Haiti,country,N.W.T. Yukon,0,7
+1975,3,residence,Jamaica,country,Canada,8211,7
+1975,3,residence,Jamaica,country,Nfld.,2,7
+1975,3,residence,Jamaica,country,P.E.I.,4,7
+1975,3,residence,Jamaica,country,N.S.,24,7
+1975,3,residence,Jamaica,country,N.B.,7,7
+1975,3,residence,Jamaica,country,Que.,520,7
+1975,3,residence,Jamaica,country,Ont.,7187,7
+1975,3,residence,Jamaica,country,Man.,114,7
+1975,3,residence,Jamaica,country,Sask.,22,7
+1975,3,residence,Jamaica,country,Alta.,135,7
+1975,3,residence,Jamaica,country,B.C.,196,7
+1975,3,residence,Jamaica,country,N.W.T. Yukon,0,7
+1975,3,residence,Martinique,country,Canada,15,7
+1975,3,residence,Martinique,country,Nfld.,0,7
+1975,3,residence,Martinique,country,P.E.I.,0,7
+1975,3,residence,Martinique,country,N.S.,0,7
+1975,3,residence,Martinique,country,N.B.,0,7
+1975,3,residence,Martinique,country,Que.,13,7
+1975,3,residence,Martinique,country,Ont.,2,7
+1975,3,residence,Martinique,country,Man.,0,7
+1975,3,residence,Martinique,country,Sask.,0,7
+1975,3,residence,Martinique,country,Alta.,0,7
+1975,3,residence,Martinique,country,B.C.,0,7
+1975,3,residence,Martinique,country,N.W.T. Yukon,0,7
+1975,3,residence,Montserrat,country,Canada,35,7
+1975,3,residence,Montserrat,country,Nfld.,0,7
+1975,3,residence,Montserrat,country,P.E.I.,0,7
+1975,3,residence,Montserrat,country,N.S.,0,7
+1975,3,residence,Montserrat,country,N.B.,0,7
+1975,3,residence,Montserrat,country,Que.,9,7
+1975,3,residence,Montserrat,country,Ont.,24,7
+1975,3,residence,Montserrat,country,Man.,1,7
+1975,3,residence,Montserrat,country,Sask.,0,7
+1975,3,residence,Montserrat,country,Alta.,1,7
+1975,3,residence,Montserrat,country,B.C.,0,7
+1975,3,residence,Montserrat,country,N.W.T. Yukon,0,7
+1975,3,residence,Netherlands Antilles,country,Canada,38,7
+1975,3,residence,Netherlands Antilles,country,Nfld.,0,7
+1975,3,residence,Netherlands Antilles,country,P.E.I.,0,7
+1975,3,residence,Netherlands Antilles,country,N.S.,0,7
+1975,3,residence,Netherlands Antilles,country,N.B.,0,7
+1975,3,residence,Netherlands Antilles,country,Que.,9,7
+1975,3,residence,Netherlands Antilles,country,Ont.,25,7
+1975,3,residence,Netherlands Antilles,country,Man.,1,7
+1975,3,residence,Netherlands Antilles,country,Sask.,0,7
+1975,3,residence,Netherlands Antilles,country,Alta.,3,7
+1975,3,residence,Netherlands Antilles,country,B.C.,0,7
+1975,3,residence,Netherlands Antilles,country,N.W.T. Yukon,0,7
+1975,3,residence,Nevis,country,Canada,13,7
+1975,3,residence,Nevis,country,Nfld.,0,7
+1975,3,residence,Nevis,country,P.E.I.,0,7
+1975,3,residence,Nevis,country,N.S.,0,7
+1975,3,residence,Nevis,country,N.B.,0,7
+1975,3,residence,Nevis,country,Que.,0,7
+1975,3,residence,Nevis,country,Ont.,11,7
+1975,3,residence,Nevis,country,Man.,1,7
+1975,3,residence,Nevis,country,Sask.,0,7
+1975,3,residence,Nevis,country,Alta.,0,7
+1975,3,residence,Nevis,country,B.C.,1,7
+1975,3,residence,Nevis,country,N.W.T. Yukon,0,7
+1975,3,residence,Puerto Rico,country,Canada,23,7
+1975,3,residence,Puerto Rico,country,Nfld.,0,7
+1975,3,residence,Puerto Rico,country,P.E.I.,0,7
+1975,3,residence,Puerto Rico,country,N.S.,0,7
+1975,3,residence,Puerto Rico,country,N.B.,1,7
+1975,3,residence,Puerto Rico,country,Que.,8,7
+1975,3,residence,Puerto Rico,country,Ont.,9,7
+1975,3,residence,Puerto Rico,country,Man.,0,7
+1975,3,residence,Puerto Rico,country,Sask.,0,7
+1975,3,residence,Puerto Rico,country,Alta.,1,7
+1975,3,residence,Puerto Rico,country,B.C.,4,7
+1975,3,residence,Puerto Rico,country,N.W.T. Yukon,0,7
+1975,3,residence,St. Kitts,country,Canada,92,7
+1975,3,residence,St. Kitts,country,Nfld.,0,7
+1975,3,residence,St. Kitts,country,P.E.I.,0,7
+1975,3,residence,St. Kitts,country,N.S.,2,7
+1975,3,residence,St. Kitts,country,N.B.,0,7
+1975,3,residence,St. Kitts,country,Que.,7,7
+1975,3,residence,St. Kitts,country,Ont.,70,7
+1975,3,residence,St. Kitts,country,Man.,7,7
+1975,3,residence,St. Kitts,country,Sask.,0,7
+1975,3,residence,St. Kitts,country,Alta.,0,7
+1975,3,residence,St. Kitts,country,B.C.,6,7
+1975,3,residence,St. Kitts,country,N.W.T. Yukon,0,7
+1975,3,residence,St. Lucia,country,Canada,100,7
+1975,3,residence,St. Lucia,country,Nfld.,0,7
+1975,3,residence,St. Lucia,country,P.E.I.,0,7
+1975,3,residence,St. Lucia,country,N.S.,0,7
+1975,3,residence,St. Lucia,country,N.B.,1,7
+1975,3,residence,St. Lucia,country,Que.,13,7
+1975,3,residence,St. Lucia,country,Ont.,73,7
+1975,3,residence,St. Lucia,country,Man.,5,7
+1975,3,residence,St. Lucia,country,Sask.,1,7
+1975,3,residence,St. Lucia,country,Alta.,6,7
+1975,3,residence,St. Lucia,country,B.C.,1,7
+1975,3,residence,St. Lucia,country,N.W.T. Yukon,0,7
+1975,3,residence,St. Vincent,country,Canada,350,7
+1975,3,residence,St. Vincent,country,Nfld.,0,7
+1975,3,residence,St. Vincent,country,P.E.I.,0,7
+1975,3,residence,St. Vincent,country,N.S.,0,7
+1975,3,residence,St. Vincent,country,N.B.,0,7
+1975,3,residence,St. Vincent,country,Que.,83,7
+1975,3,residence,St. Vincent,country,Ont.,244,7
+1975,3,residence,St. Vincent,country,Man.,11,7
+1975,3,residence,St. Vincent,country,Sask.,0,7
+1975,3,residence,St. Vincent,country,Alta.,6,7
+1975,3,residence,St. Vincent,country,B.C.,6,7
+1975,3,residence,St. Vincent,country,N.W.T. Yukon,0,7
+1975,3,residence,Trinidad-Tobago,country,Canada,3817,7
+1975,3,residence,Trinidad-Tobago,country,Nfld.,3,7
+1975,3,residence,Trinidad-Tobago,country,P.E.I.,0,7
+1975,3,residence,Trinidad-Tobago,country,N.S.,13,7
+1975,3,residence,Trinidad-Tobago,country,N.B.,4,7
+1975,3,residence,Trinidad-Tobago,country,Que.,412,7
+1975,3,residence,Trinidad-Tobago,country,Ont.,2933,7
+1975,3,residence,Trinidad-Tobago,country,Man.,147,7
+1975,3,residence,Trinidad-Tobago,country,Sask.,20,7
+1975,3,residence,Trinidad-Tobago,country,Alta.,179,7
+1975,3,residence,Trinidad-Tobago,country,B.C.,104,7
+1975,3,residence,Trinidad-Tobago,country,N.W.T. Yukon,2,7
+1975,3,residence,Turks and Caicos Islands,country,Canada,1,7
+1975,3,residence,Turks and Caicos Islands,country,Nfld.,0,7
+1975,3,residence,Turks and Caicos Islands,country,P.E.I.,0,7
+1975,3,residence,Turks and Caicos Islands,country,N.S.,0,7
+1975,3,residence,Turks and Caicos Islands,country,N.B.,0,7
+1975,3,residence,Turks and Caicos Islands,country,Que.,0,7
+1975,3,residence,Turks and Caicos Islands,country,Ont.,1,7
+1975,3,residence,Turks and Caicos Islands,country,Man.,0,7
+1975,3,residence,Turks and Caicos Islands,country,Sask.,0,7
+1975,3,residence,Turks and Caicos Islands,country,Alta.,0,7
+1975,3,residence,Turks and Caicos Islands,country,B.C.,0,7
+1975,3,residence,Turks and Caicos Islands,country,N.W.T. Yukon,0,7
+1975,3,residence,Virgin Islands (British),country,Canada,30,7
+1975,3,residence,Virgin Islands (British),country,Nfld.,0,7
+1975,3,residence,Virgin Islands (British),country,P.E.I.,0,7
+1975,3,residence,Virgin Islands (British),country,N.S.,0,7
+1975,3,residence,Virgin Islands (British),country,N.B.,0,7
+1975,3,residence,Virgin Islands (British),country,Que.,0,7
+1975,3,residence,Virgin Islands (British),country,Ont.,18,7
+1975,3,residence,Virgin Islands (British),country,Man.,1,7
+1975,3,residence,Virgin Islands (British),country,Sask.,4,7
+1975,3,residence,Virgin Islands (British),country,Alta.,1,7
+1975,3,residence,Virgin Islands (British),country,B.C.,6,7
+1975,3,residence,Virgin Islands (British),country,N.W.T. Yukon,0,7
+1975,3,residence,Virgin Islands (U.S.),country,Canada,32,7
+1975,3,residence,Virgin Islands (U.S.),country,Nfld.,0,7
+1975,3,residence,Virgin Islands (U.S.),country,P.E.I.,0,7
+1975,3,residence,Virgin Islands (U.S.),country,N.S.,0,7
+1975,3,residence,Virgin Islands (U.S.),country,N.B.,0,7
+1975,3,residence,Virgin Islands (U.S.),country,Que.,6,7
+1975,3,residence,Virgin Islands (U.S.),country,Ont.,26,7
+1975,3,residence,Virgin Islands (U.S.),country,Man.,0,7
+1975,3,residence,Virgin Islands (U.S.),country,Sask.,0,7
+1975,3,residence,Virgin Islands (U.S.),country,Alta.,0,7
+1975,3,residence,Virgin Islands (U.S.),country,B.C.,0,7
+1975,3,residence,Virgin Islands (U.S.),country,N.W.T. Yukon,0,7
+1975,3,residence,"West Indies, N.E.S.",country,Canada,4,7
+1975,3,residence,"West Indies, N.E.S.",country,Nfld.,0,7
+1975,3,residence,"West Indies, N.E.S.",country,P.E.I.,0,7
+1975,3,residence,"West Indies, N.E.S.",country,N.S.,0,7
+1975,3,residence,"West Indies, N.E.S.",country,N.B.,0,7
+1975,3,residence,"West Indies, N.E.S.",country,Que.,2,7
+1975,3,residence,"West Indies, N.E.S.",country,Ont.,2,7
+1975,3,residence,"West Indies, N.E.S.",country,Man.,0,7
+1975,3,residence,"West Indies, N.E.S.",country,Sask.,0,7
+1975,3,residence,"West Indies, N.E.S.",country,Alta.,0,7
+1975,3,residence,"West Indies, N.E.S.",country,B.C.,0,7
+1975,3,residence,"West Indies, N.E.S.",country,N.W.T. Yukon,0,7
+1975,3,residence,Total: Caribbean,subtotal,Canada,17973,7
+1975,3,residence,Total: Caribbean,subtotal,Nfld.,5,7
+1975,3,residence,Total: Caribbean,subtotal,P.E.I.,4,7
+1975,3,residence,Total: Caribbean,subtotal,N.S.,61,7
+1975,3,residence,Total: Caribbean,subtotal,N.B.,22,7
+1975,3,residence,Total: Caribbean,subtotal,Que.,4677,7
+1975,3,residence,Total: Caribbean,subtotal,Ont.,11993,7
+1975,3,residence,Total: Caribbean,subtotal,Man.,350,7
+1975,3,residence,Total: Caribbean,subtotal,Sask.,48,7
+1975,3,residence,Total: Caribbean,subtotal,Alta.,375,7
+1975,3,residence,Total: Caribbean,subtotal,B.C.,436,7
+1975,3,residence,Total: Caribbean,subtotal,N.W.T. Yukon,2,7
+1975,3,residence,Argentina,country,Canada,1567,7
+1975,3,residence,Argentina,country,Nfld.,0,7
+1975,3,residence,Argentina,country,P.E.I.,0,7
+1975,3,residence,Argentina,country,N.S.,1,7
+1975,3,residence,Argentina,country,N.B.,0,7
+1975,3,residence,Argentina,country,Que.,190,7
+1975,3,residence,Argentina,country,Ont.,726,7
+1975,3,residence,Argentina,country,Man.,227,7
+1975,3,residence,Argentina,country,Sask.,64,7
+1975,3,residence,Argentina,country,Alta.,325,7
+1975,3,residence,Argentina,country,B.C.,34,7
+1975,3,residence,Argentina,country,N.W.T. Yukon,0,7
+1975,3,residence,Bolivia,country,Canada,65,7
+1975,3,residence,Bolivia,country,Nfld.,0,7
+1975,3,residence,Bolivia,country,P.E.I.,0,7
+1975,3,residence,Bolivia,country,N.S.,0,7
+1975,3,residence,Bolivia,country,N.B.,0,7
+1975,3,residence,Bolivia,country,Que.,21,7
+1975,3,residence,Bolivia,country,Ont.,27,7
+1975,3,residence,Bolivia,country,Man.,0,7
+1975,3,residence,Bolivia,country,Sask.,0,7
+1975,3,residence,Bolivia,country,Alta.,9,7
+1975,3,residence,Bolivia,country,B.C.,8,7
+1975,3,residence,Bolivia,country,N.W.T. Yukon,0,7
+1975,3,residence,Brazil,country,Canada,531,7
+1975,3,residence,Brazil,country,Nfld.,0,7
+1975,3,residence,Brazil,country,P.E.I.,0,7
+1975,3,residence,Brazil,country,N.S.,0,7
+1975,3,residence,Brazil,country,N.B.,4,7
+1975,3,residence,Brazil,country,Que.,58,7
+1975,3,residence,Brazil,country,Ont.,356,7
+1975,3,residence,Brazil,country,Man.,29,7
+1975,3,residence,Brazil,country,Sask.,17,7
+1975,3,residence,Brazil,country,Alta.,10,7
+1975,3,residence,Brazil,country,B.C.,56,7
+1975,3,residence,Brazil,country,N.W.T. Yukon,1,7
+1975,3,residence,Chile,country,Canada,2297,7
+1975,3,residence,Chile,country,Nfld.,1,7
+1975,3,residence,Chile,country,P.E.I.,0,7
+1975,3,residence,Chile,country,N.S.,7,7
+1975,3,residence,Chile,country,N.B.,4,7
+1975,3,residence,Chile,country,Que.,630,7
+1975,3,residence,Chile,country,Ont.,901,7
+1975,3,residence,Chile,country,Man.,161,7
+1975,3,residence,Chile,country,Sask.,49,7
+1975,3,residence,Chile,country,Alta.,386,7
+1975,3,residence,Chile,country,B.C.,158,7
+1975,3,residence,Chile,country,N.W.T. Yukon,0,7
+1975,3,residence,Colombia,country,Canada,1046,7
+1975,3,residence,Colombia,country,Nfld.,0,7
+1975,3,residence,Colombia,country,P.E.I.,0,7
+1975,3,residence,Colombia,country,N.S.,2,7
+1975,3,residence,Colombia,country,N.B.,0,7
+1975,3,residence,Colombia,country,Que.,297,7
+1975,3,residence,Colombia,country,Ont.,672,7
+1975,3,residence,Colombia,country,Man.,3,7
+1975,3,residence,Colombia,country,Sask.,0,7
+1975,3,residence,Colombia,country,Alta.,36,7
+1975,3,residence,Colombia,country,B.C.,36,7
+1975,3,residence,Colombia,country,N.W.T. Yukon,0,7
+1975,3,residence,Ecuador,country,Canada,1698,7
+1975,3,residence,Ecuador,country,Nfld.,0,7
+1975,3,residence,Ecuador,country,P.E.I.,0,7
+1975,3,residence,Ecuador,country,N.S.,1,7
+1975,3,residence,Ecuador,country,N.B.,0,7
+1975,3,residence,Ecuador,country,Que.,61,7
+1975,3,residence,Ecuador,country,Ont.,1624,7
+1975,3,residence,Ecuador,country,Man.,1,7
+1975,3,residence,Ecuador,country,Sask.,0,7
+1975,3,residence,Ecuador,country,Alta.,2,7
+1975,3,residence,Ecuador,country,B.C.,9,7
+1975,3,residence,Ecuador,country,N.W.T. Yukon,0,7
+1975,3,residence,French Guiana,country,Canada,1,7
+1975,3,residence,French Guiana,country,Nfld.,0,7
+1975,3,residence,French Guiana,country,P.E.I.,0,7
+1975,3,residence,French Guiana,country,N.S.,0,7
+1975,3,residence,French Guiana,country,N.B.,0,7
+1975,3,residence,French Guiana,country,Que.,1,7
+1975,3,residence,French Guiana,country,Ont.,0,7
+1975,3,residence,French Guiana,country,Man.,0,7
+1975,3,residence,French Guiana,country,Sask.,0,7
+1975,3,residence,French Guiana,country,Alta.,0,7
+1975,3,residence,French Guiana,country,B.C.,0,7
+1975,3,residence,French Guiana,country,N.W.T. Yukon,0,7
+1975,3,residence,Guyana,country,Canada,4394,7
+1975,3,residence,Guyana,country,Nfld.,1,7
+1975,3,residence,Guyana,country,P.E.I.,2,7
+1975,3,residence,Guyana,country,N.S.,12,7
+1975,3,residence,Guyana,country,N.B.,12,7
+1975,3,residence,Guyana,country,Que.,220,7
+1975,3,residence,Guyana,country,Ont.,3808,7
+1975,3,residence,Guyana,country,Man.,125,7
+1975,3,residence,Guyana,country,Sask.,24,7
+1975,3,residence,Guyana,country,Alta.,138,7
+1975,3,residence,Guyana,country,B.C.,52,7
+1975,3,residence,Guyana,country,N.W.T. Yukon,0,7
+1975,3,residence,Paraguay,country,Canada,252,7
+1975,3,residence,Paraguay,country,Nfld.,0,7
+1975,3,residence,Paraguay,country,P.E.I.,0,7
+1975,3,residence,Paraguay,country,N.S.,0,7
+1975,3,residence,Paraguay,country,N.B.,0,7
+1975,3,residence,Paraguay,country,Que.,3,7
+1975,3,residence,Paraguay,country,Ont.,30,7
+1975,3,residence,Paraguay,country,Man.,108,7
+1975,3,residence,Paraguay,country,Sask.,1,7
+1975,3,residence,Paraguay,country,Alta.,2,7
+1975,3,residence,Paraguay,country,B.C.,108,7
+1975,3,residence,Paraguay,country,N.W.T. Yukon,0,7
+1975,3,residence,Peru,country,Canada,494,7
+1975,3,residence,Peru,country,Nfld.,0,7
+1975,3,residence,Peru,country,P.E.I.,0,7
+1975,3,residence,Peru,country,N.S.,2,7
+1975,3,residence,Peru,country,N.B.,0,7
+1975,3,residence,Peru,country,Que.,124,7
+1975,3,residence,Peru,country,Ont.,221,7
+1975,3,residence,Peru,country,Man.,19,7
+1975,3,residence,Peru,country,Sask.,11,7
+1975,3,residence,Peru,country,Alta.,55,7
+1975,3,residence,Peru,country,B.C.,62,7
+1975,3,residence,Peru,country,N.W.T. Yukon,0,7
+1975,3,residence,Surinam,country,Canada,74,7
+1975,3,residence,Surinam,country,Nfld.,0,7
+1975,3,residence,Surinam,country,P.E.I.,0,7
+1975,3,residence,Surinam,country,N.S.,0,7
+1975,3,residence,Surinam,country,N.B.,0,7
+1975,3,residence,Surinam,country,Que.,0,7
+1975,3,residence,Surinam,country,Ont.,52,7
+1975,3,residence,Surinam,country,Man.,1,7
+1975,3,residence,Surinam,country,Sask.,10,7
+1975,3,residence,Surinam,country,Alta.,6,7
+1975,3,residence,Surinam,country,B.C.,5,7
+1975,3,residence,Surinam,country,N.W.T. Yukon,0,7
+1975,3,residence,Uruguay,country,Canada,661,7
+1975,3,residence,Uruguay,country,Nfld.,0,7
+1975,3,residence,Uruguay,country,P.E.I.,0,7
+1975,3,residence,Uruguay,country,N.S.,0,7
+1975,3,residence,Uruguay,country,N.B.,0,7
+1975,3,residence,Uruguay,country,Que.,109,7
+1975,3,residence,Uruguay,country,Ont.,499,7
+1975,3,residence,Uruguay,country,Man.,1,7
+1975,3,residence,Uruguay,country,Sask.,0,7
+1975,3,residence,Uruguay,country,Alta.,18,7
+1975,3,residence,Uruguay,country,B.C.,33,7
+1975,3,residence,Uruguay,country,N.W.T. Yukon,1,7
+1975,3,residence,Venezuela,country,Canada,190,7
+1975,3,residence,Venezuela,country,Nfld.,0,7
+1975,3,residence,Venezuela,country,P.E.I.,0,7
+1975,3,residence,Venezuela,country,N.S.,0,7
+1975,3,residence,Venezuela,country,N.B.,0,7
+1975,3,residence,Venezuela,country,Que.,31,7
+1975,3,residence,Venezuela,country,Ont.,131,7
+1975,3,residence,Venezuela,country,Man.,0,7
+1975,3,residence,Venezuela,country,Sask.,1,7
+1975,3,residence,Venezuela,country,Alta.,9,7
+1975,3,residence,Venezuela,country,B.C.,18,7
+1975,3,residence,Venezuela,country,N.W.T. Yukon,0,7
+1975,3,residence,Total: South America,subtotal,Canada,13270,7
+1975,3,residence,Total: South America,subtotal,Nfld.,2,7
+1975,3,residence,Total: South America,subtotal,P.E.I.,2,7
+1975,3,residence,Total: South America,subtotal,N.S.,25,7
+1975,3,residence,Total: South America,subtotal,N.B.,20,7
+1975,3,residence,Total: South America,subtotal,Que.,1745,7
+1975,3,residence,Total: South America,subtotal,Ont.,9047,7
+1975,3,residence,Total: South America,subtotal,Man.,675,7
+1975,3,residence,Total: South America,subtotal,Sask.,177,7
+1975,3,residence,Total: South America,subtotal,Alta.,996,7
+1975,3,residence,Total: South America,subtotal,B.C.,579,7
+1975,3,residence,Total: South America,subtotal,N.W.T. Yukon,2,7
+1975,3,residence,Cape Verde Islands,country,Canada,13,7
+1975,3,residence,Cape Verde Islands,country,Nfld.,0,7
+1975,3,residence,Cape Verde Islands,country,P.E.I.,0,7
+1975,3,residence,Cape Verde Islands,country,N.S.,0,7
+1975,3,residence,Cape Verde Islands,country,N.B.,0,7
+1975,3,residence,Cape Verde Islands,country,Que.,1,7
+1975,3,residence,Cape Verde Islands,country,Ont.,11,7
+1975,3,residence,Cape Verde Islands,country,Man.,1,7
+1975,3,residence,Cape Verde Islands,country,Sask.,0,7
+1975,3,residence,Cape Verde Islands,country,Alta.,0,7
+1975,3,residence,Cape Verde Islands,country,B.C.,0,7
+1975,3,residence,Cape Verde Islands,country,N.W.T. Yukon,0,7
+1975,3,residence,Comoro Islands,country,Canada,3,7
+1975,3,residence,Comoro Islands,country,Nfld.,0,7
+1975,3,residence,Comoro Islands,country,P.E.I.,0,7
+1975,3,residence,Comoro Islands,country,N.S.,0,7
+1975,3,residence,Comoro Islands,country,N.B.,0,7
+1975,3,residence,Comoro Islands,country,Que.,3,7
+1975,3,residence,Comoro Islands,country,Ont.,0,7
+1975,3,residence,Comoro Islands,country,Man.,0,7
+1975,3,residence,Comoro Islands,country,Sask.,0,7
+1975,3,residence,Comoro Islands,country,Alta.,0,7
+1975,3,residence,Comoro Islands,country,B.C.,0,7
+1975,3,residence,Comoro Islands,country,N.W.T. Yukon,0,7
+1975,3,residence,Fiji,country,Canada,2323,7
+1975,3,residence,Fiji,country,Nfld.,0,7
+1975,3,residence,Fiji,country,P.E.I.,0,7
+1975,3,residence,Fiji,country,N.S.,0,7
+1975,3,residence,Fiji,country,N.B.,0,7
+1975,3,residence,Fiji,country,Que.,15,7
+1975,3,residence,Fiji,country,Ont.,222,7
+1975,3,residence,Fiji,country,Man.,4,7
+1975,3,residence,Fiji,country,Sask.,0,7
+1975,3,residence,Fiji,country,Alta.,185,7
+1975,3,residence,Fiji,country,B.C.,1896,7
+1975,3,residence,Fiji,country,N.W.T. Yukon,1,7
+1975,3,residence,Guam,country,Canada,13,7
+1975,3,residence,Guam,country,Nfld.,0,7
+1975,3,residence,Guam,country,P.E.I.,0,7
+1975,3,residence,Guam,country,N.S.,0,7
+1975,3,residence,Guam,country,N.B.,0,7
+1975,3,residence,Guam,country,Que.,2,7
+1975,3,residence,Guam,country,Ont.,1,7
+1975,3,residence,Guam,country,Man.,10,7
+1975,3,residence,Guam,country,Sask.,0,7
+1975,3,residence,Guam,country,Alta.,0,7
+1975,3,residence,Guam,country,B.C.,0,7
+1975,3,residence,Guam,country,N.W.T. Yukon,0,7
+1975,3,residence,Mauritius,country,Canada,253,7
+1975,3,residence,Mauritius,country,Nfld.,2,7
+1975,3,residence,Mauritius,country,P.E.I.,0,7
+1975,3,residence,Mauritius,country,N.S.,0,7
+1975,3,residence,Mauritius,country,N.B.,1,7
+1975,3,residence,Mauritius,country,Que.,99,7
+1975,3,residence,Mauritius,country,Ont.,109,7
+1975,3,residence,Mauritius,country,Man.,5,7
+1975,3,residence,Mauritius,country,Sask.,0,7
+1975,3,residence,Mauritius,country,Alta.,12,7
+1975,3,residence,Mauritius,country,B.C.,25,7
+1975,3,residence,Mauritius,country,N.W.T. Yukon,0,7
+1975,3,residence,New Caledonia & Loyalty Is.,country,Canada,4,7
+1975,3,residence,New Caledonia & Loyalty Is.,country,Nfld.,0,7
+1975,3,residence,New Caledonia & Loyalty Is.,country,P.E.I.,0,7
+1975,3,residence,New Caledonia & Loyalty Is.,country,N.S.,0,7
+1975,3,residence,New Caledonia & Loyalty Is.,country,N.B.,0,7
+1975,3,residence,New Caledonia & Loyalty Is.,country,Que.,0,7
+1975,3,residence,New Caledonia & Loyalty Is.,country,Ont.,0,7
+1975,3,residence,New Caledonia & Loyalty Is.,country,Man.,0,7
+1975,3,residence,New Caledonia & Loyalty Is.,country,Sask.,0,7
+1975,3,residence,New Caledonia & Loyalty Is.,country,Alta.,0,7
+1975,3,residence,New Caledonia & Loyalty Is.,country,B.C.,4,7
+1975,3,residence,New Caledonia & Loyalty Is.,country,N.W.T. Yukon,0,7
+1975,3,residence,New Hebrides,country,Canada,6,7
+1975,3,residence,New Hebrides,country,Nfld.,0,7
+1975,3,residence,New Hebrides,country,P.E.I.,0,7
+1975,3,residence,New Hebrides,country,N.S.,0,7
+1975,3,residence,New Hebrides,country,N.B.,0,7
+1975,3,residence,New Hebrides,country,Que.,0,7
+1975,3,residence,New Hebrides,country,Ont.,0,7
+1975,3,residence,New Hebrides,country,Man.,0,7
+1975,3,residence,New Hebrides,country,Sask.,0,7
+1975,3,residence,New Hebrides,country,Alta.,0,7
+1975,3,residence,New Hebrides,country,B.C.,6,7
+1975,3,residence,New Hebrides,country,N.W.T. Yukon,0,7
+1975,3,residence,Reunion,country,Canada,1,7
+1975,3,residence,Reunion,country,Nfld.,0,7
+1975,3,residence,Reunion,country,P.E.I.,0,7
+1975,3,residence,Reunion,country,N.S.,0,7
+1975,3,residence,Reunion,country,N.B.,0,7
+1975,3,residence,Reunion,country,Que.,1,7
+1975,3,residence,Reunion,country,Ont.,0,7
+1975,3,residence,Reunion,country,Man.,0,7
+1975,3,residence,Reunion,country,Sask.,0,7
+1975,3,residence,Reunion,country,Alta.,0,7
+1975,3,residence,Reunion,country,B.C.,0,7
+1975,3,residence,Reunion,country,N.W.T. Yukon,0,7
+1975,3,residence,"Samoa, Eastern",country,Canada,7,7
+1975,3,residence,"Samoa, Eastern",country,Nfld.,0,7
+1975,3,residence,"Samoa, Eastern",country,P.E.I.,0,7
+1975,3,residence,"Samoa, Eastern",country,N.S.,0,7
+1975,3,residence,"Samoa, Eastern",country,N.B.,0,7
+1975,3,residence,"Samoa, Eastern",country,Que.,0,7
+1975,3,residence,"Samoa, Eastern",country,Ont.,0,7
+1975,3,residence,"Samoa, Eastern",country,Man.,0,7
+1975,3,residence,"Samoa, Eastern",country,Sask.,0,7
+1975,3,residence,"Samoa, Eastern",country,Alta.,0,7
+1975,3,residence,"Samoa, Eastern",country,B.C.,7,7
+1975,3,residence,"Samoa, Eastern",country,N.W.T. Yukon,0,7
+1975,3,residence,"Samoa, Western",country,Canada,2,7
+1975,3,residence,"Samoa, Western",country,Nfld.,0,7
+1975,3,residence,"Samoa, Western",country,P.E.I.,0,7
+1975,3,residence,"Samoa, Western",country,N.S.,0,7
+1975,3,residence,"Samoa, Western",country,N.B.,0,7
+1975,3,residence,"Samoa, Western",country,Que.,0,7
+1975,3,residence,"Samoa, Western",country,Ont.,0,7
+1975,3,residence,"Samoa, Western",country,Man.,0,7
+1975,3,residence,"Samoa, Western",country,Sask.,0,7
+1975,3,residence,"Samoa, Western",country,Alta.,2,7
+1975,3,residence,"Samoa, Western",country,B.C.,0,7
+1975,3,residence,"Samoa, Western",country,N.W.T. Yukon,0,7
+1975,3,residence,Seychelles Islands,country,Canada,11,7
+1975,3,residence,Seychelles Islands,country,Nfld.,0,7
+1975,3,residence,Seychelles Islands,country,P.E.I.,0,7
+1975,3,residence,Seychelles Islands,country,N.S.,0,7
+1975,3,residence,Seychelles Islands,country,N.B.,0,7
+1975,3,residence,Seychelles Islands,country,Que.,1,7
+1975,3,residence,Seychelles Islands,country,Ont.,10,7
+1975,3,residence,Seychelles Islands,country,Man.,0,7
+1975,3,residence,Seychelles Islands,country,Sask.,0,7
+1975,3,residence,Seychelles Islands,country,Alta.,0,7
+1975,3,residence,Seychelles Islands,country,B.C.,0,7
+1975,3,residence,Seychelles Islands,country,N.W.T. Yukon,0,7
+1975,3,residence,Society Islands,country,Canada,5,7
+1975,3,residence,Society Islands,country,Nfld.,0,7
+1975,3,residence,Society Islands,country,P.E.I.,0,7
+1975,3,residence,Society Islands,country,N.S.,0,7
+1975,3,residence,Society Islands,country,N.B.,0,7
+1975,3,residence,Society Islands,country,Que.,1,7
+1975,3,residence,Society Islands,country,Ont.,0,7
+1975,3,residence,Society Islands,country,Man.,0,7
+1975,3,residence,Society Islands,country,Sask.,0,7
+1975,3,residence,Society Islands,country,Alta.,0,7
+1975,3,residence,Society Islands,country,B.C.,4,7
+1975,3,residence,Society Islands,country,N.W.T. Yukon,0,7
+1975,3,residence,Solomon Islands (British),country,Canada,6,7
+1975,3,residence,Solomon Islands (British),country,Nfld.,0,7
+1975,3,residence,Solomon Islands (British),country,P.E.I.,0,7
+1975,3,residence,Solomon Islands (British),country,N.S.,0,7
+1975,3,residence,Solomon Islands (British),country,N.B.,0,7
+1975,3,residence,Solomon Islands (British),country,Que.,0,7
+1975,3,residence,Solomon Islands (British),country,Ont.,1,7
+1975,3,residence,Solomon Islands (British),country,Man.,0,7
+1975,3,residence,Solomon Islands (British),country,Sask.,0,7
+1975,3,residence,Solomon Islands (British),country,Alta.,0,7
+1975,3,residence,Solomon Islands (British),country,B.C.,5,7
+1975,3,residence,Solomon Islands (British),country,N.W.T. Yukon,0,7
+1975,3,residence,Tonga,country,Canada,3,7
+1975,3,residence,Tonga,country,Nfld.,0,7
+1975,3,residence,Tonga,country,P.E.I.,0,7
+1975,3,residence,Tonga,country,N.S.,0,7
+1975,3,residence,Tonga,country,N.B.,0,7
+1975,3,residence,Tonga,country,Que.,0,7
+1975,3,residence,Tonga,country,Ont.,1,7
+1975,3,residence,Tonga,country,Man.,0,7
+1975,3,residence,Tonga,country,Sask.,0,7
+1975,3,residence,Tonga,country,Alta.,1,7
+1975,3,residence,Tonga,country,B.C.,1,7
+1975,3,residence,Tonga,country,N.W.T. Yukon,0,7
+1975,3,residence,Others,country,Canada,2,7
+1975,3,residence,Others,country,Nfld.,0,7
+1975,3,residence,Others,country,P.E.I.,0,7
+1975,3,residence,Others,country,N.S.,0,7
+1975,3,residence,Others,country,N.B.,0,7
+1975,3,residence,Others,country,Que.,0,7
+1975,3,residence,Others,country,Ont.,0,7
+1975,3,residence,Others,country,Man.,0,7
+1975,3,residence,Others,country,Sask.,0,7
+1975,3,residence,Others,country,Alta.,0,7
+1975,3,residence,Others,country,B.C.,2,7
+1975,3,residence,Others,country,N.W.T. Yukon,0,7
+1975,3,residence,Total: Oceania and Other Ocean Islands,subtotal,Canada,2652,7
+1975,3,residence,Total: Oceania and Other Ocean Islands,subtotal,Nfld.,2,7
+1975,3,residence,Total: Oceania and Other Ocean Islands,subtotal,P.E.I.,0,7
+1975,3,residence,Total: Oceania and Other Ocean Islands,subtotal,N.S.,0,7
+1975,3,residence,Total: Oceania and Other Ocean Islands,subtotal,N.B.,1,7
+1975,3,residence,Total: Oceania and Other Ocean Islands,subtotal,Que.,123,7
+1975,3,residence,Total: Oceania and Other Ocean Islands,subtotal,Ont.,355,7
+1975,3,residence,Total: Oceania and Other Ocean Islands,subtotal,Man.,20,7
+1975,3,residence,Total: Oceania and Other Ocean Islands,subtotal,Sask.,0,7
+1975,3,residence,Total: Oceania and Other Ocean Islands,subtotal,Alta.,200,7
+1975,3,residence,Total: Oceania and Other Ocean Islands,subtotal,B.C.,1950,7
+1975,3,residence,Total: Oceania and Other Ocean Islands,subtotal,N.W.T. Yukon,1,7
+1975,3,residence,GRAND TOTAL,total,Canada,187881,7
+1975,3,residence,GRAND TOTAL,total,Nfld.,1106,7
+1975,3,residence,GRAND TOTAL,total,P.E.I.,235,7
+1975,3,residence,GRAND TOTAL,total,N.S.,2124,7
+1975,3,residence,GRAND TOTAL,total,N.B.,2093,7
+1975,3,residence,GRAND TOTAL,total,Que.,28042,7
+1975,3,residence,GRAND TOTAL,total,Ont.,98471,7
+1975,3,residence,GRAND TOTAL,total,Man.,7134,7
+1975,3,residence,GRAND TOTAL,total,Sask.,2837,7
+1975,3,residence,GRAND TOTAL,total,Alta.,16277,7
+1975,3,residence,GRAND TOTAL,total,B.C.,29272,7
+1975,3,residence,GRAND TOTAL,total,N.W.T. Yukon,290,7

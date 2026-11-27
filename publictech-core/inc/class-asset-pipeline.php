@@ -274,6 +274,11 @@ final class Asset_Pipeline {
 		if ( is_singular( 'member-parliament' ) || is_post_type_archive( 'member-parliament' ) ) {
 			return true;
 		}
+		// Party / region archives render the MP directory (taxonomy-mp_party.php / taxonomy-mp_region.php) and need
+		// its search script; without it the facets, sort and pager are dead on those pages.
+		if ( is_tax( [ 'mp_party', 'mp_region' ] ) ) {
+			return true;
+		}
 		if ( is_singular( 'forum-thread' ) || is_post_type_archive( 'forum-thread' ) ) {
 			return true;
 		}

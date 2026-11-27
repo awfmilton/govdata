@@ -1,0 +1,167 @@
+year,table,basis,row_label,row_kind,column,value,page
+1977,9,citizenship,Albania,country,Canada,2,26
+1977,9,citizenship,Austria,country,Canada,180,26
+1977,9,citizenship,Belgium,country,Canada,341,26
+1977,9,citizenship,Britain and Colonies,country,Canada,22453,26
+1977,9,citizenship,Bulgaria,country,Canada,22,26
+1977,9,citizenship,Czechoslovakia,country,Canada,136,26
+1977,9,citizenship,Denmark,country,Canada,248,26
+1977,9,citizenship,Finland,country,Canada,185,26
+1977,9,citizenship,France,country,Canada,2450,26
+1977,9,citizenship,German Dem. Rep.,country,Canada,27,26
+1977,9,citizenship,"Germany, Fed. Rep.",country,Canada,2049,26
+1977,9,citizenship,Greece,country,Canada,1892,26
+1977,9,citizenship,Hungary,country,Canada,290,26
+1977,9,citizenship,Iceland,country,Canada,34,26
+1977,9,citizenship,Irish Republic,country,Canada,763,26
+1977,9,citizenship,Italy,country,Canada,3102,26
+1977,9,citizenship,Liechtenstein,country,Canada,1,26
+1977,9,citizenship,Lithuania,country,Canada,1,26
+1977,9,citizenship,Luxembourg,country,Canada,3,26
+1977,9,citizenship,Malta,country,Canada,167,26
+1977,9,citizenship,Netherlands,country,Canada,1362,26
+1977,9,citizenship,Norway,country,Canada,84,26
+1977,9,citizenship,Poland,country,Canada,956,26
+1977,9,citizenship,Portugal,country,Canada,4736,26
+1977,9,citizenship,Romania,country,Canada,241,26
+1977,9,citizenship,Spain,country,Canada,332,26
+1977,9,citizenship,Sweden,country,Canada,280,26
+1977,9,citizenship,Switzerland,country,Canada,825,26
+1977,9,citizenship,Turkey,country,Canada,320,26
+1977,9,citizenship,U.S.S.R.,country,Canada,279,26
+1977,9,citizenship,Yugoslavia,country,Canada,1660,26
+1977,9,citizenship,Total: Europe,subtotal,Canada,45421,26
+1977,9,citizenship,Algeria,country,Canada,73,26
+1977,9,citizenship,Angola,country,Canada,1,26
+1977,9,citizenship,"Benin, Peoples, Rep. of",country,Canada,8,26
+1977,9,citizenship,Botswana,country,Canada,4,26
+1977,9,citizenship,Burundi,country,Canada,2,26
+1977,9,citizenship,Cameroun,country,Canada,10,26
+1977,9,citizenship,Central African Rep.,country,Canada,1,26
+1977,9,citizenship,Chad,country,Canada,1,26
+1977,9,citizenship,Congo Rep. of.,country,Canada,2,26
+1977,9,citizenship,Egypt,country,Canada,620,26
+1977,9,citizenship,Ethiopia,country,Canada,51,26
+1977,9,citizenship,Gabon,country,Canada,1,26
+1977,9,citizenship,Gambia,country,Canada,2,26
+1977,9,citizenship,Ghana,country,Canada,143,26
+1977,9,citizenship,Guinea,country,Canada,2,26
+1977,9,citizenship,Ivory Coast,country,Canada,5,26
+1977,9,citizenship,Kenya,country,Canada,313,26
+1977,9,citizenship,Lesotho,country,Canada,1,26
+1977,9,citizenship,Liberia,country,Canada,3,26
+1977,9,citizenship,Libya,country,Canada,2,26
+1977,9,citizenship,Malagasy Republic,country,Canada,24,26
+1977,9,citizenship,Malawi,country,Canada,16,26
+1977,9,citizenship,Mali,country,Canada,1,26
+1977,9,citizenship,Mauritania,country,Canada,1,26
+1977,9,citizenship,Morocco,country,Canada,247,26
+1977,9,citizenship,Namibia,country,Canada,1,26
+1977,9,citizenship,Nigeria,country,Canada,139,26
+1977,9,citizenship,Rhodesia,country,Canada,8,26
+1977,9,citizenship,Rwanda,country,Canada,1,26
+1977,9,citizenship,Senegal,country,Canada,8,26
+1977,9,citizenship,Sierra Leone,country,Canada,7,26
+1977,9,citizenship,"Somali, Republic",country,Canada,7,26
+1977,9,citizenship,"South Africa, Rep.",country,Canada,1857,26
+1977,9,citizenship,Sudan,country,Canada,12,26
+1977,9,citizenship,Swaziland,country,Canada,2,26
+1977,9,citizenship,Tanzania,country,Canada,800,28
+1977,9,citizenship,Togo,country,Canada,5,28
+1977,9,citizenship,Tunisia,country,Canada,92,28
+1977,9,citizenship,Uganda,country,Canada,59,28
+1977,9,citizenship,Upper-Volta,country,Canada,2,28
+1977,9,citizenship,Zaire,country,Canada,11,28
+1977,9,citizenship,Zambia,country,Canada,40,28
+1977,9,citizenship,"Africa, N.E.S.",country,Canada,3,28
+1977,9,citizenship,Total: Africa,subtotal,Canada,4588,28
+1977,9,citizenship,Afghanistan,country,Canada,12,28
+1977,9,citizenship,Bahrain,country,Canada,2,28
+1977,9,citizenship,Bangladesh,country,Canada,137,28
+1977,9,citizenship,Bhutan,country,Canada,1,28
+1977,9,citizenship,Brunei,country,Canada,3,28
+1977,9,citizenship,Burma,country,Canada,25,28
+1977,9,citizenship,China,country,Canada,965,28
+1977,9,citizenship,Cyprus,country,Canada,296,28
+1977,9,citizenship,India,country,Canada,5993,28
+1977,9,citizenship,Indonesia,country,Canada,126,28
+1977,9,citizenship,Iran,country,Canada,409,28
+1977,9,citizenship,Iraq,country,Canada,192,28
+1977,9,citizenship,Israel,country,Canada,1000,28
+1977,9,citizenship,Japan,country,Canada,387,28
+1977,9,citizenship,Jordan,country,Canada,175,28
+1977,9,citizenship,Kampuchea,country,Canada,13,28
+1977,9,citizenship,"Korea, D.P.R. of",country,Canada,22,28
+1977,9,citizenship,"Korea, Rep. of",country,Canada,1320,28
+1977,9,citizenship,Kuwait,country,Canada,1,28
+1977,9,citizenship,Laos,country,Canada,44,28
+1977,9,citizenship,Lebanon,country,Canada,3718,28
+1977,9,citizenship,Malaysia,country,Canada,578,28
+1977,9,citizenship,Mongolia,country,Canada,1,28
+1977,9,citizenship,Nepal,country,Canada,4,28
+1977,9,citizenship,Oman,country,Canada,3,28
+1977,9,citizenship,Pakistan,country,Canada,1595,28
+1977,9,citizenship,Philippines,country,Canada,6052,28
+1977,9,citizenship,Singapore,country,Canada,225,28
+1977,9,citizenship,Sri Lanka,country,Canada,210,28
+1977,9,citizenship,Syria,country,Canada,236,28
+1977,9,citizenship,Taiwan,country,Canada,1107,28
+1977,9,citizenship,Thailand,country,Canada,58,28
+1977,9,citizenship,United Arab Emirates,country,Canada,2,28
+1977,9,citizenship,"Vietnam, Soc. Rep. of",country,Canada,286,28
+1977,9,citizenship,"Vietnam, South",country,Canada,310,28
+1977,9,citizenship,"Yemen, Arab Rep.",country,Canada,1,28
+1977,9,citizenship,Total: Asia,subtotal,Canada,25509,28
+1977,9,citizenship,Australia,country,Canada,875,28
+1977,9,citizenship,New Zealand,country,Canada,453,28
+1977,9,citizenship,"Papua, New Guinea",country,Canada,1,28
+1977,9,citizenship,"Australasia, N.E.S.",country,Canada,2,28
+1977,9,citizenship,Total: Australasia,subtotal,Canada,1331,28
+1977,9,citizenship,Belize,country,Canada,24,28
+1977,9,citizenship,Costa Rica,country,Canada,35,28
+1977,9,citizenship,El Salvador,country,Canada,126,28
+1977,9,citizenship,Guatemala,country,Canada,146,28
+1977,9,citizenship,Honduras,country,Canada,68,28
+1977,9,citizenship,Mexico,country,Canada,762,28
+1977,9,citizenship,Nicaragua,country,Canada,14,28
+1977,9,citizenship,Panama,country,Canada,27,28
+1977,9,citizenship,U.S.A.,country,Canada,12237,28
+1977,9,citizenship,Total: North and Central America,subtotal,Canada,13439,28
+1977,9,citizenship,Anguilla,country,Canada,1,30
+1977,9,citizenship,Antigua,country,Canada,107,30
+1977,9,citizenship,Bahamas,country,Canada,43,30
+1977,9,citizenship,Barbados,country,Canada,653,30
+1977,9,citizenship,Cuba,country,Canada,5,30
+1977,9,citizenship,Dominica,country,Canada,92,30
+1977,9,citizenship,Dominican Rep.,country,Canada,37,30
+1977,9,citizenship,Grenada,country,Canada,209,30
+1977,9,citizenship,Haiti,country,Canada,2075,30
+1977,9,citizenship,Jamaica,country,Canada,6161,30
+1977,9,citizenship,Nevis,country,Canada,8,30
+1977,9,citizenship,St. Kitts,country,Canada,80,30
+1977,9,citizenship,St. Lucia,country,Canada,75,30
+1977,9,citizenship,St. Vincent,country,Canada,238,30
+1977,9,citizenship,Trinidad and Tobago,country,Canada,1586,30
+1977,9,citizenship,"West Indies, N.E.S.",country,Canada,2,30
+1977,9,citizenship,Total: Caribbean,subtotal,Canada,11372,30
+1977,9,citizenship,Argentina,country,Canada,724,30
+1977,9,citizenship,Bolivia,country,Canada,29,30
+1977,9,citizenship,Brazil,country,Canada,217,30
+1977,9,citizenship,Chile,country,Canada,2206,30
+1977,9,citizenship,Colombia,country,Canada,506,30
+1977,9,citizenship,Ecuador,country,Canada,554,30
+1977,9,citizenship,Guyana,country,Canada,2567,30
+1977,9,citizenship,Paraguay,country,Canada,116,30
+1977,9,citizenship,Peru,country,Canada,320,30
+1977,9,citizenship,Uruguay,country,Canada,307,30
+1977,9,citizenship,Venezuela,country,Canada,65,30
+1977,9,citizenship,Total: South America,subtotal,Canada,7611,30
+1977,9,citizenship,Cape Verde Islands,country,Canada,1,30
+1977,9,citizenship,Fiji,country,Canada,716,30
+1977,9,citizenship,Mauritius,country,Canada,209,30
+1977,9,citizenship,"Samoa, West",country,Canada,3,30
+1977,9,citizenship,Tonga,country,Canada,8,30
+1977,9,citizenship,U.S. Trust Terr. of the Pacific Is.,country,Canada,1,30
+1977,9,citizenship,Total: Oceania and Other Ocean Islands,subtotal,Canada,938,30
+1977,9,citizenship,Stateless,country,Canada,4705,30
+1977,9,citizenship,TOTAL,total,Canada,114914,30

@@ -1,0 +1,200 @@
+year,table,basis,row_label,row_kind,column,value,page
+1979,10,birth,Albania,country,Canada,4,18
+1979,10,birth,Austria,country,Canada,189,18
+1979,10,birth,Belgium,country,Canada,402,18
+1979,10,birth,Britain,subtotal,Canada,11806,18
+1979,10,birth,England,country,Canada,8708,18
+1979,10,birth,Northern Ireland,country,Canada,602,18
+1979,10,birth,Scotland,country,Canada,2075,18
+1979,10,birth,Wales,country,Canada,403,18
+1979,10,birth,Channel Islands,country,Canada,18,18
+1979,10,birth,Bulgaria,country,Canada,66,18
+1979,10,birth,Czechoslovakia,country,Canada,464,18
+1979,10,birth,Denmark,country,Canada,229,18
+1979,10,birth,Estonian S.S.R.,country,Canada,8,18
+1979,10,birth,Finland,country,Canada,198,18
+1979,10,birth,France,country,Canada,1547,18
+1979,10,birth,German Democratic Rep.,country,Canada,31,18
+1979,10,birth,"Germany, Fed. Rep.",country,Canada,1428,18
+1979,10,birth,Gibraltar,country,Canada,16,18
+1979,10,birth,Greece,country,Canada,1187,18
+1979,10,birth,Hungary,country,Canada,465,18
+1979,10,birth,Iceland,country,Canada,13,18
+1979,10,birth,Irish Rep.,country,Canada,607,18
+1979,10,birth,Italy,country,Canada,2134,18
+1979,10,birth,Latvian S.S.R.,country,Canada,7,18
+1979,10,birth,Liechtenstein,country,Canada,4,18
+1979,10,birth,Lithuanian S.S.R.,country,Canada,12,18
+1979,10,birth,Luxembourg,country,Canada,7,18
+1979,10,birth,Malta,country,Canada,211,18
+1979,10,birth,Monaco,country,Canada,1,18
+1979,10,birth,Netherlands,country,Canada,1426,18
+1979,10,birth,Norway,country,Canada,71,18
+1979,10,birth,Poland,country,Canada,1263,18
+1979,10,birth,Portugal,country,Canada,3742,18
+1979,10,birth,Romania,country,Canada,556,18
+1979,10,birth,Spain,country,Canada,253,18
+1979,10,birth,Sweden,country,Canada,221,18
+1979,10,birth,Switzerland,country,Canada,1010,18
+1979,10,birth,Turkey,country,Canada,427,18
+1979,10,birth,U.S.S.R.,country,Canada,1650,18
+1979,10,birth,Yugoslavia,country,Canada,978,18
+1979,10,birth,Total: Europe,subtotal,Canada,32633,18
+1979,10,birth,Algeria,country,Canada,145,18
+1979,10,birth,Angola,country,Canada,76,18
+1979,10,birth,"Benin, Peoples Rep. of",country,Canada,3,18
+1979,10,birth,"Botswana, Republic of",country,Canada,6,18
+1979,10,birth,Burundi,country,Canada,9,18
+1979,10,birth,"Cameroun, Fed. Rep. of",country,Canada,9,18
+1979,10,birth,Central African Empire,country,Canada,3,18
+1979,10,birth,"Chad, Rep. of",country,Canada,2,18
+1979,10,birth,"Congo, Republic of",country,Canada,3,18
+1979,10,birth,Egypt,country,Canada,652,18
+1979,10,birth,Equatorial Guinea,country,Canada,1,18
+1979,10,birth,Ethiopia,country,Canada,103,18
+1979,10,birth,Gabon Rep.,country,Canada,5,18
+1979,10,birth,Gambia,country,Canada,1,18
+1979,10,birth,Ghana,country,Canada,137,18
+1979,10,birth,"Guinea, Rep. of",country,Canada,9,18
+1979,10,birth,Ivory Coast,country,Canada,26,18
+1979,10,birth,Kenya,country,Canada,366,18
+1979,10,birth,Lesotho,country,Canada,3,18
+1979,10,birth,Liberia,country,Canada,4,18
+1979,10,birth,Libya,country,Canada,13,20
+1979,10,birth,Malagasy Republic,country,Canada,61,20
+1979,10,birth,Malawi,country,Canada,13,20
+1979,10,birth,Mali Rep.,country,Canada,4,20
+1979,10,birth,Mauritania,country,Canada,6,20
+1979,10,birth,Morocco,country,Canada,301,20
+1979,10,birth,Mozambique,country,Canada,75,20
+1979,10,birth,Namibia,country,Canada,5,20
+1979,10,birth,Niger,country,Canada,2,20
+1979,10,birth,Nigeria,country,Canada,68,20
+1979,10,birth,Rhodesia,country,Canada,168,20
+1979,10,birth,Rwanda,country,Canada,14,20
+1979,10,birth,Senegal,country,Canada,29,20
+1979,10,birth,Sierra Leone,country,Canada,4,20
+1979,10,birth,"Somali, Republic",country,Canada,3,20
+1979,10,birth,South Africa Rep.,country,Canada,1080,20
+1979,10,birth,"Sudan, Dem. Rep. of",country,Canada,14,20
+1979,10,birth,Swaziland,country,Canada,7,20
+1979,10,birth,"Tanzania, United Rep. of",country,Canada,646,20
+1979,10,birth,"Togo, Rep. of",country,Canada,3,20
+1979,10,birth,Tunisia,country,Canada,85,20
+1979,10,birth,Uganda,country,Canada,148,20
+1979,10,birth,Upper Volta,country,Canada,4,20
+1979,10,birth,"Zaire, Republic",country,Canada,36,20
+1979,10,birth,Zambia,country,Canada,60,20
+1979,10,birth,Total: Africa,subtotal,Canada,4412,20
+1979,10,birth,Afghanistan,country,Canada,9,20
+1979,10,birth,Bahrain,country,Canada,4,20
+1979,10,birth,Bangladesh,country,Canada,75,20
+1979,10,birth,Brunei,country,Canada,158,20
+1979,10,birth,"Burma, Union of",country,Canada,106,20
+1979,10,birth,"China, Peop. Rep. of",country,Canada,5821,20
+1979,10,birth,Cyprus,country,Canada,137,20
+1979,10,birth,Hong Kong B.C.C.,country,Canada,3548,20
+1979,10,birth,India,country,Canada,5486,20
+1979,10,birth,"Indonesia, Rep. of",country,Canada,245,20
+1979,10,birth,Iran,country,Canada,1023,20
+1979,10,birth,Iraq,country,Canada,304,20
+1979,10,birth,Israel,country,Canada,499,20
+1979,10,birth,Japan,country,Canada,591,20
+1979,10,birth,Jordan,country,Canada,142,20
+1979,10,birth,"Kampuchea, Dem. Rep.",country,Canada,1206,20
+1979,10,birth,"Korea, Dem. Peop. Rep. of",country,Canada,3,20
+1979,10,birth,"Korea, Republic of",country,Canada,867,20
+1979,10,birth,Kuwait,country,Canada,18,20
+1979,10,birth,Laos,country,Canada,3843,20
+1979,10,birth,Lebanon,country,Canada,1537,20
+1979,10,birth,Macao,country,Canada,124,20
+1979,10,birth,Malaysia,country,Canada,612,20
+1979,10,birth,Mongolian People's Rep.,country,Canada,1,20
+1979,10,birth,Nepal,country,Canada,7,20
+1979,10,birth,Pakistan,country,Canada,964,20
+1979,10,birth,"Philippines, Rep. of the",country,Canada,3927,20
+1979,10,birth,Qatar,country,Canada,1,20
+1979,10,birth,Saudi Arabia,country,Canada,9,20
+1979,10,birth,Singapore,country,Canada,183,20
+1979,10,birth,Sri Lanka,country,Canada,152,20
+1979,10,birth,Syria,country,Canada,251,20
+1979,10,birth,Taiwan (Formosa),country,Canada,489,20
+1979,10,birth,Thailand,country,Canada,274,20
+1979,10,birth,United Arab Emirates,country,Canada,1,20
+1979,10,birth,"Vietnam, Soc. Rep. of",country,Canada,19114,20
+1979,10,birth,"Yemen, Arab Rep.",country,Canada,4,20
+1979,10,birth,"Yemen, P.D.R.",country,Canada,5,20
+1979,10,birth,Total: Asia,subtotal,Canada,51740,20
+1979,10,birth,Australia,country,Canada,558,22
+1979,10,birth,Nauru,country,Canada,1,22
+1979,10,birth,New Zealand,country,Canada,506,22
+1979,10,birth,Papua New Guinea,country,Canada,3,22
+1979,10,birth,Total: Australasia,subtotal,Canada,1068,22
+1979,10,birth,Belize,country,Canada,19,22
+1979,10,birth,Canada,country,Canada,582,22
+1979,10,birth,Costa Rica,country,Canada,20,22
+1979,10,birth,El Salvador,country,Canada,108,22
+1979,10,birth,Guatemala,country,Canada,59,22
+1979,10,birth,Honduras,country,Canada,43,22
+1979,10,birth,Mexico,country,Canada,384,22
+1979,10,birth,Nicaragua,country,Canada,44,22
+1979,10,birth,Panama,country,Canada,13,22
+1979,10,birth,Panama Canal Zone,country,Canada,2,22
+1979,10,birth,St. Pierre and Miquelon,country,Canada,33,22
+1979,10,birth,U.S.A.,country,Canada,7821,22
+1979,10,birth,Total: North and Central America,subtotal,Canada,9128,22
+1979,10,birth,Anguilla,country,Canada,1,22
+1979,10,birth,Antigua,country,Canada,77,22
+1979,10,birth,Bahamas Islands,country,Canada,37,22
+1979,10,birth,Barbados,country,Canada,299,22
+1979,10,birth,Bermuda,country,Canada,59,22
+1979,10,birth,Cayman Islands,country,Canada,1,22
+1979,10,birth,Cuba,country,Canada,20,22
+1979,10,birth,Dominica,country,Canada,55,22
+1979,10,birth,Dominican Rep.,country,Canada,29,22
+1979,10,birth,Grenada,country,Canada,162,22
+1979,10,birth,Guadeloupe,country,Canada,8,22
+1979,10,birth,Haiti,country,Canada,1321,22
+1979,10,birth,Jamaica,country,Canada,3313,22
+1979,10,birth,Martinique,country,Canada,8,22
+1979,10,birth,Montserrat,country,Canada,16,22
+1979,10,birth,Netherland Antilles,country,Canada,25,22
+1979,10,birth,Nevis,country,Canada,19,22
+1979,10,birth,Puerto Rico,country,Canada,6,22
+1979,10,birth,St. Kitts,country,Canada,50,22
+1979,10,birth,St. Lucia,country,Canada,50,22
+1979,10,birth,St. Vincent,country,Canada,171,22
+1979,10,birth,Trinidad and Tobago Dem. Rep. of,country,Canada,796,22
+1979,10,birth,Turks and Caicos Islands,country,Canada,1,22
+1979,10,birth,"Virgin Is., Br.",country,Canada,3,22
+1979,10,birth,"Virgin Is., U.S.A.",country,Canada,8,22
+1979,10,birth,Total: Caribbean,subtotal,Canada,6535,22
+1979,10,birth,Argentina,country,Canada,414,22
+1979,10,birth,Bolivia,country,Canada,26,22
+1979,10,birth,Brazil,country,Canada,163,22
+1979,10,birth,Chile,country,Canada,1310,22
+1979,10,birth,Colombia,country,Canada,326,22
+1979,10,birth,Ecuador,country,Canada,283,22
+1979,10,birth,French Guiana,country,Canada,2,22
+1979,10,birth,Guyana,country,Canada,2563,22
+1979,10,birth,Paraguay,country,Canada,73,22
+1979,10,birth,Peru,country,Canada,354,22
+1979,10,birth,Surinam,country,Canada,18,22
+1979,10,birth,Uruguay,country,Canada,227,22
+1979,10,birth,Venezuela,country,Canada,51,22
+1979,10,birth,Total: South America,subtotal,Canada,5810,22
+1979,10,birth,Cape Verde Isl.,country,Canada,6,24
+1979,10,birth,Comoro Islands,country,Canada,2,24
+1979,10,birth,Fiji,country,Canada,507,24
+1979,10,birth,French Polynesia,country,Canada,4,24
+1979,10,birth,Mauritius,country,Canada,203,24
+1979,10,birth,New Caledonia,country,Canada,3,24
+1979,10,birth,Reunion,country,Canada,1,24
+1979,10,birth,St. Helena,country,Canada,1,24
+1979,10,birth,"Samoa, American",country,Canada,1,24
+1979,10,birth,"Samoa, Western",country,Canada,4,24
+1979,10,birth,Seychelles,country,Canada,2,24
+1979,10,birth,Tonga,country,Canada,2,24
+1979,10,birth,Total: Oceania and Other Ocean Islands,subtotal,Canada,736,24
+1979,10,birth,Not Stated,country,Canada,34,24
+1979,10,birth,TOTAL,total,Canada,112096,24

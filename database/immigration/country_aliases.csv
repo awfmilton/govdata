@@ -1,0 +1,221 @@
+alias,canonical,kind,notes
+United Kingdom and Colonies,United Kingdom and Overseas Territories,country,IRCC 1980-2015 file spelling
+Hong Kong,Hong Kong SAR,country,
+Macau,Macau SAR,country,
+"Benin, Peoples Republic of","Benin, Republic of",country,
+Soloman Islands,Solomon Islands,country,misspelling in IRCC_PRadmiss_0004
+"Solomons, The",Solomon Islands,country,
+Commonwealth of the Northern Mariana Islands,"Northern Mariana Islands, Commonwealth of the",country,
+Country of citizenship not stated,Country not stated,other,
+Other countries of citizenship,Other,other,
+Union of Soviet Socialist Republics,Union of Soviet Socialist Republics,country,former state; NOT merged into successor states
+Czechoslovakia,Czechoslovakia,country,former state; NOT merged into successor states
+Yugoslavia,Yugoslavia,country,former state; NOT merged into successor states
+Democratic Republic of Germany,German Democratic Republic,country,former state (East Germany)
+Serbia and Montenegro,Serbia and Montenegro,country,former state 2003-2006
+Panama Canal Zone,Panama Canal Zone,country,former territory
+Pitcairn Island,Pitcairn Island,country,
+Africa NES,Africa NES,group,not elsewhere specified
+Asia NES,Asia NES,group,not elsewhere specified
+Central America NES,Central America NES,group,not elsewhere specified
+Europe NES,Europe NES,group,not elsewhere specified
+Ocean NES,Ocean NES,group,not elsewhere specified
+South America NES,South America NES,group,not elsewhere specified
+West Indies NES,West Indies NES,group,not elsewhere specified
+Great Britain,United Kingdom and Overseas Territories,country,StatCan last-permanent-residence label
+Netherlands,"Netherlands, The",country,StatCan last-permanent-residence label
+United States,United States of America,country,StatCan last-permanent-residence label
+"South Africa","South Africa, Republic of",country,StatCan last-permanent-residence label
+China,"China, People's Republic of",country,"StatCan 1955-1976 label; place of last permanent residence, mapped to the PRC entry"
+West Indies,West Indies,region,StatCan region label
+All other countries,All other countries,other,StatCan residual
+"Africa, n.e.s.",Africa NES,group,MP22-1 1966-1979
+"Africa, other",Other Africa,group,MP22-1 1966-1979
+Anguilla,Anguilla,country,MP22-1 1966-1979
+Antigua,Antigua and Barbuda,country,MP22-1 1966-1979
+Arabia Saudi,Saudi Arabia,country,MP22-1 1966-1979
+"Asia, n.e.s.",Asia NES,group,MP22-1 1966-1979
+"Asia, other",Other Asia,group,MP22-1 1966-1979
+"Australasia, N.E.S.",Australasia NES,group,MP22-1 1966-1979
+Bahamas,"Bahama Islands, The",country,MP22-1 1966-1979
+Bahamas Islands,"Bahama Islands, The",country,MP22-1 1966-1979
+"Benin, Peoples Rep. of","Benin, Republic of",country,MP22-1 1966-1979
+"Benin, Peoples, Rep. of","Benin, Republic of",country,MP22-1 1966-1979
+Born at sea,Born at sea,other,MP22-1 1966-1979
+Botswana,"Botswana, Republic of",country,MP22-1 1966-1979
+"Botswana, Rep. of","Botswana, Republic of",country,MP22-1 1966-1979
+Brasil,Brazil,country,MP22-1 1966-1979
+Britain,United Kingdom and Overseas Territories,country,MP22-1 1966-1979; MP22-1 label
+Britain & Colonies,United Kingdom and Overseas Territories,country,MP22-1 1966-1979
+Britain and Colonies,United Kingdom and Overseas Territories,country,MP22-1 1966-1979
+British Honduras (Belize),Belize,country,MP22-1 1966-1979; renamed 1973
+Burma,Myanmar (Burma),country,MP22-1 1966-1979; renamed
+"Burma, Union of",Myanmar (Burma),country,MP22-1 1966-1979; renamed
+Cameroon,"Cameroon, Federal Republic of",country,MP22-1 1966-1979
+Cameroun,"Cameroon, Federal Republic of",country,MP22-1 1966-1979
+"Cameroun, Fed. Rep. of","Cameroon, Federal Republic of",country,MP22-1 1966-1979
+Canada,Canada,other,MP22-1 1966-1979; last permanent residence / birth / citizenship given as Canada
+Cape Verde Isl.,Cape Verde Islands,country,MP22-1 1966-1979
+Caroline Islands,Caroline Islands,country,MP22-1 1966-1979; pre-1979 territory (later Micronesia and Palau); not split
+Cayman Islands,Cayman Islands,country,MP22-1 1966-1979
+Central African Emp.,Central African Republic,country,MP22-1 1966-1979; Empire 1976-1979
+Central African Rep.,Central African Republic,country,MP22-1 1966-1979
+Central America N.E.S.,Central America NES,group,MP22-1 1966-1979
+"Central America, n.e.s.",Central America NES,group,MP22-1 1966-1979
+Ceylon,Sri Lanka,country,MP22-1 1966-1979; renamed 1972
+Chad,"Chad, Republic of",country,MP22-1 1966-1979
+Channel Islands,Channel Islands,country,MP22-1 1966-1979
+"China, Peop. Rep. of","China, People's Republic of",country,MP22-1 1966-1979
+Comoro Islands,Comoros,country,MP22-1 1966-1979
+Congo Rep. of.,"Congo, People's Republic of the",country,MP22-1 1966-1979; Republic of the Congo (Brazzaville)
+Congo Republic of,"Congo, People's Republic of the",country,MP22-1 1966-1979; Brazzaville
+"Congo, Republic of","Congo, People's Republic of the",country,MP22-1 1966-1979; Brazzaville
+Cook Islands,Cook Islands,country,MP22-1 1966-1979
+Dahomey,"Benin, Republic of",country,MP22-1 1966-1979; renamed 1975
+Djibouti,"Djibouti, Republic of",country,MP22-1 1966-1979
+Dominican Rep.,Dominican Republic,country,MP22-1 1966-1979
+England,United Kingdom and Overseas Territories,country,MP22-1 1966-1979; constituent country; row label kept in country_raw
+Equatorial Guinea,"Equatorial Guinea, Republic of",country,MP22-1 1966-1979
+Estonian S.S.R.,Estonia,country,MP22-1 1966-1979; listed separately from the USSR in the source
+"Europe, n.e.s.",Europe NES,group,MP22-1 1966-1979
+"Europe, other",Other Europe,group,MP22-1 1966-1979
+French Guiana,French Guiana,country,MP22-1 1966-1979
+French Guina,French Guiana,country,MP22-1 1966-1979; source misspelling
+Gabon,Gabon Republic,country,MP22-1 1966-1979
+Gabon Rep.,Gabon Republic,country,MP22-1 1966-1979
+German Dem. Rep.,German Democratic Republic,country,MP22-1 1966-1979
+German Democratic Rep.,German Democratic Republic,country,MP22-1 1966-1979
+Germany Fed. Rep.,Germany,country,"MP22-1 1966-1979; West Germany, legal predecessor of unified Germany"
+Germany Federal Republic,Germany,country,MP22-1 1966-1979; West Germany
+"Germany, Fed. Rep.",Germany,country,MP22-1 1966-1979; West Germany
+"Germany, Federal Republic",Germany,country,MP22-1 1966-1979; West Germany
+Gibraltar,Gibraltar,country,MP22-1 1966-1979
+Gilbert and Ellice Islands,Gilbert and Ellice Islands,country,MP22-1 1966-1979; colony split 1975-76 into Kiribati and Tuvalu; not split
+Gilbert Islands,Kiribati,country,MP22-1 1966-1979; renamed 1979
+Greenland,Greenland,country,MP22-1 1966-1979
+Guam,Guam,country,MP22-1 1966-1979
+Guinea,"Guinea, Republic of",country,MP22-1 1966-1979
+"Guinea, Rep. of","Guinea, Republic of",country,MP22-1 1966-1979
+Hong Kong B.C.C.,Hong Kong SAR,country,MP22-1 1966-1979
+Indonesia,"Indonesia, Republic of",country,MP22-1 1966-1979
+"Indonesia, Rep. of","Indonesia, Republic of",country,MP22-1 1966-1979
+Ireland (Republic),"Ireland, Republic of",country,MP22-1 1966-1979
+"Ireland, Rep.","Ireland, Republic of",country,MP22-1 1966-1979
+"Ireland, Republic","Ireland, Republic of",country,MP22-1 1966-1979
+Irish Rep.,"Ireland, Republic of",country,MP22-1 1966-1979
+Irish Republic,"Ireland, Republic of",country,MP22-1 1966-1979
+Ivory Coast,"Ivory Coast, Republic of",country,MP22-1 1966-1979
+Kampuchea,Cambodia,country,MP22-1 1966-1979; renamed
+"Kampuchea, Dem. Republic",Cambodia,country,MP22-1 1966-1979; renamed
+Khmer Rep.,Cambodia,country,MP22-1 1966-1979; renamed
+"Khmer, Rep.",Cambodia,country,MP22-1 1966-1979; renamed
+"Korea, D.P.R. of","Korea, People's Democratic Republic of",country,MP22-1 1966-1979
+"Korea, North","Korea, People's Democratic Republic of",country,MP22-1 1966-1979
+"Korea, Rep. of","Korea, Republic of",country,MP22-1 1966-1979
+"Korea, South","Korea, Republic of",country,MP22-1 1966-1979
+Latvian S.S.R.,Latvia,country,MP22-1 1966-1979; listed separately from the USSR in the source
+Lesser Br. Isles,United Kingdom and Overseas Territories,country,MP22-1 1966-1979; Channel Islands and Isle of Man; row label kept
+Lesser British Isles,United Kingdom and Overseas Territories,country,MP22-1 1966-1979; row label kept
+Lithuanian S.S.R.,Lithuania,country,MP22-1 1966-1979; listed separately from the USSR in the source
+Luxemburg,Luxembourg,country,MP22-1 1966-1979
+Macao,Macau SAR,country,MP22-1 1966-1979
+Malagasy Republic,Madagascar,country,MP22-1 1966-1979; renamed 1975
+Mali,"Mali, Republic of",country,MP22-1 1966-1979
+Mali Rep.,"Mali, Republic of",country,MP22-1 1966-1979
+Marianas Islands,"Northern Mariana Islands, Commonwealth of the",country,MP22-1 1966-1979
+Martinique,Martinique,country,MP22-1 1966-1979
+Mongolia,"Mongolia, People's Republic of",country,MP22-1 1966-1979
+Montserrat,Montserrat,country,MP22-1 1966-1979
+Muscat and Oman,Oman,country,MP22-1 1966-1979; renamed 1970
+Namibia (S.W. Africa),Namibia,country,MP22-1 1966-1979
+Netherlands Antilles,"Netherlands Antilles, The",country,MP22-1 1966-1979
+New Caledonia & Loyalty Is.,New Caledonia,country,MP22-1 1966-1979
+New Guinea,Papua New Guinea,country,MP22-1 1966-1979; united with Papua 1975
+New Hebrides,Vanuatu,country,MP22-1 1966-1979; renamed 1980
+Niger,"Niger, Republic of the",country,MP22-1 1966-1979
+Northern Ireland,United Kingdom and Overseas Territories,country,MP22-1 1966-1979; constituent country; row label kept
+Others,Other Countries,other,MP22-1 1966-1979
+Panama,"Panama, Republic of",country,MP22-1 1966-1979
+Papua,Papua New Guinea,country,MP22-1 1966-1979; united with New Guinea 1975
+"Philippines, Rep. of the",Philippines,country,MP22-1 1966-1979
+Rhodesia,Zimbabwe,country,MP22-1 1966-1979; renamed 1980
+Roumania,Romania,country,MP22-1 1966-1979
+Samoa Western,"Samoa, Independent State of",country,MP22-1 1966-1979
+"Samoa, Eastern","Samoa, American",country,MP22-1 1966-1979
+"Samoa, West","Samoa, Independent State of",country,MP22-1 1966-1979
+"Samoa, Western","Samoa, Independent State of",country,MP22-1 1966-1979
+Sao Tome,Sao Tome and Principe,country,MP22-1 1966-1979
+Scotland,United Kingdom and Overseas Territories,country,MP22-1 1966-1979; constituent country; row label kept
+Seychelles Islands,Seychelles,country,MP22-1 1966-1979
+Society Islands,French Polynesia,country,MP22-1 1966-1979
+Solomon Islands (British),Solomon Islands,country,MP22-1 1966-1979
+"Solomon Islands, Br.",Solomon Islands,country,MP22-1 1966-1979
+"Solomon Islands, British",Solomon Islands,country,MP22-1 1966-1979
+Somali Republic,"Somalia, Democratic Republic of",country,MP22-1 1966-1979
+"Somali, Republic","Somalia, Democratic Republic of",country,MP22-1 1966-1979
+South Africa Rep.,"South Africa, Republic of",country,MP22-1 1966-1979
+South Africa Republic,"South Africa, Republic of",country,MP22-1 1966-1979
+"South Africa, Rep.","South Africa, Republic of",country,MP22-1 1966-1979
+"South Africa, Republic","South Africa, Republic of",country,MP22-1 1966-1979
+"South America, n.e.s.",South America NES,group,MP22-1 1966-1979
+"South America, other",Other South America,group,MP22-1 1966-1979
+St. Helena,St. Helena,country,MP22-1 1966-1979
+St. Kitts,St. Kitts-Nevis,country,MP22-1 1966-1979
+St. Pierre & Miquelon,St. Pierre and Miquelon,country,MP22-1 1966-1979
+St. Pierre and Miquelon,St. Pierre and Miquelon,country,MP22-1 1966-1979
+St. Vincent,St. Vincent and the Grenadines,country,MP22-1 1966-1979
+Sudan,"Sudan, Democratic Republic of",country,MP22-1 1966-1979
+"Sudan, Dem. Rep. of","Sudan, Democratic Republic of",country,MP22-1 1966-1979
+Taiwan (Formosa),Taiwan,country,MP22-1 1966-1979
+Tanzania,"Tanzania, United Republic of",country,MP22-1 1966-1979
+"Tanzania, United Rep. of","Tanzania, United Republic of",country,MP22-1 1966-1979
+Togo,"Togo, Republic of",country,MP22-1 1966-1979
+"Togo, Rep. of","Togo, Republic of",country,MP22-1 1966-1979
+Trinidad and Tobago,"Trinidad and Tobago, Republic of",country,MP22-1 1966-1979
+"Trinidad and Tobago, Dem. Rep. of","Trinidad and Tobago, Republic of",country,MP22-1 1966-1979
+Trinidad-Tobago,"Trinidad and Tobago, Republic of",country,MP22-1 1966-1979
+U.S. Trust Terr. of the Pacific Is.,U.S. Trust Territory of the Pacific Islands,country,MP22-1 1966-1979; pre-1986 territory; not split
+U.S. Trust Terr. of the Pacific Isl.,U.S. Trust Territory of the Pacific Islands,country,MP22-1 1966-1979
+U.S. Trust Territory of the Pacific Islands,U.S. Trust Territory of the Pacific Islands,country,MP22-1 1966-1979
+U.S.A.,United States of America,country,MP22-1 1966-1979
+U.S.S.R.,Union of Soviet Socialist Republics,country,MP22-1 1966-1979; former state; NOT merged into successor states
+Upper Volta,Burkina-Faso,country,MP22-1 1966-1979; renamed 1984
+Upper-Volta,Burkina-Faso,country,MP22-1 1966-1979; renamed 1984
+Vatican City State,Holy See,country,MP22-1 1966-1979
+"Vietnam, North","Vietnam, North (Democratic Republic)",country,MP22-1 1966-1979; former state 1954-1976; NOT merged
+"Vietnam, South","Vietnam, South (Republic)",country,MP22-1 1966-1979; former state 1954-1975; NOT merged
+"Vietnam, Soc. Rep.",Vietnam,country,MP22-1 1966-1979
+"Vietnam, Soc. Rep. of",Vietnam,country,MP22-1 1966-1979
+Virgin Is. (U.S.A.),"Virgin Islands, U.S.",country,MP22-1 1966-1979
+Virgin Is. Br.,"Virgin Islands, British",country,MP22-1 1966-1979
+"Virgin Is., Br.","Virgin Islands, British",country,MP22-1 1966-1979
+"Virgin Is., U.S.A.","Virgin Islands, U.S.",country,MP22-1 1966-1979
+Virgin Islands (U.S.),"Virgin Islands, U.S.",country,MP22-1 1966-1979
+"Virgin Islands, U.S.A.","Virgin Islands, U.S.",country,MP22-1 1966-1979
+Wales,United Kingdom and Overseas Territories,country,MP22-1 1966-1979; constituent country; row label kept
+West Indies N.E.S.,West Indies NES,group,MP22-1 1966-1979
+"West Indies, n.e.s.",West Indies NES,group,MP22-1 1966-1979
+Yemen Arab Rep.,Yemen Arab Republic (North Yemen),country,MP22-1 1966-1979; former state 1962-1990; NOT merged
+"Yemen, Arab Rep.",Yemen Arab Republic (North Yemen),country,MP22-1 1966-1979
+"Yemen, Arab. Rep.",Yemen Arab Republic (North Yemen),country,MP22-1 1966-1979
+"Yemen, P.D.R.","Yemen, People's Democratic Republic of (South Yemen)",country,MP22-1 1966-1979; former state 1967-1990; NOT merged
+Zaire,"Congo, Democratic Republic of the",country,MP22-1 1966-1979; renamed 1997
+"Zaire, Republic","Congo, Democratic Republic of the",country,MP22-1 1966-1979; renamed 1997
+Admiralty Islands,Papua New Guinea,country,MP22-1 1966-1979; part of Papua New Guinea
+Central African Empire,Central African Republic,country,MP22-1 1966-1979; Empire 1976-1979
+"Chad, Rep. of","Chad, Republic of",country,MP22-1 1966-1979
+Crozet Archipelago,Crozet Archipelago,country,MP22-1 1966-1979; French Southern Territories
+Falkland Islands,Falkland Islands,country,MP22-1 1966-1979
+"Kampuchea, Dem. Rep.",Cambodia,country,MP22-1 1966-1979; renamed
+"Kampuchea, Dem. Rep. of",Cambodia,country,MP22-1 1966-1979; renamed
+"Korea, Dem. Peop. Rep. of","Korea, People's Democratic Republic of",country,MP22-1 1966-1979
+Mongolian People's Rep.,"Mongolia, People's Republic of",country,MP22-1 1966-1979
+Netherland Antilles,"Netherlands Antilles, The",country,MP22-1 1966-1979
+Afars and Issas,"Djibouti, Republic of",country,"MP22-1 1966-1979; French Territory of the Afars and Issas, renamed 1977"
+Bahama Islands,"Bahama Islands, The",country,MP22-1 1966-1979
+British Honduras,Belize,country,MP22-1 1966-1979; renamed 1973
+Dutch West Indies,"Netherlands Antilles, The",country,MP22-1 1966-1979
+Maldives,"Maldives, Republic of",country,MP22-1 1966-1979
+Maurentia,Mauritania,country,MP22-1 1966-1979; 1973 printed spelling; listed among African countries where later reports print Mauritania
+S.W. Africa,Namibia,country,MP22-1 1966-1979; South West Africa
+"Timor, Portuguese","East Timor, Democratic Republic of",country,MP22-1 1966-1979; Portuguese Timor (same territory)

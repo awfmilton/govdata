@@ -1,0 +1,160 @@
+year,table,basis,row_label,row_kind,column,value,page
+1975,10,citizenship,Austria,country,Canada,291,22
+1975,10,citizenship,Belgium,country,Canada,332,22
+1975,10,citizenship,Britain and Colonies,country,Canada,40495,22
+1975,10,citizenship,Bulgaria,country,Canada,27,22
+1975,10,citizenship,Czechoslovakia,country,Canada,161,22
+1975,10,citizenship,Denmark,country,Canada,494,22
+1975,10,citizenship,Estonia,country,Canada,1,22
+1975,10,citizenship,Finland,country,Canada,301,22
+1975,10,citizenship,France,country,Canada,3196,22
+1975,10,citizenship,German Dem. Rep.,country,Canada,31,22
+1975,10,citizenship,"Germany, Fed. Rep.",country,Canada,2387,22
+1975,10,citizenship,Greece,country,Canada,4032,22
+1975,10,citizenship,Hungary,country,Canada,432,22
+1975,10,citizenship,Iceland,country,Canada,20,22
+1975,10,citizenship,Ireland (Republic),country,Canada,1495,22
+1975,10,citizenship,Italy,country,Canada,4940,22
+1975,10,citizenship,Liechtenstein,country,Canada,1,22
+1975,10,citizenship,Lithuania,country,Canada,2,22
+1975,10,citizenship,Luxembourg,country,Canada,4,22
+1975,10,citizenship,Malta,country,Canada,416,22
+1975,10,citizenship,Netherlands,country,Canada,1468,22
+1975,10,citizenship,Norway,country,Canada,188,22
+1975,10,citizenship,Poland,country,Canada,935,22
+1975,10,citizenship,Portugal,country,Canada,9530,22
+1975,10,citizenship,Romania,country,Canada,255,22
+1975,10,citizenship,Spain,country,Canada,646,22
+1975,10,citizenship,Sweden,country,Canada,395,22
+1975,10,citizenship,Switzerland,country,Canada,902,22
+1975,10,citizenship,Turkey,country,Canada,383,22
+1975,10,citizenship,U.S.S.R.,country,Canada,230,22
+1975,10,citizenship,Yugoslavia,country,Canada,3676,22
+1975,10,citizenship,TOTAL: EUROPE,subtotal,Canada,77666,22
+1975,10,citizenship,Afars and Issas,country,Canada,1,22
+1975,10,citizenship,Algeria,country,Canada,49,22
+1975,10,citizenship,Botswana,country,Canada,1,22
+1975,10,citizenship,Burundi,country,Canada,4,22
+1975,10,citizenship,Cameroon,country,Canada,22,22
+1975,10,citizenship,"Congo, Republic of",country,Canada,2,22
+1975,10,citizenship,Dahomey,country,Canada,5,22
+1975,10,citizenship,Egypt,country,Canada,954,22
+1975,10,citizenship,Ethiopia,country,Canada,15,22
+1975,10,citizenship,Gambia,country,Canada,4,22
+1975,10,citizenship,Ghana,country,Canada,296,22
+1975,10,citizenship,Guinea,country,Canada,6,22
+1975,10,citizenship,Ivory Coast,country,Canada,1,22
+1975,10,citizenship,Kenya,country,Canada,2025,22
+1975,10,citizenship,Lesotho,country,Canada,3,22
+1975,10,citizenship,Liberia,country,Canada,4,22
+1975,10,citizenship,Libya,country,Canada,2,22
+1975,10,citizenship,Malagasy Republic,country,Canada,9,22
+1975,10,citizenship,Malawi,country,Canada,21,22
+1975,10,citizenship,Mali,country,Canada,4,22
+1975,10,citizenship,Mauritania,country,Canada,1,22
+1975,10,citizenship,Morocco,country,Canada,625,22
+1975,10,citizenship,Nigeria,country,Canada,251,22
+1975,10,citizenship,Rhodesia,country,Canada,6,22
+1975,10,citizenship,Rwanda,country,Canada,3,22
+1975,10,citizenship,Senegal,country,Canada,14,22
+1975,10,citizenship,Sierra Leone,country,Canada,14,22
+1975,10,citizenship,Somali Republic,country,Canada,4,22
+1975,10,citizenship,"South Africa, Rep.",country,Canada,1272,22
+1975,10,citizenship,Sudan,country,Canada,11,22
+1975,10,citizenship,Swaziland,country,Canada,3,22
+1975,10,citizenship,Tanzania,country,Canada,2680,24
+1975,10,citizenship,Togo,country,Canada,3,24
+1975,10,citizenship,Tunisia,country,Canada,143,24
+1975,10,citizenship,Uganda,country,Canada,235,24
+1975,10,citizenship,Zaire,country,Canada,6,24
+1975,10,citizenship,Zambia,country,Canada,13,24
+1975,10,citizenship,TOTAL: AFRICA,subtotal,Canada,8712,24
+1975,10,citizenship,Afghanistan,country,Canada,12,24
+1975,10,citizenship,Bahrain,country,Canada,1,24
+1975,10,citizenship,Bangladesh,country,Canada,147,24
+1975,10,citizenship,Brunei,country,Canada,43,24
+1975,10,citizenship,Burma,country,Canada,43,24
+1975,10,citizenship,China,country,Canada,1166,24
+1975,10,citizenship,Cyprus,country,Canada,1006,24
+1975,10,citizenship,India,country,Canada,11600,24
+1975,10,citizenship,Indonesia,country,Canada,258,24
+1975,10,citizenship,Iran,country,Canada,197,24
+1975,10,citizenship,Iraq,country,Canada,94,24
+1975,10,citizenship,Israel,country,Canada,1668,24
+1975,10,citizenship,Japan,country,Canada,587,24
+1975,10,citizenship,Jordan,country,Canada,293,24
+1975,10,citizenship,Khmer Rep.,country,Canada,205,24
+1975,10,citizenship,"Korea, North",country,Canada,42,24
+1975,10,citizenship,"Korea, South",country,Canada,4252,24
+1975,10,citizenship,Laos,country,Canada,8,24
+1975,10,citizenship,Lebanon,country,Canada,1227,24
+1975,10,citizenship,Malaysia,country,Canada,660,24
+1975,10,citizenship,Nepal,country,Canada,5,24
+1975,10,citizenship,Pakistan,country,Canada,2520,24
+1975,10,citizenship,Philippines,country,Canada,7576,24
+1975,10,citizenship,Saudi Arabia,country,Canada,1,24
+1975,10,citizenship,Singapore,country,Canada,307,24
+1975,10,citizenship,Sri Lanka,country,Canada,536,24
+1975,10,citizenship,Syria,country,Canada,461,24
+1975,10,citizenship,Taiwan,country,Canada,1476,24
+1975,10,citizenship,Thailand,country,Canada,51,24
+1975,10,citizenship,"Vietnam, North",country,Canada,21,24
+1975,10,citizenship,"Vietnam, South",country,Canada,1189,24
+1975,10,citizenship,Yemen Arab Rep.,country,Canada,12,24
+1975,10,citizenship,"Asia, N.E.S.",country,Canada,2,24
+1975,10,citizenship,TOTAL: ASIA,subtotal,Canada,37666,24
+1975,10,citizenship,Australia,country,Canada,1358,24
+1975,10,citizenship,Nauru,country,Canada,1,24
+1975,10,citizenship,New Zealand,country,Canada,457,24
+1975,10,citizenship,"Australasia, N.E.S.",country,Canada,4,24
+1975,10,citizenship,TOTAL: AUSTRALASIA,subtotal,Canada,1820,24
+1975,10,citizenship,Belize,country,Canada,22,24
+1975,10,citizenship,Costa Rica,country,Canada,36,24
+1975,10,citizenship,El Salvador,country,Canada,178,24
+1975,10,citizenship,Guatemala,country,Canada,254,24
+1975,10,citizenship,Honduras,country,Canada,30,24
+1975,10,citizenship,Mexico,country,Canada,776,24
+1975,10,citizenship,Nicaragua,country,Canada,23,24
+1975,10,citizenship,Panama,country,Canada,10,24
+1975,10,citizenship,U.S.A.,country,Canada,18912,24
+1975,10,citizenship,Central America N.E.S.,country,Canada,3,24
+1975,10,citizenship,TOTAL: NORTH AND CENTRAL AMERICA,subtotal,Canada,20244,24
+1975,10,citizenship,Anguilla,country,Canada,5,26
+1975,10,citizenship,Antigua,country,Canada,104,26
+1975,10,citizenship,Bahamas,country,Canada,30,26
+1975,10,citizenship,Barbados,country,Canada,875,26
+1975,10,citizenship,Cuba,country,Canada,14,26
+1975,10,citizenship,Dominica,country,Canada,96,26
+1975,10,citizenship,Dominican Rep.,country,Canada,23,26
+1975,10,citizenship,Grenada,country,Canada,356,26
+1975,10,citizenship,Haiti,country,Canada,3533,26
+1975,10,citizenship,Jamaica,country,Canada,8519,26
+1975,10,citizenship,Nevis,country,Canada,14,26
+1975,10,citizenship,St. Kitts,country,Canada,71,26
+1975,10,citizenship,St. Lucia,country,Canada,83,26
+1975,10,citizenship,St. Vincent,country,Canada,300,26
+1975,10,citizenship,Trinidad and Tobago,country,Canada,3936,26
+1975,10,citizenship,West Indies N.E.S.,country,Canada,1,26
+1975,10,citizenship,TOTAL: CARIBBEAN,subtotal,Canada,17960,26
+1975,10,citizenship,Argentina,country,Canada,669,26
+1975,10,citizenship,Bolivia,country,Canada,77,26
+1975,10,citizenship,Brazil,country,Canada,350,26
+1975,10,citizenship,Chile,country,Canada,3041,26
+1975,10,citizenship,Colombia,country,Canada,1053,26
+1975,10,citizenship,Ecuador,country,Canada,1697,26
+1975,10,citizenship,Guyana,country,Canada,4475,26
+1975,10,citizenship,Paraguay,country,Canada,249,26
+1975,10,citizenship,Peru,country,Canada,405,26
+1975,10,citizenship,Uruguay,country,Canada,631,26
+1975,10,citizenship,Venezuela,country,Canada,143,26
+1975,10,citizenship,TOTAL: SOUTH AMERICA,subtotal,Canada,12790,26
+1975,10,citizenship,Caroline Islands,country,Canada,1,26
+1975,10,citizenship,Fiji,country,Canada,2050,26
+1975,10,citizenship,Maldives,country,Canada,1,26
+1975,10,citizenship,Mauritius,country,Canada,319,26
+1975,10,citizenship,"Samoa, Western",country,Canada,2,26
+1975,10,citizenship,Tonga,country,Canada,6,26
+1975,10,citizenship,Others,country,Canada,1,26
+1975,10,citizenship,TOTAL: OCEANIA AND OTHER OCEAN ISLANDS,subtotal,Canada,2380,26
+1975,10,citizenship,Stateless,country,Canada,8643,26
+1975,10,citizenship,GRAND TOTAL,total,Canada,187881,26

@@ -1,0 +1,361 @@
+year,table,basis,row_label,row_kind,column,value,page
+1970,14,citizenship,Albania,country,1946-1955,218,22
+1970,14,citizenship,Albania,country,1956-1967,23,22
+1970,14,citizenship,Albania,country,1968,4,22
+1970,14,citizenship,Albania,country,1969,3,22
+1970,14,citizenship,Albania,country,1970,0,22
+1970,14,citizenship,Albania,country,Canada,248,22
+1970,14,citizenship,Argentina,country,1946-1955,442,22
+1970,14,citizenship,Argentina,country,1956-1967,2239,22
+1970,14,citizenship,Argentina,country,1968,310,22
+1970,14,citizenship,Argentina,country,1969,387,22
+1970,14,citizenship,Argentina,country,1970,242,22
+1970,14,citizenship,Argentina,country,Canada,3620,22
+1970,14,citizenship,Australia,country,1946-1955,1298,22
+1970,14,citizenship,Australia,country,1956-1967,24672,22
+1970,14,citizenship,Australia,country,1968,3380,22
+1970,14,citizenship,Australia,country,1969,3074,22
+1970,14,citizenship,Australia,country,1970,2916,22
+1970,14,citizenship,Australia,country,Canada,35340,22
+1970,14,citizenship,Austria,country,1946-1955,18305,22
+1970,14,citizenship,Austria,country,1956-1967,13687,22
+1970,14,citizenship,Austria,country,1968,787,22
+1970,14,citizenship,Austria,country,1969,504,22
+1970,14,citizenship,Austria,country,1970,431,22
+1970,14,citizenship,Austria,country,Canada,33714,22
+1970,14,citizenship,Belgium,country,1946-1955,12044,22
+1970,14,citizenship,Belgium,country,1956-1967,12920,22
+1970,14,citizenship,Belgium,country,1968,742,22
+1970,14,citizenship,Belgium,country,1969,722,22
+1970,14,citizenship,Belgium,country,1970,454,22
+1970,14,citizenship,Belgium,country,Canada,26882,22
+1970,14,citizenship,Brazil,country,1946-1955,256,22
+1970,14,citizenship,Brazil,country,1956-1967,1714,22
+1970,14,citizenship,Brazil,country,1968,272,22
+1970,14,citizenship,Brazil,country,1969,353,22
+1970,14,citizenship,Brazil,country,1970,291,22
+1970,14,citizenship,Brazil,country,Canada,2886,22
+1970,14,citizenship,Britain & Colonies,country,1946-1955,396194,22
+1970,14,citizenship,Britain & Colonies,country,1956-1967,495139,22
+1970,14,citizenship,Britain & Colonies,country,1968,41466,22
+1970,14,citizenship,Britain & Colonies,country,1969,37105,22
+1970,14,citizenship,Britain & Colonies,country,1970,30281,22
+1970,14,citizenship,Britain & Colonies,country,Canada,1000185,22
+1970,14,citizenship,Bulgaria,country,1946-1955,867,22
+1970,14,citizenship,Bulgaria,country,1956-1967,145,22
+1970,14,citizenship,Bulgaria,country,1968,36,22
+1970,14,citizenship,Bulgaria,country,1969,42,22
+1970,14,citizenship,Bulgaria,country,1970,33,22
+1970,14,citizenship,Bulgaria,country,Canada,1123,22
+1970,14,citizenship,Ceylon,country,1946-1955,27,22
+1970,14,citizenship,Ceylon,country,1956-1967,775,22
+1970,14,citizenship,Ceylon,country,1968,123,22
+1970,14,citizenship,Ceylon,country,1969,205,22
+1970,14,citizenship,Ceylon,country,1970,207,22
+1970,14,citizenship,Ceylon,country,Canada,1337,22
+1970,14,citizenship,China,country,1946-1955,13820,22
+1970,14,citizenship,China,country,1956-1967,24234,22
+1970,14,citizenship,China,country,1968,5259,22
+1970,14,citizenship,China,country,1969,5272,22
+1970,14,citizenship,China,country,1970,3465,22
+1970,14,citizenship,China,country,Canada,52050,22
+1970,14,citizenship,Czechoslovakia,country,1946-1955,13211,22
+1970,14,citizenship,Czechoslovakia,country,1956-1967,851,22
+1970,14,citizenship,Czechoslovakia,country,1968,9653,22
+1970,14,citizenship,Czechoslovakia,country,1969,4721,22
+1970,14,citizenship,Czechoslovakia,country,1970,1411,22
+1970,14,citizenship,Czechoslovakia,country,Canada,29847,22
+1970,14,citizenship,Denmark,country,1946-1955,13640,22
+1970,14,citizenship,Denmark,country,1956-1967,21272,22
+1970,14,citizenship,Denmark,country,1968,1061,22
+1970,14,citizenship,Denmark,country,1969,633,22
+1970,14,citizenship,Denmark,country,1970,470,22
+1970,14,citizenship,Denmark,country,Canada,37076,22
+1970,14,citizenship,Egypt,country,1946-1955,32,22
+1970,14,citizenship,Egypt,country,1956-1967,8816,22
+1970,14,citizenship,Egypt,country,1968,1948,22
+1970,14,citizenship,Egypt,country,1969,1471,22
+1970,14,citizenship,Egypt,country,1970,986,22
+1970,14,citizenship,Egypt,country,Canada,13253,22
+1970,14,citizenship,Estonia,country,1946-1955,13536,22
+1970,14,citizenship,Estonia,country,1956-1967,115,22
+1970,14,citizenship,Estonia,country,1968,8,22
+1970,14,citizenship,Estonia,country,1969,2,22
+1970,14,citizenship,Estonia,country,1970,1,22
+1970,14,citizenship,Estonia,country,Canada,13662,22
+1970,14,citizenship,Finland,country,1946-1955,9596,22
+1970,14,citizenship,Finland,country,1956-1967,10500,22
+1970,14,citizenship,Finland,country,1968,806,22
+1970,14,citizenship,Finland,country,1969,758,22
+1970,14,citizenship,Finland,country,1970,681,22
+1970,14,citizenship,Finland,country,Canada,22341,22
+1970,14,citizenship,France,country,1946-1955,23689,22
+1970,14,citizenship,France,country,1956-1967,44857,22
+1970,14,citizenship,France,country,1968,6020,22
+1970,14,citizenship,France,country,1969,3995,22
+1970,14,citizenship,France,country,1970,3292,22
+1970,14,citizenship,France,country,Canada,81853,22
+1970,14,citizenship,Germany Federal Republic,country,1946-1955,132265,22
+1970,14,citizenship,Germany Federal Republic,country,1956-1967,132458,22
+1970,14,citizenship,Germany Federal Republic,country,1968,5942,22
+1970,14,citizenship,Germany Federal Republic,country,1969,3880,22
+1970,14,citizenship,Germany Federal Republic,country,1970,3000,22
+1970,14,citizenship,Germany Federal Republic,country,Canada,277545,22
+1970,14,citizenship,Greece,country,1946-1955,15155,22
+1970,14,citizenship,Greece,country,1956-1967,68776,22
+1970,14,citizenship,Greece,country,1968,8157,22
+1970,14,citizenship,Greece,country,1969,7134,22
+1970,14,citizenship,Greece,country,1970,6506,22
+1970,14,citizenship,Greece,country,Canada,105728,22
+1970,14,citizenship,Hungary,country,1946-1955,13916,22
+1970,14,citizenship,Hungary,country,1956-1967,42803,22
+1970,14,citizenship,Hungary,country,1968,715,22
+1970,14,citizenship,Hungary,country,1969,626,22
+1970,14,citizenship,Hungary,country,1970,541,22
+1970,14,citizenship,Hungary,country,Canada,58601,22
+1970,14,citizenship,Iceland,country,1946-1955,181,22
+1970,14,citizenship,Iceland,country,1956-1967,239,22
+1970,14,citizenship,Iceland,country,1968,32,22
+1970,14,citizenship,Iceland,country,1969,73,22
+1970,14,citizenship,Iceland,country,1970,53,22
+1970,14,citizenship,Iceland,country,Canada,578,22
+1970,14,citizenship,India,country,1946-1955,460,22
+1970,14,citizenship,India,country,1956-1967,15399,22
+1970,14,citizenship,India,country,1968,3963,22
+1970,14,citizenship,India,country,1969,5939,22
+1970,14,citizenship,India,country,1970,6324,22
+1970,14,citizenship,India,country,Canada,32085,22
+1970,14,citizenship,Iran,country,1946-1955,68,22
+1970,14,citizenship,Iran,country,1956-1967,785,22
+1970,14,citizenship,Iran,country,1968,231,22
+1970,14,citizenship,Iran,country,1969,121,22
+1970,14,citizenship,Iran,country,1970,157,22
+1970,14,citizenship,Iran,country,Canada,1362,22
+1970,14,citizenship,"Ireland, Republic",country,1946-1955,9031,22
+1970,14,citizenship,"Ireland, Republic",country,1956-1967,21665,22
+1970,14,citizenship,"Ireland, Republic",country,1968,1871,22
+1970,14,citizenship,"Ireland, Republic",country,1969,1503,22
+1970,14,citizenship,"Ireland, Republic",country,1970,1324,22
+1970,14,citizenship,"Ireland, Republic",country,Canada,35394,22
+1970,14,citizenship,Israel,country,1946-1955,4590,22
+1970,14,citizenship,Israel,country,1956-1967,12183,22
+1970,14,citizenship,Israel,country,1968,1503,22
+1970,14,citizenship,Israel,country,1969,868,22
+1970,14,citizenship,Israel,country,1970,816,22
+1970,14,citizenship,Israel,country,Canada,19960,22
+1970,14,citizenship,Italy,country,1946-1955,132664,22
+1970,14,citizenship,Italy,country,1956-1967,293397,22
+1970,14,citizenship,Italy,country,1968,21232,22
+1970,14,citizenship,Italy,country,1969,10884,22
+1970,14,citizenship,Italy,country,1970,8731,22
+1970,14,citizenship,Italy,country,Canada,466908,22
+1970,14,citizenship,Japan,country,1946-1955,267,22
+1970,14,citizenship,Japan,country,1956-1967,2945,22
+1970,14,citizenship,Japan,country,1968,628,22
+1970,14,citizenship,Japan,country,1969,698,22
+1970,14,citizenship,Japan,country,1970,785,22
+1970,14,citizenship,Japan,country,Canada,5323,22
+1970,14,citizenship,Latvia,country,1946-1955,13737,22
+1970,14,citizenship,Latvia,country,1956-1967,292,22
+1970,14,citizenship,Latvia,country,1968,4,22
+1970,14,citizenship,Latvia,country,1969,3,22
+1970,14,citizenship,Latvia,country,1970,3,22
+1970,14,citizenship,Latvia,country,Canada,14039,22
+1970,14,citizenship,Lebanon,country,1946-1955,334,22
+1970,14,citizenship,Lebanon,country,1956-1967,5912,22
+1970,14,citizenship,Lebanon,country,1968,1314,22
+1970,14,citizenship,Lebanon,country,1969,985,22
+1970,14,citizenship,Lebanon,country,1970,1021,22
+1970,14,citizenship,Lebanon,country,Canada,9566,22
+1970,14,citizenship,Lithuania,country,1946-1955,11820,22
+1970,14,citizenship,Lithuania,country,1956-1967,159,22
+1970,14,citizenship,Lithuania,country,1968,6,22
+1970,14,citizenship,Lithuania,country,1969,3,22
+1970,14,citizenship,Lithuania,country,1970,3,22
+1970,14,citizenship,Lithuania,country,Canada,11991,22
+1970,14,citizenship,Luxembourg,country,1946-1955,42,22
+1970,14,citizenship,Luxembourg,country,1956-1967,509,22
+1970,14,citizenship,Luxembourg,country,1968,16,22
+1970,14,citizenship,Luxembourg,country,1969,12,22
+1970,14,citizenship,Luxembourg,country,1970,10,22
+1970,14,citizenship,Luxembourg,country,Canada,589,22
+1970,14,citizenship,Mexico,country,1946-1955,341,22
+1970,14,citizenship,Mexico,country,1956-1967,1315,22
+1970,14,citizenship,Mexico,country,1968,221,22
+1970,14,citizenship,Mexico,country,1969,335,22
+1970,14,citizenship,Mexico,country,1970,421,22
+1970,14,citizenship,Mexico,country,Canada,2633,22
+1970,14,citizenship,Morocco,country,1946-1955,0,22
+1970,14,citizenship,Morocco,country,1956-1967,4090,22
+1970,14,citizenship,Morocco,country,1968,1428,22
+1970,14,citizenship,Morocco,country,1969,377,22
+1970,14,citizenship,Morocco,country,1970,290,22
+1970,14,citizenship,Morocco,country,Canada,6185,22
+1970,14,citizenship,"Netherlands, The",country,1946-1955,107869,22
+1970,14,citizenship,"Netherlands, The",country,1956-1967,56146,22
+1970,14,citizenship,"Netherlands, The",country,1968,3312,22
+1970,14,citizenship,"Netherlands, The",country,1969,2529,22
+1970,14,citizenship,"Netherlands, The",country,1970,1947,22
+1970,14,citizenship,"Netherlands, The",country,Canada,171803,22
+1970,14,citizenship,New Zealand,country,1946-1955,306,22
+1970,14,citizenship,New Zealand,country,1956-1967,6255,22
+1970,14,citizenship,New Zealand,country,1968,1126,22
+1970,14,citizenship,New Zealand,country,1969,913,22
+1970,14,citizenship,New Zealand,country,1970,969,22
+1970,14,citizenship,New Zealand,country,Canada,9569,22
+1970,14,citizenship,Norway,country,1946-1955,6043,22
+1970,14,citizenship,Norway,country,1956-1967,5659,22
+1970,14,citizenship,Norway,country,1968,448,22
+1970,14,citizenship,Norway,country,1969,324,22
+1970,14,citizenship,Norway,country,1970,248,22
+1970,14,citizenship,Norway,country,Canada,12722,22
+1970,14,citizenship,Pakistan,country,1946-1955,120,22
+1970,14,citizenship,Pakistan,country,1956-1967,2878,22
+1970,14,citizenship,Pakistan,country,1968,723,22
+1970,14,citizenship,Pakistan,country,1969,1120,22
+1970,14,citizenship,Pakistan,country,1970,1129,22
+1970,14,citizenship,Pakistan,country,Canada,5970,22
+1970,14,citizenship,Philippines,country,1946-1955,0,22
+1970,14,citizenship,Philippines,country,1956-1967,7882,22
+1970,14,citizenship,Philippines,country,1968,2703,22
+1970,14,citizenship,Philippines,country,1969,3081,22
+1970,14,citizenship,Philippines,country,1970,3247,22
+1970,14,citizenship,Philippines,country,Canada,16913,22
+1970,14,citizenship,Poland,country,1946-1955,104450,22
+1970,14,citizenship,Poland,country,1956-1967,22588,22
+1970,14,citizenship,Poland,country,1968,1250,22
+1970,14,citizenship,Poland,country,1969,980,22
+1970,14,citizenship,Poland,country,1970,874,22
+1970,14,citizenship,Poland,country,Canada,130142,22
+1970,14,citizenship,Portugal,country,1946-1955,2688,22
+1970,14,citizenship,Portugal,country,1956-1967,59493,22
+1970,14,citizenship,Portugal,country,1968,8841,22
+1970,14,citizenship,Portugal,country,1969,8031,22
+1970,14,citizenship,Portugal,country,1970,8700,22
+1970,14,citizenship,Portugal,country,Canada,87753,22
+1970,14,citizenship,Romania,country,1946-1955,8780,22
+1970,14,citizenship,Romania,country,1956-1967,832,22
+1970,14,citizenship,Romania,country,1968,73,22
+1970,14,citizenship,Romania,country,1969,132,22
+1970,14,citizenship,Romania,country,1970,159,22
+1970,14,citizenship,Romania,country,Canada,9976,22
+1970,14,citizenship,Saudi Arabia,country,1946-1955,0,22
+1970,14,citizenship,Saudi Arabia,country,1956-1967,19,22
+1970,14,citizenship,Saudi Arabia,country,1968,2,22
+1970,14,citizenship,Saudi Arabia,country,1969,4,22
+1970,14,citizenship,Saudi Arabia,country,1970,1,22
+1970,14,citizenship,Saudi Arabia,country,Canada,26,22
+1970,14,citizenship,South Africa Republic,country,1946-1955,276,22
+1970,14,citizenship,South Africa Republic,country,1956-1967,6672,22
+1970,14,citizenship,South Africa Republic,country,1968,948,22
+1970,14,citizenship,South Africa Republic,country,1969,678,22
+1970,14,citizenship,South Africa Republic,country,1970,734,22
+1970,14,citizenship,South Africa Republic,country,Canada,9308,22
+1970,14,citizenship,Spain,country,1946-1955,1190,22
+1970,14,citizenship,Spain,country,1956-1967,11069,22
+1970,14,citizenship,Spain,country,1968,1683,22
+1970,14,citizenship,Spain,country,1969,995,22
+1970,14,citizenship,Spain,country,1970,912,22
+1970,14,citizenship,Spain,country,Canada,15849,22
+1970,14,citizenship,Sweden,country,1946-1955,2876,22
+1970,14,citizenship,Sweden,country,1956-1967,3941,22
+1970,14,citizenship,Sweden,country,1968,389,22
+1970,14,citizenship,Sweden,country,1969,288,22
+1970,14,citizenship,Sweden,country,1970,281,22
+1970,14,citizenship,Sweden,country,Canada,7775,22
+1970,14,citizenship,Switzerland,country,1946-1955,6950,22
+1970,14,citizenship,Switzerland,country,1956-1967,12975,22
+1970,14,citizenship,Switzerland,country,1968,1926,22
+1970,14,citizenship,Switzerland,country,1969,1531,22
+1970,14,citizenship,Switzerland,country,1970,1520,22
+1970,14,citizenship,Switzerland,country,Canada,24902,22
+1970,14,citizenship,Syria,country,1946-1955,1075,22
+1970,14,citizenship,Syria,country,1956-1967,797,22
+1970,14,citizenship,Syria,country,1968,733,22
+1970,14,citizenship,Syria,country,1969,427,22
+1970,14,citizenship,Syria,country,1970,329,22
+1970,14,citizenship,Syria,country,Canada,3361,22
+1970,14,citizenship,Tunisia,country,1946-1955,0,22
+1970,14,citizenship,Tunisia,country,1956-1967,402,22
+1970,14,citizenship,Tunisia,country,1968,95,22
+1970,14,citizenship,Tunisia,country,1969,63,22
+1970,14,citizenship,Tunisia,country,1970,63,22
+1970,14,citizenship,Tunisia,country,Canada,623,22
+1970,14,citizenship,Turkey,country,1946-1955,230,22
+1970,14,citizenship,Turkey,country,1956-1967,4018,22
+1970,14,citizenship,Turkey,country,1968,621,22
+1970,14,citizenship,Turkey,country,1969,423,22
+1970,14,citizenship,Turkey,country,1970,319,22
+1970,14,citizenship,Turkey,country,Canada,5611,22
+1970,14,citizenship,U.S.S.R.,country,1946-1955,18010,22
+1970,14,citizenship,U.S.S.R.,country,1956-1967,1386,22
+1970,14,citizenship,U.S.S.R.,country,1968,221,22
+1970,14,citizenship,U.S.S.R.,country,1969,145,22
+1970,14,citizenship,U.S.S.R.,country,1970,136,22
+1970,14,citizenship,U.S.S.R.,country,Canada,19898,22
+1970,14,citizenship,United States,country,1946-1955,81582,22
+1970,14,citizenship,United States,country,1956-1967,139654,22
+1970,14,citizenship,United States,country,1968,19059,22
+1970,14,citizenship,United States,country,1969,21474,22
+1970,14,citizenship,United States,country,1970,23183,22
+1970,14,citizenship,United States,country,Canada,284952,22
+1970,14,citizenship,Yugoslavia,country,1946-1955,20953,22
+1970,14,citizenship,Yugoslavia,country,1956-1967,18918,22
+1970,14,citizenship,Yugoslavia,country,1968,6402,22
+1970,14,citizenship,Yugoslavia,country,1969,5241,22
+1970,14,citizenship,Yugoslavia,country,1970,6701,22
+1970,14,citizenship,Yugoslavia,country,Canada,58215,22
+1970,14,citizenship,"Africa, n.e.s.",country,1946-1955,277,22
+1970,14,citizenship,"Africa, n.e.s.",country,1956-1967,1409,22
+1970,14,citizenship,"Africa, n.e.s.",country,1968,326,22
+1970,14,citizenship,"Africa, n.e.s.",country,1969,400,22
+1970,14,citizenship,"Africa, n.e.s.",country,1970,488,22
+1970,14,citizenship,"Africa, n.e.s.",country,Canada,2900,22
+1970,14,citizenship,"Asia, n.e.s.",country,1946-1955,17,22
+1970,14,citizenship,"Asia, n.e.s.",country,1956-1967,4734,22
+1970,14,citizenship,"Asia, n.e.s.",country,1968,2518,22
+1970,14,citizenship,"Asia, n.e.s.",country,1969,2565,22
+1970,14,citizenship,"Asia, n.e.s.",country,1970,2778,22
+1970,14,citizenship,"Asia, n.e.s.",country,Canada,12612,22
+1970,14,citizenship,Central America,country,1946-1955,137,22
+1970,14,citizenship,Central America,country,1956-1967,260,22
+1970,14,citizenship,Central America,country,1968,70,22
+1970,14,citizenship,Central America,country,1969,116,22
+1970,14,citizenship,Central America,country,1970,153,22
+1970,14,citizenship,Central America,country,Canada,736,22
+1970,14,citizenship,"Europe, n.e.s.",country,1946-1955,358,22
+1970,14,citizenship,"Europe, n.e.s.",country,1956-1967,1930,22
+1970,14,citizenship,"Europe, n.e.s.",country,1968,478,22
+1970,14,citizenship,"Europe, n.e.s.",country,1969,365,22
+1970,14,citizenship,"Europe, n.e.s.",country,1970,287,22
+1970,14,citizenship,"Europe, n.e.s.",country,Canada,3418,22
+1970,14,citizenship,"South America, n.e.s.",country,1946-1955,696,22
+1970,14,citizenship,"South America, n.e.s.",country,1956-1967,4874,22
+1970,14,citizenship,"South America, n.e.s.",country,1968,1564,22
+1970,14,citizenship,"South America, n.e.s.",country,1969,3205,22
+1970,14,citizenship,"South America, n.e.s.",country,1970,3835,22
+1970,14,citizenship,"South America, n.e.s.",country,Canada,14174,22
+1970,14,citizenship,West Indies,country,1946-1955,227,22
+1970,14,citizenship,West Indies,country,1956-1967,17021,22
+1970,14,citizenship,West Indies,country,1968,7533,22
+1970,14,citizenship,West Indies,country,1969,12003,22
+1970,14,citizenship,West Indies,country,1970,11932,22
+1970,14,citizenship,West Indies,country,Canada,48716,22
+1970,14,citizenship,"Other Countries, n.e.s.",country,1946-1955,754,22
+1970,14,citizenship,"Other Countries, n.e.s.",country,1956-1967,185,22
+1970,14,citizenship,"Other Countries, n.e.s.",country,1968,0,22
+1970,14,citizenship,"Other Countries, n.e.s.",country,1969,0,22
+1970,14,citizenship,"Other Countries, n.e.s.",country,1970,0,22
+1970,14,citizenship,"Other Countries, n.e.s.",country,Canada,939,22
+1970,14,citizenship,Stateless,country,1946-1955,4409,22
+1970,14,citizenship,Stateless,country,1956-1967,42437,22
+1970,14,citizenship,Stateless,country,1968,1792,22
+1970,14,citizenship,Stateless,country,1969,1810,22
+1970,14,citizenship,Stateless,country,1970,1642,22
+1970,14,citizenship,Stateless,country,Canada,52090,22
+1970,14,citizenship,TOTAL,total,1946-1955,1222319,22
+1970,14,citizenship,TOTAL,total,1956-1967,1699320,22
+1970,14,citizenship,TOTAL,total,1968,183974,22
+1970,14,citizenship,TOTAL,total,1969,161531,22
+1970,14,citizenship,TOTAL,total,1970,147713,22
+1970,14,citizenship,TOTAL,total,Canada,3414857,22

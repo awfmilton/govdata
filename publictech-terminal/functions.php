@@ -11,7 +11,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'PUBLICTECH_TERMINAL_VERSION', '1.2.0' );
+define( 'PUBLICTECH_TERMINAL_VERSION', '1.2.1' );
 define( 'PUBLICTECH_TERMINAL_URL',     trailingslashit( get_stylesheet_directory_uri() ) );
 define( 'PUBLICTECH_TERMINAL_DIR',     trailingslashit( get_stylesheet_directory() ) );
 
@@ -316,7 +316,8 @@ add_filter( 'publictech_columns_pt-grants-02_disbursements', static function ():
 /* Directory: 24 members per page, matching search.js (/mp/search per_page) — the server used the site default
  * (10), so client-side paging disagreed with the server pager (matrix D7). */
 add_action( 'pre_get_posts', static function ( WP_Query $q ): void {
-	if ( ! is_admin() && $q->is_main_query() && $q->is_post_type_archive( 'member-parliament' ) ) {
+	// Party and region archives render the same directory (taxonomy-mp_party.php / taxonomy-mp_region.php).
+	if ( ! is_admin() && $q->is_main_query() && ( $q->is_post_type_archive( 'member-parliament' ) || $q->is_tax( [ 'mp_party', 'mp_region' ] ) ) ) {
 		$q->set( 'posts_per_page', 24 );
 	}
 } );

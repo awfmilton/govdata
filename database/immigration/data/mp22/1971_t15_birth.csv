@@ -1,0 +1,391 @@
+year,table,basis,row_label,row_kind,column,value,page
+1971,15,birth,Albania,country,1946-1955,0,23
+1971,15,birth,Albania,country,1956-1968,287,23
+1971,15,birth,Albania,country,1969,21,23
+1971,15,birth,Albania,country,1970,14,23
+1971,15,birth,Albania,country,1971,8,23
+1971,15,birth,Albania,country,Canada,330,23
+1971,15,birth,Algeria,country,1946-1955,0,23
+1971,15,birth,Algeria,country,1956-1968,2854,23
+1971,15,birth,Algeria,country,1969,196,23
+1971,15,birth,Algeria,country,1970,169,23
+1971,15,birth,Algeria,country,1971,124,23
+1971,15,birth,Algeria,country,Canada,3343,23
+1971,15,birth,Argentina,country,1946-1955,97,23
+1971,15,birth,Argentina,country,1956-1968,2490,23
+1971,15,birth,Argentina,country,1969,377,23
+1971,15,birth,Argentina,country,1970,234,23
+1971,15,birth,Argentina,country,1971,205,23
+1971,15,birth,Argentina,country,Canada,3403,23
+1971,15,birth,Australia,country,1946-1955,6388,23
+1971,15,birth,Australia,country,1956-1968,24668,23
+1971,15,birth,Australia,country,1969,2628,23
+1971,15,birth,Australia,country,1970,2515,23
+1971,15,birth,Australia,country,1971,1542,23
+1971,15,birth,Australia,country,Canada,37741,23
+1971,15,birth,Austria,country,1946-1955,21167,23
+1971,15,birth,Austria,country,1956-1968,15005,23
+1971,15,birth,Austria,country,1969,598,23
+1971,15,birth,Austria,country,1970,494,23
+1971,15,birth,Austria,country,1971,360,23
+1971,15,birth,Austria,country,Canada,37624,23
+1971,15,birth,Belgium,country,1946-1955,15078,23
+1971,15,birth,Belgium,country,1956-1968,14732,23
+1971,15,birth,Belgium,country,1969,769,23
+1971,15,birth,Belgium,country,1970,485,23
+1971,15,birth,Belgium,country,1971,363,23
+1971,15,birth,Belgium,country,Canada,31427,23
+1971,15,birth,Bermuda,country,1946-1955,0,23
+1971,15,birth,Bermuda,country,1956-1968,835,23
+1971,15,birth,Bermuda,country,1969,122,23
+1971,15,birth,Bermuda,country,1970,85,23
+1971,15,birth,Bermuda,country,1971,98,23
+1971,15,birth,Bermuda,country,Canada,1140,23
+1971,15,birth,Brazil,country,1946-1955,102,23
+1971,15,birth,Brazil,country,1956-1968,2038,23
+1971,15,birth,Brazil,country,1969,320,23
+1971,15,birth,Brazil,country,1970,273,23
+1971,15,birth,Brazil,country,1971,217,23
+1971,15,birth,Brazil,country,Canada,2950,23
+1971,15,birth,Britain,country,1946-1955,338561,23
+1971,15,birth,Britain,country,1956-1968,468998,23
+1971,15,birth,Britain,country,1969,28790,23
+1971,15,birth,Britain,country,1970,23688,23
+1971,15,birth,Britain,country,1971,14230,23
+1971,15,birth,Britain,country,Canada,874267,23
+1971,15,birth,Bulgaria,country,1946-1955,0,23
+1971,15,birth,Bulgaria,country,1956-1968,704,23
+1971,15,birth,Bulgaria,country,1969,78,23
+1971,15,birth,Bulgaria,country,1970,107,23
+1971,15,birth,Bulgaria,country,1971,95,23
+1971,15,birth,Bulgaria,country,Canada,984,23
+1971,15,birth,Canada,country,1946-1955,8948,23
+1971,15,birth,Canada,country,1956-1968,11251,23
+1971,15,birth,Canada,country,1969,1134,23
+1971,15,birth,Canada,country,1970,1140,23
+1971,15,birth,Canada,country,1971,1222,23
+1971,15,birth,Canada,country,Canada,23695,23
+1971,15,birth,Ceylon,country,1946-1955,0,23
+1971,15,birth,Ceylon,country,1956-1968,1109,23
+1971,15,birth,Ceylon,country,1969,215,23
+1971,15,birth,Ceylon,country,1970,212,23
+1971,15,birth,Ceylon,country,1971,253,23
+1971,15,birth,Ceylon,country,Canada,1789,23
+1971,15,birth,China,country,1946-1955,15423,23
+1971,15,birth,China,country,1956-1968,29622,23
+1971,15,birth,China,country,1969,5185,23
+1971,15,birth,China,country,1970,3397,23
+1971,15,birth,China,country,1971,3694,23
+1971,15,birth,China,country,Canada,57321,23
+1971,15,birth,Czechoslovakia,country,1946-1955,17091,23
+1971,15,birth,Czechoslovakia,country,1956-1968,15571,23
+1971,15,birth,Czechoslovakia,country,1969,5029,23
+1971,15,birth,Czechoslovakia,country,1970,1703,23
+1971,15,birth,Czechoslovakia,country,1971,585,23
+1971,15,birth,Czechoslovakia,country,Canada,39979,23
+1971,15,birth,Denmark,country,1946-1955,6359,23
+1971,15,birth,Denmark,country,1956-1968,22277,23
+1971,15,birth,Denmark,country,1969,650,23
+1971,15,birth,Denmark,country,1970,486,23
+1971,15,birth,Denmark,country,1971,342,23
+1971,15,birth,Denmark,country,Canada,30114,23
+1971,15,birth,Egypt,country,1946-1955,0,23
+1971,15,birth,Egypt,country,1956-1968,15223,23
+1971,15,birth,Egypt,country,1969,1839,23
+1971,15,birth,Egypt,country,1970,1273,23
+1971,15,birth,Egypt,country,1971,999,23
+1971,15,birth,Egypt,country,Canada,19334,23
+1971,15,birth,Estonia,country,1946-1955,0,23
+1971,15,birth,Estonia,country,1956-1968,1081,23
+1971,15,birth,Estonia,country,1969,51,23
+1971,15,birth,Estonia,country,1970,28,23
+1971,15,birth,Estonia,country,1971,17,23
+1971,15,birth,Estonia,country,Canada,1177,23
+1971,15,birth,Finland,country,1946-1955,4824,23
+1971,15,birth,Finland,country,1956-1968,11482,23
+1971,15,birth,Finland,country,1969,772,23
+1971,15,birth,Finland,country,1970,694,23
+1971,15,birth,Finland,country,1971,452,23
+1971,15,birth,Finland,country,Canada,18224,23
+1971,15,birth,France,country,1946-1955,24422,23
+1971,15,birth,France,country,1956-1968,44950,23
+1971,15,birth,France,country,1969,3612,23
+1971,15,birth,France,country,1970,2958,23
+1971,15,birth,France,country,1971,2059,23
+1971,15,birth,France,country,Canada,78001,23
+1971,15,birth,Germany Fed. Rep.,country,1946-1955,122743,23
+1971,15,birth,Germany Fed. Rep.,country,1956-1968,130767,23
+1971,15,birth,Germany Fed. Rep.,country,1969,4208,23
+1971,15,birth,Germany Fed. Rep.,country,1970,3220,23
+1971,15,birth,Germany Fed. Rep.,country,1971,2082,23
+1971,15,birth,Germany Fed. Rep.,country,Canada,263020,23
+1971,15,birth,Greece,country,1946-1955,14897,23
+1971,15,birth,Greece,country,1956-1968,75623,23
+1971,15,birth,Greece,country,1969,7106,23
+1971,15,birth,Greece,country,1970,6440,23
+1971,15,birth,Greece,country,1971,4822,23
+1971,15,birth,Greece,country,Canada,108888,23
+1971,15,birth,Hong Kong,country,1946-1955,0,23
+1971,15,birth,Hong Kong,country,1956-1968,10555,23
+1971,15,birth,Hong Kong,country,1969,3354,23
+1971,15,birth,Hong Kong,country,1970,2250,23
+1971,15,birth,Hong Kong,country,1971,2581,23
+1971,15,birth,Hong Kong,country,Canada,18740,23
+1971,15,birth,Hungary,country,1946-1955,16542,23
+1971,15,birth,Hungary,country,1956-1968,51235,23
+1971,15,birth,Hungary,country,1969,1132,23
+1971,15,birth,Hungary,country,1970,1023,23
+1971,15,birth,Hungary,country,1971,847,23
+1971,15,birth,Hungary,country,Canada,70779,23
+1971,15,birth,Iceland,country,1946-1955,0,23
+1971,15,birth,Iceland,country,1956-1968,288,23
+1971,15,birth,Iceland,country,1969,69,23
+1971,15,birth,Iceland,country,1970,52,23
+1971,15,birth,Iceland,country,1971,18,23
+1971,15,birth,Iceland,country,Canada,427,23
+1971,15,birth,India,country,1946-1955,4381,23
+1971,15,birth,India,country,1956-1968,25289,23
+1971,15,birth,India,country,1969,6736,23
+1971,15,birth,India,country,1970,7089,23
+1971,15,birth,India,country,1971,6301,23
+1971,15,birth,India,country,Canada,49796,23
+1971,15,birth,Iran,country,1946-1955,0,23
+1971,15,birth,Iran,country,1956-1968,1085,23
+1971,15,birth,Iran,country,1969,130,23
+1971,15,birth,Iran,country,1970,168,23
+1971,15,birth,Iran,country,1971,227,23
+1971,15,birth,Iran,country,Canada,1610,23
+1971,15,birth,"Ireland, Republic",country,1946-1955,15041,23
+1971,15,birth,"Ireland, Republic",country,1956-1968,27133,23
+1971,15,birth,"Ireland, Republic",country,1969,1627,23
+1971,15,birth,"Ireland, Republic",country,1970,1410,23
+1971,15,birth,"Ireland, Republic",country,1971,954,23
+1971,15,birth,"Ireland, Republic",country,Canada,46165,23
+1971,15,birth,Israel,country,1946-1955,1080,23
+1971,15,birth,Israel,country,1956-1968,6375,23
+1971,15,birth,Israel,country,1969,558,23
+1971,15,birth,Israel,country,1970,585,23
+1971,15,birth,Israel,country,1971,417,23
+1971,15,birth,Israel,country,Canada,9015,23
+1971,15,birth,Italy,country,1946-1955,133225,23
+1971,15,birth,Italy,country,1956-1968,311514,23
+1971,15,birth,Italy,country,1969,10685,23
+1971,15,birth,Italy,country,1970,8659,23
+1971,15,birth,Italy,country,1971,5937,23
+1971,15,birth,Italy,country,Canada,470020,23
+1971,15,birth,Japan,country,1946-1955,423,23
+1971,15,birth,Japan,country,1956-1968,3724,23
+1971,15,birth,Japan,country,1969,750,23
+1971,15,birth,Japan,country,1970,821,23
+1971,15,birth,Japan,country,1971,830,23
+1971,15,birth,Japan,country,Canada,6548,23
+1971,15,birth,Latvia,country,1946-1955,13416,23
+1971,15,birth,Latvia,country,1956-1968,1809,23
+1971,15,birth,Latvia,country,1969,40,23
+1971,15,birth,Latvia,country,1970,29,23
+1971,15,birth,Latvia,country,1971,44,23
+1971,15,birth,Latvia,country,Canada,15338,23
+1971,15,birth,Lebanon,country,1946-1955,0,23
+1971,15,birth,Lebanon,country,1956-1968,6104,23
+1971,15,birth,Lebanon,country,1969,831,23
+1971,15,birth,Lebanon,country,1970,899,23
+1971,15,birth,Lebanon,country,1971,739,23
+1971,15,birth,Lebanon,country,Canada,8573,23
+1971,15,birth,Lithuania,country,1946-1955,11654,23
+1971,15,birth,Lithuania,country,1956-1968,1216,23
+1971,15,birth,Lithuania,country,1969,55,23
+1971,15,birth,Lithuania,country,1970,34,23
+1971,15,birth,Lithuania,country,1971,31,23
+1971,15,birth,Lithuania,country,Canada,12990,23
+1971,15,birth,Luxembourg,country,1946-1955,0,23
+1971,15,birth,Luxembourg,country,1956-1968,656,23
+1971,15,birth,Luxembourg,country,1969,22,23
+1971,15,birth,Luxembourg,country,1970,13,23
+1971,15,birth,Luxembourg,country,1971,2,23
+1971,15,birth,Luxembourg,country,Canada,693,23
+1971,15,birth,Malta,country,1946-1955,0,23
+1971,15,birth,Malta,country,1956-1968,8195,23
+1971,15,birth,Malta,country,1969,381,23
+1971,15,birth,Malta,country,1970,307,23
+1971,15,birth,Malta,country,1971,242,23
+1971,15,birth,Malta,country,Canada,9125,23
+1971,15,birth,Mexico,country,1946-1955,556,23
+1971,15,birth,Mexico,country,1956-1968,1711,23
+1971,15,birth,Mexico,country,1969,349,23
+1971,15,birth,Mexico,country,1970,437,23
+1971,15,birth,Mexico,country,1971,354,23
+1971,15,birth,Mexico,country,Canada,3407,23
+1971,15,birth,Morocco,country,1946-1955,0,23
+1971,15,birth,Morocco,country,1956-1968,8522,23
+1971,15,birth,Morocco,country,1969,616,23
+1971,15,birth,Morocco,country,1970,514,23
+1971,15,birth,Morocco,country,1971,284,23
+1971,15,birth,Morocco,country,Canada,9936,23
+1971,15,birth,"Netherlands, The",country,1946-1955,107790,23
+1971,15,birth,"Netherlands, The",country,1956-1968,56598,23
+1971,15,birth,"Netherlands, The",country,1969,2412,23
+1971,15,birth,"Netherlands, The",country,1970,1843,23
+1971,15,birth,"Netherlands, The",country,1971,1262,23
+1971,15,birth,"Netherlands, The",country,Canada,169905,23
+1971,15,birth,New Zealand,country,1946-1955,2346,23
+1971,15,birth,New Zealand,country,1956-1968,7395,23
+1971,15,birth,New Zealand,country,1969,895,23
+1971,15,birth,New Zealand,country,1970,947,23
+1971,15,birth,New Zealand,country,1971,640,23
+1971,15,birth,New Zealand,country,Canada,12223,23
+1971,15,birth,Norway,country,1946-1955,6047,23
+1971,15,birth,Norway,country,1956-1968,6174,23
+1971,15,birth,Norway,country,1969,321,23
+1971,15,birth,Norway,country,1970,252,23
+1971,15,birth,Norway,country,1971,149,23
+1971,15,birth,Norway,country,Canada,12943,23
+1971,15,birth,Pakistan,country,1946-1955,0,23
+1971,15,birth,Pakistan,country,1956-1968,3676,23
+1971,15,birth,Pakistan,country,1969,885,23
+1971,15,birth,Pakistan,country,1970,1010,23
+1971,15,birth,Pakistan,country,1971,961,23
+1971,15,birth,Pakistan,country,Canada,6532,23
+1971,15,birth,Philippines,country,1946-1955,0,23
+1971,15,birth,Philippines,country,1956-1968,10904,23
+1971,15,birth,Philippines,country,1969,3138,23
+1971,15,birth,Philippines,country,1970,3305,23
+1971,15,birth,Philippines,country,1971,4213,23
+1971,15,birth,Philippines,country,Canada,21560,23
+1971,15,birth,Poland,country,1946-1955,101433,23
+1971,15,birth,Poland,country,1956-1968,34987,23
+1971,15,birth,Poland,country,1969,1563,23
+1971,15,birth,Poland,country,1970,1403,23
+1971,15,birth,Poland,country,1971,1527,23
+1971,15,birth,Poland,country,Canada,140913,23
+1971,15,birth,Portugal,country,1946-1955,0,23
+1971,15,birth,Portugal,country,1956-1968,67413,23
+1971,15,birth,Portugal,country,1969,7917,23
+1971,15,birth,Portugal,country,1970,8594,23
+1971,15,birth,Portugal,country,1971,9776,23
+1971,15,birth,Portugal,country,Canada,93700,23
+1971,15,birth,Romania,country,1946-1955,13143,23
+1971,15,birth,Romania,country,1956-1968,7146,23
+1971,15,birth,Romania,country,1969,453,23
+1971,15,birth,Romania,country,1970,488,23
+1971,15,birth,Romania,country,1971,377,23
+1971,15,birth,Romania,country,Canada,21607,23
+1971,15,birth,St. Pierre & Miquelon,country,1946-1955,0,23
+1971,15,birth,St. Pierre & Miquelon,country,1956-1968,300,23
+1971,15,birth,St. Pierre & Miquelon,country,1969,18,23
+1971,15,birth,St. Pierre & Miquelon,country,1970,15,23
+1971,15,birth,St. Pierre & Miquelon,country,1971,22,23
+1971,15,birth,St. Pierre & Miquelon,country,Canada,355,23
+1971,15,birth,Saudi Arabia,country,1946-1955,0,23
+1971,15,birth,Saudi Arabia,country,1956-1968,63,23
+1971,15,birth,Saudi Arabia,country,1969,9,23
+1971,15,birth,Saudi Arabia,country,1970,11,23
+1971,15,birth,Saudi Arabia,country,1971,11,23
+1971,15,birth,Saudi Arabia,country,Canada,94,23
+1971,15,birth,Spain,country,1946-1955,0,23
+1971,15,birth,Spain,country,1956-1968,12904,23
+1971,15,birth,Spain,country,1969,998,23
+1971,15,birth,Spain,country,1970,913,23
+1971,15,birth,Spain,country,1971,620,23
+1971,15,birth,Spain,country,Canada,15435,23
+1971,15,birth,Sweden,country,1946-1955,0,23
+1971,15,birth,Sweden,country,1956-1968,4417,23
+1971,15,birth,Sweden,country,1969,316,23
+1971,15,birth,Sweden,country,1970,290,23
+1971,15,birth,Sweden,country,1971,337,23
+1971,15,birth,Sweden,country,Canada,5360,23
+1971,15,birth,Switzerland,country,1946-1955,7139,23
+1971,15,birth,Switzerland,country,1956-1968,15557,23
+1971,15,birth,Switzerland,country,1969,1606,23
+1971,15,birth,Switzerland,country,1970,1576,23
+1971,15,birth,Switzerland,country,1971,843,23
+1971,15,birth,Switzerland,country,Canada,26721,23
+1971,15,birth,Syria,country,1946-1955,0,23
+1971,15,birth,Syria,country,1956-1968,1829,23
+1971,15,birth,Syria,country,1969,392,23
+1971,15,birth,Syria,country,1970,316,23
+1971,15,birth,Syria,country,1971,277,23
+1971,15,birth,Syria,country,Canada,2814,23
+1971,15,birth,Tunisia,country,1946-1955,0,23
+1971,15,birth,Tunisia,country,1956-1968,1261,23
+1971,15,birth,Tunisia,country,1969,144,23
+1971,15,birth,Tunisia,country,1970,108,23
+1971,15,birth,Tunisia,country,1971,83,23
+1971,15,birth,Tunisia,country,Canada,1596,23
+1971,15,birth,Turkey,country,1946-1955,0,23
+1971,15,birth,Turkey,country,1956-1968,7104,23
+1971,15,birth,Turkey,country,1969,671,23
+1971,15,birth,Turkey,country,1970,491,23
+1971,15,birth,Turkey,country,1971,442,23
+1971,15,birth,Turkey,country,Canada,8708,23
+1971,15,birth,"South Africa, Rep.",country,1946-1955,0,23
+1971,15,birth,"South Africa, Rep.",country,1956-1968,9133,23
+1971,15,birth,"South Africa, Rep.",country,1969,819,23
+1971,15,birth,"South Africa, Rep.",country,1970,829,23
+1971,15,birth,"South Africa, Rep.",country,1971,774,23
+1971,15,birth,"South Africa, Rep.",country,Canada,11555,23
+1971,15,birth,U.S.S.R.,country,1946-1955,23458,23
+1971,15,birth,U.S.S.R.,country,1956-1968,9223,23
+1971,15,birth,U.S.S.R.,country,1969,394,23
+1971,15,birth,U.S.S.R.,country,1970,406,23
+1971,15,birth,U.S.S.R.,country,1971,349,23
+1971,15,birth,U.S.S.R.,country,Canada,33830,23
+1971,15,birth,United States,country,1946-1955,70739,23
+1971,15,birth,United States,country,1956-1968,139124,23
+1971,15,birth,United States,country,1969,19258,23
+1971,15,birth,United States,country,1970,20859,23
+1971,15,birth,United States,country,1971,20723,23
+1971,15,birth,United States,country,Canada,270703,23
+1971,15,birth,Yugoslavia,country,1946-1955,24055,23
+1971,15,birth,Yugoslavia,country,1956-1968,51570,23
+1971,15,birth,Yugoslavia,country,1969,5462,23
+1971,15,birth,Yugoslavia,country,1970,6892,23
+1971,15,birth,Yugoslavia,country,1971,3547,23
+1971,15,birth,Yugoslavia,country,Canada,91526,23
+1971,15,birth,"Africa, n.e.s.",country,1946-1955,4375,23
+1971,15,birth,"Africa, n.e.s.",country,1956-1968,6301,23
+1971,15,birth,"Africa, n.e.s.",country,1969,2339,23
+1971,15,birth,"Africa, n.e.s.",country,1970,1124,23
+1971,15,birth,"Africa, n.e.s.",country,1971,1199,23
+1971,15,birth,"Africa, n.e.s.",country,Canada,15338,23
+1971,15,birth,"Asia, n.e.s.",country,1946-1955,3678,23
+1971,15,birth,"Asia, n.e.s.",country,1956-1968,12031,23
+1971,15,birth,"Asia, n.e.s.",country,1969,2268,23
+1971,15,birth,"Asia, n.e.s.",country,1970,3619,23
+1971,15,birth,"Asia, n.e.s.",country,1971,3726,23
+1971,15,birth,"Asia, n.e.s.",country,Canada,25322,23
+1971,15,birth,"Central America, n.e.s.",country,1946-1955,226,23
+1971,15,birth,"Central America, n.e.s.",country,1956-1968,641,23
+1971,15,birth,"Central America, n.e.s.",country,1969,168,23
+1971,15,birth,"Central America, n.e.s.",country,1970,219,23
+1971,15,birth,"Central America, n.e.s.",country,1971,187,23
+1971,15,birth,"Central America, n.e.s.",country,Canada,1441,23
+1971,15,birth,"Europe, n.e.s.",country,1946-1955,36572,23
+1971,15,birth,"Europe, n.e.s.",country,1956-1968,247,23
+1971,15,birth,"Europe, n.e.s.",country,1969,34,23
+1971,15,birth,"Europe, n.e.s.",country,1970,14,23
+1971,15,birth,"Europe, n.e.s.",country,1971,14,23
+1971,15,birth,"Europe, n.e.s.",country,Canada,36881,23
+1971,15,birth,"South America, n.e.s.",country,1946-1955,3219,23
+1971,15,birth,"South America, n.e.s.",country,1956-1968,12323,23
+1971,15,birth,"South America, n.e.s.",country,1969,3461,23
+1971,15,birth,"South America, n.e.s.",country,1970,3999,23
+1971,15,birth,"South America, n.e.s.",country,1971,4176,23
+1971,15,birth,"South America, n.e.s.",country,Canada,27178,23
+1971,15,birth,West Indies,country,1946-1955,5169,23
+1971,15,birth,West Indies,country,1956-1968,43795,23
+1971,15,birth,West Indies,country,1969,13803,23
+1971,15,birth,West Indies,country,1970,13286,23
+1971,15,birth,West Indies,country,1971,11202,23
+1971,15,birth,West Indies,country,Canada,87255,23
+1971,15,birth,"Other Countries, n.e.s.",country,1946-1955,20512,23
+1971,15,birth,"Other Countries, n.e.s.",country,1956-1968,4200,23
+1971,15,birth,"Other Countries, n.e.s.",country,1969,752,23
+1971,15,birth,"Other Countries, n.e.s.",country,1970,999,23
+1971,15,birth,"Other Countries, n.e.s.",country,1971,886,23
+1971,15,birth,"Other Countries, n.e.s.",country,Canada,27349,23
+1971,15,birth,TOTAL,total,1946-1955,1222319,23
+1971,15,birth,TOTAL,total,1956-1968,1883294,23
+1971,15,birth,TOTAL,total,1969,161531,23
+1971,15,birth,TOTAL,total,1970,147713,23
+1971,15,birth,TOTAL,total,1971,121900,23
+1971,15,birth,TOTAL,total,Canada,3536757,23
