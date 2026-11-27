@@ -18,6 +18,12 @@
 	var fmtInt = function (d) { return d3.format(',')(Math.round(d)); };
 	var fmtShort = function (d) { return Math.abs(d) >= 1000 ? d3.format('.2s')(d).replace('G', 'B') : d3.format(',.0f')(d); };
 	var registry = [];
+	/** Millions of dollars as C$12M / C$1.2B (d3's SI 'k' would print 'C$6.0kM'). */
+	function moneyM(d, cur) {
+		if (d === 0) { return '0'; }
+		var a = Math.abs(d);
+		return cur + (a >= 1000 ? d3.format('~g')(+(d / 1000).toPrecision(3)) + 'B' : d3.format('~g')(+d.toPrecision(3)) + 'M');
+	}
 
 	function mount(host, draw) {
 		if (!host || !window.d3) { return; }
@@ -196,7 +202,7 @@
 				{ name: 'Gross ODA', color: t.pos, values: aid.map(function (r) { return [r[0], r[1]]; }) },
 				{ name: 'Net ODA', color: t.ink2, values: aid.map(function (r) { return [r[0], r[2]]; }) },
 				{ name: 'Humanitarian', color: t.warn, values: aid.filter(function (r) { return r[4] !== null; }).map(function (r) { return [r[0], r[4]]; }) }
-			], { markers: markers, yfmt: function (d) { return '$' + fmtShort(d) + 'M'; }, tipfmt: function (d) { return 'US$' + d3.format(',.1f')(d) + 'M'; } });
+			], { markers: markers, yfmt: function (d) { return moneyM(d, '$'); }, tipfmt: function (d) { return 'US$' + d3.format(',.1f')(d) + 'M'; } });
 		});
 
 		var cadS = D.aidCad || [];
@@ -205,7 +211,7 @@
 			lineChart(host, [
 				{ name: 'International assistance', color: t.accent, values: cadS.map(function (r) { return [fy(r), r[1] / 1e6]; }) },
 				{ name: 'of which ODA (2016-17 on)', color: t.pos, values: cadS.filter(function (r) { return r[2] !== null; }).map(function (r) { return [fy(r), r[2] / 1e6]; }) }
-			], { yfmt: function (d) { return d === 0 ? '0' : 'C$' + fmtShort(d) + 'M'; }, tipfmt: function (d) { return 'C$' + d3.format(',.1f')(d) + 'M'; } });
+			], { yfmt: function (d) { return moneyM(d, 'C$'); }, tipfmt: function (d) { return 'C$' + d3.format(',.1f')(d) + 'M'; } });
 		});
 
 		if (sit.length) {
@@ -269,7 +275,7 @@
 		var node = document.getElementById('ptAidData');
 		if (!node) { return; }
 		var D = JSON.parse(node.textContent || '{}'), t = theme(), tot = D.totals || [];
-		var cad = function (d) { return d === 0 ? '0' : 'C$' + fmtShort(d) + 'M'; };
+		var cad = function (d) { return moneyM(d, 'C$'); };
 		var mode = 'cad';
 		function drawTotal(host) {
 			if (mode === 'gni') {
@@ -283,7 +289,7 @@
 				lineChart(host, series, { yfmt: pct, tipfmt: pct, hlines: [{ y: 0.7, label: 'UN target 0.7%' }] });
 			} else if (mode === 'real') {
 				lineChart(host, [{ name: 'Net ODA, ' + D.baseYear + ' US$', color: t.pos, values: tot.map(function (r) { return [r[0], r[2]]; }) }],
-					{ yfmt: function (d) { return d === 0 ? '0' : '$' + fmtShort(d) + 'M'; }, tipfmt: function (d) { return 'US$' + d3.format(',.0f')(d) + 'M'; } });
+					{ yfmt: function (d) { return moneyM(d, '$'); }, tipfmt: function (d) { return 'US$' + d3.format(',.0f')(d) + 'M'; } });
 			} else {
 				lineChart(host, [{ name: 'Net ODA, current C$', color: t.accent, values: tot.map(function (r) { return [r[0], r[1]]; }) }],
 					{ yfmt: cad, tipfmt: function (d) { return 'C$' + d3.format(',.0f')(d) + 'M'; } });
@@ -311,7 +317,7 @@
 		var regs = D.regions || {}, cols = [t.accent, t.warn, t.pos, t.neg, t.ink2];
 		mount(document.getElementById('ptAidRegions'), function (h) {
 			lineChart(h, Object.keys(regs).map(function (k, i) { return { name: k, color: cols[i % cols.length], values: regs[k] }; }),
-				{ yfmt: function (d) { return '$' + fmtShort(d) + 'M'; }, tipfmt: function (d) { return 'US$' + d3.format(',.0f')(d) + 'M'; } });
+				{ yfmt: function (d) { return moneyM(d, '$'); }, tipfmt: function (d) { return 'US$' + d3.format(',.0f')(d) + 'M'; } });
 		});
 		mount(document.getElementById('ptAidCadDept'), function (h) {
 			var fy = function (r) { return [parseInt(r[0], 10), r[1] / 1e6]; };
@@ -321,11 +327,11 @@
 				series.push({ name: k.replace(/^Immigration, Refugees and Citizenship Canada$/, 'IRCC').replace(/^Department of /, '').slice(0, 30),
 					color: dcols[i % dcols.length], values: depts[k].map(fy) });
 			});
-			lineChart(h, series, { yfmt: function (d) { return d === 0 ? '0' : 'C$' + fmtShort(d) + 'M'; }, tipfmt: function (d) { return 'C$' + d3.format(',.0f')(d) + 'M'; } });
+			lineChart(h, series, { yfmt: function (d) { return moneyM(d, 'C$'); }, tipfmt: function (d) { return 'C$' + d3.format(',.0f')(d) + 'M'; } });
 		});
 		mount(document.getElementById('ptAidGac'), function (h) {
 			barChart(h, (D.gacYears || []).map(function (r) { return [r[0] + '-' + String(r[0] + 1).slice(2), r[2] / 1e6]; }),
-				{ yfmt: function (d) { return d === 0 ? '0' : 'C$' + fmtShort(d) + 'M'; } });
+				{ yfmt: function (d) { return moneyM(d, 'C$'); } });
 		});
 	}
 
