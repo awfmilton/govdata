@@ -179,6 +179,8 @@ def run_countries(conn, cfg, only_report: bool) -> int:
         ('cty_oda', lambda: countries.load_oda(conn.cursor(), ua)),
         ('parl_person_birth', lambda: countries.load_births(conn.cursor(), ua)),
         ('cty_law_tags', lambda: countries.tag_country_laws(conn.cursor(), ua)),
+        ('cty_dac1', lambda: countries.load_dac1(conn.cursor(), ua)),
+        ('aid_law_tags', lambda: countries.tag_aid_laws(conn.cursor(), ua)),
     ]
     return run_steps(conn, steps + [('cty_report', lambda: report.build_all(conn.cursor()))])
 

@@ -84,3 +84,32 @@ CREATE TABLE IF NOT EXISTS cty_report (
   payload       LONGTEXT     NOT NULL,
   generated_at  DATETIME     NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- OECD DAC1: Canada as a donor, every measure (total, bilateral, multilateral by channel, in-donor refugee costs,
+-- administrative costs, ODA as % of GNI, GNI), 1960 onward. unit XDC = Canadian dollars (current prices).
+CREATE TABLE IF NOT EXISTS cty_dac1 (
+  measure        VARCHAR(12)  NOT NULL,
+  flow_type      VARCHAR(8)   NOT NULL,
+  unit           VARCHAR(8)   NOT NULL,
+  price_base     CHAR(1)      NOT NULL,
+  year           SMALLINT     NOT NULL,
+  measure_label  VARCHAR(200) NOT NULL,
+  flow_label     VARCHAR(80)  NOT NULL,
+  value          DECIMAL(20,6) NULL,          -- millions for money; percent for ratio measures
+  base_year      SMALLINT     NULL,
+  fetched_at     DATETIME     NOT NULL,
+  PRIMARY KEY (measure, flow_type, unit, price_base, year)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- Federal acts, regulations and House bills about foreign aid, debt relief and the international financial
+-- institutions (title match; country-specific debt remission orders are also in cty_law_tags).
+CREATE TABLE IF NOT EXISTS aid_law_tags (
+  ref_kind      ENUM('act','regulation','bill') NOT NULL,
+  ref_id        VARCHAR(64)  NOT NULL,
+  title         VARCHAR(1000) NOT NULL,
+  matched_term  VARCHAR(120) NOT NULL,
+  official_number VARCHAR(120) NULL,
+  url           VARCHAR(400) NULL,
+  tagged_at     DATETIME     NOT NULL,
+  PRIMARY KEY (ref_kind, ref_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;

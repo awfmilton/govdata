@@ -1,6 +1,6 @@
 <?php
 /**
- * Country pages: /countries/ (index and cross-country analysis) and /country/{slug}/ (one country).
+ * Country pages: /countries/ (index and cross-country analysis), /country/{slug}/ (one country) and /foreign-aid/.
  *
  * Every figure is precomputed on govdata-serving by database/immigration (run.py countries / report) into
  * grantconts.cty_report; this class only reads those JSON payloads (read-only connection, cached) and routes the
@@ -17,9 +17,10 @@ final class Country_Reports {
 
 	public const QV_COUNTRY = 'pt_country';
 	public const QV_INDEX   = 'pt_countries';
+	public const QV_AID     = 'pt_foreign_aid';
 
 	/** Bump when the rewrite rules change; the rules are flushed once per value. */
-	private const REWRITE_VERSION = '1';
+	private const REWRITE_VERSION = '2';
 
 	/** Payloads are rebuilt daily on the database host; a page reads at most a 6-hour-old copy. */
 	private const TTL = 6 * HOUR_IN_SECONDS;
@@ -44,11 +45,13 @@ final class Country_Reports {
 	public function add_query_vars( array $vars ): array {
 		$vars[] = self::QV_COUNTRY;
 		$vars[] = self::QV_INDEX;
+		$vars[] = self::QV_AID;
 		return $vars;
 	}
 
 	public function register_rewrites(): void {
 		add_rewrite_rule( '^countries/?$', 'index.php?' . self::QV_INDEX . '=1', 'top' );
+		add_rewrite_rule( '^foreign-aid/?$', 'index.php?' . self::QV_AID . '=1', 'top' );
 		add_rewrite_rule( '^country/([a-z0-9-]+)/?$', 'index.php?' . self::QV_COUNTRY . '=$matches[1]', 'top' );
 		if ( get_option( 'pt_country_rewrite_v' ) !== self::REWRITE_VERSION ) {
 			flush_rewrite_rules( false );
@@ -62,12 +65,16 @@ final class Country_Reports {
 		return '1' === (string) get_query_var( self::QV_INDEX );
 	}
 
+	public static function is_aid(): bool {
+		return '1' === (string) get_query_var( self::QV_AID );
+	}
+
 	public static function slug(): string {
 		return sanitize_title( (string) get_query_var( self::QV_COUNTRY ) );
 	}
 
 	public static function is_country_page(): bool {
-		return self::is_index() || '' !== self::slug();
+		return self::is_index() || self::is_aid() || '' !== self::slug();
 	}
 
 	/** Unknown slug → a real 404; a missing index (loader not run) still renders its "being compiled" state. */
@@ -87,6 +94,9 @@ final class Country_Reports {
 		if ( self::is_index() ) {
 			return locate_template( 'country-index.php' ) ?: $template;
 		}
+		if ( self::is_aid() ) {
+			return locate_template( 'foreign-aid.php' ) ?: $template;
+		}
 		if ( '' !== self::slug() && null !== $this->country( self::slug() ) ) {
 			return locate_template( 'country-report.php' ) ?: $template;
 		}
@@ -94,7 +104,9 @@ final class Country_Reports {
 	}
 
 	public function title( array $parts ): array {
-		if ( self::is_index() ) {
+		if ( self::is_aid() ) {
+			$parts['title'] = __( 'Canada’s foreign aid: how much, where, through whom', 'publictech-core' );
+		} elseif ( self::is_index() ) {
 			$parts['title'] = __( 'Countries: immigration, aid, laws and Parliament', 'publictech-core' );
 		} elseif ( '' !== self::slug() && ( $c = $this->country( self::slug() ) ) ) {
 			/* translators: %s: country name */
@@ -126,6 +138,10 @@ final class Country_Reports {
 
 	public function analysis(): ?array {
 		return $this->payload( 'analysis' );
+	}
+
+	public function aid(): ?array {
+		return $this->payload( 'aid' );
 	}
 
 	public function country( string $slug ): ?array {

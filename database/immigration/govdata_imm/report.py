@@ -18,6 +18,7 @@ of Canada's gross ODA to all individual countries that year.
 import json
 import math
 import random
+import re
 from collections import defaultdict
 from datetime import date, datetime, timezone
 
@@ -628,8 +629,161 @@ def build_all(cur) -> dict:
                                             'countries': sorted(index_rows, key=lambda r: r['name'])}, separators=(',', ':')), generated))
     cur.execute('REPLACE INTO cty_report (report_key, country_id, payload, generated_at) VALUES (%s,%s,%s,%s)',
                 ('analysis', None, json.dumps(analysis, separators=(',', ':'), default=str), generated))
+    aid_payload = build_aid(cur, C, index_rows, generated)
+    aid_payload['base_year'] = aid_base
+    aid_payload['spearman_imm_aid'] = analysis['scatter_spearman']
+    cur.execute('REPLACE INTO cty_report (report_key, country_id, payload, generated_at) VALUES (%s,%s,%s,%s)',
+                ('aid', None, json.dumps(aid_payload, separators=(',', ':'), default=str), generated))
     cur.execute('DELETE FROM cty_report WHERE generated_at < %s', (generated,))
     return {'country_pages': written, 'imm_events': imm_study.get('n_events'), 'aid_events': aid_study.get('n_events'),
             'imm_diff_pct': imm_study.get('difference_pct'), 'imm_p': imm_study.get('p_value'),
             'aid_diff_pct': aid_study.get('difference_pct'), 'aid_p': aid_study.get('p_value'),
             'fe_imm': fe['immigration'], 'fe_aid': fe['aid']}
+
+
+# ── foreign aid page (report_key 'aid') ─────────────────────────────────────
+
+AID_REGIONS = [('F', 'Africa'), ('S', 'Asia'), ('A', 'Americas'), ('E', 'Europe'), ('O', 'Oceania')]
+AID_INCOME = [('LDC', 'Least developed'), ('OLIC', 'Other low income'), ('LMIC', 'Lower-middle income'),
+              ('UMIC', 'Upper-middle income'), ('INC_X', 'Not allocated by income')]
+DAC1_BILATERAL = [('1820', 'Refugees in Canada'), ('1700', 'Administrative costs'), ('1500', 'Scholarships and students in Canada'),
+                  ('1600', 'Debt relief'), ('1100', 'Budget support'), ('1210', 'Core support to NGOs and research'),
+                  ('1300', 'Projects'), ('1400', 'Experts and technical assistance'), ('1810', 'Development awareness')]
+DAC1_MULTI = [('2101', 'UN agencies'), ('2103', 'World Bank IDA'), ('2104', 'Other World Bank'),
+              ('2105', 'Regional development banks'), ('2106', 'Global Environment Facility'), ('2108', 'Other agencies')]
+RECIPIENT_TYPES = {'N': 'Not-for-profit organizations and charities', 'G': 'Government', 'F': 'For-profit organizations',
+                   'I': 'International (non-government)', 'S': 'Academia', 'A': 'Indigenous recipients',
+                   'O': 'Other', 'P': 'Individuals', None: 'Not stated'}
+REMISSION = re.compile(r'remission of interest|loans made to|debt', re.I)
+
+
+def _dac1(cur, measure, unit='XDC', flow='1140', price='V') -> dict:
+    cur.execute('SELECT year, value FROM cty_dac1 WHERE measure=%s AND unit=%s AND flow_type=%s AND price_base=%s AND value IS NOT NULL',
+                (measure, unit, flow, price))
+    return {y: float(v) for y, v in cur.fetchall()}
+
+
+def build_aid(cur, C: dict, index_rows: list, generated) -> dict:
+    """Canada's aid as a whole: DAC1 (Canadian dollars, totals and channels), DAC2a (regions, income groups, agencies,
+    recipient countries), in-donor refugee costs beside refugee admissions, Global Affairs Canada grants, and the laws."""
+    oda_cad = _dac1(cur, '1010')
+    oda_q = _dac1(cur, '1010', unit='USD', price='Q')
+    gni = _dac1(cur, '1')
+    ratio_ge = _dac1(cur, '11002', unit='PT_B5G', flow='1160')
+    bil, mul = _dac1(cur, '1015'), _dac1(cur, '2000')
+    years = sorted(oda_cad)
+    last = max(y for y in years if y in gni) if gni else max(years)
+    # [year, ODA CAD M (net, current), ODA US$ M constant, ODA/GNI % (net flows), ODA/GNI % (grant equivalent, 2018+),
+    #  bilateral CAD M, multilateral CAD M]
+    totals = [[y, round(oda_cad[y], 1), round(oda_q[y], 1) if y in oda_q else None,
+               round(100 * oda_cad[y] / gni[y], 3) if gni.get(y) else None, ratio_ge.get(y),
+               round(bil[y], 1) if y in bil else None, round(mul[y], 1) if y in mul else None] for y in years]
+    bil_parts = {label: sorted((y, round(v, 1)) for y, v in _dac1(cur, m).items()) for m, label in DAC1_BILATERAL}
+    mul_parts = {label: sorted((y, round(v, 1)) for y, v in _dac1(cur, m).items()) for m, label in DAC1_MULTI}
+
+    def oda2(codes, measure='240', price='Q'):
+        cur.execute(f"SELECT recipient_code, year, usd_millions FROM cty_oda WHERE measure=%s AND price_base=%s AND "
+                    f"recipient_code IN ({','.join(['%s'] * len(codes))})", [measure, price] + codes)
+        out = defaultdict(dict)
+        for code, y, v in cur.fetchall():
+            if v is not None:
+                out[code][y] = float(v)
+        return out
+
+    reg = oda2([c for c, _ in AID_REGIONS] + ['DPGC', 'ALLR'])
+    inc = oda2([c for c, _ in AID_INCOME])
+    cur.execute("SELECT DISTINCT recipient_code, recipient_label FROM cty_oda WHERE recipient_code REGEXP '^(1UN|5|9OTH)'")
+    agencies = dict(cur.fetchall())
+    ag = oda2(sorted(agencies)) if agencies else {}
+    aid_last = max(reg['ALLR']) if reg.get('ALLR') else None
+    w0 = aid_last - 9 if aid_last else None
+
+    def last10(series):
+        return round(sum(v for y, v in series.items() if w0 <= y <= aid_last), 1)
+
+    cur.execute("SELECT country_id, year, usd_millions FROM cty_oda WHERE measure='240' AND price_base='Q' AND country_id IS NOT NULL")
+    by_c = defaultdict(dict)
+    for cid, y, v in cur.fetchall():
+        if v is not None:
+            by_c[cid][y] = float(v)
+    idx = {r['slug']: r for r in index_rows}
+
+    def row(cid, v):
+        c = C[cid]
+        r = idx.get(c['slug'], {})
+        return [c['slug'], c['name'], v, r.get('imm_last10'), r.get('mps', 0)]
+
+    top10 = sorted(((cid, last10(s)) for cid, s in by_c.items()), key=lambda t: -t[1])[:25]
+    alltime = sorted(((cid, round(sum(s.values()), 1)) for cid, s in by_c.items()), key=lambda t: -t[1])[:25]
+    decades = []
+    for d0 in range(1960, (aid_last or 1960) + 1, 10):
+        tot = defaultdict(float)
+        for cid, s in by_c.items():
+            for y, v in s.items():
+                if d0 <= y < d0 + 10:
+                    tot[cid] += v
+        allsum = sum(tot.values())
+        decades.append({'decade': f'{d0}s', 'top': [[C[cid]['slug'], C[cid]['name'], round(v, 1), round(100 * v / allsum, 1) if allsum else None]
+                                                    for cid, v in sorted(tot.items(), key=lambda t: -t[1])[:5]]})
+
+    # Refugee costs in Canada counted as aid, beside refugees admitted as permanent residents (IRCC, 2015 onward).
+    refugees = {}
+    cur.execute("SELECT YEAR(ref_period), COUNT(DISTINCT MONTH(ref_period)), SUM(value) FROM imm_fact "
+                "WHERE source_key='ircc_pr_citz_immcat' AND cat_main LIKE 'Resettled Refugee%' GROUP BY 1")
+    for y, months, v in cur.fetchall():
+        if months == 12:
+            refugees[y] = int(v or 0)
+    ref_cost = dict(bil_parts['Refugees in Canada'])
+    refugee_rows = [[y, ref_cost.get(y), refugees.get(y), round(oda_cad[y], 1) if y in oda_cad else None,
+                     round(1e6 * ref_cost[y] / refugees[y]) if ref_cost.get(y) and refugees.get(y) else None]
+                    for y in sorted(set(ref_cost) | set(refugees)) if y >= 1993]
+
+    # Global Affairs Canada grants and contributions (proactive disclosure, CAD, agreement value at signing).
+    gac = "owner_org_title LIKE 'Global Affairs%' AND amendment_number IS NULL"
+    cur.execute(f"SELECT LEFT(fiscal_year, 4), COUNT(*), SUM(GREATEST(agreement_value, 0)) FROM master_table WHERE {gac} GROUP BY 1")
+    gac_years = sorted([int(y), int(n), round(float(v or 0), 2)] for y, n, v in cur.fetchall() if y and y.isdigit())
+    cur.execute(f"SELECT recipient_type, COUNT(*), SUM(GREATEST(agreement_value, 0)) FROM master_table WHERE {gac} GROUP BY 1")
+    gac_types = sorted(([RECIPIENT_TYPES.get(t, t or 'Not stated'), int(n), round(float(v or 0), 2)] for t, n, v in cur.fetchall()),
+                       key=lambda r: -r[2])
+    cur.execute(f"SELECT recipient_legal_name, MAX(recipient_type), MAX(recipient_country), COUNT(*), SUM(GREATEST(agreement_value, 0)) "
+                f"FROM master_table WHERE {gac} GROUP BY 1 ORDER BY 5 DESC LIMIT 30")
+    gac_recips = [[n, RECIPIENT_TYPES.get(t, t), cc, int(k), round(float(v or 0), 2)] for n, t, cc, k, v in cur.fetchall()]
+    cur.execute(f"SELECT prog_name_en, COUNT(*), SUM(GREATEST(agreement_value, 0)) FROM master_table WHERE {gac} AND prog_name_en <> '' "
+                f"GROUP BY 1 ORDER BY 3 DESC LIMIT 15")
+    gac_progs = [[n, int(k), round(float(v or 0), 2)] for n, k, v in cur.fetchall()]
+    cur.execute(f"SELECT SUM(UPPER(TRIM(recipient_country)) = 'CA'), SUM(UPPER(TRIM(recipient_country)) <> 'CA'), "
+                f"SUM(CASE WHEN UPPER(TRIM(recipient_country)) = 'CA' THEN GREATEST(agreement_value, 0) END), "
+                f"SUM(CASE WHEN UPPER(TRIM(recipient_country)) <> 'CA' THEN GREATEST(agreement_value, 0) END), COUNT(*), "
+                f"SUM(GREATEST(agreement_value, 0)) FROM master_table WHERE {gac}")
+    in_n, out_n, in_v, out_v, n_all, v_all = cur.fetchone()
+
+    # Laws and bills about aid; country debt-relief orders.
+    cur.execute('SELECT ref_kind, ref_id, title, official_number, url FROM aid_law_tags ORDER BY ref_kind, title')
+    laws, bill_ids = [], set()
+    for kind, ref, title, num, url in cur.fetchall():
+        laws.append({'kind': kind, 'id': ref, 'title': title, 'number': num, 'url': url})
+        if kind == 'bill':
+            bill_ids.add(int(ref))
+    cur.execute("SELECT t.ref_kind, t.title, t.url, i.slug, i.display_name FROM cty_law_tags t JOIN imm_country_iso i USING (country_id) "
+                "WHERE t.ref_kind <> 'bill' ORDER BY i.display_name")
+    remissions = [{'kind': k, 'title': t, 'url': u, 'slug': s, 'country': n} for k, t, u, s, n in cur.fetchall() if REMISSION.search(t)]
+    binfo, bdivs = bill_details(cur, bill_ids)
+    for law in laws:
+        if law['kind'] == 'bill':
+            law.update(binfo.get(int(law['id']), {}))
+            law['divisions'] = bdivs.get(int(law['id']), [])
+
+    return {
+        'generated_at': generated.isoformat() + 'Z', 'last_year': last, 'oda_last_year': aid_last, 'window': [w0, aid_last],
+        'totals': totals, 'bilateral_parts': bil_parts, 'multilateral_parts': mul_parts,
+        'regions': {name: sorted((y, round(v, 1)) for y, v in reg.get(code, {}).items()) for code, name in AID_REGIONS},
+        'all_recipients': sorted((y, round(v, 1)) for y, v in reg.get('ALLR', {}).items()),
+        'income_last10': [[name, last10(inc.get(code, {}))] for code, name in AID_INCOME],
+        'agencies_last10': sorted(([agencies[c], last10(ag.get(c, {}))] for c in agencies if ag.get(c)), key=lambda r: -r[1])[:15],
+        'top_last10': [row(cid, v) for cid, v in top10], 'top_alltime': [row(cid, v) for cid, v in alltime],
+        'decades': decades, 'refugees': refugee_rows,
+        'gac': {'by_year': gac_years, 'types': gac_types, 'recipients': gac_recips, 'programs': gac_progs,
+                'n': int(n_all or 0), 'value': round(float(v_all or 0), 2),
+                'in_canada': [int(in_n or 0), round(float(in_v or 0), 2)], 'abroad': [int(out_n or 0), round(float(out_v or 0), 2)]},
+        'laws': laws, 'remissions': remissions,
+    }

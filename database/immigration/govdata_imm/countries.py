@@ -21,6 +21,11 @@ TERMS_CSV = HERE / 'country_terms.csv'
 
 OECD_URL = ('https://sdmx.oecd.org/public/rest/data/OECD.DCD.FSD,DSD_DAC2@DF_DAC2A,/CAN..{measures}.USD.V+Q'
             '?startPeriod=1960&format=csvfilewithlabels')
+OECD_DAC1_URL = ('https://sdmx.oecd.org/public/rest/data/OECD.DCD.FSD,DSD_DAC1@DF_DAC1,/CAN......'
+                 '?startPeriod=1960&format=csvfilewithlabels')
+AID_TITLE = re.compile(r'(official development assistance|development assistance|international assistance|foreign aid|'
+                       r'international development|bretton woods|(?<!student )debt relief|remission of (?:interest|debt)|'
+                       r'loans made to the|development finance|international financial institution)', re.I)
 # 206 ODA net disbursements, 240 gross ODA, 201 grants, 216 humanitarian aid, 106 imputed multilateral ODA.
 OECD_MEASURES = ['206', '240', '201', '216', '106']
 
@@ -290,3 +295,54 @@ def tag_country_laws(cur, ua: str) -> dict:
     cur.executemany('INSERT IGNORE INTO cty_law_tags (ref_kind, ref_id, country_id, title, matched_term, topic, '
                     'official_number, current_to, url, tagged_at) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)', rows)
     return {'law_tags': n_laws, 'bill_tags': len(rows) - n_laws}
+
+
+# ── OECD DAC1 (Canada as donor) ─────────────────────────────────────────────
+
+def load_dac1(cur, ua: str) -> dict:
+    data = get(OECD_DAC1_URL, ua, timeout=600)
+    rows = []
+    for r in csv.DictReader(io.StringIO(data.decode('utf-8-sig'))):
+        if r['DONOR'] != 'CAN':
+            continue
+        # DAC1 breaks a few memo lines down by sector and tying status; keep the totals only.
+        if r.get('SECTOR') not in (None, '', '1000', '_Z', '_T') or r.get('TYING_STATUS') not in (None, '', 'T', '_Z', '_T'):
+            continue
+        val = r['OBS_VALUE']
+        v = float(val) if val not in ('', None) else None
+        if v is not None and r['UNIT_MEASURE'] in ('USD', 'XDC'):
+            v = v * 10 ** (int(r.get('UNIT_MULT') or 0) - 6)      # money in millions
+        rows.append((r['MEASURE'], r['FLOW_TYPE'], r['UNIT_MEASURE'], r['PRICE_BASE'], int(r['TIME_PERIOD']),
+                     r['Measure'][:200], r['Flow type'][:80], v, int(r['BASE_PER']) if r.get('BASE_PER') else None, _now()))
+    if len(rows) < 5000:
+        raise RuntimeError(f'OECD DAC1 returned only {len(rows)} rows; keeping the previous load')
+    cur.execute('DELETE FROM cty_dac1')
+    cur.executemany('INSERT IGNORE INTO cty_dac1 (measure, flow_type, unit, price_base, year, measure_label, flow_label, value, '
+                    'base_year, fetched_at) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)', rows)
+    return {'rows': len(rows)}
+
+
+def tag_aid_laws(cur, ua: str) -> dict:
+    catalogue = ET.fromstring(get('https://laws-lois.justice.gc.ca/eng/XML/Legis.xml', ua, timeout=300))
+    rows = []
+    for tag, kind in (('Act', 'act'), ('Regulation', 'regulation')):
+        for el in catalogue.iter(tag):
+            if el.findtext('Language') != 'eng':
+                continue
+            title = (el.findtext('Title') or '').strip()
+            m = AID_TITLE.search(title)
+            if m:
+                rows.append((kind, el.findtext('UniqueId'), title[:1000], m.group(1).lower(), el.findtext('OfficialNumber'),
+                             (el.findtext('LinkToHTMLToC') or '').replace('http://', 'https://')[:400], _now()))
+    n_laws = len(rows)
+    cur.execute('SELECT legisinfo_id, parliament, session, number_code, COALESCE(NULLIF(short_title_en, ""), long_title_en), '
+                'CONCAT_WS(" ", short_title_en, long_title_en) FROM parl_bills')
+    for bid, p, s, num, title, both in cur.fetchall():
+        m = AID_TITLE.search(both or '')
+        if m:
+            rows.append(('bill', str(bid), (title or '')[:1000], m.group(1).lower(), num,
+                         f'https://www.parl.ca/legisinfo/en/bill/{p}-{s}/{num.lower()}', _now()))
+    cur.execute('DELETE FROM aid_law_tags')
+    cur.executemany('INSERT INTO aid_law_tags (ref_kind, ref_id, title, matched_term, official_number, url, tagged_at) '
+                    'VALUES (%s,%s,%s,%s,%s,%s,%s)', rows)
+    return {'laws': n_laws, 'bills': len(rows) - n_laws}
