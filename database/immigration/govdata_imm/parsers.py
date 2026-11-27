@@ -235,7 +235,8 @@ def parse_mp22_csv(data: bytes, src: dict) -> list[dict]:
             basis = MP22_BASIS.get(rec['basis'])
             if basis is None:
                 raise LayoutError(f'{name}: unknown basis {rec["basis"]!r}')
-            label = rec['row_label'].strip()
+            # Footnote markers printed after a label ("Iran (4)", "Philippines (6)") are not part of the name.
+            label = re.sub(r'\s*\(\d+\)$', '', rec['row_label'].strip())
             # One table per (year, basis) is the authority for a cell; a second table repeating the same cell is ignored.
             k = (year, basis, label, province)
             if k in seen:
