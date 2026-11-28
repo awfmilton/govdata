@@ -195,6 +195,35 @@ def parse_ircc_hist_xls(data: bytes, src: dict) -> tuple[list[dict], dict]:
     return rows, control
 
 
+def parse_ircc_tr_yearend(data: bytes, src: dict) -> tuple[list[dict], dict]:
+    """IRCC temporary-resident 'holders on December 31st' workbooks: countries down, years across, the same shape
+    as the 1980-2015 PR table. ref_period is 1 January of the year whose 31 December the count is taken on."""
+    from .aid_data import _xlsx_rows
+    sheet = _xlsx_rows(data)
+    hdr = next((i for i, r in enumerate(sheet[:20]) if r and r[0].strip() == 'Country of Citizenship'), None)
+    if hdr is None:
+        raise LayoutError(f"{src['key']}: no 'Country of Citizenship' header row")
+    years = {c: int(float(v)) for c, v in enumerate(sheet[hdr]) if c and re.fullmatch(r'\d{4}(\.0)?', (v or '').strip())}
+    if len(years) < 5:
+        raise LayoutError(f"{src['key']}: header has only {len(years)} year columns")
+    rows, control = [], {}
+    for r in sheet[hdr + 1:]:
+        name = (r[0] if r else '').strip()
+        if not name or name.startswith(('*', 'Source', 'Note', 'For further')):
+            continue
+        for c, y in years.items():
+            value, sup = _int_or_suppressed(r[c] if c < len(r) else '')
+            if name.lower() == 'total':
+                control[y] = value
+                continue
+            row = {k: None for k in DIMS}
+            row.update(population=src.get('population'), grain='year', ref_period=date(y, 1, 1),
+                       country_basis=src.get('country_basis'), country_raw=name, value=value, suppressed=sup,
+                       rounded=1 if src.get('rounded', True) else 0)
+            rows.append(row)
+    return rows, control
+
+
 # Province / territory column headings in the MP22-1 reports -> the names IRCC open data uses.
 MP22_PROVINCES = {
     'nfld.': 'Newfoundland and Labrador', 'p.e.i.': 'Prince Edward Island', 'n.s.': 'Nova Scotia',
@@ -253,4 +282,4 @@ def parse_mp22_csv(data: bytes, src: dict) -> list[dict]:
 
 
 PARSERS = {'ircc_odp': parse_ircc_odp, 'statcan_csv': parse_statcan_csv, 'ircc_hist_xls': parse_ircc_hist_xls,
-           'mp22_csv': parse_mp22_csv}
+           'mp22_csv': parse_mp22_csv, 'ircc_tr_yearend': parse_ircc_tr_yearend}

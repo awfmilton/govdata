@@ -88,8 +88,11 @@ get_header(); ?>
 			<table class="pt-cty-table sortable" id="ptCtyTable">
 				<thead><tr>
 					<th data-sort="text"><?php esc_html_e( 'Country', 'publictech-terminal' ); ?></th>
-					<th data-sort="num"><?php esc_html_e( 'Immigrants (10 yrs)', 'publictech-terminal' ); ?></th>
+					<th data-sort="num" title="<?php esc_attr_e( 'New permanent residents', 'publictech-terminal' ); ?>"><?php esc_html_e( 'Permanent residents (10 yrs)', 'publictech-terminal' ); ?></th>
 					<th data-sort="num"><?php esc_html_e( 'Since 1964', 'publictech-terminal' ); ?></th>
+					<th data-sort="num" title="<?php esc_attr_e( 'Study permits that took effect', 'publictech-terminal' ); ?>"><?php esc_html_e( 'Study permits (5 yrs)', 'publictech-terminal' ); ?></th>
+					<th data-sort="num" title="<?php esc_attr_e( 'TFWP and IMP work permits that took effect', 'publictech-terminal' ); ?>"><?php esc_html_e( 'Work permits (5 yrs)', 'publictech-terminal' ); ?></th>
+					<th data-sort="num"><?php esc_html_e( 'Refugee claims (5 yrs)', 'publictech-terminal' ); ?></th>
 					<th data-sort="num"><?php esc_html_e( 'Aid US$M (10 yrs)', 'publictech-terminal' ); ?></th>
 					<th data-sort="num"><?php esc_html_e( 'MPs', 'publictech-terminal' ); ?></th>
 					<th data-sort="num"><?php esc_html_e( 'Senators', 'publictech-terminal' ); ?></th>
@@ -102,6 +105,9 @@ get_header(); ?>
 						<td data-v="<?php echo esc_attr( (string) $r['name'] ); ?>"><a href="<?php echo esc_url( Country_Reports::url( (string) $r['slug'] ) ); ?>"><?php echo esc_html( (string) $r['name'] ); ?></a><?php echo ! empty( $r['historical'] ) ? ' <span class="mono pt-cty-sub">' . esc_html__( 'historical', 'publictech-terminal' ) . '</span>' : ''; ?></td>
 						<td class="mono" data-v="<?php echo (int) $r['imm_last10']; ?>"><?php echo esc_html( number_format( (int) $r['imm_last10'] ) ); ?></td>
 						<td class="mono" data-v="<?php echo (int) $r['imm_since_1964']; ?>"><?php echo esc_html( number_format( (int) $r['imm_since_1964'] ) ); ?></td>
+						<?php foreach ( [ 'study5', 'work5', 'asylum5' ] as $pt_k ) : $pt_v = (int) ( $r[ $pt_k ] ?? 0 ); ?>
+							<td class="mono" data-v="<?php echo $pt_v; ?>"><?php echo esc_html( $pt_v ? number_format( $pt_v ) : '—' ); ?></td>
+						<?php endforeach; ?>
 						<td class="mono" data-v="<?php echo esc_attr( (string) (float) $r['aid_last10'] ); ?>"><?php echo esc_html( $r['aid_last10'] ? number_format( (float) $r['aid_last10'], 1 ) : '—' ); ?></td>
 						<td class="mono" data-v="<?php echo (int) $r['mps']; ?>"><?php echo (int) $r['mps']; ?></td>
 						<td class="mono" data-v="<?php echo (int) $r['senators']; ?>"><?php echo (int) $r['senators']; ?></td>
@@ -227,6 +233,7 @@ get_header(); ?>
 				<li><?php esc_html_e( 'Members are counted by place of birth (the place’s country today), not ancestry: an MP whose parents came from a country is not counted for it. About one in six parliamentarians has no recorded birthplace.', 'publictech-terminal' ); ?></li>
 				<li><?php esc_html_e( 'Per-country immigration figures start in 1964, so the first usable event year is 1969. The 1964–1979 reports list only the larger source countries each year, by country of last residence, citizenship or birth; from 1980 the basis is citizenship.', 'publictech-terminal' ); ?></li>
 				<li><?php esc_html_e( 'Aid is bilateral official development assistance only; high-income countries receive none, so the aid comparison covers fewer countries.', 'publictech-terminal' ); ?></li>
+				<li><?php esc_html_e( '"Immigrants" here means new permanent residents. Students, temporary workers and refugee claimants are shown on each country page (2015 onward for permits, 2000 onward for year-end holders, 2013 onward for refugee claims) but are not part of this comparison, which needs per-country figures back to 1964.', 'publictech-terminal' ); ?></li>
 			</ul>
 		</div>
 	</div>

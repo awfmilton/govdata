@@ -205,6 +205,22 @@
 			], { markers: markers, yfmt: function (d) { return moneyM(d, '$'); }, tipfmt: function (d) { return 'US$' + d3.format(',.1f')(d) + 'M'; } });
 		});
 
+		var tf = D.tempFlows || {}, ts = D.tempStocks || {}, asy = D.asylum || [];
+		var tnames = { study: 'Study permits', tfwp: 'TFWP work permits', imp: 'IMP work permits', hc: 'Humanitarian work permits' };
+		var tcols = { study: t.warn, tfwp: t.neg, imp: t.pos, hc: t.ink2 };
+		mount(document.getElementById('ptCtyTemp'), function (host) {
+			var series = [{ name: 'New permanent residents', color: t.accent, values: imm.filter(function (r) { return r[0] >= 2015; }).map(function (r) { return [r[0], r[1]]; }) }];
+			['study', 'tfwp', 'imp', 'hc'].forEach(function (k) { if (tf[k] && tf[k].length) { series.push({ name: tnames[k], color: tcols[k], values: tf[k] }); } });
+			var full = asy.filter(function (r) { return !r[8] || String(r[8]).indexOf('December') !== -1; });
+			if (full.length) { series.push({ name: 'Refugee claims', color: '#9b7bff', values: full.map(function (r) { return [r[0], r[1] || 0]; }) }); }
+			lineChart(host, series, { yfmt: fmtShort });
+		});
+		mount(document.getElementById('ptCtyHolders'), function (host) {
+			var series = [];
+			['study', 'tfwp', 'imp'].forEach(function (k) { if (ts[k] && ts[k].length) { series.push({ name: tnames[k].replace(' permits', ''), color: tcols[k], values: ts[k] }); } });
+			lineChart(host, series, { yfmt: fmtShort });
+		});
+
 		var cadS = D.aidCad || [];
 		mount(document.getElementById('ptCtyAidCad'), function (host) {
 			var fy = function (r) { return parseInt(r[0], 10); };

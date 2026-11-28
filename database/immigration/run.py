@@ -148,7 +148,7 @@ def relink(cur, resolver, sources) -> int:
     """Resolve rows loaded while their spelling had no match. Values are untouched, so this is not a revision."""
     n = 0
     for src in sources:
-        may_create = {'ircc_odp': 'all', 'statcan_csv': 'groups', 'mp22_csv': 'groups'}.get(src['parser'], 'none')
+        may_create = src.get('may_create') or {'ircc_odp': 'all', 'statcan_csv': 'groups', 'mp22_csv': 'groups'}.get(src['parser'], 'none')
         cur.execute('SELECT DISTINCT country_raw FROM imm_fact WHERE source_key = %s AND country_raw IS NOT NULL '
                     'AND country_id IS NULL', (src['key'],))
         for (raw,) in cur.fetchall():
@@ -183,6 +183,7 @@ def run_countries(conn, cfg, only_report: bool) -> int:
         ('cty_law_tags', lambda: countries.tag_country_laws(conn.cursor(), ua)),
         ('cty_dac1', lambda: countries.load_dac1(conn.cursor(), ua)),
         ('aid_law_tags', lambda: countries.tag_aid_laws(conn.cursor(), ua)),
+        ('irb_rpd_claims', lambda: countries.load_irb(conn.cursor(), ua)),
         ('aid_sria', lambda: aid_data.load_sria(conn, ua, cfg.raw_dir)),
         ('aid_hpds', lambda: aid_data.load_hpds(conn, ua, cfg.raw_dir)),
     ]

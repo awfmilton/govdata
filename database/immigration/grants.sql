@@ -35,3 +35,4 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON grantconts.aid_hpds            TO 'imm_l
 GRANT SELECT, INSERT, UPDATE, DELETE ON grantconts.aid_sria            TO 'imm_load'@'localhost';
 GRANT SELECT, INSERT, UPDATE, DELETE ON grantconts.aid_sria_sources    TO 'imm_load'@'localhost';
 GRANT SELECT, INSERT, UPDATE, DELETE ON grantconts.aid_sria_recipients TO 'imm_load'@'localhost';
+GRANT SELECT, INSERT, UPDATE, DELETE ON grantconts.irb_rpd_claims      TO 'imm_load'@'localhost';

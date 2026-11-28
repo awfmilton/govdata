@@ -283,6 +283,85 @@ def immigration_loyalty(cur) -> tuple[dict, float, int]:
     return {pid: (a, n) for pid, (a, n) in per.items()}, (agree / total if total else None), len(divs)
 
 
+# ── temporary residents and asylum claims ───────────────────────────────────
+
+TR_FLOWS = {'ircc_tr_study_citz': 'study', 'ircc_tr_tfwp_citz': 'tfwp', 'ircc_tr_imp_citz': 'imp', 'ircc_tr_hc_citz': 'hc'}
+TR_STOCKS = {'ircc_tr_study_yearend': 'study', 'ircc_tr_tfwp_yearend': 'tfwp', 'ircc_tr_imp_yearend': 'imp'}
+
+
+def temporary(cur) -> tuple[dict, dict]:
+    """-> (per-country, national). Flows: permits that became effective, summed to complete calendar years. Stocks:
+    permit holders on 31 December. Asylum: IRB claims referred / decided by country of alleged persecution."""
+    per = defaultdict(lambda: {'flows': defaultdict(dict), 'stocks': defaultdict(dict), 'asylum': {}})
+    nat = {'flows': defaultdict(dict), 'stocks': defaultdict(dict), 'asylum': {}}
+    keys = list(TR_FLOWS)
+    cur.execute(f"SELECT source_key, YEAR(ref_period), COUNT(DISTINCT MONTH(ref_period)) FROM imm_fact "
+                f"WHERE source_key IN ({','.join(['%s'] * len(keys))}) GROUP BY 1, 2", keys)
+    complete = {(k, y) for k, y, m in cur.fetchall() if m == 12}
+    cur.execute(f"SELECT source_key, country_id, YEAR(ref_period), SUM(value) FROM imm_fact "
+                f"WHERE source_key IN ({','.join(['%s'] * len(keys))}) GROUP BY 1, 2, 3", keys)
+    for k, cid, y, v in cur.fetchall():
+        if (k, y) not in complete:
+            continue
+        name = TR_FLOWS[k]
+        nat['flows'][name][y] = nat['flows'][name].get(y, 0) + int(v or 0)
+        if cid:
+            per[cid]['flows'][name][y] = int(v or 0)
+    keys = list(TR_STOCKS)
+    cur.execute(f"SELECT source_key, country_id, YEAR(ref_period), SUM(value) FROM imm_fact "
+                f"WHERE source_key IN ({','.join(['%s'] * len(keys))}) GROUP BY 1, 2, 3", keys)
+    for k, cid, y, v in cur.fetchall():
+        name = TR_STOCKS[k]
+        nat['stocks'][name][y] = nat['stocks'][name].get(y, 0) + int(v or 0)
+        if cid:
+            per[cid]['stocks'][name][y] = int(v or 0)
+    cur.execute('SELECT country_id, country_raw, year, referred, accepted, rejected, abandoned, withdrawn_other, finalized, pending, '
+                'period FROM irb_rpd_claims')
+    for cid, raw, y, *vals in cur.fetchall():
+        if raw == 'Total':
+            nat['asylum'][y] = vals
+        elif cid:
+            prev = per[cid]['asylum'].get(y)
+            if prev:                                   # two IRB spellings for one country in a year: add them
+                vals = [(a or 0) + (b or 0) if isinstance(a, int) or isinstance(b, int) else a for a, b in zip(prev, vals)]
+                vals[-1] = prev[-1]
+            per[cid]['asylum'][y] = vals
+    return per, nat
+
+
+def _acc(rows):
+    """Acceptance rate among claims decided on the merits (accepted / (accepted + rejected))."""
+    a = sum(r[1] or 0 for r in rows)
+    j = sum(r[2] or 0 for r in rows)
+    return round(100 * a / (a + j), 1) if a + j else None
+
+
+def temporary_payload(t: dict, nat: dict, pr: dict, last_full: int) -> dict:
+    flows = {k: sorted(v.items()) for k, v in t['flows'].items()}
+    stocks = {k: sorted(v.items()) for k, v in t['stocks'].items()}
+    asylum = [[y] + v for y, v in sorted(t['asylum'].items())]
+    complete_years = [y for y, v in sorted(nat['asylum'].items()) if (v[-1] or '').strip().startswith('January to December') or y < 2023]
+    a_last = complete_years[-5:]
+    mine = [t['asylum'][y] for y in a_last if y in t['asylum']]
+    nat_rows = [nat['asylum'][y] for y in a_last]
+    referred = sum(r[0] or 0 for r in mine)
+    nat_referred = sum(r[0] or 0 for r in nat_rows)
+    years5 = list(range(last_full - 4, last_full + 1))
+    def s5(series):
+        return sum(series.get(y, 0) for y in years5)
+    temp5 = s5(t['flows'].get('study', {})) + s5(t['flows'].get('tfwp', {})) + s5(t['flows'].get('imp', {}))
+    pr5 = s5(pr)
+    return {
+        'flows': flows, 'stocks': stocks, 'asylum': asylum,
+        'years5': [years5[0], years5[-1]], 'asylum_years': [a_last[0], a_last[-1]] if a_last else None,
+        'study5': s5(t['flows'].get('study', {})), 'tfwp5': s5(t['flows'].get('tfwp', {})), 'imp5': s5(t['flows'].get('imp', {})),
+        'hc5': s5(t['flows'].get('hc', {})), 'pr5': pr5,
+        'temp_per_pr': round(temp5 / pr5, 2) if pr5 else None,
+        'asylum_referred5': referred, 'asylum_share_pct': round(100 * referred / nat_referred, 2) if nat_referred else None,
+        'acceptance_pct': _acc(mine), 'national_acceptance_pct': _acc(nat_rows),
+    }
+
+
 def current_mp_births(cur, C: dict) -> dict:
     """Birthplace coverage for the members voting in the newest session (last 120 days of divisions)."""
     cur.execute('SELECT DISTINCT v.person_id, v.first_name, v.last_name, v.caucus, v.constituency FROM parl_division_votes v '
@@ -490,6 +569,7 @@ def build_all(cur) -> dict:
     detail, canada_mix, mix_years = immigration_detail(cur, last_full)
     aid_s, aid_base, aid_total = aid(cur)
     cad_by_c, cad_wog = aid_cad(cur)
+    tr_by_c, tr_nat = temporary(cur)
     aid_last = max(aid_total) if aid_total else None
     g = grants(cur)
     cur.execute('SELECT MAX(held_at) FROM parl_divisions')
@@ -614,6 +694,7 @@ def build_all(cur) -> dict:
             },
             'grants': gr,
             'aid_cad': cad_by_c.get(cid),
+            'temporary': temporary_payload(tr_by_c[cid], tr_nat, s, last_full) if cid in tr_by_c else None,
             'parliamentarians': plist,
             'representation': {'mps_since_1968': mps_since[cid], 'immigrants_since_1964': imm_since[cid],
                                'per_100k': round(mps_since[cid] / imm_since[cid] * 1e5, 2) if imm_since[cid] else None,
@@ -637,6 +718,9 @@ def build_all(cur) -> dict:
             'grants_total': gr['total'] if gr else 0, 'mps': n_mps, 'senators': n_sen,
             'laws': len(lw['laws']), 'bills': len(lw['bills']),
             'events': len(events),
+            'study5': (tr_by_c[cid] and sum(tr_by_c[cid]['flows'].get('study', {}).get(y, 0) for y in range(last_full - 4, last_full + 1))) if cid in tr_by_c else 0,
+            'work5': sum(tr_by_c[cid]['flows'].get(k, {}).get(y, 0) for k in ('tfwp', 'imp') for y in range(last_full - 4, last_full + 1)) if cid in tr_by_c else 0,
+            'asylum5': sum((tr_by_c[cid]['asylum'].get(y) or [0])[0] or 0 for y in range(last_full - 4, last_full + 1)) if cid in tr_by_c else 0,
         })
 
     name = {cid: c['name'] for cid, c in C.items()}
