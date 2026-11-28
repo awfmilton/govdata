@@ -33,7 +33,7 @@ WIKIDATA_URL = 'https://query.wikidata.org/sparql'
 # Member of the House of Commons of Canada (Q15964890), member of the Senate of Canada (Q18524027).
 SPARQL = """
 SELECT ?person ?personLabel ?lop ?birth ?pob ?pobLabel ?cty ?ctyLabel ?iso2 ?pos ?start ?end WHERE {
-  VALUES ?pos { wd:Q15964890 wd:Q18524027 }
+  VALUES ?pos { wd:%s }
   ?person p:P39 ?st . ?st ps:P39 ?pos .
   OPTIONAL { ?st pq:P580 ?start } OPTIONAL { ?st pq:P582 ?end }
   OPTIONAL { ?person wdt:P6616 ?lop }
@@ -157,10 +157,18 @@ class _Truncated(RuntimeError):
 
 
 def _load_births(cur, ua: str) -> dict:
-    url = WIKIDATA_URL + '?' + urllib.parse.urlencode({'query': SPARQL})
-    data = get(url, ua, timeout=300, accept='text/csv')
+    # One query per chamber: together they run close to Wikidata's 60-second limit, and a query that hits it comes
+    # back cut off -- sometimes mid-row. An incomplete row is treated as a cut-off answer (and retried).
+    records = []
+    for pos in (MP_POS, SENATE_POS):
+        url = WIKIDATA_URL + '?' + urllib.parse.urlencode({'query': SPARQL % pos})
+        data = get(url, ua, timeout=300, accept='text/csv')
+        for r in csv.DictReader(io.StringIO(data.decode('utf-8'))):
+            if None in r.values() or None in r:
+                raise _Truncated('Wikidata answer ended mid-row')
+            records.append(r)
     people: dict[str, dict] = {}
-    for r in csv.DictReader(io.StringIO(data.decode('utf-8'))):
+    for r in records:
         q = _qid(r['person'])
         p = people.setdefault(q, {'name': r['personLabel'], 'lop': r['lop'] or None, 'birth': _d(r['birth']),
                                   'pob': r['pobLabel'] or None, 'pob_q': _qid(r['pob']) or None,
