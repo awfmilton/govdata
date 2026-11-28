@@ -183,7 +183,7 @@ get_header(); ?>
 								<td class="mono"><?php echo esc_html( $pt_cell( $r[1] ) ); ?></td>
 								<td class="mono"><?php echo esc_html( $pt_cell( $r[2] ) ); ?></td>
 								<td class="mono"><?php echo esc_html( $pt_cell( $r[3] ) ); ?></td>
-								<td class="mono"><?php echo esc_html( number_format( (int) $r[4] + (int) $r[5] ) ); ?></td>
+								<td class="mono"><?php echo esc_html( null === $r[4] && null === $r[5] ? '—' : number_format( (int) $r[4] + (int) $r[5] ) ); ?></td>
 								<td class="mono"><?php echo esc_html( $pt_dec ? number_format( 100 * (int) $r[2] / $pt_dec, 0 ) . '%' : '—' ); ?></td>
 								<td class="mono"><?php echo esc_html( $pt_cell( $r[7] ) ); ?></td>
 							</tr>

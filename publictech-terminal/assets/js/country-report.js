@@ -209,7 +209,7 @@
 		var tnames = { study: 'Study permits', tfwp: 'TFWP work permits', imp: 'IMP work permits', hc: 'Humanitarian work permits' };
 		var tcols = { study: t.warn, tfwp: t.neg, imp: t.pos, hc: t.ink2 };
 		mount(document.getElementById('ptCtyTemp'), function (host) {
-			var series = [{ name: 'New permanent residents', color: t.accent, values: imm.filter(function (r) { return r[0] >= 2015; }).map(function (r) { return [r[0], r[1]]; }) }];
+			var series = [{ name: 'New permanent residents', color: t.accent, values: imm.filter(function (r) { return r[0] >= 2013; }).map(function (r) { return [r[0], r[1]]; }) }];
 			['study', 'tfwp', 'imp', 'hc'].forEach(function (k) { if (tf[k] && tf[k].length) { series.push({ name: tnames[k], color: tcols[k], values: tf[k] }); } });
 			var full = asy.filter(function (r) { return !r[8] || String(r[8]).indexOf('December') !== -1; });
 			if (full.length) { series.push({ name: 'Refugee claims', color: '#9b7bff', values: full.map(function (r) { return [r[0], r[1] || 0]; }) }); }
