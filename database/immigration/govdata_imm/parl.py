@@ -1,7 +1,7 @@
 """House of Commons divisions and per-member votes, LEGISinfo bills, and Justice Laws amendment history.
 
 Official publishers only: ourcommons.ca vote XML (38th Parliament, 2004, onward), LEGISinfo JSON (35th, 1994,
-onward), laws-lois.justice.gc.ca XML. Each call is idempotent (upsert / replace per unit), so a daily run that
+onward), laws-lois.justice.gc.ca XML. Each call is idempotent (upsert / replace per unit), so a weekly run that
 re-reads the current session costs nothing when nothing moved.
 """
 

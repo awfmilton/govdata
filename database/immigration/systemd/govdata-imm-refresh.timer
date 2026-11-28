@@ -1,9 +1,10 @@
 [Unit]
-Description=Daily govdata.ca immigration data refresh
+Description=Weekly govdata.ca immigration data check (IRCC publishes monthly, StatCan quarterly)
 
 [Timer]
-# 14:30 UTC: after StatCan's 08:30 ET releases; IRCC open data posts during the Ottawa business day.
-OnCalendar=*-*-* 14:30:00 UTC
+# Mondays 14:30 UTC. A check is a metadata request per source (CKAN / StatCan WDS / HTTP validators); a source is
+# downloaded only when its publisher has released something new, and the country pages are rebuilt only then.
+OnCalendar=Mon *-*-* 14:30:00 UTC
 RandomizedDelaySec=900
 Persistent=true
 

@@ -142,6 +142,9 @@ CREATE TABLE IF NOT EXISTS aid_files (
   row_count     INT          NOT NULL,
   amount_total  DECIMAL(18,2) NULL,
   archive_path  VARCHAR(400) NULL,
+  http_etag          VARCHAR(200) NULL,          -- validators sent back as If-None-Match / If-Modified-Since
+  http_last_modified VARCHAR(80)  NULL,
+  parser_version     VARCHAR(40)  NULL,          -- a parser change makes the next run download and reparse
   fetched_at    DATETIME     NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 

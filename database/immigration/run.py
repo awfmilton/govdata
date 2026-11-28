@@ -169,6 +169,8 @@ def run_parl(conn, cfg, everything: bool) -> int:
         ('parl_divisions', lambda: parl.load_divisions(conn, cfg.user_agent, recent, refetch_last=0 if everything else 5)),
         ('imm_bill_tags', lambda: parl.tag_bills(conn.cursor())),
         ('imm_ee_draws', lambda: parl.load_ee_draws(conn.cursor(), cfg.user_agent)),
+        # The country pages list bills and their divisions: rebuild them from what was just loaded.
+        ('cty_report', lambda: report.build_all(conn.cursor())),
     ])
 
 
@@ -258,7 +260,7 @@ def main():
     with conn.cursor() as cur:
         register_sources(cur, sources)
     conn.commit()
-    failed = 0
+    failed = loaded = 0
     for src in sources:
         t0 = time.time()
         try:
@@ -270,7 +272,10 @@ def main():
             conn.commit()
             outcome, info = 'failed', repr(e)
         failed += outcome == 'failed'
+        loaded += outcome == 'loaded'
         print(f"{src['key']}: {outcome} {info if info else ''} ({time.time() - t0:.1f}s)", flush=True)
+    if loaded:                                      # a publisher released new figures: the country pages show them
+        failed += run_steps(conn, [('cty_report', lambda: report.build_all(conn.cursor()))])
     return 1 if failed else 0
 
 

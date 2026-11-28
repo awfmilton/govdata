@@ -1,8 +1,10 @@
 [Unit]
-Description=Daily rebuild of the govdata.ca country pages (after the House and immigration refreshes)
+Description=Monthly rebuild of the govdata.ca country pages
 
 [Timer]
-OnCalendar=*-*-* 07:30:00 UTC
+# The 1st of each month, 07:30 UTC. OECD and Global Affairs publish yearly, the IRB quarterly; unchanged files are
+# not downloaded (HTTP validators / table fingerprints).
+OnCalendar=*-*-01 07:30:00 UTC
 RandomizedDelaySec=10m
 Persistent=true
 

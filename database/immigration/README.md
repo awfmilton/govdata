@@ -60,7 +60,15 @@ On govdata-serving, as root:
 
 `run.sh` loads `/etc/govdata-imm/env` (root-only: `IMM_DB_USER`, `IMM_DB_PASS`; the password is also in the
 mcp-manager vault) and runs `run.py`. Raw downloads are archived gzip-compressed under `/var/lib/govdata-imm/raw/<source>/`.
-A systemd timer (`govdata-imm-refresh.timer`) runs `refresh` daily; a non-zero exit marks the unit failed.
+Timers follow the publishers' release cycles, not the calendar (a non-zero exit marks the unit failed):
+
+| Timer | When | Why |
+|---|---|---|
+| `govdata-imm-refresh` | Mondays 14:30 UTC | IRCC open data is released monthly, StatCan 17-10-0040 quarterly; the archived tables never change. A check is one metadata request per source; the country pages are rebuilt only when something new was loaded. |
+| `govdata-imm-parl` | Saturdays 06:00 UTC | The week's House divisions, bills and immigration-law amendments; rebuilds the country pages. |
+| `govdata-imm-countries` | 1st of the month, 07:30 UTC | OECD and Global Affairs publish yearly, the IRB quarterly, Wikidata/Parlinfo birthplaces change after elections. Unchanged files are not downloaded (HTTP validators; table fingerprints for the IRB). |
+
+`run.sh report` rebuilds the pages by hand.
 
 ### How a new publication is detected
 
@@ -81,7 +89,7 @@ mysql < grants.sql
 
 ## Country pages
 
-`run.sh countries` (daily, `govdata-imm-countries.timer`, after the House refresh) loads four more sources and then
+`run.sh countries` (monthly, `govdata-imm-countries.timer`) loads four more sources and then
 rebuilds the page payloads; `run.sh report` rebuilds only the payloads.
 
 | Table | Source | Notes |
