@@ -1,5 +1,5 @@
 [Unit]
-Description=govdata.ca House of Commons votes, bills and immigration-law amendments refresh
+Description=govdata.ca House of Commons votes, bills and immigration-law amendments refresh (weekly)
 Documentation=file:///opt/govdata-imm/README.md
 After=mysql.service network-online.target
 Wants=network-online.target

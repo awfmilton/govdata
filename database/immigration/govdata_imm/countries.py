@@ -1,7 +1,7 @@
 """Sources for the country pages: ISO codes (reviewed CSV), Canada's aid by recipient (OECD DAC2a), where members of
 Parliament and senators were born (Wikidata), and the laws and House bills whose title names a country.
 
-Each loader is idempotent and replaces only what it owns, so the daily run can repeat it.
+Each loader is idempotent and replaces only what it owns, so any scheduled run can repeat it.
 """
 
 import csv

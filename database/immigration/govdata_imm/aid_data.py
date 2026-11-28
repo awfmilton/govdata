@@ -104,6 +104,43 @@ def _fetch(url: str, ua: str) -> bytes:
         raise
 
 
+def _fetch_if_changed(cur, key: str, url: str, ua: str):
+    """-> (bytes, etag, last_modified), or None when the publisher answers 304 Not Modified to the validators stored
+    for this file (and the parser has not changed since). GAC's files carry ETag/Last-Modified; most never change,
+    so the monthly run downloads nothing."""
+    import urllib.error
+    import urllib.request
+    cur.execute('SELECT http_etag, http_last_modified, parser_version FROM aid_files WHERE file_key=%s', (key,))
+    r = cur.fetchone()
+    headers = {'User-Agent': ua, 'Accept': '*/*'}
+    if r and r[2] == PARSER_VERSION.decode():
+        if r[0]:
+            headers['If-None-Match'] = r[0]
+        if r[1]:
+            headers['If-Modified-Since'] = r[1]
+    urls = [url] + [b + url[len(a):] for a, b in (MIRROR, MIRROR[::-1]) if url.startswith(a)]
+    last_error = None
+    for u in urls:
+        for attempt in range(3):
+            try:
+                with urllib.request.urlopen(urllib.request.Request(u, headers=headers), timeout=300) as resp:
+                    return resp.read(), resp.headers.get('ETag'), resp.headers.get('Last-Modified')
+            except urllib.error.HTTPError as e:
+                if e.code == 304:
+                    return None
+                last_error = e
+                if e.code < 500:
+                    break
+            except OSError as e:
+                last_error = e
+    raise last_error
+
+
+def _validators(cur, key: str, etag, last_modified) -> None:
+    cur.execute('UPDATE aid_files SET http_etag=%s, http_last_modified=%s, parser_version=%s WHERE file_key=%s',
+                (etag, last_modified, PARSER_VERSION.decode(), key))
+
+
 def _archive(raw_dir: Path, key: str, data: bytes, sha: str) -> str:
     d = raw_dir / 'aid'
     d.mkdir(parents=True, exist_ok=True)
@@ -296,9 +333,15 @@ def load_hpds(conn, ua: str, raw_dir: Path) -> dict:
     for fy, url in hpds_files(ua):
         key = f'hpds:{fy}'
         try:
-            data = _fetch(url, ua)
+            got = _fetch_if_changed(cur, key, url, ua)
+            if got is None:                              # 304: the publisher has not changed the file
+                unchanged += 1
+                continue
+            data, etag, last_mod = got
             sha = hashlib.sha256(data + PARSER_VERSION).hexdigest()
             if not _changed(cur, key, sha):
+                _validators(cur, key, etag, last_mod)
+                conn.commit()
                 unchanged += 1
                 continue
             rows = _parse_hpds(_rows(data), fy, look, iso)
@@ -311,6 +354,7 @@ def load_hpds(conn, ua: str, raw_dir: Path) -> dict:
                                 rows[i:i + 2000])
             total = round(sum(r[-2] for r in rows), 2)
             _record(cur, key, 'hpds', fy, url, sha, len(rows), total, path)
+            _validators(cur, key, etag, last_mod)
             conn.commit()
             loaded.append(f'{fy}:{len(rows)}')
             for r in rows:
@@ -369,9 +413,15 @@ def load_sria(conn, ua: str, raw_dir: Path) -> dict:
         fy = int(m.group(1))
         key = f'sria:{fy}'
         try:
-            data = _fetch(url, ua)
+            got = _fetch_if_changed(cur, key, url, ua)
+            if got is None:                              # 304: the publisher has not changed the file
+                unchanged += 1
+                continue
+            data, etag, last_mod = got
             sha = hashlib.sha256(data + PARSER_VERSION).hexdigest()
             if not _changed(cur, key, sha):
+                _validators(cur, key, etag, last_mod)
+                conn.commit()
                 unchanged += 1
                 continue
             rows = list(csv.reader(io.StringIO(_text(data))))
@@ -399,6 +449,7 @@ def load_sria(conn, ua: str, raw_dir: Path) -> dict:
             cur.execute('DELETE FROM aid_sria WHERE fy_start=%s', (fy,))
             cur.executemany('INSERT INTO aid_sria (fy_start, source_code, recipient_code, amount_cad, country_id) VALUES (%s,%s,%s,%s,%s)', out)
             _record(cur, key, 'sria', fy, url, sha, len(out), round(sum(x[3] for x in out), 2), path)
+            _validators(cur, key, etag, last_mod)
             conn.commit()
             loaded.append(f'{fy}:{len(out)}')
         except Exception as e:  # noqa: BLE001
