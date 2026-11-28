@@ -212,6 +212,26 @@ CREATE TABLE IF NOT EXISTS aid_sria_sources (
   channel        VARCHAR(120) NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+-- Immigration and Refugee Board, Refugee Protection Division: claims by country of alleged persecution, per
+-- calendar year (2013 onward; the current year is partial -- see period). NULL = the IRB suppressed a count under 5.
+CREATE TABLE IF NOT EXISTS irb_rpd_claims (
+  year            SMALLINT     NOT NULL,
+  country_raw     VARCHAR(200) NOT NULL,
+  country_id      SMALLINT UNSIGNED NULL,
+  referred        INT NULL,
+  accepted        INT NULL,
+  rejected        INT NULL,
+  abandoned       INT NULL,
+  withdrawn_other INT NULL,
+  finalized       INT NULL,
+  pending         INT NULL,                          -- at the end of the period
+  period          VARCHAR(80)  NULL,                 -- the page's own wording, e.g. "January to December 2024"
+  page_sha256     CHAR(64)     NOT NULL,
+  fetched_at      DATETIME     NOT NULL,
+  PRIMARY KEY (year, country_raw),
+  KEY idx_country (country_id, year)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
 CREATE TABLE IF NOT EXISTS aid_sria_recipients (
   recipient_code VARCHAR(20)  NOT NULL PRIMARY KEY,
   name           VARCHAR(200) NOT NULL,

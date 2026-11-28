@@ -27,7 +27,7 @@ def _batches(seq, n=BATCH):
 
 def apply_edition(cur, src: dict, edition_id: int, rows: list[dict], resolver) -> dict:
     key = src['key']
-    may_create = {'ircc_odp': 'all', 'statcan_csv': 'groups', 'mp22_csv': 'groups'}.get(src['parser'], 'none')
+    may_create = src.get('may_create') or {'ircc_odp': 'all', 'statcan_csv': 'groups', 'mp22_csv': 'groups'}.get(src['parser'], 'none')
     new = {}
     for r in rows:
         k = row_key(key, r)

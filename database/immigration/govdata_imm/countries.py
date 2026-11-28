@@ -511,3 +511,99 @@ def merge_parlinfo(cur) -> dict:
     cur.execute("UPDATE parl_person_birth SET birth_source='wikidata' WHERE birth_source IS NULL AND birth_iso2 IS NOT NULL")
     return {'filled_from_parlinfo': filled, 'not_disclosed': hidden, 'country_differs_from_wikidata': disagree,
             'unmatched_parlinfo_countries': unmatched}
+
+
+# ── Immigration and Refugee Board: refugee claims by country ────────────────
+
+IRB_INDEX = 'https://www.irb-cisr.gc.ca/en/statistics/protection/Pages/index.aspx'
+IRB_YEAR = 'https://www.irb-cisr.gc.ca/en/statistics/protection/Pages/RPDStat{}.aspx'
+IRB_COLS = ('referred', 'accepted', 'rejected', 'abandoned', 'withdrawn_other', 'finalized', 'pending')
+
+
+def _irb_table(html_text: str) -> tuple[str | None, list[tuple], list[str]]:
+    """(period wording, [(country, referred, accepted, rejected, abandoned, withdrawn/other, finalized, pending)])."""
+    import html as html_mod
+    tables = re.findall(r'<table.*?</table>', html_text, re.S | re.I)
+    if len(tables) != 1:
+        raise RuntimeError(f'expected one statistics table, found {len(tables)}')
+    t = tables[0]
+    cap = re.search(r'<caption.*?>(.*?)</caption>', t, re.S | re.I)
+    caption = ' '.join(html_mod.unescape(re.sub(r'<[^>]+>', ' ', cap.group(1))).replace('​', '').split()) if cap else ''
+    period = re.search(r'(January.*\d{4})', caption)
+    # Header words, from the text before the first row of figures (2013-2016 pages put the headings in <td> cells).
+    first_fig = re.search(r'<t[hd][^>]*>\s*(?:<[^>]+>\s*)*[\d,]{2,}', t, re.I)
+    header = ' '.join(html_mod.unescape(re.sub(r'<[^>]+>', ' ', t[:first_fig.start() if first_fig else 3000])).split()).lower()
+    for word in ('referred', 'accepted', 'rejected', 'abandoned', 'withdrawn', 'total', 'pending'):
+        if word not in header:
+            raise RuntimeError(f'IRB table header lacks {word!r}: {header[:200]}')
+    out, odd = [], []
+    for tr in re.findall(r'<tr.*?</tr>', t, re.S | re.I):
+        cells = [' '.join(html_mod.unescape(re.sub(r'<[^>]+>', ' ', c)).split())
+                 for c in re.findall(r'<t[hd][^>]*>(.*?)</t[hd]>', tr, re.S | re.I)]
+        if len(cells) != 8 or not re.search(r'\d|--', cells[1]):
+            continue
+        vals = []
+        for c in cells[1:]:
+            c = c.replace(',', '').replace('​', '').strip()
+            if c.isdigit():
+                vals.append(int(c))
+            else:
+                vals.append(None)                    # '--' = suppressed under 5; anything else (2013 Mozambique: 'v') = unknown
+                if c not in ('--', '-', ''):
+                    odd.append(f'{cells[0]}: {c!r}')
+        out.append((cells[0].replace('​', '').strip(),) + tuple(vals))
+    return (period.group(1) if period else None), out, odd
+
+
+def load_irb(cur, ua: str) -> dict:
+    """Every year page linked from the IRB statistics index (2013 onward), replaced year by year when it changes."""
+    import hashlib
+    from .country import norm
+    index = get(IRB_INDEX, ua, timeout=120).decode('utf-8', 'replace')
+    years = sorted({int(y) for y in re.findall(r'RPDStat(\d{4})\.aspx', index)})
+    if len(years) < 10:
+        raise RuntimeError(f'IRB index lists only {len(years)} years')
+    look = _country_lookup(cur)
+    cur.execute('SELECT year, MAX(page_sha256) FROM irb_rpd_claims GROUP BY 1')
+    have = dict(cur.fetchall())
+    loaded, unmatched, odd_cells, gaps = [], {}, [], []
+    for y in years:
+        page = get(IRB_YEAR.format(y), ua, timeout=120)
+        period, rows, odd = _irb_table(page.decode('utf-8', 'replace'))
+        # Fingerprint the table, not the page: the ASP.NET page carries tokens that change on every request.
+        sha = hashlib.sha256(json.dumps([period, rows]).encode('utf-8')).hexdigest()
+        if have.get(y) == sha:
+            continue
+        odd_cells.extend(f'{y} {o}' for o in odd)
+        total = next((r for r in rows if r[0].lower() == 'total'), None)
+        body = [r for r in rows if r[0].lower() != 'total']
+        if total and total[1] is not None:
+            # The IRB's own country rows fall short of its printed total (2013: 5.8%, 2014: 4.1%, 2024: 0.2%) --
+            # suppressed cells and claims it does not show by country. Keep both; fail only on a layout-sized gap.
+            s = sum(r[1] or 0 for r in body)
+            gaps.append(f'{y}: rows {s} of printed {total[1]} referred')
+            if abs(s - total[1]) > 0.15 * total[1]:
+                raise RuntimeError(f'IRB {y}: countries sum to {s} referred, table total {total[1]} -- layout changed?')
+        out = []
+        for r in rows:                                   # the printed Total row is stored too (country_raw 'Total')
+            cid = look.get(norm(r[0]))
+            if cid == 'CA':
+                cid = None
+            if cid is None and not r[0].startswith('(') and r[0].lower() != 'total':
+                unmatched[r[0]] = unmatched.get(r[0], 0) + 1
+            out.append((y, r[0][:200], cid) + r[1:] + (period, sha, _now()))
+        cur.execute('DELETE FROM irb_rpd_claims WHERE year=%s', (y,))
+        cur.executemany('INSERT INTO irb_rpd_claims (year, country_raw, country_id, referred, accepted, rejected, abandoned, '
+                        'withdrawn_other, finalized, pending, period, page_sha256, fetched_at) '
+                        'VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)', out)
+        loaded.append(f'{y}:{len(out)}')
+    # Rows loaded before a spelling had a reviewed alias: resolve them now (values untouched).
+    cur.execute("SELECT DISTINCT country_raw FROM irb_rpd_claims WHERE country_id IS NULL AND country_raw <> 'Total'")
+    relinked = 0
+    for (raw,) in cur.fetchall():
+        cid = look.get(norm(raw))
+        if cid not in (None, 'CA'):
+            relinked += cur.execute('UPDATE irb_rpd_claims SET country_id=%s WHERE country_raw=%s AND country_id IS NULL', (cid, raw))
+    cur.execute("SELECT country_raw, COUNT(*) FROM irb_rpd_claims WHERE country_id IS NULL AND country_raw <> 'Total' GROUP BY 1")
+    unmatched = dict(cur.fetchall())
+    return {'loaded': loaded, 'relinked': relinked, 'years': [years[0], years[-1]], 'unmatched': unmatched, 'unreadable_cells': odd_cells, 'row_totals': gaps}

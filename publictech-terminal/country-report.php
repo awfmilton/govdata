@@ -94,7 +94,7 @@ get_header(); ?>
 
 	<div class="kpis" style="margin-bottom:14px">
 		<div class="kpi corner">
-			<div class="lab"><?php printf( esc_html__( 'Immigrants %1$d–%2$d', 'publictech-terminal' ), $pt_last_full - 9, $pt_last_full ); ?></div>
+			<div class="lab"><?php printf( esc_html__( 'Permanent residents %1$d–%2$d', 'publictech-terminal' ), $pt_last_full - 9, $pt_last_full ); ?></div>
 			<div class="val"><?php echo esc_html( $pt_n( $pt_im['last10'] ?? null ) ); ?></div>
 			<div class="delta dim"><?php printf( esc_html__( 'Rank %s among source countries', 'publictech-terminal' ), esc_html( $pt_rank( $pt_im['rank_last10'] ?? null ) ) ); ?></div>
 		</div>
@@ -139,9 +139,62 @@ get_header(); ?>
 					</div>
 					<p class="pt-cty-note">
 						<?php esc_html_e( '1964–1979: the printed annual reports (MP22-1), by the basis printed for most countries that year; 1980 onward: IRCC, by country of citizenship. Years before 1964 have no per-country figures; a year missing from the line was not published for this country.', 'publictech-terminal' ); ?>
+						<?php esc_html_e( 'These are permanent residents only: students, temporary workers and asylum claimants are counted below, and only appear here if and when they become permanent residents.', 'publictech-terminal' ); ?>
 					</p>
 				</div>
 			</div>
+
+			<?php $pt_tr = is_array( $pt_p['temporary'] ?? null ) ? $pt_p['temporary'] : null; if ( $pt_tr ) :
+				$pt_y5 = implode( '–', (array) $pt_tr['years5'] ); ?>
+			<div class="panel corner" id="temporary">
+				<div class="hd">
+					<h3>◇ <?php esc_html_e( 'Students, temporary workers and refugee claimants', 'publictech-terminal' ); ?></h3>
+					<span class="meta"><?php esc_html_e( 'IRCC · IMMIGRATION AND REFUGEE BOARD', 'publictech-terminal' ); ?></span>
+				</div>
+				<div class="kvs">
+					<div class="kv"><span class="k"><?php echo esc_html( sprintf( __( 'New permanent residents, %s', 'publictech-terminal' ), $pt_y5 ) ); ?></span><span class="v"><?php echo esc_html( $pt_n( $pt_tr['pr5'] ) ); ?></span></div>
+					<div class="kv"><span class="k"><?php echo esc_html( sprintf( __( 'Study permits that took effect, %s', 'publictech-terminal' ), $pt_y5 ) ); ?></span><span class="v"><?php echo esc_html( $pt_n( $pt_tr['study5'] ) ); ?></span></div>
+					<div class="kv"><span class="k"><?php echo esc_html( sprintf( __( 'Temporary Foreign Worker Program permits, %s', 'publictech-terminal' ), $pt_y5 ) ); ?></span><span class="v"><?php echo esc_html( $pt_n( $pt_tr['tfwp5'] ) ); ?></span></div>
+					<div class="kv"><span class="k"><?php echo esc_html( sprintf( __( 'International Mobility Program permits, %s', 'publictech-terminal' ), $pt_y5 ) ); ?></span><span class="v"><?php echo esc_html( $pt_n( $pt_tr['imp5'] ) ); ?></span></div>
+					<div class="kv"><span class="k"><?php echo esc_html( sprintf( __( 'Humanitarian work permits, %s', 'publictech-terminal' ), $pt_y5 ) ); ?></span><span class="v"><?php echo esc_html( $pt_n( $pt_tr['hc5'] ) ); ?></span></div>
+					<div class="kv"><span class="k"><?php esc_html_e( 'Study and work permits per new permanent resident', 'publictech-terminal' ); ?></span><span class="v"><?php echo esc_html( null === $pt_tr['temp_per_pr'] ? '—' : number_format( (float) $pt_tr['temp_per_pr'], 2 ) ); ?></span></div>
+					<?php if ( $pt_tr['asylum_years'] ) : $pt_ay = implode( '–', (array) $pt_tr['asylum_years'] ); ?>
+					<div class="kv"><span class="k"><?php echo esc_html( sprintf( __( 'Refugee claims, %s', 'publictech-terminal' ), $pt_ay ) ); ?></span><span class="v"><?php echo esc_html( $pt_n( $pt_tr['asylum_referred5'] ) . ( null !== $pt_tr['asylum_share_pct'] ? ' · ' . number_format( (float) $pt_tr['asylum_share_pct'], 1 ) . '% of all' : '' ) ); ?></span></div>
+					<div class="kv"><span class="k"><?php esc_html_e( 'Claims accepted (of those decided on the merits)', 'publictech-terminal' ); ?></span><span class="v"><?php echo esc_html( ( null === $pt_tr['acceptance_pct'] ? '—' : $pt_tr['acceptance_pct'] . '%' ) . ' · all countries ' . ( null === $pt_tr['national_acceptance_pct'] ? '—' : $pt_tr['national_acceptance_pct'] . '%' ) ); ?></span></div>
+					<?php endif; ?>
+				</div>
+				<div class="bd">
+					<h4 class="pt-cty-h4" style="margin-top:0"><?php esc_html_e( 'Arrivals per year', 'publictech-terminal' ); ?></h4>
+					<div class="chart-host" id="ptCtyTemp" style="height:260px"></div>
+					<h4 class="pt-cty-h4"><?php esc_html_e( 'Holding a permit on 31 December', 'publictech-terminal' ); ?></h4>
+					<div class="chart-host" id="ptCtyHolders" style="height:220px"></div>
+					<p class="pt-cty-note"><?php esc_html_e( 'Permits are counted when they take effect, so one person can be counted more than once (a renewal, or a study permit followed by a work permit), and many later become permanent residents: the lines are not added together. The International Mobility Program covers open work permits such as post-graduation, spousal, working-holiday and emergency programs (Ukraine 2022 on); humanitarian work permits go mostly to refugee claimants. Refugee claims are by country of alleged persecution; a claim decided in a later year counts in that year’s decisions.', 'publictech-terminal' ); ?></p>
+					<?php if ( ! empty( $pt_tr['asylum'] ) ) : ?>
+					<h4 class="pt-cty-h4"><?php esc_html_e( 'Refugee claims (Immigration and Refugee Board)', 'publictech-terminal' ); ?></h4>
+					<div class="pt-cty-scroll" style="max-height:320px">
+					<table class="pt-cty-table compact">
+						<thead><tr><th><?php esc_html_e( 'Year', 'publictech-terminal' ); ?></th><th><?php esc_html_e( 'Claims', 'publictech-terminal' ); ?></th><th><?php esc_html_e( 'Accepted', 'publictech-terminal' ); ?></th><th><?php esc_html_e( 'Rejected', 'publictech-terminal' ); ?></th><th><?php esc_html_e( 'Abandoned / withdrawn', 'publictech-terminal' ); ?></th><th><?php esc_html_e( 'Accepted %', 'publictech-terminal' ); ?></th><th><?php esc_html_e( 'Pending at year end', 'publictech-terminal' ); ?></th></tr></thead>
+						<tbody>
+						<?php foreach ( array_reverse( (array) $pt_tr['asylum'] ) as $r ) :
+							$pt_dec = (int) $r[2] + (int) $r[3];
+							$pt_cell = static fn( $v ): string => null === $v ? '<5' : number_format( (int) $v ); ?>
+							<tr>
+								<td class="mono"><?php echo esc_html( $r[0] . ( ! empty( $r[8] ) && ! str_contains( (string) $r[8], 'December' ) ? ' (to date)' : '' ) ); ?></td>
+								<td class="mono"><?php echo esc_html( $pt_cell( $r[1] ) ); ?></td>
+								<td class="mono"><?php echo esc_html( $pt_cell( $r[2] ) ); ?></td>
+								<td class="mono"><?php echo esc_html( $pt_cell( $r[3] ) ); ?></td>
+								<td class="mono"><?php echo esc_html( null === $r[4] && null === $r[5] ? '—' : number_format( (int) $r[4] + (int) $r[5] ) ); ?></td>
+								<td class="mono"><?php echo esc_html( $pt_dec ? number_format( 100 * (int) $r[2] / $pt_dec, 0 ) . '%' : '—' ); ?></td>
+								<td class="mono"><?php echo esc_html( $pt_cell( $r[7] ) ); ?></td>
+							</tr>
+						<?php endforeach; ?>
+						</tbody>
+					</table>
+					</div>
+					<?php endif; ?>
+				</div>
+			</div>
+			<?php endif; ?>
 
 			<div class="panel corner">
 				<div class="hd">
@@ -462,6 +515,9 @@ echo wp_json_encode( [
 	'immigration' => $pt_im['series'] ?? [],
 	'aid'         => $pt_ad['series'] ?? [],
 	'aidCad'      => $pt_p['aid_cad']['series'] ?? [],
+	'tempFlows'   => $pt_p['temporary']['flows'] ?? new \stdClass(),
+	'tempStocks'  => $pt_p['temporary']['stocks'] ?? new \stdClass(),
+	'asylum'      => $pt_p['temporary']['asylum'] ?? [],
 	'aidShare'    => $pt_ad['share'] ?? [],
 	'sitting'     => $pt_p['sitting_by_year'] ?? [],
 	'events'      => array_map( static fn( $e ) => (int) $e['year'], $pt_ev ),
